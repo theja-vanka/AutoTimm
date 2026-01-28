@@ -55,9 +55,7 @@ class ImageClassifier(pl.LightningModule):
         self.train_acc = torchmetrics.Accuracy(
             task="multiclass", num_classes=num_classes
         )
-        self.val_acc = torchmetrics.Accuracy(
-            task="multiclass", num_classes=num_classes
-        )
+        self.val_acc = torchmetrics.Accuracy(task="multiclass", num_classes=num_classes)
         self.val_f1 = torchmetrics.F1Score(
             task="multiclass", num_classes=num_classes, average="macro"
         )
@@ -120,9 +118,7 @@ class ImageClassifier(pl.LightningModule):
         self.val_acc(preds, y)
         self.val_f1(preds, y)
         self.log("val/loss", loss, prog_bar=True)
-        self.log(
-            "val/acc", self.val_acc, on_step=False, on_epoch=True, prog_bar=True
-        )
+        self.log("val/acc", self.val_acc, on_step=False, on_epoch=True, prog_bar=True)
         self.log("val/f1", self.val_f1, on_step=False, on_epoch=True)
 
     def test_step(
