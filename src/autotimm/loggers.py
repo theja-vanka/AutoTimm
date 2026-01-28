@@ -54,8 +54,7 @@ def create_logger(
             from pytorch_lightning.loggers import WandbLogger
         except ImportError:
             raise ImportError(
-                "W&B logger requires wandb. Install with: "
-                "pip install autotimm[wandb]"
+                "W&B logger requires wandb. Install with: pip install autotimm[wandb]"
             ) from None
         kwargs.setdefault("project", "autotimm")
         return WandbLogger(**kwargs)

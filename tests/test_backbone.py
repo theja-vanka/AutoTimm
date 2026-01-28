@@ -3,7 +3,12 @@
 import pytest
 import torch.nn as nn
 
-from autotimm.backbone import BackboneConfig, create_backbone, get_backbone_out_features, list_backbones
+from autotimm.backbone import (
+    BackboneConfig,
+    create_backbone,
+    get_backbone_out_features,
+    list_backbones,
+)
 
 
 def test_create_backbone_from_string():

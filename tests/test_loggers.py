@@ -5,6 +5,7 @@ from pytorch_lightning.loggers import CSVLogger
 
 from autotimm.loggers import create_logger
 
+
 def test_create_tensorboard_logger(tmp_path):
     pytest.importorskip("tensorboard")
     from pytorch_lightning.loggers import TensorBoardLogger

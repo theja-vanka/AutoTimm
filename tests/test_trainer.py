@@ -20,7 +20,5 @@ def test_create_trainer_default_checkpoint_callback():
 
 
 def test_create_trainer_no_checkpoint():
-    trainer = create_trainer(
-        max_epochs=1, logger="none", enable_checkpointing=False
-    )
+    trainer = create_trainer(max_epochs=1, logger="none", enable_checkpointing=False)
     assert isinstance(trainer, pl.Trainer)
