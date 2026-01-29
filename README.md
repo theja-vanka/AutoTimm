@@ -156,10 +156,10 @@ If you use AutoTimm in your research, please cite:
 
 ```bibtex
 @software{autotimm,
-  author = {Theja Vanka},
+  author = {Krishnatheja Vanka},
   title = {AutoTimm: Automated Deep Learning Image Classification},
   url = {https://github.com/theja-vanka/AutoTimm},
-  year = {2024}
+  year = {2026}
 }
 ```
 
