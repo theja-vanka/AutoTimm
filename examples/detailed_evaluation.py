@@ -9,7 +9,11 @@ This example shows how to:
 
 import torch
 from torchmetrics import ConfusionMatrix
-from torchmetrics.classification import MulticlassF1Score, MulticlassPrecision, MulticlassRecall
+from torchmetrics.classification import (
+    MulticlassF1Score,
+    MulticlassPrecision,
+    MulticlassRecall,
+)
 
 from autotimm import (
     AutoTrainer,
@@ -42,7 +46,9 @@ def print_classification_report(
     print("-" * 70)
 
     for i, name in enumerate(class_names):
-        print(f"{name:<20} {prec_values[i]:>12.4f} {rec_values[i]:>12.4f} {f1_values[i]:>12.4f}")
+        print(
+            f"{name:<20} {prec_values[i]:>12.4f} {rec_values[i]:>12.4f} {f1_values[i]:>12.4f}"
+        )
 
     print("-" * 70)
 
@@ -51,16 +57,20 @@ def print_classification_report(
     macro_rec = MulticlassRecall(num_classes=num_classes, average="macro")
     macro_f1 = MulticlassF1Score(num_classes=num_classes, average="macro")
 
-    print(f"{'Macro Avg':<20} {macro_prec(y_pred, y_true):>12.4f} "
-          f"{macro_rec(y_pred, y_true):>12.4f} {macro_f1(y_pred, y_true):>12.4f}")
+    print(
+        f"{'Macro Avg':<20} {macro_prec(y_pred, y_true):>12.4f} "
+        f"{macro_rec(y_pred, y_true):>12.4f} {macro_f1(y_pred, y_true):>12.4f}"
+    )
 
     # Weighted averages
     weighted_prec = MulticlassPrecision(num_classes=num_classes, average="weighted")
     weighted_rec = MulticlassRecall(num_classes=num_classes, average="weighted")
     weighted_f1 = MulticlassF1Score(num_classes=num_classes, average="weighted")
 
-    print(f"{'Weighted Avg':<20} {weighted_prec(y_pred, y_true):>12.4f} "
-          f"{weighted_rec(y_pred, y_true):>12.4f} {weighted_f1(y_pred, y_true):>12.4f}")
+    print(
+        f"{'Weighted Avg':<20} {weighted_prec(y_pred, y_true):>12.4f} "
+        f"{weighted_rec(y_pred, y_true):>12.4f} {weighted_f1(y_pred, y_true):>12.4f}"
+    )
 
 
 def print_confusion_matrix(cm: torch.Tensor, class_names: list[str]):
@@ -85,8 +95,16 @@ def print_confusion_matrix(cm: torch.Tensor, class_names: list[str]):
 def main():
     # CIFAR-10 class names
     class_names = [
-        "airplane", "automobile", "bird", "cat", "deer",
-        "dog", "frog", "horse", "ship", "truck"
+        "airplane",
+        "automobile",
+        "bird",
+        "cat",
+        "deer",
+        "dog",
+        "frog",
+        "horse",
+        "ship",
+        "truck",
     ]
     num_classes = len(class_names)
 
@@ -218,9 +236,9 @@ def main():
     # Save confusion matrix to file
     try:
         import matplotlib
+
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
-        import numpy as np
 
         fig, ax = plt.subplots(figsize=(12, 10))
         cm_np = confusion.numpy()
@@ -237,9 +255,14 @@ def main():
         # Add text annotations
         for i in range(num_classes):
             for j in range(num_classes):
-                text = ax.text(j, i, cm_np[i, j],
-                               ha="center", va="center",
-                               color="white" if cm_np[i, j] > cm_np.max() / 2 else "black")
+                ax.text(
+                    j,
+                    i,
+                    cm_np[i, j],
+                    ha="center",
+                    va="center",
+                    color="white" if cm_np[i, j] > cm_np.max() / 2 else "black",
+                )
 
         fig.colorbar(im, ax=ax)
         plt.tight_layout()
@@ -247,7 +270,9 @@ def main():
         print("\nConfusion matrix saved to: confusion_matrix.png")
         plt.close()
     except ImportError:
-        print("\nInstall matplotlib to save confusion matrix image: pip install matplotlib")
+        print(
+            "\nInstall matplotlib to save confusion matrix image: pip install matplotlib"
+        )
 
 
 if __name__ == "__main__":

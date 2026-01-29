@@ -1,6 +1,5 @@
 """Tests for the AutoTrainer class."""
 
-import pytest
 import pytorch_lightning as pl
 
 from autotimm.trainer import AutoTrainer, TunerConfig

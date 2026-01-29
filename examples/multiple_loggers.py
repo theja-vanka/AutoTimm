@@ -108,8 +108,8 @@ def main():
     # )
 
     print("Training with multiple loggers...")
-    print(f"  - TensorBoard: logs/tensorboard/")
-    print(f"  - CSV: logs/csv/")
+    print("  - TensorBoard: logs/tensorboard/")
+    print("  - CSV: logs/csv/")
 
     trainer.fit(model, datamodule=data)
     trainer.test(model, datamodule=data)
