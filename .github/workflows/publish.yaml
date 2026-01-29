@@ -28,10 +28,7 @@ jobs:
       - name: Verify version matches tag
         run: |
           pip install setuptools-scm
-          VERSION=$(python - <<EOF
-            import setuptools_scm
-            print(setuptools_scm.get_version())
-            EOF)
+          VERSION=$(python -c "import setuptools_scm; print(setuptools_scm.get_version())")
           TAG=${GITHUB_REF#refs/tags/v}
           test "$VERSION" = "$TAG"
 
