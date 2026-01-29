@@ -3,7 +3,7 @@ name: Build, Test, and Publish
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "v*"
 
 jobs:
   test:
@@ -12,6 +12,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -28,10 +30,7 @@ jobs:
       - name: Verify version matches tag
         run: |
           pip install setuptools-scm
-          VERSION=$(python - <<EOF
-            import setuptools_scm
-            print(setuptools_scm.get_version())
-            EOF)
+          VERSION=$(python -c "import setuptools_scm; print(setuptools_scm.get_version())")
           TAG=${GITHUB_REF#refs/tags/v}
           test "$VERSION" = "$TAG"
 
@@ -42,6 +41,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -71,6 +72,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -86,6 +89,7 @@ jobs:
         with:
           repository-url: https://test.pypi.org/legacy/
           password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          verbose: true
 
   publish-pypi:
     name: Publish to PyPI
@@ -94,6 +98,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -108,3 +114,17 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
+
+  github-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: publish-pypi
+
+    steps:
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -293,42 +293,48 @@ class ImageDataModule(pl.LightningDataModule):
             **self._loader_kwargs(),
         )
 
-    def summary(self) -> str:
-        """Return a human-readable summary of the data module.
+    def summary(self):
+        """Return a Rich Table summarizing the data module.
 
         Call after ``setup()`` so that datasets and class info are available.
         """
-        lines = ["ImageDataModule Summary"]
-        lines.append(f"  Data dir       : {self.data_dir}")
+        from rich.table import Table
+
+        table = Table(title="ImageDataModule Summary", show_lines=True)
+        table.add_column("Field", style="bold cyan")
+        table.add_column("Value", style="white")
+
+        table.add_row("Data dir", str(self.data_dir))
         if self.dataset_name:
-            lines.append(f"  Dataset        : {self.dataset_name}")
-        lines.append(f"  Image size     : {self.image_size}")
-        lines.append(f"  Batch size     : {self.batch_size}")
-        lines.append(f"  Num workers    : {self.num_workers}")
-        lines.append(f"  Backend        : {self.transform_backend}")
+            table.add_row("Dataset", str(self.dataset_name))
+        table.add_row("Image size", str(self.image_size))
+        table.add_row("Batch size", str(self.batch_size))
+        table.add_row("Num workers", str(self.num_workers))
+        table.add_row("Backend", str(self.transform_backend))
+
         if self.num_classes is not None:
-            lines.append(f"  Num classes    : {self.num_classes}")
+            table.add_row("Num classes", str(self.num_classes))
 
         if self.train_dataset is not None:
-            lines.append(f"  Train samples  : {len(self.train_dataset)}")
+            table.add_row("Train samples", str(len(self.train_dataset)))
         if self.val_dataset is not None:
-            lines.append(f"  Val samples    : {len(self.val_dataset)}")
+            table.add_row("Val samples", str(len(self.val_dataset)))
         if self.test_dataset is not None:
-            lines.append(f"  Test samples   : {len(self.test_dataset)}")
+            table.add_row("Test samples", str(len(self.test_dataset)))
 
         if self._train_targets is not None:
-            lines.append(f"  Balanced sampling : {self.balanced_sampling}")
+            table.add_row("Balanced sampling", str(self.balanced_sampling))
             counts = Counter(self._train_targets)
-            lines.append("  Class distribution (train):")
             for cls_idx in sorted(counts):
                 name = (
                     self.class_names[cls_idx]
                     if self.class_names and cls_idx < len(self.class_names)
                     else str(cls_idx)
                 )
-                lines.append(f"    {name}: {counts[cls_idx]}")
+                table.add_row(f"Class: {name}", str(counts[cls_idx]))
 
-        return "\n".join(lines)
+        return table
+
 
 
 class _AlbumentationsBuiltinWrapper:

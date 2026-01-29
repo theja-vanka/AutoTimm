@@ -2,7 +2,13 @@
 
 Automated deep learning image tasks powered by [timm](https://github.com/huggingface/pytorch-image-models) and [PyTorch Lightning](https://github.com/Lightning-AI/pytorch-lightning).
 
-AutoTimm lets you train image classifiers with any of timm's 1000+ backbones in a few lines of Python. It supports both torchvision (PIL) and albumentations (OpenCV) transform pipelines, and comes with built-in logging for TensorBoard, MLflow, and Weights & Biases.
+AutoTimm lets you train image classifiers with any of timm's 1000+ backbones in a few lines of Python. It features:
+
+- **Configurable metrics** - Use torchmetrics, timm metrics, or custom metrics
+- **Multiple logger backends** - TensorBoard, MLflow, W&B, CSV simultaneously
+- **Auto-tuning** - Automatic learning rate and batch size finding
+- **Enhanced logging** - Learning rate, gradient norms, confusion matrices
+- **Flexible transforms** - Torchvision (PIL) or albumentations (OpenCV)
 
 ## Installation
 
@@ -33,14 +39,190 @@ pip install -e ".[dev,all]"
 ## Quick Start
 
 ```python
-from autotimm import ImageClassifier, ImageDataModule, create_trainer
+from autotimm import (
+    AutoTrainer, ImageClassifier, ImageDataModule,
+    LoggerConfig, MetricConfig,
+)
 
-data = ImageDataModule(data_dir="./data", dataset_name="CIFAR10", image_size=224, batch_size=64)
-model = ImageClassifier(backbone="resnet18", num_classes=10, lr=1e-3)
-trainer = create_trainer(max_epochs=10, logger="tensorboard")
+# Data
+data = ImageDataModule(
+    data_dir="./data",
+    dataset_name="CIFAR10",
+    image_size=224,
+    batch_size=64,
+)
+
+# Metrics (explicit configuration required)
+metrics = [
+    MetricConfig(
+        name="accuracy",
+        backend="torchmetrics",
+        metric_class="Accuracy",
+        params={"task": "multiclass"},
+        stages=["train", "val", "test"],
+        prog_bar=True,
+    ),
+]
+
+# Model
+model = ImageClassifier(
+    backbone="resnet18",
+    num_classes=10,
+    metrics=metrics,
+    lr=1e-3,
+)
+
+# Trainer with logging
+trainer = AutoTrainer(
+    max_epochs=10,
+    logger=[LoggerConfig(backend="tensorboard", params={"save_dir": "logs"})],
+    checkpoint_monitor="val/accuracy",
+)
 
 trainer.fit(model, datamodule=data)
 trainer.test(model, datamodule=data)
+```
+
+## Configurable Metrics
+
+AutoTimm requires explicit metric configuration, supporting multiple backends:
+
+### Torchmetrics (recommended)
+
+```python
+from autotimm import MetricConfig
+
+metrics = [
+    MetricConfig(
+        name="accuracy",
+        backend="torchmetrics",
+        metric_class="Accuracy",
+        params={"task": "multiclass"},
+        stages=["train", "val", "test"],
+        prog_bar=True,
+    ),
+    MetricConfig(
+        name="f1",
+        backend="torchmetrics",
+        metric_class="F1Score",
+        params={"task": "multiclass", "average": "macro"},
+        stages=["val", "test"],
+    ),
+    MetricConfig(
+        name="top5_accuracy",
+        backend="torchmetrics",
+        metric_class="Accuracy",
+        params={"task": "multiclass", "top_k": 5},
+        stages=["val", "test"],
+    ),
+]
+```
+
+### Timm metrics
+
+```python
+MetricConfig(
+    name="timm_acc",
+    backend="timm",
+    metric_class="accuracy",
+    params={"topk": (1, 5)},
+    stages=["val"],
+)
+```
+
+### Custom metrics
+
+```python
+MetricConfig(
+    name="custom",
+    backend="custom",
+    metric_class="mypackage.metrics.CustomMetric",
+    params={"param1": "value"},
+    stages=["val"],
+)
+```
+
+## Configurable Logging
+
+### Single logger
+
+```python
+from autotimm import AutoTrainer, LoggerConfig
+
+trainer = AutoTrainer(
+    max_epochs=10,
+    logger=[LoggerConfig(backend="tensorboard", params={"save_dir": "logs"})],
+)
+```
+
+### Multiple loggers
+
+```python
+from autotimm import LoggerConfig, LoggerManager
+
+# Option 1: List of configs
+trainer = AutoTrainer(
+    logger=[
+        LoggerConfig(backend="tensorboard", params={"save_dir": "logs/tb"}),
+        LoggerConfig(backend="csv", params={"save_dir": "logs/csv"}),
+        LoggerConfig(backend="wandb", params={"project": "my-project"}),
+    ],
+)
+
+# Option 2: LoggerManager
+manager = LoggerManager(configs=[
+    LoggerConfig(backend="tensorboard", params={"save_dir": "logs"}),
+    LoggerConfig(backend="mlflow", params={"experiment_name": "exp1"}),
+])
+trainer = AutoTrainer(logger=manager)
+```
+
+### Enhanced logging
+
+```python
+from autotimm import LoggingConfig
+
+model = ImageClassifier(
+    backbone="resnet18",
+    num_classes=10,
+    metrics=metrics,
+    logging_config=LoggingConfig(
+        log_learning_rate=True,      # Log LR each step
+        log_gradient_norm=True,      # Log gradient norms
+        log_confusion_matrix=True,   # Log confusion matrix each epoch
+    ),
+)
+```
+
+## Auto-Tuning
+
+Automatically find optimal learning rate and batch size:
+
+```python
+from autotimm import AutoTrainer, TunerConfig
+
+# LR finding only
+trainer = AutoTrainer(
+    max_epochs=10,
+    tuner_config=TunerConfig(
+        auto_lr=True,
+        auto_batch_size=False,
+        lr_find_kwargs={"min_lr": 1e-6, "max_lr": 1.0, "num_training": 100},
+    ),
+)
+
+# Full auto-tuning (batch size + LR)
+trainer = AutoTrainer(
+    max_epochs=10,
+    tuner_config=TunerConfig(
+        auto_lr=True,
+        auto_batch_size=True,
+        lr_find_kwargs={"min_lr": 1e-6, "max_lr": 1.0},
+        batch_size_kwargs={"mode": "power", "init_val": 16},
+    ),
+)
+
+trainer.fit(model, datamodule=data)  # Runs tuning before training
 ```
 
 ## Custom Dataset
@@ -52,40 +234,31 @@ dataset/
   train/
     class_a/
       img1.jpg
-      img2.jpg
     class_b/
-      img3.jpg
+      img2.jpg
   val/
     class_a/
+      img3.jpg
+    class_b/
       img4.jpg
-    class_b/
-      img5.jpg
-  test/          # optional
-    class_a/
-      img6.jpg
-    class_b/
-      img7.jpg
 ```
 
 Then:
 
 ```python
-from autotimm import ImageClassifier, ImageDataModule, create_trainer
-
 data = ImageDataModule(data_dir="./dataset", image_size=384, batch_size=16)
 data.setup("fit")
 
-model = ImageClassifier(backbone="efficientnet_b3", num_classes=data.num_classes, lr=3e-4)
-trainer = create_trainer(max_epochs=20, precision="bf16-mixed")
-
-trainer.fit(model, datamodule=data)
+model = ImageClassifier(
+    backbone="efficientnet_b3",
+    num_classes=data.num_classes,
+    metrics=metrics,
+)
 ```
 
 If no `val/` directory exists, a fraction of the training data is held out automatically (controlled by `val_split`, default 10%).
 
 ## Transform Backends
-
-AutoTimm supports two transform backends. Choose via `transform_backend`:
 
 ### Torchvision (default, PIL-based)
 
@@ -113,19 +286,15 @@ data = ImageDataModule(
 )
 ```
 
-When `transform_backend="albumentations"` is used with folder datasets, images are loaded with OpenCV (`cv2.imread`) instead of PIL. Built-in datasets (CIFAR10, etc.) automatically convert PIL images to numpy arrays for the pipeline.
-
-### Custom albumentations pipeline
+### Custom transforms
 
 ```python
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
-from autotimm import ImageDataModule
 
 custom_train = A.Compose([
     A.RandomResizedCrop(size=(224, 224)),
     A.HorizontalFlip(p=0.5),
-    A.Affine(rotate=(-20, 20), scale=(0.8, 1.2), p=0.5),
     A.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, p=0.8),
     A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ToTensorV2(),
@@ -136,22 +305,6 @@ data = ImageDataModule(
     transform_backend="albumentations",
     train_transforms=custom_train,
 )
-```
-
-### Custom torchvision pipeline
-
-```python
-from torchvision import transforms
-from autotimm import ImageDataModule
-
-custom_train = transforms.Compose([
-    transforms.RandomResizedCrop(224),
-    transforms.AutoAugment(),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-])
-
-data = ImageDataModule(data_dir="./data", dataset_name="CIFAR10", train_transforms=custom_train)
 ```
 
 ## Backbone Discovery
@@ -181,30 +334,85 @@ cfg = BackboneConfig(
     pretrained=True,
     drop_path_rate=0.1,
 )
-model = ImageClassifier(backbone=cfg, num_classes=100)
+model = ImageClassifier(backbone=cfg, num_classes=100, metrics=metrics)
 ```
 
-## Logging
+## Training Features
 
-Switch between logging backends by changing one argument:
+### Freeze backbone for linear probing
 
 ```python
-from autotimm import create_trainer
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    metrics=metrics,
+    freeze_backbone=True,
+    lr=1e-2,
+)
+```
 
-# TensorBoard (default)
-trainer = create_trainer(logger="tensorboard")
+### Mixup augmentation
 
-# Weights & Biases
-trainer = create_trainer(logger="wandb", logger_kwargs={"project": "my-project"})
+```python
+model = ImageClassifier(backbone="resnet50", num_classes=10, metrics=metrics, mixup_alpha=0.2)
+```
 
-# MLflow
-trainer = create_trainer(logger="mlflow", logger_kwargs={"experiment_name": "my-exp"})
+### Label smoothing
 
-# CSV (no extra dependencies)
-trainer = create_trainer(logger="csv")
+```python
+model = ImageClassifier(backbone="resnet50", num_classes=10, metrics=metrics, label_smoothing=0.1)
+```
 
-# No logging
-trainer = create_trainer(logger="none")
+### Learning rate schedulers
+
+```python
+model = ImageClassifier(backbone="resnet50", num_classes=10, metrics=metrics, scheduler="cosine")  # or "step", "none"
+```
+
+### Gradient accumulation, clipping, and mixed precision
+
+```python
+trainer = AutoTrainer(
+    max_epochs=20,
+    accumulate_grad_batches=4,
+    gradient_clip_val=1.0,
+    precision="bf16-mixed",
+)
+```
+
+### Multi-GPU training
+
+```python
+trainer = AutoTrainer(
+    max_epochs=10,
+    accelerator="gpu",
+    devices=2,              # Use 2 GPUs
+    strategy="ddp",         # Distributed Data Parallel
+    precision="bf16-mixed",
+)
+```
+
+### Two-phase fine-tuning
+
+```python
+# Phase 1: Linear probe
+model = ImageClassifier(
+    backbone="vit_base_patch16_224",
+    num_classes=data.num_classes,
+    metrics=metrics,
+    freeze_backbone=True,
+    lr=1e-2,
+)
+trainer = AutoTrainer(max_epochs=5)
+trainer.fit(model, datamodule=data)
+
+# Phase 2: Full fine-tune
+for param in model.backbone.parameters():
+    param.requires_grad = True
+
+model._lr = 1e-4
+trainer = AutoTrainer(max_epochs=20, gradient_clip_val=1.0)
+trainer.fit(model, datamodule=data)
 ```
 
 ## Data Module Features
@@ -226,158 +434,56 @@ data.setup("fit")
 print(data.summary())
 ```
 
-Output:
-
-```
-ImageDataModule Summary
-  Data dir       : data
-  Dataset        : CIFAR10
-  Image size     : 224
-  Batch size     : 32
-  Num workers    : 4
-  Backend        : torchvision
-  Num classes    : 10
-  Train samples  : 45000
-  Val samples    : 5000
-  Balanced sampling : False
-  Class distribution (train):
-    airplane: 4527
-    automobile: 4512
-    ...
-```
-
-### Persistent workers and prefetching
-
-```python
-data = ImageDataModule(
-    data_dir="./dataset",
-    num_workers=8,
-    persistent_workers=True,  # keep workers alive between epochs
-    prefetch_factor=4,        # prefetch 4 batches per worker
-)
-```
-
-## Training Features
-
-### Freeze backbone for linear probing
-
-```python
-model = ImageClassifier(backbone="resnet50", num_classes=10, freeze_backbone=True, lr=1e-2)
-```
-
-### Mixup augmentation
-
-```python
-model = ImageClassifier(backbone="resnet50", num_classes=10, mixup_alpha=0.2)
-```
-
-### Label smoothing
-
-```python
-model = ImageClassifier(backbone="resnet50", num_classes=10, label_smoothing=0.1)
-```
-
-### Learning rate schedulers
-
-```python
-# Cosine annealing (default)
-model = ImageClassifier(backbone="resnet50", num_classes=10, scheduler="cosine")
-
-# Step decay
-model = ImageClassifier(backbone="resnet50", num_classes=10, scheduler="step")
-
-# No scheduler
-model = ImageClassifier(backbone="resnet50", num_classes=10, scheduler="none")
-```
-
-### Gradient accumulation, clipping, and mixed precision
-
-```python
-trainer = create_trainer(
-    max_epochs=20,
-    accumulate_grad_batches=4,
-    gradient_clip_val=1.0,
-    precision="bf16-mixed",
-)
-```
-
-### Two-phase fine-tuning (linear probe then full)
-
-```python
-from autotimm import ImageClassifier, ImageDataModule, create_trainer
-
-data = ImageDataModule(data_dir="./dataset", image_size=224, batch_size=32)
-data.setup("fit")
-
-# Phase 1: Linear probe
-model = ImageClassifier(
-    backbone="vit_base_patch16_224",
-    num_classes=data.num_classes,
-    freeze_backbone=True,
-    lr=1e-2,
-)
-trainer = create_trainer(max_epochs=5)
-trainer.fit(model, datamodule=data)
-
-# Phase 2: Full fine-tune with lower LR
-for param in model.backbone.parameters():
-    param.requires_grad = True
-
-model._lr = 1e-4
-trainer = create_trainer(max_epochs=20, gradient_clip_val=1.0)
-trainer.fit(model, datamodule=data)
-```
-
 ## Examples
 
 The [`examples/`](examples/) directory contains runnable scripts:
 
 | Script | Description |
 |---|---|
-| [`classify_cifar10.py`](examples/classify_cifar10.py) | ResNet-18 on CIFAR-10 with TensorBoard |
+| [`classify_cifar10.py`](examples/classify_cifar10.py) | ResNet-18 on CIFAR-10 with metrics and auto-tuning |
 | [`classify_custom_folder.py`](examples/classify_custom_folder.py) | EfficientNet on a custom folder dataset with W&B |
-| [`albumentations_cifar10.py`](examples/albumentations_cifar10.py) | CIFAR-10 with albumentations strong augmentation |
-| [`albumentations_custom_folder.py`](examples/albumentations_custom_folder.py) | Custom albumentations pipeline with OpenCV loading |
-| [`vit_finetuning.py`](examples/vit_finetuning.py) | Two-phase ViT fine-tuning (linear probe then full) |
-| [`balanced_sampling.py`](examples/balanced_sampling.py) | Weighted sampling for class-imbalanced data |
-| [`mlflow_tracking.py`](examples/mlflow_tracking.py) | CIFAR-100 training with MLflow experiment tracking |
-| [`backbone_discovery.py`](examples/backbone_discovery.py) | Explore and inspect available timm backbones |
+| [`timm_metrics.py`](examples/timm_metrics.py) | Using timm metrics alongside torchmetrics |
+| [`multiple_loggers.py`](examples/multiple_loggers.py) | TensorBoard + CSV logging simultaneously |
+| [`auto_tuning.py`](examples/auto_tuning.py) | Automatic LR and batch size finding |
+| [`inference.py`](examples/inference.py) | Model inference and batch prediction |
+| [`detailed_evaluation.py`](examples/detailed_evaluation.py) | Confusion matrix and per-class metrics |
+| [`multi_gpu_training.py`](examples/multi_gpu_training.py) | Multi-GPU and distributed training |
+| [`vit_finetuning.py`](examples/vit_finetuning.py) | Two-phase ViT fine-tuning |
+| [`balanced_sampling.py`](examples/balanced_sampling.py) | Weighted sampling for imbalanced data |
+| [`mlflow_tracking.py`](examples/mlflow_tracking.py) | MLflow experiment tracking |
+| [`albumentations_cifar10.py`](examples/albumentations_cifar10.py) | Albumentations strong augmentation |
+| [`albumentations_custom_folder.py`](examples/albumentations_custom_folder.py) | Custom albumentations pipeline |
+| [`backbone_discovery.py`](examples/backbone_discovery.py) | Explore timm backbones |
 
 ## API Reference
 
-### Core
+### Core Classes
 
-| Symbol | Type | Description |
-|---|---|---|
-| `ImageClassifier` | `LightningModule` | Image classifier: timm backbone + classification head + training loop |
-| `ImageDataModule` | `LightningDataModule` | Data module for ImageFolder and built-in datasets with torchvision/albumentations transforms |
-| `create_trainer` | `function` | Factory for `pl.Trainer` with logger and checkpoint wiring |
+| Class | Description |
+|---|---|
+| `ImageClassifier` | Image classifier: timm backbone + classification head + training loop |
+| `ImageDataModule` | Data module for ImageFolder and built-in datasets |
+| `AutoTrainer` | `pl.Trainer` subclass with logger, checkpoint, and tuner support |
 
-### Backbone
+### Configuration Classes
 
-| Symbol | Type | Description |
-|---|---|---|
-| `BackboneConfig` | `dataclass` | Configuration for timm backbone (model name, pretrained, dropout, etc.) |
-| `create_backbone` | `function` | Create a headless timm model from a name or config |
-| `list_backbones` | `function` | Search available timm model names by glob pattern |
+| Class | Description |
+|---|---|
+| `MetricConfig` | Configuration for a single metric (backend, class, params, stages) |
+| `MetricManager` | Manages multiple metrics across train/val/test stages |
+| `LoggerConfig` | Configuration for a logger backend (tensorboard, mlflow, wandb, csv) |
+| `LoggerManager` | Manages multiple loggers |
+| `LoggingConfig` | Enhanced logging options (LR, gradients, confusion matrix) |
+| `TunerConfig` | Auto-tuning configuration (LR finder, batch size finder) |
+| `BackboneConfig` | Timm backbone configuration (model name, pretrained, dropout) |
 
-### Heads and Utilities
+### Utility Functions
 
-| Symbol | Type | Description |
-|---|---|---|
-| `ClassificationHead` | `nn.Module` | Linear head with optional dropout |
-| `create_logger` | `function` | Factory for TensorBoard / MLflow / W&B / CSV loggers |
-| `count_parameters` | `function` | Count model parameters (total or trainable) |
-
-### Data (via `autotimm.data`)
-
-| Symbol | Type | Description |
-|---|---|---|
-| `ImageFolderCV2` | `Dataset` | ImageFolder dataset that loads images with OpenCV |
-| `get_train_transforms` | `function` | Get transforms by preset name and backend |
-| `albu_default_train_transforms` | `function` | Default albumentations training transforms |
-| `albu_strong_train_transforms` | `function` | Strong albumentations augmentation pipeline |
-| `albu_default_eval_transforms` | `function` | Default albumentations eval transforms |
+| Function | Description |
+|---|---|
+| `create_backbone` | Create a headless timm model from a name or config |
+| `list_backbones` | Search available timm model names by glob pattern |
+| `count_parameters` | Count model parameters (total or trainable) |
 
 ## Built-in Datasets
 
