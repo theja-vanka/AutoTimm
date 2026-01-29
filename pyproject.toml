@@ -1,16 +1,17 @@
 [build-system]
-requires = ["setuptools>=68.0"]
+requires = ["setuptools>=68.0", "wheel", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "autotimm"
 description = "Automated deep learning image tasks powered by timm and PyTorch Lightning"
 readme = "README.md"
-license = "Apache-2.0"
+license = { file = "LICENSE" }
 requires-python = ">=3.9"
+keywords = ["deep-learning", "computer-vision", "pytorch", "timm", "automation"]
 dynamic = ["version"]
 authors = [
-    {name = "AutoTimm Contributors"},
+    {name = "Krishnatheja Vanka"},
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -29,6 +30,7 @@ dependencies = [
     "timm>=1.0",
     "pytorch-lightning>=2.0",
     "torchmetrics>=1.0",
+    "numpy>=1.23",
 ]
 
 [project.optional-dependencies]
@@ -40,13 +42,27 @@ all = ["tensorboard>=2.14", "mlflow>=2.0", "wandb>=0.15", "albumentations>=1.3",
 dev = [
     "pytest>=7.0",
     "pytest-cov",
+    "build",
+    "twine",
+    "ruff",
+    "black",
 ]
+
+[project.urls]
+Homepage = "https://github.com/theja-vanka/AutoTimm"
+Repository = "https://github.com/theja-vanka/AutoTimm"
+Issues = "https://github.com/theja-vanka/AutoTimm/issues"
+
+[tool.setuptools]
+include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
-[tool.setuptools.dynamic]
-version = {attr = "autotimm._version.__version__"}
+[tool.setuptools_scm]
+version_scheme = "release-branch-semver"
+local_scheme = "no-local-version"
+tag_regex = "^v(?P<version>.*)$"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
