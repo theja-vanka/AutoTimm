@@ -31,8 +31,7 @@ jobs:
           VERSION=$(python - <<EOF
             import setuptools_scm
             print(setuptools_scm.get_version())
-            EOF
-          )
+            EOF)
           TAG=${GITHUB_REF#refs/tags/v}
           test "$VERSION" = "$TAG"
 
