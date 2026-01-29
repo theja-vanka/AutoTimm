@@ -8,7 +8,6 @@ from autotimm.metrics import (
     LoggingConfig,
     MetricConfig,
     MetricManager,
-    TimmMetricWrapper,
 )
 
 
@@ -27,16 +26,6 @@ class TestMetricConfig:
         assert config.backend == "torchmetrics"
         assert config.metric_class == "Accuracy"
         assert config.stages == ["train", "val", "test"]
-
-    def test_valid_timm_config(self):
-        config = MetricConfig(
-            name="timm_acc",
-            backend="timm",
-            metric_class="accuracy",
-            params={"topk": (1, 5)},
-            stages=["val"],
-        )
-        assert config.backend == "timm"
 
     def test_case_insensitive_backend(self):
         config = MetricConfig(
@@ -301,90 +290,116 @@ class TestMetricManager:
         assert manager.configs == configs
         assert manager.num_classes == 10
 
-
-class TestTimmMetricWrapper:
-    """Tests for TimmMetricWrapper class."""
-
-    def test_update_and_compute(self):
-        pytest.importorskip("timm")
-        from timm.utils.metrics import accuracy
-
-        wrapper = TimmMetricWrapper(fn=accuracy, params={"topk": (1,)})
-
-        # Simulate predictions (logits) and targets
-        logits = torch.randn(32, 10)
-        targets = torch.randint(0, 10, (32,))
-
-        wrapper.update(logits, targets)
-        result = wrapper.compute()
-
-        assert isinstance(result, torch.Tensor)
-        assert 0.0 <= result.item() <= 1.0
-
-    def test_reset(self):
-        pytest.importorskip("timm")
-        from timm.utils.metrics import accuracy
-
-        wrapper = TimmMetricWrapper(fn=accuracy, params={"topk": (1,)})
-
-        logits = torch.randn(32, 10)
-        targets = torch.randint(0, 10, (32,))
-        wrapper.update(logits, targets)
-
-        wrapper.reset()
-
-        # After reset, compute should return 0 (no data)
-        result = wrapper.compute()
-        assert result.item() == 0.0
-
-    def test_accumulation(self):
-        pytest.importorskip("timm")
-        from timm.utils.metrics import accuracy
-
-        wrapper = TimmMetricWrapper(fn=accuracy, params={"topk": (1,)})
-
-        # Multiple updates
-        for _ in range(3):
-            logits = torch.randn(16, 10)
-            targets = torch.randint(0, 10, (16,))
-            wrapper.update(logits, targets)
-
-        result = wrapper.compute()
-        assert isinstance(result, torch.Tensor)
-
-
-class TestMetricManagerWithTimm:
-    """Tests for MetricManager with timm backend."""
-
-    def test_create_timm_metric(self):
-        pytest.importorskip("timm")
-
+    def test_iter(self):
         configs = [
             MetricConfig(
-                name="timm_accuracy",
-                backend="timm",
-                metric_class="accuracy",
-                params={"topk": (1, 5)},
+                name="accuracy",
+                backend="torchmetrics",
+                metric_class="Accuracy",
+                params={"task": "multiclass"},
+                stages=["train", "val"],
+            ),
+            MetricConfig(
+                name="f1",
+                backend="torchmetrics",
+                metric_class="F1Score",
+                params={"task": "multiclass", "average": "macro"},
                 stages=["val"],
-            )
+            ),
         ]
         manager = MetricManager(configs=configs, num_classes=10)
 
-        val_metrics = manager.get_val_metrics()
-        assert "timm_accuracy" in val_metrics
-        assert isinstance(val_metrics["timm_accuracy"], TimmMetricWrapper)
+        iterated = list(manager)
+        assert len(iterated) == 2
+        assert iterated[0].name == "accuracy"
+        assert iterated[1].name == "f1"
 
-    def test_unknown_timm_metric_raises(self):
-        pytest.importorskip("timm")
-
+    def test_getitem(self):
         configs = [
             MetricConfig(
-                name="unknown",
-                backend="timm",
-                metric_class="unknown_metric",
-                params={},
+                name="accuracy",
+                backend="torchmetrics",
+                metric_class="Accuracy",
+                params={"task": "multiclass"},
                 stages=["train"],
-            )
+            ),
+            MetricConfig(
+                name="f1",
+                backend="torchmetrics",
+                metric_class="F1Score",
+                params={"task": "multiclass", "average": "macro"},
+                stages=["val"],
+            ),
         ]
-        with pytest.raises(ValueError, match="Unknown timm metric"):
-            MetricManager(configs=configs, num_classes=10)
+        manager = MetricManager(configs=configs, num_classes=10)
+
+        assert manager[0].name == "accuracy"
+        assert manager[1].name == "f1"
+
+    def test_get_metric_by_name(self):
+        configs = [
+            MetricConfig(
+                name="accuracy",
+                backend="torchmetrics",
+                metric_class="Accuracy",
+                params={"task": "multiclass"},
+                stages=["train", "val"],
+            ),
+            MetricConfig(
+                name="f1",
+                backend="torchmetrics",
+                metric_class="F1Score",
+                params={"task": "multiclass", "average": "macro"},
+                stages=["val"],
+            ),
+        ]
+        manager = MetricManager(configs=configs, num_classes=10)
+
+        # Get without stage (searches val first)
+        accuracy = manager.get_metric_by_name("accuracy")
+        assert accuracy is not None
+        assert isinstance(accuracy, torchmetrics.Metric)
+
+        # Get with specific stage
+        accuracy_train = manager.get_metric_by_name("accuracy", stage="train")
+        assert accuracy_train is not None
+
+        # Get non-existent metric
+        unknown = manager.get_metric_by_name("unknown")
+        assert unknown is None
+
+        # Get metric from wrong stage
+        f1_train = manager.get_metric_by_name("f1", stage="train")
+        assert f1_train is None
+
+    def test_get_config_by_name(self):
+        configs = [
+            MetricConfig(
+                name="accuracy",
+                backend="torchmetrics",
+                metric_class="Accuracy",
+                params={"task": "multiclass"},
+                stages=["train", "val"],
+                prog_bar=True,
+            ),
+            MetricConfig(
+                name="f1",
+                backend="torchmetrics",
+                metric_class="F1Score",
+                params={"task": "multiclass", "average": "macro"},
+                stages=["val"],
+            ),
+        ]
+        manager = MetricManager(configs=configs, num_classes=10)
+
+        config = manager.get_config_by_name("accuracy")
+        assert config is not None
+        assert config.name == "accuracy"
+        assert config.prog_bar is True
+
+        config = manager.get_config_by_name("f1")
+        assert config is not None
+        assert config.name == "f1"
+
+        config = manager.get_config_by_name("unknown")
+        assert config is None

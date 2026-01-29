@@ -7,7 +7,7 @@ from autotimm.loggers import LoggerConfig, LoggerManager
 from autotimm.metrics import LoggingConfig, MetricConfig, MetricManager
 from autotimm.tasks.classification import ImageClassifier
 from autotimm.trainer import AutoTrainer, TunerConfig
-from autotimm.utils import count_parameters
+from autotimm.utils import count_parameters, list_optimizers, list_schedulers
 
 __all__ = [
     "AutoTrainer",
@@ -24,4 +24,6 @@ __all__ = [
     "count_parameters",
     "create_backbone",
     "list_backbones",
+    "list_optimizers",
+    "list_schedulers",
 ]
