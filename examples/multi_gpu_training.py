@@ -180,9 +180,9 @@ def main():
         checkpoint_mode="max",
     )
 
-    print(f"  Per-GPU batch size: 64")
-    print(f"  Number of GPUs: 2")
-    print(f"  Gradient accumulation: 4")
+    print("  Per-GPU batch size: 64")
+    print("  Number of GPUs: 2")
+    print("  Gradient accumulation: 4")
     print(f"  Effective batch size: {64 * 2 * 4}")
 
     # ========================================================================

@@ -247,7 +247,6 @@ class ImageClassifier(pl.LightningModule):
 
             matplotlib.use("Agg")
             import matplotlib.pyplot as plt
-            import numpy as np
 
             fig = self._create_confusion_matrix_figure(cm.cpu().numpy())
 
@@ -268,10 +267,10 @@ class ImageClassifier(pl.LightningModule):
 
     def _create_confusion_matrix_figure(self, cm_np: Any) -> Any:
         """Create a professional confusion matrix visualization.
-        
+
         Parameters:
             cm_np: Confusion matrix as numpy array.
-            
+
         Returns:
             matplotlib Figure object.
         """
@@ -279,7 +278,9 @@ class ImageClassifier(pl.LightningModule):
         import numpy as np
 
         # Calculate normalized confusion matrix for percentages
-        cm_normalized = cm_np.astype("float") / (cm_np.sum(axis=1)[:, np.newaxis] + 1e-10)
+        cm_normalized = cm_np.astype("float") / (
+            cm_np.sum(axis=1)[:, np.newaxis] + 1e-10
+        )
 
         # Create figure with appropriate size
         fig_size = max(10, min(20, self._num_classes * 0.8))
@@ -287,19 +288,23 @@ class ImageClassifier(pl.LightningModule):
 
         # Use a professional color scheme
         cmap = plt.cm.Blues
-        im = ax.imshow(cm_normalized, interpolation="nearest", cmap=cmap, vmin=0, vmax=1)
+        im = ax.imshow(
+            cm_normalized, interpolation="nearest", cmap=cmap, vmin=0, vmax=1
+        )
 
         # Add colorbar with label
         cbar = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
-        cbar.set_label("Normalized Count (Recall)", rotation=270, labelpad=25, fontsize=12)
+        cbar.set_label(
+            "Normalized Count (Recall)", rotation=270, labelpad=25, fontsize=12
+        )
 
         # Set ticks and labels
         num_classes = cm_np.shape[0]
         tick_marks = np.arange(num_classes)
-        
+
         # Create class labels (use class indices if no names available)
         class_labels = [str(i) for i in range(num_classes)]
-        
+
         ax.set_xticks(tick_marks)
         ax.set_yticks(tick_marks)
         ax.set_xticklabels(class_labels, fontsize=10, rotation=45, ha="right")
@@ -311,10 +316,10 @@ class ImageClassifier(pl.LightningModule):
             for j in range(num_classes):
                 count = cm_np[i, j]
                 percentage = cm_normalized[i, j] * 100
-                
+
                 # Choose text color based on background
                 color = "white" if cm_normalized[i, j] > thresh else "black"
-                
+
                 # Display count and percentage
                 text_str = f"{int(count)}\n({percentage:.1f}%)"
                 ax.text(
@@ -382,45 +387,45 @@ class ImageClassifier(pl.LightningModule):
 
     def configure_optimizers(self) -> dict:
         """Configure optimizer and learning rate scheduler.
-        
+
         Supports torch.optim, timm optimizers, and custom optimizers/schedulers.
         """
         params = filter(lambda p: p.requires_grad, self.parameters())
-        
+
         # Create optimizer
         optimizer = self._create_optimizer(params)
-        
+
         # Return early if no scheduler
         if self._scheduler is None or self._scheduler == "none":
             return {"optimizer": optimizer}
-        
+
         # Create scheduler
         scheduler_config = self._create_scheduler(optimizer)
-        
+
         return {
             "optimizer": optimizer,
             "lr_scheduler": scheduler_config,
         }
-    
+
     def _create_optimizer(self, params) -> torch.optim.Optimizer:
         """Create optimizer from config."""
         # Prepare base kwargs
         opt_kwargs = {"lr": self._lr, "weight_decay": self._weight_decay}
         opt_kwargs.update(self._optimizer_kwargs)
-        
+
         # Dict config: {"class": "path.to.Optimizer", "params": {...}}
         if isinstance(self._optimizer, dict):
             opt_class_path = self._optimizer["class"]
             opt_params = self._optimizer.get("params", {})
             opt_kwargs.update(opt_params)
-            
+
             # Import and instantiate
             optimizer_cls = self._import_class(opt_class_path)
             return optimizer_cls(params, **opt_kwargs)
-        
+
         # String name: try torch.optim first, then timm
         optimizer_name = self._optimizer.lower()
-        
+
         # Torch optimizers
         torch_optimizers = {
             "adamw": torch.optim.AdamW,
@@ -429,14 +434,14 @@ class ImageClassifier(pl.LightningModule):
             "rmsprop": torch.optim.RMSprop,
             "adagrad": torch.optim.Adagrad,
         }
-        
+
         if optimizer_name in torch_optimizers:
             return torch_optimizers[optimizer_name](params, **opt_kwargs)
-        
+
         # Try timm optimizers
         try:
             import timm.optim as timm_optim
-            
+
             timm_optimizers = {
                 "adamp": timm_optim.AdamP,
                 "sgdp": timm_optim.SGDP,
@@ -448,47 +453,49 @@ class ImageClassifier(pl.LightningModule):
                 "madgrad": timm_optim.MADGRAD,
                 "novograd": timm_optim.NovGrad,
             }
-            
+
             if optimizer_name in timm_optimizers:
                 return timm_optimizers[optimizer_name](params, **opt_kwargs)
         except ImportError:
             pass
-        
+
         raise ValueError(
             f"Unknown optimizer: {self._optimizer}. "
             f"Use a torch.optim optimizer name, timm optimizer name, "
             f"or provide a dict with 'class' and 'params' keys."
         )
-    
+
     def _create_scheduler(self, optimizer: torch.optim.Optimizer) -> dict:
         """Create scheduler config from optimizer."""
         sched_kwargs = self._scheduler_kwargs.copy()
         interval = sched_kwargs.pop("interval", "step")
         frequency = sched_kwargs.pop("frequency", 1)
-        
+
         # Dict config: {"class": "path.to.Scheduler", "params": {...}}
         if isinstance(self._scheduler, dict):
             sched_class_path = self._scheduler["class"]
             sched_params = self._scheduler.get("params", {})
             sched_kwargs.update(sched_params)
-            
+
             scheduler_cls = self._import_class(sched_class_path)
             scheduler = scheduler_cls(optimizer, **sched_kwargs)
-            
+
             return {
                 "scheduler": scheduler,
                 "interval": interval,
                 "frequency": frequency,
             }
-        
+
         # String name: try torch schedulers first, then timm
         scheduler_name = self._scheduler.lower()
-        
+
         # Torch schedulers
         if scheduler_name == "cosine":
             scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
                 optimizer,
-                T_max=sched_kwargs.pop("T_max", self.trainer.estimated_stepping_batches),
+                T_max=sched_kwargs.pop(
+                    "T_max", self.trainer.estimated_stepping_batches
+                ),
                 **sched_kwargs,
             )
         elif scheduler_name == "step":
@@ -515,18 +522,22 @@ class ImageClassifier(pl.LightningModule):
             scheduler = torch.optim.lr_scheduler.OneCycleLR(
                 optimizer,
                 max_lr=sched_kwargs.pop("max_lr", self._lr * 10),
-                total_steps=sched_kwargs.pop("total_steps", self.trainer.estimated_stepping_batches),
+                total_steps=sched_kwargs.pop(
+                    "total_steps", self.trainer.estimated_stepping_batches
+                ),
                 **sched_kwargs,
             )
         else:
             # Try timm schedulers
             try:
                 import timm.scheduler as timm_scheduler
-                
+
                 if scheduler_name == "cosine_with_restarts":
                     scheduler = timm_scheduler.CosineLRScheduler(
                         optimizer,
-                        t_initial=sched_kwargs.pop("t_initial", self.trainer.max_epochs),
+                        t_initial=sched_kwargs.pop(
+                            "t_initial", self.trainer.max_epochs
+                        ),
                         cycle_limit=sched_kwargs.pop("cycle_limit", 1),
                         **sched_kwargs,
                     )
@@ -554,23 +565,23 @@ class ImageClassifier(pl.LightningModule):
                     f"Use a torch.optim.lr_scheduler name, timm scheduler name, "
                     f"or provide a dict with 'class' and 'params' keys."
                 )
-        
+
         return {
             "scheduler": scheduler,
             "interval": interval,
             "frequency": frequency,
         }
-    
+
     def _import_class(self, class_path: str):
         """Import a class from a fully qualified path."""
         import importlib
-        
+
         if "." not in class_path:
             raise ValueError(
                 f"Class path must be fully qualified (e.g., 'torch.optim.Adam'), "
                 f"got: {class_path}"
             )
-        
+
         module_path, class_name = class_path.rsplit(".", 1)
         module = importlib.import_module(module_path)
         return getattr(module, class_name)

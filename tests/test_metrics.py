@@ -1,7 +1,6 @@
 """Tests for the metrics module."""
 
 import pytest
-import torch
 import torchmetrics
 
 from autotimm.metrics import (
@@ -148,7 +147,9 @@ class TestLoggingConfig:
             )
 
     def test_negative_predictions_per_epoch_raises(self):
-        with pytest.raises(ValueError, match="predictions_per_epoch must be non-negative"):
+        with pytest.raises(
+            ValueError, match="predictions_per_epoch must be non-negative"
+        ):
             LoggingConfig(
                 log_learning_rate=True,
                 log_gradient_norm=False,

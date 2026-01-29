@@ -102,8 +102,7 @@ class LoggerManager:
                 from pytorch_lightning.loggers import MLFlowLogger
             except ImportError:
                 raise ImportError(
-                    "MLflow logger requires mlflow. "
-                    "Install with: pip install mlflow"
+                    "MLflow logger requires mlflow. Install with: pip install mlflow"
                 ) from None
             self._validate_required_params(params, ["experiment_name"], "mlflow")
             return MLFlowLogger(**params)
@@ -113,8 +112,7 @@ class LoggerManager:
                 from pytorch_lightning.loggers import WandbLogger
             except ImportError:
                 raise ImportError(
-                    "W&B logger requires wandb. "
-                    "Install with: pip install wandb"
+                    "W&B logger requires wandb. Install with: pip install wandb"
                 ) from None
             self._validate_required_params(params, ["project"], "wandb")
             return WandbLogger(**params)

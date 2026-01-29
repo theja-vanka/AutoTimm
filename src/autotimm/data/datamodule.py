@@ -336,7 +336,6 @@ class ImageDataModule(pl.LightningDataModule):
         return table
 
 
-
 class _AlbumentationsBuiltinWrapper:
     """Wraps an albumentations ``Compose`` so it works as a torchvision transform.
 

@@ -130,7 +130,9 @@ class AutoTrainer(pl.Trainer):
     ) -> None:
         if isinstance(logger, LoggerManager):
             resolved_logger = logger.loggers
-        elif isinstance(logger, list) and logger and isinstance(logger[0], LoggerConfig):
+        elif (
+            isinstance(logger, list) and logger and isinstance(logger[0], LoggerConfig)
+        ):
             manager = LoggerManager(configs=logger)
             resolved_logger = manager.loggers
         else:

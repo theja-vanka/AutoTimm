@@ -75,8 +75,8 @@ def main():
             auto_lr=True,
             auto_batch_size=False,
             lr_find_kwargs={
-                "min_lr": 1e-7,       # Minimum LR to test
-                "max_lr": 1.0,        # Maximum LR to test
+                "min_lr": 1e-7,  # Minimum LR to test
+                "max_lr": 1.0,  # Maximum LR to test
                 "num_training": 100,  # Number of training steps
                 "mode": "exponential",  # "exponential" or "linear"
                 "early_stop_threshold": 4.0,  # Stop if loss > early_stop_threshold * best_loss
@@ -118,10 +118,10 @@ def main():
             auto_lr=False,
             auto_batch_size=True,
             batch_size_kwargs={
-                "mode": "power",      # "power" (double until OOM) or "binsearch" (binary search)
+                "mode": "power",  # "power" (double until OOM) or "binsearch" (binary search)
                 "steps_per_trial": 3,  # Steps to run per batch size trial
-                "init_val": 16,       # Initial batch size to try
-                "max_trials": 25,     # Maximum number of trials
+                "init_val": 16,  # Initial batch size to try
+                "max_trials": 25,  # Maximum number of trials
             },
         ),
         checkpoint_monitor="val/accuracy",
@@ -153,7 +153,9 @@ def main():
         max_epochs=10,
         accelerator="auto",
         logger=[
-            LoggerConfig(backend="tensorboard", params={"save_dir": "logs/full_tuning"}),
+            LoggerConfig(
+                backend="tensorboard", params={"save_dir": "logs/full_tuning"}
+            ),
         ],
         tuner_config=TunerConfig(
             auto_lr=True,
