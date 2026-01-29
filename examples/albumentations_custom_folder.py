@@ -8,7 +8,14 @@ as RGB numpy arrays directly to the albumentations pipeline.
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
 
-from autotimm import ImageClassifier, ImageDataModule, create_trainer
+from autotimm import (
+    AutoTrainer,
+    ImageClassifier,
+    ImageDataModule,
+    LoggerConfig,
+    LoggingConfig,
+    MetricConfig,
+)
 
 # Define a custom albumentations pipeline
 custom_train = A.Compose(
@@ -41,18 +48,46 @@ data = ImageDataModule(
 data.setup("fit")
 print(data.summary())
 
+# Configure metrics
+metrics = [
+    MetricConfig(
+        name="accuracy",
+        backend="torchmetrics",
+        metric_class="Accuracy",
+        params={"task": "multiclass"},
+        stages=["train", "val", "test"],
+        prog_bar=True,
+    ),
+    MetricConfig(
+        name="f1",
+        backend="torchmetrics",
+        metric_class="F1Score",
+        params={"task": "multiclass", "average": "macro"},
+        stages=["val", "test"],
+    ),
+]
+
 model = ImageClassifier(
     backbone="convnext_tiny",
     num_classes=data.num_classes,
+    metrics=metrics,
+    logging_config=LoggingConfig(
+        log_learning_rate=True,
+        log_gradient_norm=True,
+    ),
     lr=3e-4,
     scheduler="cosine",
     label_smoothing=0.1,
 )
 
-trainer = create_trainer(
+trainer = AutoTrainer(
     max_epochs=30,
     precision="bf16-mixed",
-    logger="tensorboard",
+    logger=[
+        LoggerConfig(backend="tensorboard", params={"save_dir": "lightning_logs"}),
+    ],
+    checkpoint_monitor="val/accuracy",
+    checkpoint_mode="max",
 )
 
 trainer.fit(model, datamodule=data)

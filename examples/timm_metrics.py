@@ -1,4 +1,10 @@
-"""Train on CIFAR-10 using albumentations transforms (OpenCV backend)."""
+"""Demonstrate using timm metrics alongside torchmetrics.
+
+This example shows how to:
+- Configure multiple metrics from different backends
+- Use timm's accuracy function (top-1 and top-5)
+- Combine torchmetrics and timm metrics in one training run
+"""
 
 from autotimm import (
     AutoTrainer,
@@ -9,21 +15,18 @@ from autotimm import (
     MetricConfig,
 )
 
-# Use albumentations with the "strong" augmentation preset.
-# Built-in datasets (CIFAR10, etc.) automatically convert PIL → numpy
-# so albumentations pipelines work seamlessly.
+# Data
 data = ImageDataModule(
     data_dir="./data",
-    dataset_name="CIFAR10",
+    dataset_name="CIFAR100",  # 100 classes - good for top-5 accuracy
     image_size=224,
     batch_size=64,
     num_workers=4,
-    transform_backend="albumentations",
-    augmentation_preset="strong",
 )
 
-# Configure metrics
+# Configure metrics from multiple backends
 metrics = [
+    # Torchmetrics - standard accuracy
     MetricConfig(
         name="accuracy",
         backend="torchmetrics",
@@ -32,6 +35,15 @@ metrics = [
         stages=["train", "val", "test"],
         prog_bar=True,
     ),
+    # Torchmetrics - top-5 accuracy
+    MetricConfig(
+        name="top5_accuracy",
+        backend="torchmetrics",
+        metric_class="Accuracy",
+        params={"task": "multiclass", "top_k": 5},
+        stages=["val", "test"],
+    ),
+    # Torchmetrics - F1 Score
     MetricConfig(
         name="f1",
         backend="torchmetrics",
@@ -39,11 +51,20 @@ metrics = [
         params={"task": "multiclass", "average": "macro"},
         stages=["val", "test"],
     ),
+    # Timm - accuracy (uses logits directly, returns top-k tuple)
+    MetricConfig(
+        name="timm_acc",
+        backend="timm",
+        metric_class="accuracy",
+        params={"topk": (1, 5)},  # timm returns tuple of top-k accuracies
+        stages=["val"],
+    ),
 ]
 
+# Model with comprehensive metrics
 model = ImageClassifier(
-    backbone="resnet18",
-    num_classes=10,
+    backbone="resnet34",
+    num_classes=100,
     metrics=metrics,
     logging_config=LoggingConfig(
         log_learning_rate=True,
@@ -51,8 +72,10 @@ model = ImageClassifier(
     ),
     lr=1e-3,
     scheduler="cosine",
+    label_smoothing=0.1,
 )
 
+# Trainer with TensorBoard logging
 trainer = AutoTrainer(
     max_epochs=10,
     accelerator="auto",
