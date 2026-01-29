@@ -65,9 +65,7 @@ include-package-data = true
 where = ["src"]
 
 [tool.setuptools_scm]
-version_scheme = "release-branch-semver"
 local_scheme = "no-local-version"
-tag_regex = "^v(?P<version>.*)$"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
