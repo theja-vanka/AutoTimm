@@ -1,9 +1,9 @@
-"""Factory for training metrics (torchmetrics and timm)."""
+"""Factory for training metrics (torchmetrics)."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Callable
+from typing import Any
 
 import torch
 import torchmetrics
@@ -18,10 +18,8 @@ class MetricConfig:
 
     Parameters:
         name: Unique identifier for this metric (used in logging).
-        backend: Metric backend type. One of ``"torchmetrics"``, ``"timm"``,
-            or ``"custom"``.
-        metric_class: The metric class name (for torchmetrics) or function
-            name (for timm).
+        backend: Metric backend type. One of ``"torchmetrics"`` or ``"custom"``.
+        metric_class: The metric class name (for torchmetrics/custom).
         params: Parameters passed to the metric constructor/function.
         stages: List of stages where this metric applies: ``"train"``,
             ``"val"``, ``"test"``.
@@ -60,7 +58,7 @@ class MetricConfig:
             raise ValueError("stages is required (e.g., ['train', 'val', 'test'])")
 
         self.backend = self.backend.lower()
-        valid_backends = {"torchmetrics", "timm", "custom"}
+        valid_backends = {"torchmetrics", "custom"}
         if self.backend not in valid_backends:
             raise ValueError(
                 f"Unknown backend '{self.backend}'. "
@@ -111,60 +109,6 @@ class LoggingConfig:
             raise ValueError("verbosity must be 0, 1, or 2")
         if self.predictions_per_epoch < 0:
             raise ValueError("predictions_per_epoch must be non-negative")
-
-
-class TimmMetricWrapper(torch.nn.Module):
-    """Wrapper to make timm metric functions compatible with Lightning.
-
-    timm metrics are functional (not stateful like torchmetrics), so this
-    wrapper accumulates predictions and targets across steps.
-
-    Parameters:
-        fn: The timm metric function to wrap.
-        params: Parameters to pass to the function.
-
-    Example:
-        >>> from timm.utils.metrics import accuracy
-        >>> wrapper = TimmMetricWrapper(fn=accuracy, params={"topk": (1, 5)})
-        >>> wrapper.update(logits, targets)
-        >>> result = wrapper.compute()
-    """
-
-    def __init__(self, fn: Callable, params: dict[str, Any]) -> None:
-        super().__init__()
-        self._fn = fn
-        self._params = params
-        self._outputs: list[torch.Tensor] = []
-        self._targets: list[torch.Tensor] = []
-
-    def update(self, preds: torch.Tensor, targets: torch.Tensor) -> None:
-        """Accumulate predictions and targets."""
-        self._outputs.append(preds.detach())
-        self._targets.append(targets.detach())
-
-    def compute(self) -> torch.Tensor:
-        """Compute the metric over all accumulated data."""
-        if not self._outputs:
-            return torch.tensor(0.0)
-
-        outputs = torch.cat(self._outputs, dim=0)
-        targets = torch.cat(self._targets, dim=0)
-
-        topk = self._params.get("topk", (1,))
-        result = self._fn(outputs, targets, topk=topk)
-
-        # Return first top-k accuracy (usually top-1), normalized to 0-1
-        return result[0] / 100.0
-
-    def reset(self) -> None:
-        """Clear accumulated data."""
-        self._outputs.clear()
-        self._targets.clear()
-
-    def forward(self, preds: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
-        """Update and return current computed value."""
-        self.update(preds, targets)
-        return self.compute()
 
 
 class MetricManager:
@@ -246,8 +190,6 @@ class MetricManager:
 
         if backend == "torchmetrics":
             return self._create_torchmetrics_metric(config.metric_class, params)
-        elif backend == "timm":
-            return self._create_timm_metric(config.metric_class, params)
         elif backend == "custom":
             return self._create_custom_metric(config.metric_class, params)
         else:
@@ -264,36 +206,6 @@ class MetricManager:
             )
         metric_cls = getattr(torchmetrics, metric_class)
         return metric_cls(**params)
-
-    def _create_timm_metric(
-        self, metric_class: str, params: dict[str, Any]
-    ) -> TimmMetricWrapper:
-        """Create a wrapper around timm metric functions."""
-        try:
-            from timm.utils.metrics import accuracy as timm_accuracy
-        except ImportError:
-            raise ImportError(
-                "timm metrics require timm to be installed. "
-                "Install with: pip install timm"
-            ) from None
-
-        timm_metrics = {
-            "accuracy": timm_accuracy,
-        }
-
-        if metric_class.lower() not in timm_metrics:
-            raise ValueError(
-                f"Unknown timm metric: {metric_class}. "
-                f"Available: {', '.join(timm_metrics.keys())}"
-            )
-
-        # Remove num_classes as timm accuracy doesn't use it
-        params_copy = {k: v for k, v in params.items() if k != "num_classes"}
-
-        return TimmMetricWrapper(
-            fn=timm_metrics[metric_class.lower()],
-            params=params_copy,
-        )
 
     def _create_custom_metric(
         self, metric_class: str, params: dict[str, Any]
@@ -361,5 +273,60 @@ class MetricManager:
         return self._num_classes
 
     def __len__(self) -> int:
-        """Return total number of unique metrics across all stages."""
+        """Return total number of unique metric configs."""
         return len(self._configs)
+
+    def __iter__(self):
+        """Iterate over the metric configs."""
+        return iter(self._configs)
+
+    def __getitem__(self, index: int) -> MetricConfig:
+        """Get a metric config by index."""
+        return self._configs[index]
+
+    def get_metric_by_name(
+        self, name: str, stage: str | None = None
+    ) -> torch.nn.Module | None:
+        """Get a metric instance by name.
+
+        Parameters:
+            name: The metric name to search for.
+            stage: Optional stage to search in ("train", "val", "test").
+                If None, searches in order: val, train, test.
+
+        Returns:
+            The first matching metric instance, or None if not found.
+        """
+        if stage is not None:
+            metrics_dict = {
+                "train": self._train_metrics,
+                "val": self._val_metrics,
+                "test": self._test_metrics,
+            }.get(stage, {})
+            if name in metrics_dict:
+                return metrics_dict[name][0]
+            return None
+
+        # Search in order: val, train, test
+        for metrics_dict in [
+            self._val_metrics,
+            self._train_metrics,
+            self._test_metrics,
+        ]:
+            if name in metrics_dict:
+                return metrics_dict[name][0]
+        return None
+
+    def get_config_by_name(self, name: str) -> MetricConfig | None:
+        """Get a metric config by name.
+
+        Parameters:
+            name: The metric name to search for.
+
+        Returns:
+            The matching MetricConfig, or None if not found.
+        """
+        for config in self._configs:
+            if config.name == name:
+                return config
+        return None
