@@ -6,6 +6,8 @@ repo_url: https://github.com/theja-vanka/AutoTimm
 
 theme:
   name: material
+  favicon: assets/favicon.png
+  logo: assets/logo.png
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default

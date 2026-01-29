@@ -1,5 +1,3 @@
-# AutoTimm
-
 ![AutoTimm](autotimm.png)
 
 Automated deep learning image tasks powered by [timm](https://github.com/huggingface/pytorch-image-models) and [PyTorch Lightning](https://github.com/Lightning-AI/pytorch-lightning).

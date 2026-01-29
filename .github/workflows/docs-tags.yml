@@ -2,8 +2,8 @@ name: Deploy Docs
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'
     paths:
       - 'docs/**'
       - 'mkdocs.yml'
