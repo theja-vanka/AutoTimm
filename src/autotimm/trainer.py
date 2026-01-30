@@ -79,6 +79,9 @@ class AutoTrainer(pl.Trainer):
         accumulate_grad_batches: Gradient accumulation steps.
         val_check_interval: How often to run validation (1.0 = every epoch).
         enable_checkpointing: Whether to save model checkpoints.
+        fast_dev_run: Runs a single batch through train, val, and test to
+            find bugs quickly. Can be ``True`` (1 batch), ``False`` (disabled),
+            or an integer (number of batches). Useful for debugging.
         **trainer_kwargs: Any other ``pl.Trainer`` argument.
 
     Example:
@@ -102,6 +105,10 @@ class AutoTrainer(pl.Trainer):
         ...     max_epochs=10,
         ...     tuner_config=TunerConfig(auto_lr=True, auto_batch_size=False),
         ... )
+
+        >>> # Quick debugging with fast_dev_run
+        >>> trainer = AutoTrainer(fast_dev_run=True)
+        >>> trainer.fit(model, datamodule=data)  # Runs 1 batch only
     """
 
     def __init__(
@@ -126,6 +133,7 @@ class AutoTrainer(pl.Trainer):
         accumulate_grad_batches: int = 1,
         val_check_interval: float | int = 1.0,
         enable_checkpointing: bool = True,
+        fast_dev_run: bool | int = False,
         **trainer_kwargs: Any,
     ) -> None:
         if isinstance(logger, LoggerManager):
@@ -169,6 +177,7 @@ class AutoTrainer(pl.Trainer):
             accumulate_grad_batches=accumulate_grad_batches,
             val_check_interval=val_check_interval,
             enable_checkpointing=enable_checkpointing,
+            fast_dev_run=fast_dev_run,
             **trainer_kwargs,
         )
 

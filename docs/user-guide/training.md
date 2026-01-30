@@ -47,6 +47,25 @@ trainer = AutoTrainer(
 )
 ```
 
+## Fast Development Run
+
+Quickly test your code by running a single batch through training, validation, and testing:
+
+```python
+# Run 1 batch only (for debugging)
+trainer = AutoTrainer(fast_dev_run=True)
+trainer.fit(model, datamodule=data)
+
+# Run N batches for more thorough testing
+trainer = AutoTrainer(fast_dev_run=5)
+trainer.fit(model, datamodule=data)
+```
+
+This is useful for:
+- **Debugging**: Catch errors quickly without waiting for full epochs
+- **Testing code changes**: Verify your model runs end-to-end
+- **Development**: Iterate faster when building new features
+
 ## Auto-Tuning
 
 ### TunerConfig
@@ -471,6 +490,7 @@ AutoTrainer(
     accumulate_grad_batches=1,      # Gradient accumulation steps
     val_check_interval=1.0,         # Validation frequency
     enable_checkpointing=True,      # Save checkpoints
+    fast_dev_run=False,             # True, False, or int (number of batches)
     # ... any other pl.Trainer argument
 )
 ```
