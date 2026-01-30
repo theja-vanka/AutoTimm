@@ -52,6 +52,7 @@ pip install autotimm
 ```bash
 # With specific extras
 pip install autotimm[albumentations]  # OpenCV-based transforms
+pip install autotimm[detection]       # Object detection (includes pycocotools for mAP metrics)
 pip install autotimm[segmentation]    # Segmentation tasks (includes albumentations + pycocotools)
 pip install autotimm[tensorboard]     # TensorBoard logging
 pip install autotimm[wandb]           # Weights & Biases

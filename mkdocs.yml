@@ -78,6 +78,7 @@ nav:
           - Overview: user-guide/data-loading/index.md
           - Image Classification Data: user-guide/data-loading/image-classification-data.md
           - Object Detection Data: user-guide/data-loading/object-detection-data.md
+          - Segmentation Data: user-guide/data-loading/segmentation-data.md
       - Models:
           - Overview: user-guide/models/index.md
           - ImageClassifier: user-guide/models/image-classifier.md

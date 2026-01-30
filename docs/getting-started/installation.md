@@ -36,6 +36,28 @@ Adds:
 - `albumentations>=1.3`
 - `opencv-python-headless>=4.8`
 
+#### Object Detection
+
+```bash
+pip install autotimm[detection]
+```
+
+Adds:
+
+- `pycocotools>=2.0` (required for mAP metrics)
+
+#### Semantic Segmentation
+
+```bash
+pip install autotimm[segmentation]
+```
+
+Adds:
+
+- `albumentations>=1.3`
+- `opencv-python-headless>=4.8`
+- `pycocotools>=2.0`
+
 #### Logger Backends
 
 ```bash
@@ -55,7 +77,7 @@ pip install autotimm[mlflow]
 pip install autotimm[all]
 ```
 
-Includes all optional dependencies: tensorboard, mlflow, wandb, and albumentations.
+Incudes all optional dependencies: tensorboard, mlflow, wandb, albumentations, and pycocotools.
 
 ## Development Installation
 
