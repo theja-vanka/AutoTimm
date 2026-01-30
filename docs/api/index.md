@@ -7,7 +7,9 @@ This section provides detailed API documentation for all AutoTimm classes and fu
 | Class | Description |
 |-------|-------------|
 | [ImageClassifier](classifier.md) | End-to-end image classifier with timm backbone |
+| [ObjectDetector](classifier.md#objectdetector) | FCOS-style anchor-free object detector |
 | [ImageDataModule](data.md) | Data module for images (folder or built-in datasets) |
+| [DetectionDataModule](data.md#detectiondatamodule) | Data module for object detection (COCO format) |
 | [AutoTrainer](trainer.md) | Configured PyTorch Lightning Trainer |
 
 ## Configuration Classes
@@ -35,6 +37,14 @@ This section provides detailed API documentation for all AutoTimm classes and fu
 | Get by name | `get_metric_by_name(name)` | `get_logger_by_backend(name)` |
 | Get config | `get_config_by_name(name)` | - |
 
+## Loss Functions
+
+| Loss | Description |
+|------|-------------|
+| [FocalLoss](utils.md#autotimm.FocalLoss) | Focal loss for addressing class imbalance |
+| [GIoULoss](utils.md#autotimm.GIoULoss) | Generalized IoU loss for bounding box regression |
+| [FCOSLoss](utils.md#autotimm.FCOSLoss) | Combined FCOS detection loss |
+
 ## Utility Functions
 
 | Function | Description |
@@ -47,7 +57,7 @@ This section provides detailed API documentation for all AutoTimm classes and fu
 
 ## Quick Links
 
-### Getting Started
+### Image Classification
 
 ```python
 from autotimm import (
@@ -56,6 +66,17 @@ from autotimm import (
     ImageDataModule,
     MetricConfig,
     MetricManager,
+)
+```
+
+### Object Detection
+
+```python
+from autotimm import (
+    AutoTrainer,
+    ObjectDetector,
+    DetectionDataModule,
+    MetricConfig,
 )
 ```
 
@@ -99,17 +120,23 @@ from autotimm import (
 
 ```
 autotimm/
-├── __init__.py           # Public API exports
-├── backbone.py           # BackboneConfig, create_backbone, list_backbones
+├── __init__.py                # Public API exports
+├── backbone.py                # BackboneConfig, create_backbone, list_backbones
 ├── data/
-│   ├── datamodule.py     # ImageDataModule
-│   ├── dataset.py        # ImageFolderCV2
-│   └── transforms.py     # Transform presets
-├── heads.py              # ClassificationHead
-├── loggers.py            # LoggerConfig, LoggerManager
-├── metrics.py            # MetricConfig, MetricManager, LoggingConfig
+│   ├── datamodule.py          # ImageDataModule
+│   ├── dataset.py             # ImageFolderCV2
+│   ├── transforms.py          # Transform presets
+│   ├── detection_datamodule.py # DetectionDataModule
+│   ├── detection_dataset.py   # DetectionDataset
+│   └── detection_transforms.py # Detection augmentations
+├── heads.py                   # ClassificationHead, DetectionHead, FPN
+├── loggers.py                 # LoggerConfig, LoggerManager
+├── losses/
+│   └── detection.py           # FocalLoss, GIoULoss, FCOSLoss
+├── metrics.py                 # MetricConfig, MetricManager, LoggingConfig
 ├── tasks/
-│   └── classification.py # ImageClassifier
-├── trainer.py            # AutoTrainer, TunerConfig
-└── utils.py              # Utility functions
+│   ├── classification.py      # ImageClassifier
+│   └── object_detection.py    # ObjectDetector
+├── trainer.py                 # AutoTrainer, TunerConfig
+└── utils.py                   # Utility functions
 ```
