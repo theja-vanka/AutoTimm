@@ -381,10 +381,10 @@ All three approaches have **identical runtime performance**:
 - HF Hub backbones: `tests/test_hf_hub_backbones.py`
 
 ### Examples
-- [HF Hub Classification](../../examples/hf_hub_classification.py)
-- [HF Hub Segmentation](../../examples/hf_hub_segmentation.py)
-- [HF Hub Object Detection](../../examples/hf_hub_object_detection.py)
-- [HF Direct with Lightning](../../examples/hf_direct_models_lightning.py)
+- [HF Hub Classification](https://github.com/theja-vanka/AutoTimm/blob/main/examples/hf_hub_classification.py)
+- [HF Hub Segmentation](https://github.com/theja-vanka/AutoTimm/blob/main/examples/hf_hub_segmentation.py)
+- [HF Hub Object Detection](https://github.com/theja-vanka/AutoTimm/blob/main/examples/hf_hub_object_detection.py)
+- [HF Direct with Lightning](https://github.com/theja-vanka/AutoTimm/blob/main/examples/hf_direct_models_lightning.py)
 
 ## Summary
 
