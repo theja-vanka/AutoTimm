@@ -498,11 +498,12 @@ class SemanticSegmentor(pl.LightningModule):
         # Torch schedulers
         if scheduler_name == "cosine":
             # Get T_max from kwargs, or use trainer's estimated_stepping_batches if available
-            default_t_max = (
-                self.trainer.estimated_stepping_batches
-                if self.trainer is not None
-                else 1000
-            )
+            try:
+                default_t_max = self.trainer.estimated_stepping_batches
+            except RuntimeError:
+                # Trainer not attached yet
+                default_t_max = 1000
+            
             scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
                 optimizer,
                 T_max=sched_kwargs.pop("T_max", default_t_max),
@@ -529,12 +530,16 @@ class SemanticSegmentor(pl.LightningModule):
                 **sched_kwargs,
             )
         elif scheduler_name == "onecycle":
+            try:
+                default_total_steps = self.trainer.estimated_stepping_batches
+            except RuntimeError:
+                # Trainer not attached yet
+                default_total_steps = 1000
+            
             scheduler = torch.optim.lr_scheduler.OneCycleLR(
                 optimizer,
                 max_lr=sched_kwargs.pop("max_lr", self._lr * 10),
-                total_steps=sched_kwargs.pop(
-                    "total_steps", self.trainer.estimated_stepping_batches
-                ),
+                total_steps=sched_kwargs.pop("total_steps", default_total_steps),
                 **sched_kwargs,
             )
         elif scheduler_name == "plateau":

@@ -366,17 +366,24 @@ pytest tests/ -v
 
 ## Testing
 
+All tests pass successfully (130 passed, 3 skipped).
+
 ```bash
 # Run all tests
-pytest tests/
+pytest tests/ -v
 
 # Run specific test modules
-pytest tests/test_losses.py
-pytest tests/test_segmentation.py
+pytest tests/test_classification.py
+pytest tests/test_semantic_segmentation.py
+pytest tests/test_segmentation_losses.py
 
 # With coverage
 pytest tests/ --cov=autotimm --cov-report=html
 ```
+
+**Recent Fixes:**
+- ✅ Fixed `RuntimeError` when calling `configure_optimizers()` without attached trainer (semantic segmentation)
+- ✅ Improved scheduler initialization to handle cases where model is not yet attached to trainer
 
 ## Citation
 
