@@ -35,17 +35,6 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
-      - name: Prepare MkDocs cache dir
-        run: mkdir -p .cache
-
-      - name: Cache MkDocs Material
-        uses: actions/cache@v4
-        with:
-          path: .cache
-          key: mkdocs-material-${{ runner.os }}-${{ hashFiles('mkdocs.yml') }}
-          restore-keys: |
-            mkdocs-material-${{ runner.os }}-
-
       - name: Install dependencies
         run: |
           pip install --upgrade pip

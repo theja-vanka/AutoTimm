@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- Python 3.9+
+- Python 3.10+
 - PyTorch 2.0+
 - CUDA (optional, for GPU training)
 
