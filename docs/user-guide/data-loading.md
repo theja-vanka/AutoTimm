@@ -1,6 +1,8 @@
 # Data Loading
 
-AutoTimm provides `ImageDataModule`, a flexible data loading solution that supports both built-in torchvision datasets and custom folder-based datasets.
+AutoTimm provides two data modules:
+- **ImageDataModule**: Image classification datasets
+- **DetectionDataModule**: Object detection datasets in COCO format
 
 ## ImageDataModule
 
@@ -258,4 +260,223 @@ ImageDataModule(
     prefetch_factor=None,        # Prefetch batches per worker
     balanced_sampling=False,     # Weighted sampling
 )
+```
+
+---
+
+## DetectionDataModule
+
+For object detection tasks, use `DetectionDataModule` which loads COCO-format datasets.
+
+### COCO Dataset Format
+
+Expected directory structure:
+
+```
+coco/
+  train2017/              # Training images
+    000000000001.jpg
+    000000000002.jpg
+    ...
+  val2017/                # Validation images
+    000000000001.jpg
+    ...
+  test2017/               # Test images (optional)
+    000000000001.jpg
+    ...
+  annotations/
+    instances_train2017.json
+    instances_val2017.json
+    instances_test2017.json  # Optional
+```
+
+The annotation files follow the standard COCO JSON format with image metadata, categories, and bounding box annotations.
+
+### Basic Usage
+
+```python
+from autotimm import DetectionDataModule
+
+data = DetectionDataModule(
+    data_dir="./coco",
+    image_size=640,         # Standard COCO size
+    batch_size=16,
+    num_workers=4,
+)
+```
+
+### Augmentation Presets
+
+DetectionDataModule supports albumentations-based augmentation presets:
+
+```python
+data = DetectionDataModule(
+    data_dir="./coco",
+    image_size=640,
+    batch_size=16,
+    augmentation_preset="default",  # or "strong"
+)
+```
+
+Available presets:
+
+| Preset | Description |
+|--------|-------------|
+| `default` | RandomResizedCrop (80-100%), HorizontalFlip |
+| `strong` | Affine, blur, noise, brightness/contrast adjustments |
+
+### Custom Transforms
+
+Use custom albumentations pipelines with bbox-aware transforms:
+
+```python
+import albumentations as A
+
+custom_train = A.Compose(
+    [
+        A.RandomResizedCrop(height=640, width=640, scale=(0.8, 1.0)),
+        A.HorizontalFlip(p=0.5),
+        A.RandomBrightnessContrast(p=0.5),
+        A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ],
+    bbox_params=A.BboxParams(format="coco", label_fields=["labels"]),
+)
+
+data = DetectionDataModule(
+    data_dir="./coco",
+    image_size=640,
+    batch_size=16,
+    train_transforms=custom_train,
+)
+```
+
+**Important**: Always include `bbox_params` when using custom transforms to ensure bounding boxes are properly transformed.
+
+### Filter by Class
+
+Train on a subset of classes:
+
+```python
+# Only detect person, bicycle, and car
+selected_classes = [1, 2, 3]
+
+data = DetectionDataModule(
+    data_dir="./coco",
+    image_size=512,
+    batch_size=8,
+    class_ids=selected_classes,
+)
+```
+
+This filters the dataset to only include images containing these classes and remaps class IDs to 0-based indexing.
+
+### Filter Small Boxes
+
+Remove very small bounding boxes:
+
+```python
+data = DetectionDataModule(
+    data_dir="./coco",
+    image_size=640,
+    batch_size=16,
+    min_bbox_area=32.0,  # Minimum box area in pixels
+)
+```
+
+This helps avoid training on boxes that are too small to detect reliably.
+
+### Dataset Summary
+
+Get information about your detection dataset:
+
+```python
+data = DetectionDataModule(data_dir="./coco", image_size=640)
+data.setup("fit")
+print(data.summary())
+```
+
+Output:
+
+```
+┌─────────────────────┬──────────┐
+│ Field               │ Value    │
+├─────────────────────┼──────────┤
+│ Data dir            │ ./coco   │
+│ Image size          │ 640      │
+│ Batch size          │ 16       │
+│ Num classes         │ 80       │
+│ Train samples       │ 118287   │
+│ Val samples         │ 5000     │
+│ Test samples        │ 0        │
+└─────────────────────┴──────────┘
+```
+
+### DataLoader Options
+
+Same as ImageDataModule:
+
+```python
+data = DetectionDataModule(
+    data_dir="./coco",
+    batch_size=16,
+    num_workers=8,            # Parallel data loading
+    pin_memory=True,          # Faster GPU transfer
+    persistent_workers=True,  # Keep workers alive
+    prefetch_factor=4,        # Batches to prefetch per worker
+)
+```
+
+### Full Parameter Reference
+
+```python
+DetectionDataModule(
+    data_dir="./coco",           # COCO dataset root
+    image_size=640,              # Target image size
+    batch_size=16,               # Batch size
+    num_workers=4,               # Data loading workers
+    train_transforms=None,       # Custom albumentations transforms
+    eval_transforms=None,        # Custom eval transforms
+    augmentation_preset=None,    # "default" or "strong"
+    class_ids=None,              # Filter to specific classes
+    min_bbox_area=0.0,           # Minimum bounding box area
+    pin_memory=True,             # Pin memory for GPU
+    persistent_workers=False,    # Keep workers alive
+    prefetch_factor=None,        # Prefetch batches per worker
+)
+```
+
+### Complete Example
+
+```python
+from autotimm import AutoTrainer, DetectionDataModule, ObjectDetector, MetricConfig
+
+# Data
+data = DetectionDataModule(
+    data_dir="./coco",
+    image_size=640,
+    batch_size=16,
+    num_workers=4,
+    augmentation_preset="default",
+)
+
+# Model
+model = ObjectDetector(
+    backbone="resnet50",
+    num_classes=80,
+    metrics=[
+        MetricConfig(
+            name="mAP",
+            backend="torchmetrics",
+            metric_class="MeanAveragePrecision",
+            params={"box_format": "xyxy"},
+            stages=["val", "test"],
+            prog_bar=True,
+        ),
+    ],
+    lr=1e-4,
+)
+
+# Train
+trainer = AutoTrainer(max_epochs=12, gradient_clip_val=1.0)
+trainer.fit(model, datamodule=data)
 ```

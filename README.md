@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <strong>Train state-of-the-art image classifiers with minimal code</strong>
+  <strong>Train state-of-the-art image classifiers and object detectors with minimal code</strong>
 </p>
 
 <p align="center">
@@ -22,12 +22,13 @@
 
 ---
 
-AutoTimm combines the power of [timm](https://github.com/huggingface/pytorch-image-models) (1000+ pretrained models) with [PyTorch Lightning](https://github.com/Lightning-AI/pytorch-lightning) for a seamless training experience. Go from idea to trained model in minutes, not hours.
+AutoTimm combines the power of [timm](https://github.com/huggingface/pytorch-image-models) (1000+ pretrained models) with [PyTorch Lightning](https://github.com/Lightning-AI/pytorch-lightning) for a seamless training experience. Train image classifiers and object detectors with any timm backbone. Go from idea to trained model in minutes, not hours.
 
 ## Highlights
 
 | | |
 |---|---|
+| **Multiple Tasks** | Image classification and FCOS-style anchor-free object detection |
 | **1000+ Backbones** | Access ResNet, EfficientNet, ViT, ConvNeXt, Swin, and more from timm |
 | **Explicit Metrics** | Configure exactly what you track with MetricManager and torchmetrics |
 | **Multi-Logger Support** | TensorBoard, MLflow, Weights & Biases, CSV — use them all at once |
@@ -105,8 +106,11 @@ Ready-to-run scripts in the [`examples/`](examples/) directory:
 
 | Example | Description |
 |---------|-------------|
-| [classify_cifar10.py](examples/classify_cifar10.py) | Basic training with MetricManager and auto-tuning |
+| [classify_cifar10.py](examples/classify_cifar10.py) | Basic classification with MetricManager and auto-tuning |
 | [classify_custom_folder.py](examples/classify_custom_folder.py) | Train on your own dataset |
+| [object_detection_coco.py](examples/object_detection_coco.py) | FCOS-style object detection on COCO dataset |
+| [object_detection_transformers.py](examples/object_detection_transformers.py) | Transformer-based detection (ViT, Swin, DeiT) |
+| [object_detection_rtdetr.py](examples/object_detection_rtdetr.py) | RT-DETR end-to-end detection (no NMS required) |
 | [vit_finetuning.py](examples/vit_finetuning.py) | Two-phase Vision Transformer fine-tuning |
 | [multi_gpu_training.py](examples/multi_gpu_training.py) | Distributed training with DDP |
 | [mlflow_tracking.py](examples/mlflow_tracking.py) | Experiment tracking with MLflow |

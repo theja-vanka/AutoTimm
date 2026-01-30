@@ -227,6 +227,112 @@ Popular choices:
 | `convnext_tiny` | ConvNeXt models |
 | `swin_tiny_patch4_window7_224` | Swin Transformer |
 
+## Object Detection Quick Start
+
+AutoTimm also supports object detection with FCOS-style anchor-free detectors.
+
+### Basic Object Detection Example
+
+```python
+from autotimm import (
+    AutoTrainer,
+    DetectionDataModule,
+    MetricConfig,
+    ObjectDetector,
+)
+
+
+def main():
+    # Data - COCO format detection dataset
+    data = DetectionDataModule(
+        data_dir="./coco",
+        image_size=640,
+        batch_size=16,
+        augmentation_preset="default",
+    )
+
+    # Metrics
+    metric_configs = [
+        MetricConfig(
+            name="mAP",
+            backend="torchmetrics",
+            metric_class="MeanAveragePrecision",
+            params={"box_format": "xyxy"},
+            stages=["val", "test"],
+            prog_bar=True,
+        ),
+    ]
+
+    # Model - FCOS detector with any timm backbone
+    model = ObjectDetector(
+        backbone="resnet50",  # Try: swin_tiny, efficientnet_b3, etc.
+        num_classes=80,  # COCO has 80 classes
+        metrics=metric_configs,
+        lr=1e-4,
+    )
+
+    # Train
+    trainer = AutoTrainer(
+        max_epochs=12,
+        gradient_clip_val=1.0,
+    )
+
+    trainer.fit(model, datamodule=data)
+    trainer.test(model, datamodule=data)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+### Detection with Transformer Backbones
+
+Use Vision Transformers for detection:
+
+```python
+# Swin Transformer (recommended for detection)
+model = ObjectDetector(
+    backbone="swin_tiny_patch4_window7_224",
+    num_classes=80,
+    metrics=metric_configs,
+    lr=1e-4,
+)
+
+# Vision Transformer
+model = ObjectDetector(
+    backbone="vit_base_patch16_224",
+    num_classes=80,
+    metrics=metric_configs,
+    lr=1e-4,
+)
+```
+
+See [Object Detection Examples](../examples/index.md#object-detection-on-coco) for more details.
+
+### Alternative: RT-DETR
+
+For end-to-end transformer detection without NMS:
+
+```python
+from transformers import RTDetrForObjectDetection
+from autotimm import DetectionDataModule
+
+# Use AutoTimm's data loading
+data = DetectionDataModule(
+    data_dir="./coco",
+    image_size=640,
+    batch_size=4,
+)
+
+# RT-DETR model
+model = RTDetrForObjectDetection.from_pretrained(
+    "PekingU/rtdetr_r50vd",
+    num_labels=80,
+)
+```
+
+See [RT-DETR Example](../examples/index.md#rt-detr-real-time-detection-transformer) for complete integration.
+
 ## Next Steps
 
 - [Data Loading](../user-guide/data-loading.md) - Learn about transforms and datasets
