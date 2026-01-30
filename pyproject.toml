@@ -8,7 +8,7 @@ description = "Automated deep learning image tasks powered by timm and PyTorch L
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.9"
-keywords = ["deep-learning", "computer-vision", "pytorch", "timm", "automation"]
+keywords = ["deep-learning", "computer-vision", "pytorch", "timm", "automation", "huggingface_hub", "torchvision", "torchmetrics"]
 dynamic = ["version"]
 authors = [
     {name = "Krishnatheja Vanka"},
@@ -32,6 +32,7 @@ dependencies = [
     "torchmetrics>=1.0",
     "numpy>=1.23",
     "opencv-python-headless>=4.8",
+    "huggingface_hub>=0.20",
 ]
 
 [project.optional-dependencies]

@@ -8,6 +8,9 @@ Browse examples by topic:
 
 - **[Classification](classification.md)** - Image classification with CIFAR-10, custom datasets, and ViT fine-tuning
 - **[Object Detection](object-detection.md)** - FCOS, transformer-based detection, and RT-DETR
+- **[Semantic Segmentation](semantic-segmentation.md)** - DeepLabV3+ and FCN architectures for semantic segmentation
+- **[Instance Segmentation](instance-segmentation.md)** - Mask R-CNN style instance segmentation
+- **[Hugging Face Hub](huggingface-hub.md)** - Using HF Hub models for all tasks with comprehensive examples
 - **[Data Handling](data-handling.md)** - Balanced sampling, augmentation, and custom transforms
 - **[Training Utilities](training-utilities.md)** - Auto-tuning, multi-GPU training, and inference
 - **[Logging & Metrics](logging-metrics.md)** - Multiple loggers, MLflow, and detailed evaluation
@@ -18,8 +21,10 @@ Browse examples by topic:
 | Script | Description | Category |
 |--------|-------------|----------|
 | [`classify_cifar10.py`](classification.md#cifar-10-classification) | ResNet-18 on CIFAR-10 with MetricManager | Classification |
-| [`classify_custom_folder.py`](classification.md#custom-folder-dataset) | EfficientNet on a custom folder dataset with W&B | Classification |
+| [`classify_custom_folder.py`](classification.md#custom-folder-dataset) | Train on custom ImageFolder dataset with W&B | Classification |
 | [`vit_finetuning.py`](classification.md#vit-fine-tuning) | Two-phase ViT fine-tuning | Classification |
+| [`semantic_segmentation.py`](semantic-segmentation.md#semantic-segmentation-example) | DeepLabV3+ semantic segmentation | Semantic Segmentation |
+| [`instance_segmentation.py`](instance-segmentation.md#instance-segmentation-example) | Mask R-CNN style instance segmentation | Instance Segmentation |
 | [`object_detection_coco.py`](object-detection.md#object-detection-on-coco) | FCOS-style object detection on COCO dataset | Object Detection |
 | [`object_detection_transformers.py`](object-detection.md#transformer-based-object-detection) | Vision Transformers for object detection | Object Detection |
 | [`object_detection_rtdetr.py`](object-detection.md#rt-detr-real-time-detection-transformer) | RT-DETR end-to-end transformer detection | Object Detection |
@@ -33,6 +38,14 @@ Browse examples by topic:
 | [`mlflow_tracking.py`](logging-metrics.md#mlflow-tracking) | MLflow experiment tracking | Logging & Metrics |
 | [`detailed_evaluation.py`](logging-metrics.md#detailed-evaluation) | Confusion matrix and per-class metrics | Logging & Metrics |
 | [`backbone_discovery.py`](backbone-utilities.md#backbone-discovery) | Explore timm backbones | Backbone Utilities |
+| [`huggingface_hub_models.py`](huggingface-hub.md#introduction-to-hf-hub-models) | Introduction to HF Hub integration | HF Hub |
+| [`hf_hub_classification.py`](huggingface-hub.md#image-classification) | Classification with HF Hub models | HF Hub |
+| [`hf_hub_segmentation.py`](huggingface-hub.md#semantic-segmentation) | Segmentation with HF Hub models | HF Hub |
+| [`hf_hub_object_detection.py`](huggingface-hub.md#object-detection) | Detection with HF Hub models | HF Hub |
+| [`hf_hub_instance_segmentation.py`](huggingface-hub.md#instance-segmentation) | Instance segmentation with HF Hub models | HF Hub |
+| [`hf_hub_advanced.py`](huggingface-hub.md#advanced-usage) | Advanced HF Hub features | HF Hub |
+| [`hf_hub_lightning_integration.py`](../user-guide/huggingface-hub-integration.md#pytorch-lightning-compatibility) | Lightning compatibility with HF Hub | HF Hub |
+| [`hf_direct_models_lightning.py`](../user-guide/huggingface-transformers-integration.md) | Direct HF Transformers models with Lightning | HF Transformers |
 
 ---
 
@@ -64,6 +77,16 @@ Explore object detection with FCOS architecture, Vision Transformer backbones, a
 
 👉 [View Object Detection Examples](object-detection.md)
 
+### Semantic Segmentation
+Learn semantic segmentation with DeepLabV3+ and FCN architectures. Covers multiple dataset formats (PNG, Cityscapes, COCO, VOC) and various loss functions.
+
+👉 [View Semantic Segmentation Examples](semantic-segmentation.md)
+
+### Instance Segmentation
+Master instance segmentation with Mask R-CNN style architecture. Includes COCO format datasets, detection + mask prediction, and comprehensive evaluation metrics.
+
+👉 [View Instance Segmentation Examples](instance-segmentation.md)
+
 ### Data Handling
 Master data loading techniques including balanced sampling for imbalanced datasets, albumentations augmentation presets, and custom transform pipelines.
 
@@ -83,6 +106,16 @@ Track experiments effectively with multiple logger support, MLflow integration, 
 Discover and compare timm backbones, optimizers, and schedulers for your use case. Learn about different model families and how to select the right backbone, optimizer, and learning rate schedule.
 
 👉 [View Backbone Utilities Examples](backbone-utilities.md)
+
+### Hugging Face Hub
+Learn how to use thousands of timm-compatible models from Hugging Face Hub with AutoTimm. Covers model discovery, all tasks (classification, detection, segmentation), PyTorch Lightning compatibility, and advanced features.
+
+👉 [View Hugging Face Hub Examples](huggingface-hub.md)
+
+### HuggingFace Transformers
+Use HuggingFace Transformers vision models (ViT, DeiT, BEiT, Swin) directly with PyTorch Lightning. Learn how to use specific model classes for full control without Auto classes.
+
+👉 [View HuggingFace Transformers Integration](../user-guide/huggingface-transformers-integration.md)
 
 
 

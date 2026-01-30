@@ -21,6 +21,7 @@ from autotimm.backbone import (
     get_feature_info,
     get_feature_strides,
     list_backbones,
+    list_hf_hub_backbones,
 )
 from autotimm.data.datamodule import ImageDataModule
 from autotimm.data.detection_datamodule import DetectionDataModule
@@ -86,6 +87,7 @@ __all__ = [
     "get_feature_info",
     "get_feature_strides",
     "list_backbones",
+    "list_hf_hub_backbones",
     # Heads
     "ASPP",
     "ClassificationHead",

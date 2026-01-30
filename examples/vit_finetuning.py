@@ -4,6 +4,9 @@ This example demonstrates:
 - Two-phase ViT fine-tuning (linear probe then full fine-tune)
 - Using BackboneConfig for stochastic depth
 - MetricManager for metric configuration
+
+Usage:
+    python examples/vit_finetuning.py
 """
 
 from autotimm import (

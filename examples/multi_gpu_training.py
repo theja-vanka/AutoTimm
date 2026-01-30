@@ -1,11 +1,14 @@
 """Demonstrate multi-GPU and distributed training.
 
-This example shows how to:
-- Train on multiple GPUs using DDP (Distributed Data Parallel)
-- Configure accelerator and devices
-- Use different distributed strategies
-- Scale batch size for multi-GPU training
-- Use MetricManager for metric configuration
+This example demonstrates:
+- Training on multiple GPUs using DDP (Distributed Data Parallel)
+- Configuring accelerator and devices
+- Using different distributed strategies
+- Scaling batch size for multi-GPU training
+- MetricManager for metric configuration
+
+Usage:
+    python examples/multi_gpu_training.py
 """
 
 from autotimm import (

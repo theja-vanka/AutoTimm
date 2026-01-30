@@ -1,10 +1,13 @@
 """Demonstrate model inference and prediction.
 
-This example shows how to:
-- Load a trained model from checkpoint
-- Run inference on single images
-- Run batch predictions
-- Export predictions to file
+This example demonstrates:
+- Loading a trained model from checkpoint
+- Running inference on single images
+- Running batch predictions
+- Exporting predictions to file
+
+Usage:
+    python examples/inference.py
 """
 
 import torch

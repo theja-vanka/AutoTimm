@@ -1,4 +1,29 @@
-"""Train on a custom ImageFolder dataset with W&B logging."""
+"""Train on a custom ImageFolder dataset with W&B logging.
+
+This example demonstrates:
+- Training on custom folder-based datasets (ImageFolder format)
+- Using Weights & Biases (W&B) for experiment tracking
+- MetricManager for metric configuration
+- EfficientNet backbone for transfer learning
+
+Usage:
+    python examples/classify_custom_folder.py
+
+Expected directory structure:
+    /path/to/your/dataset/
+      train/
+        class1/
+          img1.jpg
+          img2.jpg
+          ...
+        class2/
+          ...
+      val/
+        class1/
+          ...
+        class2/
+          ...
+"""
 
 from autotimm import (
     AutoTrainer,

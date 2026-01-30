@@ -1,10 +1,13 @@
 """Demonstrate detailed model evaluation with confusion matrix and per-class metrics.
 
-This example shows how to:
+This example demonstrates:
 - Enable confusion matrix logging during training
 - Compute per-class precision, recall, F1
 - Generate classification report after training
 - Visualize results
+
+Usage:
+    python examples/detailed_evaluation.py
 """
 
 import torch
