@@ -128,7 +128,7 @@ Atrous Spatial Pyramid Pooling module for multi-scale feature extraction. Core c
 
 Dice loss for multi-class semantic segmentation. Optimizes directly for IoU-like metric. Formula: `1 - (2 * |X ∩ Y|) / (|X| + |Y|)`. Effective for handling class imbalance.
 
-::: autotimm.loss.DiceLoss
+::: autotimm.losses.DiceLoss
     options:
       show_root_heading: true
       show_source: false
@@ -140,7 +140,7 @@ Dice loss for multi-class semantic segmentation. Optimizes directly for IoU-like
 
 Combines Cross-Entropy and Dice losses with configurable weights. Leverages pixel-wise classification (CE) and region overlap optimization (Dice) for robust segmentation.
 
-::: autotimm.loss.CombinedSegmentationLoss
+::: autotimm.losses.CombinedSegmentationLoss
     options:
       show_root_heading: true
       show_source: false
@@ -152,7 +152,7 @@ Combines Cross-Entropy and Dice losses with configurable weights. Leverages pixe
 
 Focal loss for dense pixel-wise prediction. Down-weights easy examples to focus on hard pixels. Particularly effective for handling severe class imbalance in segmentation tasks.
 
-::: autotimm.loss.FocalLossPixelwise
+::: autotimm.losses.FocalLossPixelwise
     options:
       show_root_heading: true
       show_source: false
@@ -164,7 +164,7 @@ Focal loss for dense pixel-wise prediction. Down-weights easy examples to focus 
 
 Generalized Dice loss with configurable false positive/negative trade-off via alpha and beta parameters. Useful for highly imbalanced segmentation tasks.
 
-::: autotimm.loss.TverskyLoss
+::: autotimm.losses.TverskyLoss
     options:
       show_root_heading: true
       show_source: false
@@ -176,7 +176,7 @@ Generalized Dice loss with configurable false positive/negative trade-off via al
 
 Binary cross-entropy loss for instance segmentation masks. Used in conjunction with detection losses for end-to-end instance segmentation training.
 
-::: autotimm.loss.MaskLoss
+::: autotimm.losses.MaskLoss
     options:
       show_root_heading: true
       show_source: false
@@ -227,7 +227,7 @@ import autotimm
 
 # Access via submodule aliases
 model = autotimm.task.SemanticSegmentor(...)
-loss = autotimm.loss.DiceLoss(...)
+loss = autotimm.losses.DiceLoss(...)
 head = autotimm.heads.DeepLabV3PlusHead(...)
 ```
 
