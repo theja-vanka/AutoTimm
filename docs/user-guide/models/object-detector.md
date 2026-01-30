@@ -1,300 +1,8 @@
-# Models
-
-AutoTimm provides two main model types:
-- **ImageClassifier**: Image classification with any timm backbone
-- **ObjectDetector**: FCOS-style anchor-free object detection with timm backbones
-
-## ImageClassifier
-
-### Basic Usage
-
-```python
-from autotimm import ImageClassifier, MetricConfig
-
-metrics = [
-    MetricConfig(
-        name="accuracy",
-        backend="torchmetrics",
-        metric_class="Accuracy",
-        params={"task": "multiclass"},
-        stages=["train", "val", "test"],
-        prog_bar=True,
-    ),
-]
-
-model = ImageClassifier(
-    backbone="resnet50",
-    num_classes=10,
-    metrics=metrics,
-)
-```
-
-### Backbone Selection
-
-AutoTimm supports 1000+ backbones from timm. Browse available models:
-
-```python
-import autotimm
-
-# List all backbones
-all_models = autotimm.list_backbones()
-print(f"Total models: {len(all_models)}")
-
-# Search by pattern
-autotimm.list_backbones("*resnet*")
-autotimm.list_backbones("*efficientnet*")
-autotimm.list_backbones("*vit*")
-
-# Only pretrained models
-autotimm.list_backbones("*convnext*", pretrained_only=True)
-```
-
-Popular backbone families:
-
-| Family | Examples | Use Case |
-|--------|----------|----------|
-| ResNet | `resnet18`, `resnet50`, `resnet101` | General purpose |
-| EfficientNet | `efficientnet_b0` to `efficientnet_b7` | Efficiency |
-| ConvNeXt | `convnext_tiny`, `convnext_base` | Modern CNN |
-| ViT | `vit_base_patch16_224`, `vit_large_patch16_224` | Transformers |
-| Swin | `swin_tiny_patch4_window7_224` | Hierarchical ViT |
-| DeiT | `deit_base_patch16_224` | Data-efficient ViT |
-
-## BackboneConfig
-
-For advanced backbone configuration:
-
-```python
-from autotimm import BackboneConfig, ImageClassifier
-
-cfg = BackboneConfig(
-    model_name="vit_base_patch16_224",
-    pretrained=True,           # Load pretrained weights
-    drop_rate=0.1,             # Dropout rate
-    drop_path_rate=0.1,        # Stochastic depth
-)
-
-model = ImageClassifier(
-    backbone=cfg,
-    num_classes=100,
-    metrics=metrics,
-)
-```
-
-### BackboneConfig Parameters
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `model_name` | `"resnet50"` | timm model name |
-| `pretrained` | `True` | Load pretrained weights |
-| `num_classes` | `0` | Set to 0 for feature extractor |
-| `drop_rate` | `0.0` | Dropout rate |
-| `drop_path_rate` | `0.0` | Stochastic depth rate |
-| `extra_kwargs` | `{}` | Additional timm.create_model kwargs |
-
-## Backbone Utilities
-
-### Inspect Backbone
-
-```python
-import autotimm
-
-backbone = autotimm.create_backbone("resnet50")
-print(f"Output features: {backbone.num_features}")
-print(f"Parameters: {autotimm.count_parameters(backbone):,}")
-```
-
-### Count Parameters
-
-```python
-import autotimm
-
-model = ImageClassifier(backbone="resnet50", num_classes=10, metrics=metrics)
-
-# Trainable parameters only
-trainable = autotimm.count_parameters(model)
-
-# All parameters
-total = autotimm.count_parameters(model, trainable_only=False)
-
-print(f"Trainable: {trainable:,}")
-print(f"Total: {total:,}")
-```
-
-## Model Configuration
-
-### Optimizer
-
-```python
-model = ImageClassifier(
-    backbone="resnet50",
-    num_classes=10,
-    metrics=metrics,
-    lr=1e-3,
-    weight_decay=1e-4,
-    optimizer="adamw",  # "adamw", "adam", "sgd", "rmsprop"
-)
-```
-
-Available optimizers:
-
-**Torch:**
-- `adamw`, `adam`, `sgd`, `rmsprop`, `adagrad`
-
-**Timm (if installed):**
-- `adamp`, `sgdp`, `adabelief`, `radam`, `lamb`, `lars`, `madgrad`, `novograd`
-
-Custom optimizer:
-
-```python
-model = ImageClassifier(
-    backbone="resnet50",
-    num_classes=10,
-    metrics=metrics,
-    optimizer={
-        "class": "torch.optim.AdamW",
-        "params": {"betas": (0.9, 0.999)},
-    },
-)
-```
-
-### Scheduler
-
-```python
-model = ImageClassifier(
-    backbone="resnet50",
-    num_classes=10,
-    metrics=metrics,
-    scheduler="cosine",  # "cosine", "step", "onecycle", "none"
-)
-```
-
-Available schedulers:
-
-**Torch:**
-- `cosine`, `step`, `multistep`, `exponential`, `onecycle`, `plateau`
-
-**Timm:**
-- `cosine_with_restarts`
-
-Custom scheduler:
-
-```python
-model = ImageClassifier(
-    backbone="resnet50",
-    num_classes=10,
-    metrics=metrics,
-    scheduler={
-        "class": "torch.optim.lr_scheduler.CosineAnnealingWarmRestarts",
-        "params": {"T_0": 10, "T_mult": 2},
-    },
-)
-```
-
-### Label Smoothing
-
-Regularization technique for better generalization:
-
-```python
-model = ImageClassifier(
-    backbone="resnet50",
-    num_classes=10,
-    metrics=metrics,
-    label_smoothing=0.1,
-)
-```
-
-### Mixup Augmentation
-
-Data augmentation that mixes samples:
-
-```python
-model = ImageClassifier(
-    backbone="resnet50",
-    num_classes=10,
-    metrics=metrics,
-    mixup_alpha=0.2,
-)
-```
-
-### Head Dropout
-
-Dropout before the classification layer:
-
-```python
-model = ImageClassifier(
-    backbone="resnet50",
-    num_classes=10,
-    metrics=metrics,
-    head_dropout=0.5,
-)
-```
-
-## Freeze Backbone
-
-For transfer learning / linear probing:
-
-```python
-model = ImageClassifier(
-    backbone="resnet50",
-    num_classes=10,
-    metrics=metrics,
-    freeze_backbone=True,  # Only train classification head
-    lr=1e-2,               # Higher LR for head-only training
-)
-```
-
-## Two-Phase Fine-Tuning
-
-```python
-# Phase 1: Linear probe (frozen backbone)
-model = ImageClassifier(
-    backbone="vit_base_patch16_224",
-    num_classes=data.num_classes,
-    metrics=metrics,
-    freeze_backbone=True,
-    lr=1e-2,
-)
-trainer = AutoTrainer(max_epochs=5)
-trainer.fit(model, datamodule=data)
-
-# Phase 2: Full fine-tune
-for param in model.backbone.parameters():
-    param.requires_grad = True
-
-model._lr = 1e-4  # Lower LR for fine-tuning
-trainer = AutoTrainer(max_epochs=20, gradient_clip_val=1.0)
-trainer.fit(model, datamodule=data)
-```
-
-## Full Parameter Reference
-
-```python
-ImageClassifier(
-    backbone="resnet50",           # Model name or BackboneConfig
-    num_classes=10,                # Number of classes
-    metrics=metrics,               # MetricManager or list of MetricConfig
-    logging_config=None,           # LoggingConfig for enhanced logging
-    lr=1e-3,                       # Learning rate
-    weight_decay=1e-4,             # Weight decay
-    optimizer="adamw",             # Optimizer name or dict
-    optimizer_kwargs=None,         # Extra optimizer kwargs
-    scheduler="cosine",            # Scheduler name, dict, or None
-    scheduler_kwargs=None,         # Extra scheduler kwargs
-    head_dropout=0.0,              # Dropout before classifier
-    label_smoothing=0.0,           # Label smoothing factor
-    freeze_backbone=False,         # Freeze backbone weights
-    mixup_alpha=0.0,               # Mixup augmentation alpha
-)
-```
-
----
-
-## ObjectDetector
+# ObjectDetector
 
 FCOS-style anchor-free object detector that combines timm backbones with Feature Pyramid Networks (FPN) and detection heads.
 
-### Basic Usage
+## Basic Usage
 
 ```python
 from autotimm import ObjectDetector, MetricConfig
@@ -318,7 +26,7 @@ model = ObjectDetector(
 )
 ```
 
-### Architecture
+## Architecture
 
 The ObjectDetector uses the FCOS (Fully Convolutional One-Stage) architecture:
 
@@ -327,11 +35,11 @@ The ObjectDetector uses the FCOS (Fully Convolutional One-Stage) architecture:
 3. **Detection Head**: Predicts class, bounding box, and centerness for each location
 4. **NMS**: Non-Maximum Suppression filters overlapping detections
 
-### Backbone Selection
+## Backbone Selection
 
 Any timm backbone works for object detection. Popular choices:
 
-**CNN Backbones:**
+### CNN Backbones
 
 | Backbone | Speed | Accuracy | Use Case |
 |----------|-------|----------|----------|
@@ -341,7 +49,7 @@ Any timm backbone works for object detection. Popular choices:
 | `convnext_tiny` | Medium | Best | Modern CNN |
 | `resnet101` | Slow | Best | High accuracy |
 
-**Transformer Backbones:**
+### Transformer Backbones
 
 | Backbone | Speed | Accuracy | Memory | Use Case |
 |----------|-------|----------|--------|----------|
@@ -363,14 +71,15 @@ model = ObjectDetector(backbone="vit_base_patch16_224", num_classes=80, metrics=
 ```
 
 **Notes:**
+
 - Swin Transformers work best for detection due to hierarchical features
 - Transformers require smaller batch sizes (8-16) due to higher memory usage
 - Use lower learning rates (1e-4 to 1e-5) with transformer backbones
 - Two-phase training (freeze backbone → fine-tune) works well with transformers
 
-See [Transformer-Based Detection Example](../examples/index.md#transformer-based-object-detection) for detailed usage.
+See [Transformer-Based Detection Example](../examples/object-detection.md#transformer-based-object-detection) for detailed usage.
 
-### FPN Configuration
+## FPN Configuration
 
 Customize the Feature Pyramid Network:
 
@@ -384,7 +93,7 @@ model = ObjectDetector(
 )
 ```
 
-### Loss Configuration
+## Loss Configuration
 
 FCOS uses three loss components:
 
@@ -404,11 +113,12 @@ model = ObjectDetector(
 ```
 
 **Loss Functions:**
+
 - **Focal Loss**: Classification with hard example mining
 - **GIoU Loss**: Bounding box regression with IoU-based metric
 - **Centerness Loss**: Predicts how centered a location is in its box
 
-### Inference Configuration
+## Inference Configuration
 
 Control detection behavior:
 
@@ -423,7 +133,7 @@ model = ObjectDetector(
 )
 ```
 
-### Optimizer and Scheduler
+## Optimizer and Scheduler
 
 ```python
 model = ObjectDetector(
@@ -439,11 +149,12 @@ model = ObjectDetector(
 ```
 
 Common schedules for object detection:
+
 - **MultiStep**: Drop LR at specific epochs (standard for COCO)
 - **Cosine**: Smooth decay over training
 - **Step**: Drop LR every N epochs
 
-### Freeze Backbone
+## Freeze Backbone
 
 For faster training or transfer learning:
 
@@ -457,7 +168,7 @@ model = ObjectDetector(
 )
 ```
 
-### Advanced: Custom Regression Ranges
+## Advanced: Custom Regression Ranges
 
 FCOS assigns objects to FPN levels based on size. Customize these ranges:
 
@@ -477,7 +188,7 @@ model = ObjectDetector(
 )
 ```
 
-### Full Parameter Reference
+## Full Parameter Reference
 
 ```python
 ObjectDetector(
@@ -507,7 +218,7 @@ ObjectDetector(
 )
 ```
 
-### Usage Example
+## Usage Example
 
 ```python
 from autotimm import AutoTrainer, DetectionDataModule, ObjectDetector, MetricConfig
@@ -572,6 +283,7 @@ RT-DETR is an end-to-end transformer-based detector that eliminates the need for
 | Large objects | Excellent | Good |
 
 **When to use RT-DETR:**
+
 - Need end-to-end differentiable pipeline
 - Want to avoid NMS post-processing
 - Detecting large objects or complex scenes
@@ -579,6 +291,7 @@ RT-DETR is an end-to-end transformer-based detector that eliminates the need for
 - Prefer transformer-based architecture
 
 **When to use FCOS (ObjectDetector):**
+
 - Need maximum efficiency
 - Detecting small objects
 - Limited GPU memory
@@ -605,7 +318,7 @@ model = RTDetrForObjectDetection.from_pretrained(
 )
 ```
 
-See [RT-DETR Example](../examples/index.md#rt-detr-real-time-detection-transformer) for complete integration guide.
+See [RT-DETR Example](../examples/object-detection.md#rt-detr-real-time-detection-transformer) for complete integration guide.
 
 **Available RT-DETR Models:**
 
@@ -624,6 +337,7 @@ pip install transformers
 ### Summary: Choosing a Detection Architecture
 
 **Use FCOS (ObjectDetector) when:**
+
 - Starting with object detection
 - Want seamless AutoTimm integration
 - Need efficient small object detection
@@ -631,12 +345,14 @@ pip install transformers
 - Want to experiment with 1000+ timm backbones
 
 **Use Transformer Backbones (with ObjectDetector) when:**
+
 - Want to leverage vision transformers
 - Have sufficient GPU memory
 - Prefer hierarchical transformer features (Swin)
 - Want modern CNN alternatives
 
 **Use RT-DETR when:**
+
 - Need end-to-end transformer detection
 - Want to eliminate NMS
 - Have high memory budget
@@ -644,3 +360,10 @@ pip install transformers
 - Want query-based detection paradigm
 
 All approaches support COCO format datasets and can use AutoTimm's `DetectionDataModule` for efficient data loading.
+
+## See Also
+
+- [Object Detection Data](object-detection-data.md) - Data loading for detection
+- [Object Detection Inference](object-detection-inference.md) - Making predictions
+- [Image Classifier](image-classifier.md) - Classification models
+- [Object Detection Examples](../examples/object-detection.md) - Complete examples

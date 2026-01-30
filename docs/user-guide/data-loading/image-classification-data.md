@@ -1,12 +1,8 @@
-# Data Loading
+# Image Classification Data
 
-AutoTimm provides two data modules:
-- **ImageDataModule**: Image classification datasets
-- **DetectionDataModule**: Object detection datasets in COCO format
+The `ImageDataModule` handles image classification datasets including built-in datasets (CIFAR, MNIST) and custom folder-structured datasets.
 
-## ImageDataModule
-
-### Built-in Datasets
+## Built-in Datasets
 
 Load standard datasets automatically:
 
@@ -30,7 +26,9 @@ Supported datasets:
 | `MNIST` | 10 | 28x28 |
 | `FashionMNIST` | 10 | 28x28 |
 
-### Custom Folder Datasets
+---
+
+## Custom Folder Datasets
 
 Organize images in ImageFolder format:
 
@@ -65,7 +63,9 @@ print(f"Classes: {data.num_classes}")
 print(f"Class names: {data.class_names}")
 ```
 
-### Auto Validation Split
+---
+
+## Auto Validation Split
 
 If no `val/` directory exists, a fraction of training data is held out:
 
@@ -75,6 +75,8 @@ data = ImageDataModule(
     val_split=0.1,   # 10% for validation (default)
 )
 ```
+
+---
 
 ## Transform Backends
 
@@ -143,9 +145,11 @@ data = ImageDataModule(
 )
 ```
 
-### Custom Transforms
+---
 
-#### Torchvision Custom
+## Custom Transforms
+
+### Torchvision Custom
 
 ```python
 from torchvision import transforms
@@ -158,13 +162,21 @@ custom_train = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
 
+custom_eval = transforms.Compose([
+    transforms.Resize(256),
+    transforms.CenterCrop(224),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+])
+
 data = ImageDataModule(
     data_dir="./dataset",
     train_transforms=custom_train,
+    eval_transforms=custom_eval,
 )
 ```
 
-#### Albumentations Custom
+### Albumentations Custom
 
 ```python
 import albumentations as A
@@ -179,12 +191,22 @@ custom_train = A.Compose([
     ToTensorV2(),
 ])
 
+custom_eval = A.Compose([
+    A.Resize(height=256, width=256),
+    A.CenterCrop(height=224, width=224),
+    A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ToTensorV2(),
+])
+
 data = ImageDataModule(
     data_dir="./dataset",
     transform_backend="albumentations",
     train_transforms=custom_train,
+    eval_transforms=custom_eval,
 )
 ```
+
+---
 
 ## Balanced Sampling
 
@@ -198,6 +220,8 @@ data = ImageDataModule(
 ```
 
 This uses `WeightedRandomSampler` to ensure each class is sampled equally during training.
+
+---
 
 ## DataLoader Options
 
@@ -213,6 +237,15 @@ data = ImageDataModule(
     prefetch_factor=4,        # Batches to prefetch per worker
 )
 ```
+
+**Performance Tips:**
+
+- **num_workers**: Start with `4 * num_gpus`, adjust based on CPU cores
+- **pin_memory**: Set `True` when using GPU
+- **persistent_workers**: Set `True` to avoid worker restart overhead
+- **prefetch_factor**: Increase to `4-8` if CPU can keep up with GPU
+
+---
 
 ## Dataset Summary
 
@@ -241,12 +274,14 @@ Output (Rich table):
 └─────────────────────┴──────────┘
 ```
 
+---
+
 ## Full Parameter Reference
 
 ```python
 ImageDataModule(
     data_dir="./data",           # Root directory
-    dataset_name=None,           # Built-in dataset name
+    dataset_name=None,           # Built-in dataset name (CIFAR10, etc.)
     image_size=224,              # Target image size
     batch_size=32,               # Batch size
     num_workers=4,               # Data loading workers
@@ -258,225 +293,64 @@ ImageDataModule(
     pin_memory=True,             # Pin memory for GPU
     persistent_workers=False,    # Keep workers alive
     prefetch_factor=None,        # Prefetch batches per worker
-    balanced_sampling=False,     # Weighted sampling
+    balanced_sampling=False,     # Weighted sampling for imbalanced data
 )
 ```
 
 ---
 
-## DetectionDataModule
-
-For object detection tasks, use `DetectionDataModule` which loads COCO-format datasets.
-
-### COCO Dataset Format
-
-Expected directory structure:
-
-```
-coco/
-  train2017/              # Training images
-    000000000001.jpg
-    000000000002.jpg
-    ...
-  val2017/                # Validation images
-    000000000001.jpg
-    ...
-  test2017/               # Test images (optional)
-    000000000001.jpg
-    ...
-  annotations/
-    instances_train2017.json
-    instances_val2017.json
-    instances_test2017.json  # Optional
-```
-
-The annotation files follow the standard COCO JSON format with image metadata, categories, and bounding box annotations.
-
-### Basic Usage
+## Complete Example
 
 ```python
-from autotimm import DetectionDataModule
-
-data = DetectionDataModule(
-    data_dir="./coco",
-    image_size=640,         # Standard COCO size
-    batch_size=16,
-    num_workers=4,
+from autotimm import (
+    AutoTrainer,
+    ImageClassifier,
+    ImageDataModule,
+    MetricConfig,
+    MetricManager,
 )
-```
-
-### Augmentation Presets
-
-DetectionDataModule supports albumentations-based augmentation presets:
-
-```python
-data = DetectionDataModule(
-    data_dir="./coco",
-    image_size=640,
-    batch_size=16,
-    augmentation_preset="default",  # or "strong"
-)
-```
-
-Available presets:
-
-| Preset | Description |
-|--------|-------------|
-| `default` | RandomResizedCrop (80-100%), HorizontalFlip |
-| `strong` | Affine, blur, noise, brightness/contrast adjustments |
-
-### Custom Transforms
-
-Use custom albumentations pipelines with bbox-aware transforms:
-
-```python
-import albumentations as A
-
-custom_train = A.Compose(
-    [
-        A.RandomResizedCrop(height=640, width=640, scale=(0.8, 1.0)),
-        A.HorizontalFlip(p=0.5),
-        A.RandomBrightnessContrast(p=0.5),
-        A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-    ],
-    bbox_params=A.BboxParams(format="coco", label_fields=["labels"]),
-)
-
-data = DetectionDataModule(
-    data_dir="./coco",
-    image_size=640,
-    batch_size=16,
-    train_transforms=custom_train,
-)
-```
-
-**Important**: Always include `bbox_params` when using custom transforms to ensure bounding boxes are properly transformed.
-
-### Filter by Class
-
-Train on a subset of classes:
-
-```python
-# Only detect person, bicycle, and car
-selected_classes = [1, 2, 3]
-
-data = DetectionDataModule(
-    data_dir="./coco",
-    image_size=512,
-    batch_size=8,
-    class_ids=selected_classes,
-)
-```
-
-This filters the dataset to only include images containing these classes and remaps class IDs to 0-based indexing.
-
-### Filter Small Boxes
-
-Remove very small bounding boxes:
-
-```python
-data = DetectionDataModule(
-    data_dir="./coco",
-    image_size=640,
-    batch_size=16,
-    min_bbox_area=32.0,  # Minimum box area in pixels
-)
-```
-
-This helps avoid training on boxes that are too small to detect reliably.
-
-### Dataset Summary
-
-Get information about your detection dataset:
-
-```python
-data = DetectionDataModule(data_dir="./coco", image_size=640)
-data.setup("fit")
-print(data.summary())
-```
-
-Output:
-
-```
-┌─────────────────────┬──────────┐
-│ Field               │ Value    │
-├─────────────────────┼──────────┤
-│ Data dir            │ ./coco   │
-│ Image size          │ 640      │
-│ Batch size          │ 16       │
-│ Num classes         │ 80       │
-│ Train samples       │ 118287   │
-│ Val samples         │ 5000     │
-│ Test samples        │ 0        │
-└─────────────────────┴──────────┘
-```
-
-### DataLoader Options
-
-Same as ImageDataModule:
-
-```python
-data = DetectionDataModule(
-    data_dir="./coco",
-    batch_size=16,
-    num_workers=8,            # Parallel data loading
-    pin_memory=True,          # Faster GPU transfer
-    persistent_workers=True,  # Keep workers alive
-    prefetch_factor=4,        # Batches to prefetch per worker
-)
-```
-
-### Full Parameter Reference
-
-```python
-DetectionDataModule(
-    data_dir="./coco",           # COCO dataset root
-    image_size=640,              # Target image size
-    batch_size=16,               # Batch size
-    num_workers=4,               # Data loading workers
-    train_transforms=None,       # Custom albumentations transforms
-    eval_transforms=None,        # Custom eval transforms
-    augmentation_preset=None,    # "default" or "strong"
-    class_ids=None,              # Filter to specific classes
-    min_bbox_area=0.0,           # Minimum bounding box area
-    pin_memory=True,             # Pin memory for GPU
-    persistent_workers=False,    # Keep workers alive
-    prefetch_factor=None,        # Prefetch batches per worker
-)
-```
-
-### Complete Example
-
-```python
-from autotimm import AutoTrainer, DetectionDataModule, ObjectDetector, MetricConfig
 
 # Data
-data = DetectionDataModule(
-    data_dir="./coco",
-    image_size=640,
-    batch_size=16,
+data = ImageDataModule(
+    data_dir="./data",
+    dataset_name="CIFAR10",
+    image_size=224,
+    batch_size=64,
     num_workers=4,
-    augmentation_preset="default",
+    augmentation_preset="randaugment",
 )
 
+# Metrics
+metric_configs = [
+    MetricConfig(
+        name="accuracy",
+        backend="torchmetrics",
+        metric_class="Accuracy",
+        params={"task": "multiclass"},
+        stages=["train", "val", "test"],
+        prog_bar=True,
+    ),
+]
+metric_manager = MetricManager(configs=metric_configs, num_classes=10)
+
 # Model
-model = ObjectDetector(
+model = ImageClassifier(
     backbone="resnet50",
-    num_classes=80,
-    metrics=[
-        MetricConfig(
-            name="mAP",
-            backend="torchmetrics",
-            metric_class="MeanAveragePrecision",
-            params={"box_format": "xyxy"},
-            stages=["val", "test"],
-            prog_bar=True,
-        ),
-    ],
-    lr=1e-4,
+    num_classes=10,
+    metrics=metric_manager,
+    lr=1e-3,
 )
 
 # Train
-trainer = AutoTrainer(max_epochs=12, gradient_clip_val=1.0)
+trainer = AutoTrainer(max_epochs=10)
 trainer.fit(model, datamodule=data)
+trainer.test(model, datamodule=data)
 ```
+
+---
+
+## See Also
+
+- [Object Detection Data](object-detection-data.md) - For COCO format object detection datasets
+- [Data Handling Examples](../examples/data-handling.md) - More examples and use cases
+- [Training Guide](training.md) - How to train models with your data

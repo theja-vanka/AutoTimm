@@ -74,12 +74,22 @@ nav:
       - Installation: getting-started/installation.md
       - Quick Start: getting-started/quickstart.md
   - User Guide:
-      - Data Loading: user-guide/data-loading.md
-      - Models: user-guide/models.md
+      - Data Loading:
+          - Overview: user-guide/data-loading/index.md
+          - Image Classification Data: user-guide/data-loading/image-classification-data.md
+          - Object Detection Data: user-guide/data-loading/object-detection-data.md
+      - Models:
+          - Overview: user-guide/models/index.md
+          - ImageClassifier: user-guide/models/image-classifier.md
+          - ObjectDetector: user-guide/models/object-detector.md
       - Training: user-guide/training.md
       - Metrics: user-guide/metrics.md
       - Logging: user-guide/logging.md
-      - Inference: user-guide/inference.md
+      - Inference:
+          - Overview: user-guide/inference/index.md
+          - Classification Inference: user-guide/inference/classification-inference.md
+          - Object Detection Inference: user-guide/inference/object-detection-inference.md
+          - Model Export: user-guide/inference/model-export.md
   - API Reference:
       - Overview: api/index.md
       - Tasks:
@@ -98,7 +108,14 @@ nav:
           - Metrics: api/metrics.md
           - Loggers: api/loggers.md
       - Utilities: api/utils.md
-  - Examples: examples/index.md
+  - Examples:
+      - Overview: examples/index.md
+      - Classification: examples/classification.md
+      - Object Detection: examples/object-detection.md
+      - Data Handling: examples/data-handling.md
+      - Training Utilities: examples/training-utilities.md
+      - Logging & Metrics: examples/logging-metrics.md
+      - Backbone Utilities: examples/backbone-utilities.md
 
 extra:
   social:
