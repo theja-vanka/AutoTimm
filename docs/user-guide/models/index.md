@@ -127,9 +127,9 @@ metrics = [
 
 ## See Also
 
-- [Image Classification Data](image-classification-data.md) - Data loading for classification
-- [Object Detection Data](object-detection-data.md) - Data loading for detection
-- [Classification Inference](classification-inference.md) - Making predictions with classifiers
-- [Object Detection Inference](object-detection-inference.md) - Making predictions with detectors
-- [Training Guide](training.md) - Training models with AutoTrainer
-- [Metrics](metrics.md) - Configuring metrics and logging
+- [Image Classification Data](../data-loading/image-classification-data.md) - Data loading for classification
+- [Object Detection Data](../data-loading/object-detection-data.md) - Data loading for detection
+- [Classification Inference](../inference/classification-inference.md) - Making predictions with classifiers
+- [Object Detection Inference](../inference/object-detection-inference.md) - Making predictions with detectors
+- [Training Guide](../training.md) - Training models with AutoTrainer
+- [Metrics](../metrics.md) - Configuring metrics and logging

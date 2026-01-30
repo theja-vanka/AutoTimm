@@ -283,7 +283,7 @@ Learn about:
 
 ## See Also
 
-- [Training Guide](training.md) - How to train models
-- [Image Classification Data](image-classification-data.md) - Classification data loading
-- [Object Detection Data](object-detection-data.md) - Detection data loading
-- [Examples](../examples/) - Runnable code examples
+- [Training Guide](../training.md) - How to train models
+- [Image Classification Data](../data-loading/image-classification-data.md) - Classification data loading
+- [Object Detection Data](../data-loading/object-detection-data.md) - Detection data loading
+- [Examples](../../examples/index.md) - Runnable code examples

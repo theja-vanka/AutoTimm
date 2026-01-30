@@ -286,8 +286,8 @@ ImageClassifier(
 
 ## See Also
 
-- [Image Classification Data](image-classification-data.md) - Data loading for classification
-- [Classification Inference](classification-inference.md) - Making predictions
+- [Image Classification Data](../data-loading/image-classification-data.md) - Data loading for classification
+- [Classification Inference](../inference/classification-inference.md) - Making predictions
 - [Object Detector](object-detector.md) - Object detection models
-- [Classification Examples](../examples/classification.md) - Complete examples
-- [Backbone Utilities](../examples/backbone-utilities.md) - Backbone discovery and utilities
+- [Classification Examples](../../examples/classification.md) - Complete examples
+- [Backbone Utilities](../../examples/backbone-utilities.md) - Backbone discovery and utilities

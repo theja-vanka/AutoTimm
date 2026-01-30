@@ -77,6 +77,6 @@ trainer.test(model, datamodule=data)
 
 - [Installation](getting-started/installation.md) - Get AutoTimm installed
 - [Quick Start](getting-started/quickstart.md) - Train your first model
-- [User Guide](user-guide/data-loading.md) - Deep dive into features
+- [User Guide](user-guide/data-loading/index.md) - Deep dive into features
 - [API Reference](api/index.md) - Full API documentation
 - [Examples](examples/index.md) - Runnable example scripts
