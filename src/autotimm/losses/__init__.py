@@ -6,10 +6,22 @@ from autotimm.losses.detection import (
     FocalLoss,
     GIoULoss,
 )
+from autotimm.losses.segmentation import (
+    CombinedSegmentationLoss,
+    DiceLoss,
+    FocalLossPixelwise,
+    MaskLoss,
+    TverskyLoss,
+)
 
 __all__ = [
     "CenternessLoss",
+    "CombinedSegmentationLoss",
+    "DiceLoss",
     "FCOSLoss",
     "FocalLoss",
+    "FocalLossPixelwise",
     "GIoULoss",
+    "MaskLoss",
+    "TverskyLoss",
 ]

@@ -8,8 +8,12 @@ This section provides detailed API documentation for all AutoTimm classes and fu
 |-------|-------------|
 | [ImageClassifier](classifier.md) | End-to-end image classifier with timm backbone |
 | [ObjectDetector](detection.md) | FCOS-style anchor-free object detector |
+| [SemanticSegmentor](segmentation.md#semanticsegmentor) | DeepLabV3+ / FCN semantic segmentation |
+| [InstanceSegmentor](segmentation.md#instancesegmentor) | Mask R-CNN style instance segmentation |
 | [ImageDataModule](data.md) | Data module for images (folder or built-in datasets) |
 | [DetectionDataModule](detection_data.md) | Data module for object detection (COCO format) |
+| [SegmentationDataModule](segmentation.md#segmentationdatamodule) | Data module for semantic segmentation |
+| [InstanceSegmentationDataModule](segmentation.md#instancesegmentationdatamodule) | Data module for instance segmentation |
 | [AutoTrainer](trainer.md) | Configured PyTorch Lightning Trainer |
 
 ## Configuration Classes
@@ -44,9 +48,15 @@ This section provides detailed API documentation for all AutoTimm classes and fu
 |------|-------------|
 | [ClassificationHead](heads.md#classificationhead) | Simple classification head with dropout |
 | [DetectionHead](heads.md#detectionhead) | FCOS-style detection head (cls, bbox, centerness) |
+| [DeepLabV3PlusHead](segmentation.md#deeplabv3plushead) | DeepLabV3+ head with ASPP and decoder |
+| [FCNHead](segmentation.md#fcnhead) | Fully Convolutional Network head |
+| [MaskHead](segmentation.md#maskhead) | Mask prediction head for instance segmentation |
 | [FPN](heads.md#fpn) | Feature Pyramid Network for multi-scale features |
+| [ASPP](segmentation.md#aspp) | Atrous Spatial Pyramid Pooling module |
 
 ## Loss Functions
+
+### Detection Losses
 
 | Loss | Description |
 |------|-------------|
@@ -54,6 +64,16 @@ This section provides detailed API documentation for all AutoTimm classes and fu
 | [GIoULoss](losses.md#giouloss) | Generalized IoU loss for bounding box regression |
 | [CenternessLoss](losses.md#centernessloss) | Binary cross-entropy for centerness prediction |
 | [FCOSLoss](losses.md#fcosloss) | Combined FCOS detection loss |
+
+### Segmentation Losses
+
+| Loss | Description |
+|------|-------------|
+| [DiceLoss](segmentation.md#diceloss) | Dice loss for handling class imbalance in segmentation |
+| [FocalLossPixelwise](segmentation.md#focallosspixelwise) | Pixel-wise focal loss for segmentation |
+| [TverskyLoss](segmentation.md#tverskyloss) | Generalized Dice with FP/FN control |
+| [MaskLoss](segmentation.md#maskloss) | Binary cross-entropy for instance masks |
+| [CombinedSegmentationLoss](segmentation.md#combinedsegmentationloss) | Combined CE + Dice loss |
 
 ## Utility Functions
 
@@ -93,6 +113,38 @@ from autotimm import (
     FeatureBackboneConfig,
     MetricConfig,
 )
+```
+
+### Semantic Segmentation
+
+```python
+from autotimm import (
+    AutoTrainer,
+    SemanticSegmentor,
+    SegmentationDataModule,
+    MetricConfig,
+)
+
+# Using import aliases
+from autotimm.task import SemanticSegmentor
+from autotimm.loss import DiceLoss, CombinedSegmentationLoss
+from autotimm.head import DeepLabV3PlusHead, FCNHead
+```
+
+### Instance Segmentation
+
+```python
+from autotimm import (
+    AutoTrainer,
+    InstanceSegmentor,
+    InstanceSegmentationDataModule,
+    MetricConfig,
+)
+
+# Using import aliases
+from autotimm.task import InstanceSegmentor
+from autotimm.loss import MaskLoss
+from autotimm.head import MaskHead
 ```
 
 ### With Logging
@@ -141,7 +193,7 @@ from autotimm import (
 ```
 autotimm/
 ├── __init__.py                # Public API exports
-├── backbone.py                # BackboneConfig, FeatureBackboneConfig, create_backbone, 
+├── backbone.py                # BackboneConfig, FeatureBackboneConfig, create_backbone,
 │                              # create_feature_backbone, get_feature_*, list_backbones
 ├── data/
 │   ├── datamodule.py          # ImageDataModule
@@ -149,15 +201,25 @@ autotimm/
 │   ├── transforms.py          # Transform presets
 │   ├── detection_datamodule.py # DetectionDataModule
 │   ├── detection_dataset.py   # DetectionDataset
-│   └── detection_transforms.py # Detection augmentations
+│   ├── detection_transforms.py # Detection augmentations
+│   ├── segmentation_dataset.py # SemanticSegmentationDataset
+│   ├── segmentation_datamodule.py # SegmentationDataModule
+│   ├── instance_dataset.py    # COCOInstanceDataset
+│   ├── instance_datamodule.py # InstanceSegmentationDataModule
+│   └── segmentation_transforms.py # Segmentation augmentations
 ├── heads.py                   # ClassificationHead, DetectionHead, FPN
+│                              # DeepLabV3PlusHead, FCNHead, MaskHead, ASPP
 ├── loggers.py                 # LoggerConfig, LoggerManager
 ├── losses/
-│   └── detection.py           # FocalLoss, GIoULoss, CenternessLoss, FCOSLoss
+│   ├── detection.py           # FocalLoss, GIoULoss, CenternessLoss, FCOSLoss
+│   └── segmentation.py        # DiceLoss, FocalLossPixelwise, TverskyLoss,
+│                              # MaskLoss, CombinedSegmentationLoss
 ├── metrics.py                 # MetricConfig, MetricManager, LoggingConfig
 ├── tasks/
 │   ├── classification.py      # ImageClassifier
-│   └── object_detection.py    # ObjectDetector
+│   ├── object_detection.py    # ObjectDetector
+│   ├── semantic_segmentation.py # SemanticSegmentor
+│   └── instance_segmentation.py # InstanceSegmentor
 ├── trainer.py                 # AutoTrainer, TunerConfig
 └── utils.py                   # Utility functions
 ```

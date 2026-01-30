@@ -82,6 +82,8 @@ nav:
           - Overview: user-guide/models/index.md
           - ImageClassifier: user-guide/models/image-classifier.md
           - ObjectDetector: user-guide/models/object-detector.md
+          - SemanticSegmentor: user-guide/models/semantic-segmentation.md
+          - InstanceSegmentor: user-guide/models/instance-segmentation.md
       - Training: user-guide/training.md
       - Metrics: user-guide/metrics.md
       - Logging: user-guide/logging.md
@@ -95,6 +97,7 @@ nav:
       - Tasks:
           - ImageClassifier: api/classifier.md
           - ObjectDetector: api/detection.md
+          - Segmentation: api/segmentation.md
       - Data:
           - ImageDataModule: api/data.md
           - DetectionDataModule: api/detection_data.md
@@ -112,6 +115,8 @@ nav:
       - Overview: examples/index.md
       - Classification: examples/classification.md
       - Object Detection: examples/object-detection.md
+      - Semantic Segmentation: examples/semantic-segmentation.md
+      - Instance Segmentation: examples/instance-segmentation.md
       - Data Handling: examples/data-handling.md
       - Training Utilities: examples/training-utilities.md
       - Logging & Metrics: examples/logging-metrics.md

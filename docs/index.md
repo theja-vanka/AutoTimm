@@ -3,18 +3,19 @@
 
 Automated deep learning image tasks powered by [timm](https://github.com/huggingface/pytorch-image-models) and [PyTorch Lightning](https://github.com/Lightning-AI/pytorch-lightning).
 
-AutoTimm lets you train image classifiers and object detectors with any of timm's 1000+ backbones in a few lines of Python.
+AutoTimm lets you train image classifiers, object detectors, and segmentation models with any of timm's 1000+ backbones in a few lines of Python.
 
 ## Features
 
-- **Multiple tasks** - Image classification and FCOS-style anchor-free object detection
+- **4 vision tasks** - Image classification, object detection, semantic segmentation, and instance segmentation
 - **1000+ backbones** - Any timm model works: CNNs (ResNet, EfficientNet, ConvNeXt) and Transformers (ViT, Swin, DeiT)
-- **Flexible architectures** - Built-in FCOS detector + integration with RT-DETR (end-to-end transformer detection)
+- **Flexible architectures** - Built-in FCOS detector, DeepLabV3+ segmentation, Mask R-CNN style instance segmentation
+- **Advanced losses** - Focal, Dice, Tversky, Combined CE+Dice, GIoU for bbox regression
 - **Configurable metrics** - Use torchmetrics or custom metrics
 - **Multiple logger backends** - TensorBoard, MLflow, W&B, CSV simultaneously
 - **Auto-tuning** - Automatic learning rate and batch size finding
 - **Enhanced logging** - Learning rate, gradient norms, confusion matrices
-- **Flexible transforms** - Torchvision (PIL) or albumentations (OpenCV) with bbox support
+- **Flexible transforms** - Torchvision (PIL) or albumentations (OpenCV) with bbox and mask support
 
 ## Quick Example
 
