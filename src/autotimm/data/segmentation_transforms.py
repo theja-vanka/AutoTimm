@@ -2,15 +2,24 @@
 
 from __future__ import annotations
 
-import albumentations as A
-from albumentations.pytorch import ToTensorV2
+
+def _require_albumentations():
+    """Lazy import albumentations to avoid hard dependency."""
+    try:
+        import albumentations
+        return albumentations
+    except ImportError:
+        raise ImportError(
+            "Albumentations is required for segmentation transforms. "
+            "Install with: pip install autotimm[segmentation]"
+        ) from None
 
 
 def segmentation_train_transforms(
     image_size: int = 512,
     mean: tuple[float, float, float] = (0.485, 0.456, 0.406),
     std: tuple[float, float, float] = (0.229, 0.224, 0.225),
-) -> A.Compose:
+):
     """Training transforms for semantic segmentation.
 
     Applies data augmentation including random scaling, cropping, flipping,
@@ -25,6 +34,9 @@ def segmentation_train_transforms(
     Returns:
         Albumentations composition of transforms
     """
+    A = _require_albumentations()
+    from albumentations.pytorch import ToTensorV2
+    
     return A.Compose([
         A.RandomScale(scale_limit=0.5, p=0.5),
         A.PadIfNeeded(
@@ -53,7 +65,7 @@ def segmentation_eval_transforms(
     image_size: int = 512,
     mean: tuple[float, float, float] = (0.485, 0.456, 0.406),
     std: tuple[float, float, float] = (0.229, 0.224, 0.225),
-) -> A.Compose:
+):
     """Evaluation transforms for semantic segmentation.
 
     No augmentation, only resizing and normalization.
@@ -66,6 +78,9 @@ def segmentation_eval_transforms(
     Returns:
         Albumentations composition of transforms
     """
+    A = _require_albumentations()
+    from albumentations.pytorch import ToTensorV2
+    
     return A.Compose([
         A.Resize(height=image_size, width=image_size),
         A.Normalize(mean=mean, std=std),
@@ -78,7 +93,7 @@ def instance_segmentation_transforms(
     mean: tuple[float, float, float] = (0.485, 0.456, 0.406),
     std: tuple[float, float, float] = (0.229, 0.224, 0.225),
     train: bool = True,
-) -> A.Compose:
+):
     """Transforms for instance segmentation with bounding boxes and masks.
 
     Args:
@@ -90,6 +105,9 @@ def instance_segmentation_transforms(
     Returns:
         Albumentations composition of transforms
     """
+    A = _require_albumentations()
+    from albumentations.pytorch import ToTensorV2
+    
     if train:
         transforms = [
             A.RandomScale(scale_limit=0.3, p=0.5),
@@ -134,7 +152,7 @@ def get_segmentation_preset(
     preset: str = "default",
     image_size: int = 512,
     train: bool = True,
-) -> A.Compose:
+):
     """Get segmentation transform preset by name.
 
     Args:
@@ -148,6 +166,9 @@ def get_segmentation_preset(
     if not train:
         return segmentation_eval_transforms(image_size=image_size)
 
+    A = _require_albumentations()
+    from albumentations.pytorch import ToTensorV2
+    
     if preset == "strong":
         return A.Compose([
             A.RandomScale(scale_limit=0.75, p=0.7),
