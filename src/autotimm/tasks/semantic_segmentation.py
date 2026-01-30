@@ -176,6 +176,11 @@ class SemanticSegmentor(pl.LightningModule):
             for param in self.backbone.parameters():
                 param.requires_grad = False
 
+    @property
+    def num_classes(self) -> int:
+        """Return the number of segmentation classes."""
+        return self._num_classes
+
     def forward(self, images: torch.Tensor) -> torch.Tensor:
         """Forward pass through backbone and head.
 
@@ -492,11 +497,15 @@ class SemanticSegmentor(pl.LightningModule):
 
         # Torch schedulers
         if scheduler_name == "cosine":
+            # Get T_max from kwargs, or use trainer's estimated_stepping_batches if available
+            default_t_max = (
+                self.trainer.estimated_stepping_batches
+                if self.trainer is not None
+                else 1000
+            )
             scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
                 optimizer,
-                T_max=sched_kwargs.pop(
-                    "T_max", self.trainer.estimated_stepping_batches
-                ),
+                T_max=sched_kwargs.pop("T_max", default_t_max),
                 **sched_kwargs,
             )
         elif scheduler_name == "step":

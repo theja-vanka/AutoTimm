@@ -78,7 +78,7 @@ PyTorch Lightning DataModule for instance segmentation using COCO format. Handle
 
 DeepLabV3+ segmentation head with Atrous Spatial Pyramid Pooling (ASPP) and decoder with skip connections. Provides multi-scale context aggregation for accurate semantic segmentation.
 
-::: autotimm.head.DeepLabV3PlusHead
+::: autotimm.heads.DeepLabV3PlusHead
     options:
       show_root_heading: true
       show_source: false
@@ -90,7 +90,7 @@ DeepLabV3+ segmentation head with Atrous Spatial Pyramid Pooling (ASPP) and deco
 
 Fully Convolutional Network (FCN) head for semantic segmentation. Simple upsampling-based architecture suitable for baseline models.
 
-::: autotimm.head.FCNHead
+::: autotimm.heads.FCNHead
     options:
       show_root_heading: true
       show_source: false
@@ -102,7 +102,7 @@ Fully Convolutional Network (FCN) head for semantic segmentation. Simple upsampl
 
 ROI-based mask prediction head for instance segmentation. Predicts per-instance binary masks from ROI-aligned features.
 
-::: autotimm.head.MaskHead
+::: autotimm.heads.MaskHead
     options:
       show_root_heading: true
       show_source: false
@@ -114,7 +114,7 @@ ROI-based mask prediction head for instance segmentation. Predicts per-instance 
 
 Atrous Spatial Pyramid Pooling module for multi-scale feature extraction. Core component of DeepLabV3+ architecture.
 
-::: autotimm.head.ASPP
+::: autotimm.heads.ASPP
     options:
       show_root_heading: true
       show_source: false
@@ -228,7 +228,7 @@ import autotimm
 # Access via submodule aliases
 model = autotimm.task.SemanticSegmentor(...)
 loss = autotimm.loss.DiceLoss(...)
-head = autotimm.head.DeepLabV3PlusHead(...)
+head = autotimm.heads.DeepLabV3PlusHead(...)
 ```
 
 ## Parameters Reference

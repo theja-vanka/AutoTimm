@@ -90,6 +90,7 @@ class TestDeepLabV3PlusHead:
         """Test gradient flow."""
         in_channels_list = [64, 128, 256, 512]
         head = DeepLabV3PlusHead(in_channels_list=in_channels_list, num_classes=10)
+        head.train()  # Ensure in training mode
         # Use batch_size=2 to avoid BatchNorm issues in training mode
 
         features = [
@@ -103,8 +104,10 @@ class TestDeepLabV3PlusHead:
         loss = output.sum()
         loss.backward()
 
-        for feat in features:
-            assert feat.grad is not None
+        # Only check gradients for features that are actually used by DeepLabV3+
+        # DeepLabV3+ uses features[0] (low-level) and features[-1] (high-level)
+        assert features[0].grad is not None, "Low-level features should have gradients"
+        assert features[-1].grad is not None, "High-level features should have gradients"
 
 
 class TestFCNHead:

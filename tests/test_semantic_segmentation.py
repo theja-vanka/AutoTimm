@@ -229,7 +229,8 @@ class TestSemanticSegmentor:
 
         images = torch.randn(2, 3, 224, 224)
         logits = model(images)
-        masks = torch.randint(0, 6, (2, logits.shape[2], logits.shape[3]))
+        # Create masks with valid class indices (0-4 for 5 classes) plus ignore_index
+        masks = torch.randint(0, 5, (2, logits.shape[2], logits.shape[3]))
         masks[0, 0:10, 0:10] = 255  # Add ignored pixels
 
         loss = model._compute_loss(logits, masks)
@@ -304,7 +305,8 @@ class TestSemanticSegmentorIntegration:
 
     def test_deeplabv3plus_vs_fcn(self):
         """Test DeepLabV3+ vs FCN output shapes."""
-        images = torch.randn(1, 3, 224, 224)
+        # Use batch_size=2 to avoid BatchNorm issues in training mode
+        images = torch.randn(2, 3, 224, 224)
 
         model_deeplabv3 = SemanticSegmentor(
             backbone="resnet18",
@@ -312,6 +314,7 @@ class TestSemanticSegmentorIntegration:
             head_type="deeplabv3plus",
             metrics=None,
         )
+        model_deeplabv3.eval()  # Set to eval mode to avoid BatchNorm issues
 
         model_fcn = SemanticSegmentor(
             backbone="resnet18",
@@ -319,15 +322,16 @@ class TestSemanticSegmentorIntegration:
             head_type="fcn",
             metrics=None,
         )
+        model_fcn.eval()  # Set to eval mode
 
         output_deeplabv3 = model_deeplabv3(images)
         output_fcn = model_fcn(images)
 
         # Both should produce valid outputs
-        assert output_deeplabv3.shape[0] == 1
+        assert output_deeplabv3.shape[0] == 2
         assert output_deeplabv3.shape[1] == 10
 
-        assert output_fcn.shape[0] == 1
+        assert output_fcn.shape[0] == 2
         assert output_fcn.shape[1] == 10
 
         # DeepLabV3+ typically produces higher resolution

@@ -80,7 +80,7 @@ Track experiments effectively with multiple logger support, MLflow integration, 
 👉 [View Logging & Metrics Examples](logging-metrics.md)
 
 ### Backbone Utilities
-Discover and compare timm backbones for your use case. Learn about different model families and how to select the right backbone.
+Discover and compare timm backbones, optimizers, and schedulers for your use case. Learn about different model families and how to select the right backbone, optimizer, and learning rate schedule.
 
 👉 [View Backbone Utilities Examples](backbone-utilities.md)
 

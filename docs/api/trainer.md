@@ -88,6 +88,18 @@ trainer = AutoTrainer(
 )
 ```
 
+#### Fast Development Run
+
+```python
+# Run 1 batch for quick debugging
+trainer = AutoTrainer(fast_dev_run=True)
+trainer.fit(model, datamodule=data)
+
+# Run 5 batches for testing
+trainer = AutoTrainer(fast_dev_run=5)
+trainer.fit(model, datamodule=data)
+```
+
 ### Parameters
 
 | Parameter | Type | Default | Description |
@@ -106,6 +118,7 @@ trainer = AutoTrainer(
 | `accumulate_grad_batches` | `int` | `1` | Gradient accumulation |
 | `val_check_interval` | `float \| int` | `1.0` | Validation frequency |
 | `enable_checkpointing` | `bool` | `True` | Save checkpoints |
+| `fast_dev_run` | `bool \| int` | `False` | Run N batches for debugging |
 
 ---
 
