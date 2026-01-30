@@ -301,6 +301,333 @@ result = pipeline.predict("test_image.jpg")
 print(f"Predicted: {result['class']} ({result['confidence']:.2%})")
 ```
 
+## Object Detection Inference
+
+### Load Detection Model
+
+```python
+from autotimm import ObjectDetector, MetricConfig
+
+# Define metrics
+metrics = [
+    MetricConfig(
+        name="mAP",
+        backend="torchmetrics",
+        metric_class="MeanAveragePrecision",
+        params={"box_format": "xyxy"},
+        stages=["val"],
+    ),
+]
+
+# Load model
+model = ObjectDetector.load_from_checkpoint(
+    "path/to/checkpoint.ckpt",
+    backbone="resnet50",
+    num_classes=80,
+    metrics=metrics,
+)
+model.eval()
+```
+
+### Single Image Detection
+
+```python
+import torch
+from PIL import Image
+from torchvision import transforms
+
+# Prepare transform
+transform = transforms.Compose([
+    transforms.Resize((640, 640)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+])
+
+# Load and transform image
+image = Image.open("image.jpg").convert("RGB")
+input_tensor = transform(image).unsqueeze(0)  # (1, 3, 640, 640)
+
+# Detect objects
+model.eval()
+with torch.no_grad():
+    detections = model.predict_step(input_tensor, batch_idx=0)
+
+# detections is a dict with:
+# - "boxes": Tensor of shape (N, 4) in [x1, y1, x2, y2] format
+# - "scores": Tensor of shape (N,) with confidence scores
+# - "labels": Tensor of shape (N,) with class indices
+
+boxes = detections["boxes"]
+scores = detections["scores"]
+labels = detections["labels"]
+
+print(f"Found {len(boxes)} objects:")
+for box, score, label in zip(boxes, scores, labels):
+    print(f"  Class {label.item()}: {score.item():.2%} confidence at {box.tolist()}")
+```
+
+### Visualize Detections
+
+```python
+import torch
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+from PIL import Image
+
+
+def visualize_detections(image_path, boxes, labels, scores, class_names=None, threshold=0.5):
+    """Visualize object detection results."""
+    # Load image
+    image = Image.open(image_path).convert("RGB")
+    fig, ax = plt.subplots(1, figsize=(12, 8))
+    ax.imshow(image)
+
+    # Filter by confidence threshold
+    keep = scores >= threshold
+    boxes = boxes[keep]
+    labels = labels[keep]
+    scores = scores[keep]
+
+    # Draw boxes
+    for box, label, score in zip(boxes, labels, scores):
+        x1, y1, x2, y2 = box.tolist()
+        width = x2 - x1
+        height = y2 - y1
+
+        # Create rectangle
+        rect = patches.Rectangle(
+            (x1, y1), width, height,
+            linewidth=2, edgecolor='red', facecolor='none'
+        )
+        ax.add_patch(rect)
+
+        # Add label
+        class_name = class_names[label] if class_names else f"Class {label}"
+        label_text = f"{class_name}: {score:.2f}"
+        ax.text(
+            x1, y1 - 5,
+            label_text,
+            bbox=dict(facecolor='red', alpha=0.5),
+            fontsize=10, color='white'
+        )
+
+    ax.axis('off')
+    plt.tight_layout()
+    plt.show()
+
+
+# Usage
+visualize_detections(
+    "image.jpg",
+    boxes=detections["boxes"],
+    labels=detections["labels"],
+    scores=detections["scores"],
+    class_names=["person", "bicycle", "car", ...],  # COCO classes
+    threshold=0.3,
+)
+```
+
+### Batch Detection
+
+```python
+from torch.utils.data import DataLoader
+from autotimm import DetectionDataModule
+
+# Prepare data
+data = DetectionDataModule(
+    data_dir="./test_images",
+    image_size=640,
+    batch_size=8,
+)
+data.setup("test")
+
+# Batch inference
+model.eval()
+all_detections = []
+
+with torch.no_grad():
+    for batch in data.test_dataloader():
+        images = batch["image"]
+        batch_detections = model.predict_step(images, batch_idx=0)
+        all_detections.append(batch_detections)
+```
+
+### Detection Pipeline
+
+Complete detection pipeline with post-processing:
+
+```python
+import torch
+from PIL import Image
+from torchvision import transforms
+from autotimm import ObjectDetector, MetricConfig
+
+
+class DetectionPipeline:
+    """End-to-end object detection pipeline."""
+
+    def __init__(
+        self,
+        checkpoint_path,
+        backbone,
+        num_classes,
+        class_names=None,
+        score_threshold=0.3,
+        image_size=640,
+    ):
+        # Load model
+        metrics = [
+            MetricConfig(
+                name="mAP",
+                backend="torchmetrics",
+                metric_class="MeanAveragePrecision",
+                params={"box_format": "xyxy"},
+                stages=["val"],
+            ),
+        ]
+
+        self.model = ObjectDetector.load_from_checkpoint(
+            checkpoint_path,
+            backbone=backbone,
+            num_classes=num_classes,
+            metrics=metrics,
+        )
+        self.model.eval()
+
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.model = self.model.to(self.device)
+
+        self.class_names = class_names
+        self.score_threshold = score_threshold
+        self.image_size = image_size
+
+        self.transform = transforms.Compose([
+            transforms.Resize((image_size, image_size)),
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=[0.485, 0.456, 0.406],
+                std=[0.229, 0.224, 0.225]
+            ),
+        ])
+
+    def predict(self, image_path):
+        """Detect objects in a single image."""
+        # Load and transform
+        image = Image.open(image_path).convert("RGB")
+        original_size = image.size  # (width, height)
+        input_tensor = self.transform(image).unsqueeze(0).to(self.device)
+
+        # Detect
+        with torch.no_grad():
+            detections = self.model.predict_step(input_tensor, batch_idx=0)
+
+        # Filter by threshold
+        keep = detections["scores"] >= self.score_threshold
+        boxes = detections["boxes"][keep]
+        scores = detections["scores"][keep]
+        labels = detections["labels"][keep]
+
+        # Scale boxes back to original image size
+        scale_x = original_size[0] / self.image_size
+        scale_y = original_size[1] / self.image_size
+        boxes[:, [0, 2]] *= scale_x
+        boxes[:, [1, 3]] *= scale_y
+
+        # Format results
+        results = []
+        for box, score, label in zip(boxes, scores, labels):
+            class_name = self.class_names[label] if self.class_names else label.item()
+            results.append({
+                "class": class_name,
+                "class_index": label.item(),
+                "confidence": score.item(),
+                "bbox": box.cpu().tolist(),  # [x1, y1, x2, y2]
+            })
+
+        return results
+
+    def predict_batch(self, image_paths):
+        """Detect objects in multiple images."""
+        return [self.predict(path) for path in image_paths]
+
+
+# Usage
+pipeline = DetectionPipeline(
+    checkpoint_path="best-detector.ckpt",
+    backbone="resnet50",
+    num_classes=80,
+    class_names=["person", "bicycle", "car", ...],  # COCO classes
+    score_threshold=0.3,
+    image_size=640,
+)
+
+# Detect objects
+results = pipeline.predict("test_image.jpg")
+for det in results:
+    print(f"{det['class']}: {det['confidence']:.2%} at {det['bbox']}")
+```
+
+### COCO Class Names
+
+For COCO datasets, use these class names:
+
+```python
+COCO_CLASSES = [
+    'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck',
+    'boat', 'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 'bench',
+    'bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra',
+    'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee',
+    'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove',
+    'skateboard', 'surfboard', 'tennis racket', 'bottle', 'wine glass', 'cup',
+    'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple', 'sandwich', 'orange',
+    'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch',
+    'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse',
+    'remote', 'keyboard', 'cell phone', 'microwave', 'oven', 'toaster', 'sink',
+    'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear', 'hair drier',
+    'toothbrush',
+]
+
+pipeline = DetectionPipeline(
+    checkpoint_path="best-detector.ckpt",
+    backbone="resnet50",
+    num_classes=80,
+    class_names=COCO_CLASSES,
+)
+```
+
+### Detection Performance Tips
+
+1. **NMS Threshold**: Adjust `nms_thresh` in the model to control duplicate detection suppression
+   ```python
+   model = ObjectDetector(
+       backbone="resnet50",
+       num_classes=80,
+       nms_thresh=0.5,  # Default, lower = stricter NMS
+   )
+   ```
+
+2. **Score Threshold**: Higher threshold = fewer but more confident detections
+   ```python
+   model = ObjectDetector(
+       backbone="resnet50",
+       num_classes=80,
+       score_thresh=0.05,  # Default for training
+   )
+   # For inference, filter manually with higher threshold (0.3-0.5)
+   ```
+
+3. **Image Size**: Larger images detect smaller objects better but slower
+   - 512×512: Faster inference
+   - 640×640: Balanced (recommended)
+   - 800×800 or 1024×1024: Better small object detection
+
+4. **Batch Processing**: Process multiple images in one forward pass
+   ```python
+   images = torch.stack([transform(img) for img in image_list])
+   with torch.no_grad():
+       detections = model.predict_step(images, batch_idx=0)
+   ```
+
 ## Performance Tips
 
 1. **Batch predictions** - Process multiple images at once for GPU efficiency

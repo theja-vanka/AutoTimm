@@ -83,12 +83,21 @@ nav:
       - Inference: user-guide/inference.md
   - API Reference:
       - Overview: api/index.md
-      - ImageClassifier: api/classifier.md
-      - ImageDataModule: api/data.md
-      - AutoTrainer: api/trainer.md
-      - Backbone: api/backbone.md
-      - Metrics: api/metrics.md
-      - Loggers: api/loggers.md
+      - Tasks:
+          - ImageClassifier: api/classifier.md
+          - ObjectDetector: api/detection.md
+      - Data:
+          - ImageDataModule: api/data.md
+          - DetectionDataModule: api/detection_data.md
+      - Training:
+          - AutoTrainer: api/trainer.md
+      - Models:
+          - Backbone: api/backbone.md
+          - Heads: api/heads.md
+          - Losses: api/losses.md
+      - Metrics & Logging:
+          - Metrics: api/metrics.md
+          - Loggers: api/loggers.md
       - Utilities: api/utils.md
   - Examples: examples/index.md
 
