@@ -31,6 +31,7 @@ dependencies = [
     "pytorch-lightning>=2.0",
     "torchmetrics>=1.0",
     "numpy>=1.23",
+    "opencv-python-headless>=4.8",
 ]
 
 [project.optional-dependencies]

@@ -164,16 +164,32 @@ print(schedulers["torch"])
 
 ### Available Schedulers
 
-**Torch:**
-- `cosine` - CosineAnnealingLR
-- `step` - StepLR
-- `multistep` - MultiStepLR
-- `exponential` - ExponentialLR
-- `onecycle` - OneCycleLR
-- `plateau` - ReduceLROnPlateau
+Schedulers are dynamically discovered from PyTorch and timm. Common schedulers include:
 
-**Timm:**
-- `cosine_with_restarts` - CosineLRScheduler with restarts
+**PyTorch (15 total):**
+- `chainedscheduler` - ChainedScheduler
+- `constantlr` - ConstantLR
+- `cosineannealinglr` - CosineAnnealingLR
+- `cosineannealingwarmrestarts` - CosineAnnealingWarmRestarts
+- `cycliclr` - CyclicLR
+- `exponentiallr` - ExponentialLR
+- `lambdalr` - LambdaLR
+- `linearlr` - LinearLR
+- `multiplicativelr` - MultiplicativeLR
+- `multisteplr` - MultiStepLR
+- `onecyclelr` - OneCycleLR
+- `polynomiallr` - PolynomialLR
+- `reducelronplateau` - ReduceLROnPlateau
+- `sequentiallr` - SequentialLR
+- `steplr` - StepLR
+
+**Timm (6 total):**
+- `cosinelrscheduler` - CosineLRScheduler
+- `multisteplrscheduler` - MultiStepLRScheduler
+- `plateaulrscheduler` - PlateauLRScheduler
+- `polylrscheduler` - PolyLRScheduler
+- `steplrscheduler` - StepLRScheduler
+- `tanhlrscheduler` - TanhLRScheduler
 
 ---
 

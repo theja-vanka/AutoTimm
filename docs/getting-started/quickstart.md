@@ -227,6 +227,64 @@ Popular choices:
 | `convnext_tiny` | ConvNeXt models |
 | `swin_tiny_patch4_window7_224` | Swin Transformer |
 
+## Discovering Available Optimizers and Schedulers
+
+AutoTimm provides utilities to discover all available optimizers and learning rate schedulers from both PyTorch and timm.
+
+### List Optimizers
+
+```python
+import autotimm
+
+# Get all optimizers from torch and timm
+optimizers = autotimm.list_optimizers()
+print("Torch optimizers:", optimizers["torch"])
+print("Timm optimizers:", optimizers.get("timm", []))
+
+# Get only torch optimizers
+optimizers = autotimm.list_optimizers(include_timm=False)
+```
+
+**Available optimizers:**
+- **PyTorch**: `adamw`, `adam`, `sgd`, `rmsprop`, `adagrad`, `adadelta`, `adamax`, `asgd`
+- **Timm**: `adamp`, `sgdp`, `adabelief`, `radam`, `lamb`, `lars`, `madgrad`, `novograd`
+
+### List Schedulers
+
+```python
+# Get all schedulers from torch and timm
+schedulers = autotimm.list_schedulers()
+print("Torch schedulers:", schedulers["torch"])
+print("Timm schedulers:", schedulers.get("timm", []))
+```
+
+**Available schedulers:**
+- **PyTorch**: `cosineannealinglr`, `cosineannealingwarmrestarts`, `steplr`, `multisteplr`, `exponentiallr`, `onecyclelr`, `reducelronplateau`, and more (15 total)
+- **Timm**: `cosinelrscheduler`, `multisteplrscheduler`, `plateaulrscheduler`, `steplrscheduler`, and more (6 total)
+
+### Using Custom Optimizers and Schedulers
+
+```python
+# Use a timm optimizer
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    metrics=metrics,
+    optimizer="adamw",  # or "adamp", "lamb", etc.
+    lr=1e-3,
+)
+
+# Use a custom scheduler
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    metrics=metrics,
+    lr=1e-3,
+    scheduler="cosineannealinglr",
+    scheduler_kwargs={"T_max": 10},
+)
+```
+
 ## Object Detection Quick Start
 
 AutoTimm also supports object detection with FCOS-style anchor-free detectors.

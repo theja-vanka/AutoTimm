@@ -306,6 +306,156 @@ if __name__ == "__main__":
 
 ---
 
+## Discovering Optimizers and Schedulers
+
+AutoTimm provides utilities to discover available optimizers and learning rate schedulers.
+
+### List All Optimizers
+
+```python
+import autotimm
+
+
+def main():
+    # Get all optimizers from PyTorch and timm
+    optimizers = autotimm.list_optimizers()
+    
+    print("=== PyTorch Optimizers ===")
+    for opt in optimizers["torch"]:
+        print(f"  - {opt}")
+    
+    print("\n=== Timm Optimizers ===")
+    for opt in optimizers.get("timm", []):
+        print(f"  - {opt}")
+    
+    # Get only PyTorch optimizers
+    torch_only = autotimm.list_optimizers(include_timm=False)
+    print(f"\nTotal PyTorch optimizers: {len(torch_only['torch'])}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+**Output:**
+```
+=== PyTorch Optimizers ===
+  - adadelta
+  - adagrad
+  - adam
+  - adamax
+  - adamw
+  - asgd
+  - lbfgs
+  - nadam
+  - radam
+  - rmsprop
+  - rprop
+  - sgd
+  - sparseadam
+
+=== Timm Optimizers ===
+  - adabelief
+  - adafactor
+  - adahessian
+  - adamp
+  - lamb
+  - lars
+  - lookahead
+  - madgrad
+  - nadam
+  - novograd
+  - radam
+  - rmsprop
+  - sgdp
+```
+
+### List All Schedulers
+
+```python
+import autotimm
+
+
+def main():
+    # Get all schedulers
+    schedulers = autotimm.list_schedulers()
+    
+    print("=== PyTorch Schedulers ===")
+    for sched in schedulers["torch"]:
+        print(f"  - {sched}")
+    
+    print("\n=== Timm Schedulers ===")
+    for sched in schedulers.get("timm", []):
+        print(f"  - {sched}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+**Output:**
+```
+=== PyTorch Schedulers ===
+  - chainedscheduler
+  - constantlr
+  - cosineannealinglr
+  - cosineannealingwarmrestarts
+  - cycliclr
+  - exponentiallr
+  - lambdalr
+  - linearlr
+  - multiplicativelr
+  - multisteplr
+  - onecyclelr
+  - polynomiallr
+  - reducelronplateau
+  - sequentiallr
+  - steplr
+
+=== Timm Schedulers ===
+  - cosinelrscheduler
+  - multisteplrscheduler
+  - plateaulrscheduler
+  - polylrscheduler
+  - steplrscheduler
+  - tanhlrscheduler
+```
+
+### Using Discovered Optimizers and Schedulers
+
+```python
+import autotimm
+
+# Get available options
+optimizers = autotimm.list_optimizers()
+schedulers = autotimm.list_schedulers()
+
+# Create model with specific optimizer and scheduler
+model = autotimm.ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    metrics=metrics,
+    optimizer="adamw",  # From optimizers["torch"]
+    lr=1e-3,
+    weight_decay=1e-4,
+    scheduler="cosineannealinglr",  # From schedulers["torch"]
+    scheduler_kwargs={"T_max": 50},
+)
+
+# Try a timm optimizer and scheduler
+model_with_timm = autotimm.ImageClassifier(
+    backbone="efficientnet_b0",
+    num_classes=10,
+    metrics=metrics,
+    optimizer="lamb",  # From optimizers["timm"]
+    lr=1e-3,
+    scheduler="cosinelrscheduler",  # From schedulers["timm"]
+    scheduler_kwargs={"t_initial": 50, "warmup_t": 5},
+)
+```
+
+---
+
 ## Running Backbone Discovery Examples
 
 Clone the repository and run examples:

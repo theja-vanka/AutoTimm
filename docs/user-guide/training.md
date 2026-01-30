@@ -241,6 +241,82 @@ trainer.fit(model, datamodule=data)
 trainer.test(model, datamodule=data)
 ```
 
+## Optimizers and Schedulers
+
+### Available Optimizers
+
+AutoTimm supports all PyTorch and timm optimizers. Use `list_optimizers()` to discover available options:
+
+```python
+import autotimm
+
+# List all optimizers
+optimizers = autotimm.list_optimizers()
+print("PyTorch optimizers:", optimizers["torch"])
+print("Timm optimizers:", optimizers.get("timm", []))
+```
+
+**Common optimizers:**
+- **AdamW** (recommended): `optimizer="adamw"`
+- **SGD**: `optimizer="sgd"`
+- **AdamP** (timm): `optimizer="adamp"`
+- **LAMB** (timm): `optimizer="lamb"`
+
+### Available Schedulers
+
+Use `list_schedulers()` to discover available learning rate schedulers:
+
+```python
+# List all schedulers
+schedulers = autotimm.list_schedulers()
+print("PyTorch schedulers:", schedulers["torch"])
+print("Timm schedulers:", schedulers.get("timm", []))
+```
+
+**Common schedulers:**
+- **CosineAnnealingLR**: `scheduler="cosineannealinglr"`
+- **CosineAnnealingWarmRestarts**: `scheduler="cosineannealingwarmrestarts"`
+- **MultiStepLR**: `scheduler="multisteplr"`
+- **OneCycleLR**: `scheduler="onecyclelr"`
+- **ReduceLROnPlateau**: `scheduler="reducelronplateau"`
+- **StepLR**: `scheduler="steplr"`
+
+### Using Custom Optimizers
+
+```python
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    metrics=metrics,
+    optimizer="adamw",  # or any optimizer from list_optimizers()
+    lr=1e-3,
+    weight_decay=1e-4,
+)
+```
+
+### Using Custom Schedulers
+
+```python
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    metrics=metrics,
+    lr=1e-3,
+    scheduler="cosineannealinglr",
+    scheduler_kwargs={"T_max": 50, "eta_min": 1e-6},
+)
+
+# MultiStepLR scheduler
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    metrics=metrics,
+    lr=1e-3,
+    scheduler="multisteplr",
+    scheduler_kwargs={"milestones": [30, 60, 90], "gamma": 0.1},
+)
+```
+
 ## Object Detection Training
 
 Object detection models have different training requirements compared to classification models.
