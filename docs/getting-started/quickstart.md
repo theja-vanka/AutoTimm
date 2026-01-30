@@ -333,6 +333,153 @@ model = RTDetrForObjectDetection.from_pretrained(
 
 See [RT-DETR Example](../examples/object-detection.md#rt-detr-real-time-detection-transformer) for complete integration.
 
+## Semantic Segmentation Quick Start
+
+AutoTimm provides DeepLabV3+ and FCN architectures for semantic segmentation.
+
+### Basic Semantic Segmentation Example
+
+```python
+from autotimm import (
+    AutoTrainer,
+    SemanticSegmentor,
+    SegmentationDataModule,
+    MetricConfig,
+)
+
+
+def main():
+    # Data - supports PNG, COCO, Cityscapes, Pascal VOC formats
+    data = SegmentationDataModule(
+        data_dir="./cityscapes",
+        format="cityscapes",  # or "png", "coco", "voc"
+        image_size=512,
+        batch_size=8,
+        augmentation_preset="default",
+    )
+
+    # Metrics
+    metric_configs = [
+        MetricConfig(
+            name="iou",
+            backend="torchmetrics",
+            metric_class="JaccardIndex",
+            params={
+                "task": "multiclass",
+                "num_classes": 19,
+                "average": "macro",
+                "ignore_index": 255,
+            },
+            stages=["val", "test"],
+            prog_bar=True,
+        ),
+    ]
+
+    # Model - DeepLabV3+ with any timm backbone
+    model = SemanticSegmentor(
+        backbone="resnet50",  # Try: swin_tiny, efficientnet_b3, etc.
+        num_classes=19,  # Cityscapes has 19 classes
+        head_type="deeplabv3plus",  # or "fcn"
+        loss_type="combined",  # CE + Dice
+        metrics=metric_configs,
+        lr=1e-4,
+    )
+
+    # Train
+    trainer = AutoTrainer(
+        max_epochs=100,
+        precision="16-mixed",  # Mixed precision for faster training
+    )
+
+    trainer.fit(model, datamodule=data)
+    trainer.test(model, datamodule=data)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+### Using Import Aliases
+
+AutoTimm supports cleaner imports:
+
+```python
+from autotimm.task import SemanticSegmentor
+from autotimm.loss import DiceLoss, CombinedSegmentationLoss
+from autotimm.head import DeepLabV3PlusHead
+from autotimm.metric import MetricConfig
+
+# Create model using aliases
+model = SemanticSegmentor(
+    backbone="resnet50",
+    num_classes=19,
+    head_type="deeplabv3plus",
+)
+```
+
+See [Semantic Segmentation Guide](../user-guide/models/semantic-segmentation.md) for more details.
+
+## Instance Segmentation Quick Start
+
+AutoTimm supports instance segmentation with Mask R-CNN style architecture.
+
+### Basic Instance Segmentation Example
+
+```python
+from autotimm import (
+    AutoTrainer,
+    InstanceSegmentor,
+    InstanceSegmentationDataModule,
+    MetricConfig,
+)
+
+
+def main():
+    # Data - COCO format with masks
+    data = InstanceSegmentationDataModule(
+        data_dir="./coco",
+        image_size=640,
+        batch_size=4,
+        augmentation_preset="default",
+    )
+
+    # Metrics
+    metric_configs = [
+        MetricConfig(
+            name="mask_mAP",
+            backend="torchmetrics",
+            metric_class="MeanAveragePrecision",
+            params={"box_format": "xyxy", "iou_type": "segm"},
+            stages=["val", "test"],
+            prog_bar=True,
+        ),
+    ]
+
+    # Model - FCOS detection + mask head
+    model = InstanceSegmentor(
+        backbone="resnet50",
+        num_classes=80,  # COCO has 80 classes
+        metrics=metric_configs,
+        lr=1e-4,
+        mask_loss_weight=1.0,
+    )
+
+    # Train
+    trainer = AutoTrainer(
+        max_epochs=12,
+        gradient_clip_val=1.0,
+    )
+
+    trainer.fit(model, datamodule=data)
+    trainer.test(model, datamodule=data)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+See [Instance Segmentation Guide](../user-guide/models/instance-segmentation.md) for more details.
+
 ## Next Steps
 
 - [Data Loading](../user-guide/data-loading/index.md) - Learn about transforms and datasets

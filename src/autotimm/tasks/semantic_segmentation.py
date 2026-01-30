@@ -1,0 +1,570 @@
+"""Semantic segmentation task as a PyTorch Lightning module."""
+
+from __future__ import annotations
+
+from typing import Any
+
+import pytorch_lightning as pl
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+from autotimm.backbone import (
+    FeatureBackboneConfig,
+    create_feature_backbone,
+    get_feature_channels,
+)
+from autotimm.heads import DeepLabV3PlusHead, FCNHead
+from autotimm.losses.segmentation import CombinedSegmentationLoss, DiceLoss
+from autotimm.metrics import LoggingConfig, MetricConfig, MetricManager
+
+
+class SemanticSegmentor(pl.LightningModule):
+    """End-to-end semantic segmentation model backed by a timm backbone.
+
+    Parameters:
+        backbone: A timm model name (str) or a :class:`FeatureBackboneConfig`.
+        num_classes: Number of segmentation classes.
+        head_type: Type of segmentation head ('deeplabv3plus' or 'fcn').
+        loss_type: Loss function type ('ce', 'dice', 'focal', or 'combined').
+        dice_weight: Weight for Dice loss when using 'combined' loss (default: 1.0).
+        ce_weight: Weight for cross-entropy loss when using 'combined' loss (default: 1.0).
+        ignore_index: Index to ignore in loss computation (default: 255).
+        class_weights: Optional per-class weights for CE loss.
+        metrics: A :class:`MetricManager` instance or list of :class:`MetricConfig`
+            objects. Required - no default metrics are provided.
+        logging_config: Optional :class:`LoggingConfig` for enhanced logging.
+        lr: Learning rate.
+        weight_decay: Weight decay for optimizer.
+        optimizer: Optimizer name or dict with 'class' and 'params' keys.
+        optimizer_kwargs: Additional kwargs for the optimizer.
+        scheduler: Scheduler name, dict with 'class' and 'params' keys, or None.
+        scheduler_kwargs: Extra kwargs forwarded to the LR scheduler.
+        freeze_backbone: If True, backbone parameters are frozen.
+
+    Example:
+        >>> model = SemanticSegmentor(
+        ...     backbone="resnet50",
+        ...     num_classes=19,
+        ...     head_type="deeplabv3plus",
+        ...     metrics=[
+        ...         MetricConfig(
+        ...             name="iou",
+        ...             backend="torchmetrics",
+        ...             metric_class="JaccardIndex",
+        ...             params={"task": "multiclass", "num_classes": 19, "average": "macro"},
+        ...             stages=["val", "test"],
+        ...             prog_bar=True,
+        ...         ),
+        ...     ],
+        ...     loss_type="combined",
+        ...     dice_weight=1.0,
+        ... )
+    """
+
+    def __init__(
+        self,
+        backbone: str | FeatureBackboneConfig,
+        num_classes: int,
+        head_type: str = "deeplabv3plus",
+        loss_type: str = "combined",
+        dice_weight: float = 1.0,
+        ce_weight: float = 1.0,
+        ignore_index: int = 255,
+        class_weights: torch.Tensor | None = None,
+        metrics: MetricManager | list[MetricConfig] | None = None,
+        logging_config: LoggingConfig | None = None,
+        lr: float = 1e-4,
+        weight_decay: float = 1e-4,
+        optimizer: str | dict[str, Any] = "adamw",
+        optimizer_kwargs: dict[str, Any] | None = None,
+        scheduler: str | dict[str, Any] | None = "cosine",
+        scheduler_kwargs: dict[str, Any] | None = None,
+        freeze_backbone: bool = False,
+    ):
+        super().__init__()
+        self.save_hyperparameters(ignore=["metrics", "logging_config", "class_weights"])
+
+        # Create feature backbone
+        self.backbone = create_feature_backbone(backbone)
+        in_channels_list = get_feature_channels(self.backbone)
+
+        # Create segmentation head
+        if head_type == "deeplabv3plus":
+            self.head = DeepLabV3PlusHead(
+                in_channels_list=in_channels_list,
+                num_classes=num_classes,
+            )
+        elif head_type == "fcn":
+            self.head = FCNHead(
+                in_channels=in_channels_list[-1],
+                num_classes=num_classes,
+            )
+        else:
+            raise ValueError(f"Unknown head_type: {head_type}. Use 'deeplabv3plus' or 'fcn'.")
+
+        # Create loss function
+        self.loss_type = loss_type
+        self.ignore_index = ignore_index
+        if loss_type == "ce":
+            self.criterion = nn.CrossEntropyLoss(
+                weight=class_weights,
+                ignore_index=ignore_index,
+            )
+        elif loss_type == "dice":
+            self.criterion = DiceLoss(
+                num_classes=num_classes,
+                ignore_index=ignore_index,
+            )
+        elif loss_type == "combined":
+            self.criterion = CombinedSegmentationLoss(
+                num_classes=num_classes,
+                ce_weight=ce_weight,
+                dice_weight=dice_weight,
+                ignore_index=ignore_index,
+                class_weights=class_weights,
+            )
+        else:
+            from autotimm.losses.segmentation import FocalLossPixelwise
+            if loss_type == "focal":
+                self.criterion = FocalLossPixelwise(
+                    ignore_index=ignore_index,
+                )
+            else:
+                raise ValueError(
+                    f"Unknown loss_type: {loss_type}. "
+                    f"Use 'ce', 'dice', 'focal', or 'combined'."
+                )
+
+        # Initialize metrics from config
+        if metrics is None:
+            # Create empty metric dicts if no metrics provided
+            from torch.nn import ModuleDict
+            self._metric_manager = None
+            self.train_metrics = ModuleDict()
+            self.val_metrics = ModuleDict()
+            self.test_metrics = ModuleDict()
+        elif isinstance(metrics, list):
+            self._metric_manager = MetricManager(configs=metrics, num_classes=num_classes)
+            # Register metrics as ModuleDicts for proper device handling
+            self.train_metrics = self._metric_manager.get_train_metrics()
+            self.val_metrics = self._metric_manager.get_val_metrics()
+            self.test_metrics = self._metric_manager.get_test_metrics()
+        else:
+            self._metric_manager = metrics
+            # Register metrics as ModuleDicts for proper device handling
+            self.train_metrics = self._metric_manager.get_train_metrics()
+            self.val_metrics = self._metric_manager.get_val_metrics()
+            self.test_metrics = self._metric_manager.get_test_metrics()
+
+        # Logging configuration
+        self._logging_config = logging_config or LoggingConfig(
+            log_learning_rate=False,
+            log_gradient_norm=False,
+        )
+
+        # Store hyperparameters
+        self._lr = lr
+        self._weight_decay = weight_decay
+        self._optimizer = optimizer
+        self._optimizer_kwargs = optimizer_kwargs or {}
+        self._scheduler = scheduler
+        self._scheduler_kwargs = scheduler_kwargs or {}
+        self._num_classes = num_classes
+
+        if freeze_backbone:
+            for param in self.backbone.parameters():
+                param.requires_grad = False
+
+    def forward(self, images: torch.Tensor) -> torch.Tensor:
+        """Forward pass through backbone and head.
+
+        Args:
+            images: Input images [B, 3, H, W]
+
+        Returns:
+            Segmentation logits [B, num_classes, H', W']
+        """
+        features = self.backbone(images)
+        logits = self.head(features)
+        return logits
+
+    def _compute_loss(
+        self, logits: torch.Tensor, masks: torch.Tensor
+    ) -> torch.Tensor:
+        """Compute segmentation loss.
+
+        Args:
+            logits: Predicted logits [B, C, H, W]
+            masks: Ground truth masks [B, H, W]
+
+        Returns:
+            Loss value
+        """
+        # Resize logits to match mask size if needed
+        if logits.shape[-2:] != masks.shape[-2:]:
+            logits = F.interpolate(
+                logits,
+                size=masks.shape[-2:],
+                mode="bilinear",
+                align_corners=False,
+            )
+
+        return self.criterion(logits, masks)
+
+    def training_step(self, batch: dict[str, Any], batch_idx: int) -> torch.Tensor:
+        """Training step.
+
+        Args:
+            batch: Dict with 'image' [B, 3, H, W] and 'mask' [B, H, W]
+            batch_idx: Batch index
+
+        Returns:
+            Loss value
+        """
+        images = batch["image"]
+        masks = batch["mask"]
+
+        logits = self(images)
+        loss = self._compute_loss(logits, masks)
+
+        # Get predictions
+        preds = logits.argmax(dim=1)
+
+        # Log loss
+        self.log("train/loss", loss, prog_bar=True)
+
+        # Update and log all train metrics
+        if self._metric_manager is not None:
+            for name, metric in self.train_metrics.items():
+                config = self._metric_manager.get_metric_config("train", name)
+                metric.update(preds, masks)
+                if config:
+                    self.log(
+                        f"train/{name}",
+                        metric,
+                        on_step=config.log_on_step,
+                        on_epoch=config.log_on_epoch,
+                        prog_bar=config.prog_bar,
+                    )
+
+        # Enhanced logging: learning rate
+        if self._logging_config.log_learning_rate:
+            opt = self.optimizers()
+            if opt is not None and hasattr(opt, "param_groups"):
+                lr = opt.param_groups[0]["lr"]
+                self.log("train/lr", lr, on_step=True, on_epoch=False)
+
+        return loss
+
+    def on_before_optimizer_step(self, optimizer) -> None:
+        """Hook for gradient norm logging."""
+        if self._logging_config.log_gradient_norm:
+            grad_norm = self._compute_gradient_norm()
+            self.log("train/grad_norm", grad_norm, on_step=True, on_epoch=False)
+
+        if self._logging_config.log_weight_norm:
+            weight_norm = self._compute_weight_norm()
+            self.log("train/weight_norm", weight_norm, on_step=True, on_epoch=False)
+
+    def _compute_gradient_norm(self) -> torch.Tensor:
+        """Compute the total gradient norm across all parameters."""
+        total_norm = 0.0
+        for p in self.parameters():
+            if p.grad is not None:
+                param_norm = p.grad.data.norm(2)
+                total_norm += param_norm.item() ** 2
+        return torch.tensor(total_norm**0.5, device=self.device)
+
+    def _compute_weight_norm(self) -> torch.Tensor:
+        """Compute the total weight norm across all parameters."""
+        total_norm = 0.0
+        for p in self.parameters():
+            param_norm = p.data.norm(2)
+            total_norm += param_norm.item() ** 2
+        return torch.tensor(total_norm**0.5, device=self.device)
+
+    def validation_step(self, batch: dict[str, Any], batch_idx: int) -> None:
+        """Validation step.
+
+        Args:
+            batch: Dict with 'image' [B, 3, H, W] and 'mask' [B, H, W]
+            batch_idx: Batch index
+        """
+        images = batch["image"]
+        masks = batch["mask"]
+
+        logits = self(images)
+        loss = self._compute_loss(logits, masks)
+
+        # Get predictions
+        preds = logits.argmax(dim=1)
+
+        # Log loss
+        self.log("val/loss", loss, prog_bar=True)
+
+        # Update and log all val metrics
+        if self._metric_manager is not None:
+            for name, metric in self.val_metrics.items():
+                config = self._metric_manager.get_metric_config("val", name)
+                metric.update(preds, masks)
+                if config:
+                    self.log(
+                        f"val/{name}",
+                        metric,
+                        on_step=config.log_on_step,
+                        on_epoch=config.log_on_epoch,
+                        prog_bar=config.prog_bar,
+                    )
+
+    def test_step(self, batch: dict[str, Any], batch_idx: int) -> None:
+        """Test step.
+
+        Args:
+            batch: Dict with 'image' [B, 3, H, W] and 'mask' [B, H, W]
+            batch_idx: Batch index
+        """
+        images = batch["image"]
+        masks = batch["mask"]
+
+        logits = self(images)
+        loss = self._compute_loss(logits, masks)
+
+        # Get predictions
+        preds = logits.argmax(dim=1)
+
+        # Log loss
+        self.log("test/loss", loss)
+
+        # Update and log all test metrics
+        if self._metric_manager is not None:
+            for name, metric in self.test_metrics.items():
+                config = self._metric_manager.get_metric_config("test", name)
+                metric.update(preds, masks)
+                if config:
+                    self.log(
+                        f"test/{name}",
+                        metric,
+                        on_step=config.log_on_step,
+                        on_epoch=config.log_on_epoch,
+                        prog_bar=config.prog_bar,
+                    )
+
+    def predict(
+        self, images: torch.Tensor, return_logits: bool = False
+    ) -> torch.Tensor:
+        """Predict segmentation masks for input images.
+
+        Args:
+            images: Input images [B, 3, H, W]
+            return_logits: If True, return logits instead of class predictions
+
+        Returns:
+            Predicted class indices [B, H, W] or logits [B, C, H, W]
+        """
+        self.eval()
+        with torch.no_grad():
+            logits = self(images)
+            if return_logits:
+                return logits
+            return logits.argmax(dim=1)
+
+    def predict_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
+        """Prediction step for Trainer.predict().
+
+        Args:
+            batch: Input batch (dict or tensor)
+            batch_idx: Batch index
+
+        Returns:
+            Predicted class indices [B, H, W]
+        """
+        if isinstance(batch, dict):
+            images = batch["image"]
+        elif isinstance(batch, (tuple, list)):
+            images = batch[0]
+        else:
+            images = batch
+
+        return self.predict(images)
+
+    def configure_optimizers(self) -> dict:
+        """Configure optimizer and learning rate scheduler.
+
+        Supports torch.optim, timm optimizers, and custom optimizers/schedulers.
+        """
+        params = filter(lambda p: p.requires_grad, self.parameters())
+
+        # Create optimizer
+        optimizer = self._create_optimizer(params)
+
+        # Return early if no scheduler
+        if self._scheduler is None or self._scheduler == "none":
+            return {"optimizer": optimizer}
+
+        # Create scheduler
+        scheduler_config = self._create_scheduler(optimizer)
+
+        return {
+            "optimizer": optimizer,
+            "lr_scheduler": scheduler_config,
+        }
+
+    def _create_optimizer(self, params) -> torch.optim.Optimizer:
+        """Create optimizer from config."""
+        # Prepare base kwargs
+        opt_kwargs = {"lr": self._lr, "weight_decay": self._weight_decay}
+        opt_kwargs.update(self._optimizer_kwargs)
+
+        # Dict config: {"class": "path.to.Optimizer", "params": {...}}
+        if isinstance(self._optimizer, dict):
+            opt_class_path = self._optimizer["class"]
+            opt_params = self._optimizer.get("params", {})
+            opt_kwargs.update(opt_params)
+
+            # Import and instantiate
+            optimizer_cls = self._import_class(opt_class_path)
+            return optimizer_cls(params, **opt_kwargs)
+
+        # String name: try torch.optim first, then timm
+        optimizer_name = self._optimizer.lower()
+
+        # Torch optimizers
+        torch_optimizers = {
+            "adamw": torch.optim.AdamW,
+            "adam": torch.optim.Adam,
+            "sgd": torch.optim.SGD,
+            "rmsprop": torch.optim.RMSprop,
+            "adagrad": torch.optim.Adagrad,
+        }
+
+        if optimizer_name in torch_optimizers:
+            return torch_optimizers[optimizer_name](params, **opt_kwargs)
+
+        # Try timm optimizers
+        try:
+            import timm.optim as timm_optim
+
+            timm_optimizers = {
+                "adamp": timm_optim.AdamP,
+                "sgdp": timm_optim.SGDP,
+                "adabelief": timm_optim.AdaBelief,
+                "radam": timm_optim.RAdam,
+                "lamb": timm_optim.Lamb,
+                "madgrad": timm_optim.MADGRAD,
+                "novograd": timm_optim.NovGrad,
+            }
+
+            if optimizer_name in timm_optimizers:
+                return timm_optimizers[optimizer_name](params, **opt_kwargs)
+        except ImportError:
+            pass
+
+        raise ValueError(
+            f"Unknown optimizer: {self._optimizer}. "
+            f"Use a torch.optim optimizer name, timm optimizer name, "
+            f"or provide a dict with 'class' and 'params' keys."
+        )
+
+    def _create_scheduler(self, optimizer: torch.optim.Optimizer) -> dict:
+        """Create scheduler config from optimizer."""
+        sched_kwargs = self._scheduler_kwargs.copy()
+        interval = sched_kwargs.pop("interval", "step")
+        frequency = sched_kwargs.pop("frequency", 1)
+
+        # Dict config: {"class": "path.to.Scheduler", "params": {...}}
+        if isinstance(self._scheduler, dict):
+            sched_class_path = self._scheduler["class"]
+            sched_params = self._scheduler.get("params", {})
+            sched_kwargs.update(sched_params)
+
+            scheduler_cls = self._import_class(sched_class_path)
+            scheduler = scheduler_cls(optimizer, **sched_kwargs)
+
+            return {
+                "scheduler": scheduler,
+                "interval": interval,
+                "frequency": frequency,
+            }
+
+        # String name: try torch schedulers first, then timm
+        scheduler_name = self._scheduler.lower()
+
+        # Torch schedulers
+        if scheduler_name == "cosine":
+            scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+                optimizer,
+                T_max=sched_kwargs.pop(
+                    "T_max", self.trainer.estimated_stepping_batches
+                ),
+                **sched_kwargs,
+            )
+        elif scheduler_name == "step":
+            scheduler = torch.optim.lr_scheduler.StepLR(
+                optimizer,
+                step_size=sched_kwargs.pop("step_size", 30),
+                gamma=sched_kwargs.pop("gamma", 0.1),
+                **sched_kwargs,
+            )
+        elif scheduler_name == "multistep":
+            scheduler = torch.optim.lr_scheduler.MultiStepLR(
+                optimizer,
+                milestones=sched_kwargs.pop("milestones", [30, 60, 90]),
+                gamma=sched_kwargs.pop("gamma", 0.1),
+                **sched_kwargs,
+            )
+        elif scheduler_name == "exponential":
+            scheduler = torch.optim.lr_scheduler.ExponentialLR(
+                optimizer,
+                gamma=sched_kwargs.pop("gamma", 0.95),
+                **sched_kwargs,
+            )
+        elif scheduler_name == "onecycle":
+            scheduler = torch.optim.lr_scheduler.OneCycleLR(
+                optimizer,
+                max_lr=sched_kwargs.pop("max_lr", self._lr * 10),
+                total_steps=sched_kwargs.pop(
+                    "total_steps", self.trainer.estimated_stepping_batches
+                ),
+                **sched_kwargs,
+            )
+        elif scheduler_name == "plateau":
+            scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+                optimizer,
+                mode=sched_kwargs.pop("mode", "min"),
+                factor=sched_kwargs.pop("factor", 0.1),
+                patience=sched_kwargs.pop("patience", 10),
+                **sched_kwargs,
+            )
+            interval = "epoch"
+            return {
+                "scheduler": scheduler,
+                "monitor": sched_kwargs.pop("monitor", "val/loss"),
+                "interval": interval,
+                "frequency": frequency,
+            }
+        else:
+            raise ValueError(
+                f"Unknown scheduler: {self._scheduler}. "
+                f"Use a torch.optim.lr_scheduler name or provide a dict."
+            )
+
+        return {
+            "scheduler": scheduler,
+            "interval": interval,
+            "frequency": frequency,
+        }
+
+    def _import_class(self, class_path: str):
+        """Import a class from a fully qualified path."""
+        import importlib
+
+        if "." not in class_path:
+            raise ValueError(
+                f"Class path must be fully qualified (e.g., 'torch.optim.Adam'), "
+                f"got: {class_path}"
+            )
+
+        module_path, class_name = class_path.rsplit(".", 1)
+        module = importlib.import_module(module_path)
+        return getattr(module, class_name)

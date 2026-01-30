@@ -277,3 +277,340 @@ class DetectionHead(nn.Module):
         centerness_out = self.centerness_pred(reg_feat)
 
         return cls_out, reg_out, centerness_out
+
+
+class ASPP(nn.Module):
+    """Atrous Spatial Pyramid Pooling module for DeepLabV3+.
+
+    Applies parallel atrous convolutions with different dilation rates to capture
+    multi-scale context.
+
+    Parameters:
+        in_channels: Number of input channels from backbone.
+        out_channels: Number of output channels.
+        dilation_rates: List of dilation rates for parallel branches.
+    """
+
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int = 256,
+        dilation_rates: Sequence[int] = (6, 12, 18),
+    ):
+        super().__init__()
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+
+        # 1x1 convolution
+        self.conv1x1 = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=False),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+        )
+
+        # Parallel atrous convolutions
+        self.atrous_convs = nn.ModuleList()
+        for rate in dilation_rates:
+            self.atrous_convs.append(
+                nn.Sequential(
+                    nn.Conv2d(
+                        in_channels,
+                        out_channels,
+                        kernel_size=3,
+                        padding=rate,
+                        dilation=rate,
+                        bias=False,
+                    ),
+                    nn.BatchNorm2d(out_channels),
+                    nn.ReLU(inplace=True),
+                )
+            )
+
+        # Global average pooling branch
+        self.global_pool = nn.Sequential(
+            nn.AdaptiveAvgPool2d(1),
+            nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=False),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+        )
+
+        # Projection layer
+        total_channels = out_channels * (len(dilation_rates) + 2)
+        self.project = nn.Sequential(
+            nn.Conv2d(total_channels, out_channels, kernel_size=1, bias=False),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+            nn.Dropout(0.5),
+        )
+
+        self._init_weights()
+
+    def _init_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+            elif isinstance(m, nn.BatchNorm2d):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass through ASPP.
+
+        Args:
+            x: Input feature map [B, C, H, W]
+
+        Returns:
+            Output feature map [B, out_channels, H, W]
+        """
+        size = x.shape[-2:]
+
+        # Apply all branches
+        x1 = self.conv1x1(x)
+        x_atrous = [conv(x) for conv in self.atrous_convs]
+        x_global = F.interpolate(
+            self.global_pool(x), size=size, mode="bilinear", align_corners=False
+        )
+
+        # Concatenate all branches
+        x = torch.cat([x1] + x_atrous + [x_global], dim=1)
+
+        # Project to output channels
+        return self.project(x)
+
+
+class DeepLabV3PlusHead(nn.Module):
+    """DeepLabV3+ segmentation head with ASPP and decoder.
+
+    Combines high-level semantic features (C5) with low-level spatial features (C2)
+    for accurate segmentation.
+
+    Parameters:
+        in_channels_list: List of input channel counts from backbone [C2, C3, C4, C5].
+        num_classes: Number of segmentation classes.
+        aspp_out_channels: Number of ASPP output channels.
+        decoder_channels: Number of decoder output channels.
+        dilation_rates: Dilation rates for ASPP.
+    """
+
+    def __init__(
+        self,
+        in_channels_list: Sequence[int],
+        num_classes: int,
+        aspp_out_channels: int = 256,
+        decoder_channels: int = 256,
+        dilation_rates: Sequence[int] = (6, 12, 18),
+    ):
+        super().__init__()
+        self.num_classes = num_classes
+
+        # ASPP module on high-level features (C5)
+        self.aspp = ASPP(
+            in_channels=in_channels_list[-1],
+            out_channels=aspp_out_channels,
+            dilation_rates=dilation_rates,
+        )
+
+        # Low-level feature projection (C2)
+        self.low_level_projection = nn.Sequential(
+            nn.Conv2d(in_channels_list[0], 48, kernel_size=1, bias=False),
+            nn.BatchNorm2d(48),
+            nn.ReLU(inplace=True),
+        )
+
+        # Decoder
+        self.decoder = nn.Sequential(
+            nn.Conv2d(
+                aspp_out_channels + 48,
+                decoder_channels,
+                kernel_size=3,
+                padding=1,
+                bias=False,
+            ),
+            nn.BatchNorm2d(decoder_channels),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(
+                decoder_channels,
+                decoder_channels,
+                kernel_size=3,
+                padding=1,
+                bias=False,
+            ),
+            nn.BatchNorm2d(decoder_channels),
+            nn.ReLU(inplace=True),
+        )
+
+        # Final classifier
+        self.classifier = nn.Conv2d(decoder_channels, num_classes, kernel_size=1)
+
+        self._init_weights()
+
+    def _init_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+                if m.bias is not None:
+                    nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.BatchNorm2d):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
+
+    def forward(self, features: list[torch.Tensor]) -> torch.Tensor:
+        """Forward pass through DeepLabV3+ head.
+
+        Args:
+            features: List of backbone features [C2, C3, C4, C5]
+
+        Returns:
+            Segmentation logits [B, num_classes, H/4, W/4]
+        """
+        low_level_feat = features[0]  # C2
+        high_level_feat = features[-1]  # C5
+
+        # ASPP on high-level features
+        x = self.aspp(high_level_feat)
+
+        # Upsample to match low-level feature size
+        x = F.interpolate(
+            x, size=low_level_feat.shape[-2:], mode="bilinear", align_corners=False
+        )
+
+        # Project low-level features
+        low_level = self.low_level_projection(low_level_feat)
+
+        # Concatenate and decode
+        x = torch.cat([x, low_level], dim=1)
+        x = self.decoder(x)
+
+        # Final classification
+        x = self.classifier(x)
+
+        return x
+
+
+class FCNHead(nn.Module):
+    """Simple Fully Convolutional Network head for segmentation.
+
+    A simpler baseline compared to DeepLabV3+.
+
+    Parameters:
+        in_channels: Number of input channels from backbone.
+        num_classes: Number of segmentation classes.
+        intermediate_channels: Number of intermediate channels.
+    """
+
+    def __init__(
+        self,
+        in_channels: int,
+        num_classes: int,
+        intermediate_channels: int = 512,
+    ):
+        super().__init__()
+        self.num_classes = num_classes
+
+        self.conv = nn.Sequential(
+            nn.Conv2d(
+                in_channels,
+                intermediate_channels,
+                kernel_size=3,
+                padding=1,
+                bias=False,
+            ),
+            nn.BatchNorm2d(intermediate_channels),
+            nn.ReLU(inplace=True),
+            nn.Dropout(0.1),
+            nn.Conv2d(intermediate_channels, num_classes, kernel_size=1),
+        )
+
+        self._init_weights()
+
+    def _init_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+                if m.bias is not None:
+                    nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.BatchNorm2d):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
+
+    def forward(self, features: list[torch.Tensor]) -> torch.Tensor:
+        """Forward pass through FCN head.
+
+        Args:
+            features: List of backbone features (uses last one)
+
+        Returns:
+            Segmentation logits [B, num_classes, H, W]
+        """
+        x = features[-1]  # Use highest-level feature
+        return self.conv(x)
+
+
+class MaskHead(nn.Module):
+    """Mask prediction head for instance segmentation.
+
+    Takes ROI-aligned features and predicts per-instance binary masks.
+
+    Parameters:
+        in_channels: Number of input channels from ROI align.
+        num_classes: Number of object classes.
+        hidden_channels: Number of hidden layer channels.
+        num_convs: Number of convolutional layers before deconv.
+        mask_size: Output mask resolution.
+    """
+
+    def __init__(
+        self,
+        in_channels: int = 256,
+        num_classes: int = 80,
+        hidden_channels: int = 256,
+        num_convs: int = 4,
+        mask_size: int = 28,
+    ):
+        super().__init__()
+        self.num_classes = num_classes
+        self.mask_size = mask_size
+
+        # Convolutional layers
+        convs = []
+        for i in range(num_convs):
+            in_ch = in_channels if i == 0 else hidden_channels
+            convs.extend([
+                nn.Conv2d(in_ch, hidden_channels, kernel_size=3, padding=1),
+                nn.ReLU(inplace=True),
+            ])
+        self.convs = nn.Sequential(*convs)
+
+        # Deconvolution to increase resolution
+        self.deconv = nn.ConvTranspose2d(
+            hidden_channels,
+            hidden_channels,
+            kernel_size=2,
+            stride=2,
+        )
+
+        # Mask prediction
+        self.mask_pred = nn.Conv2d(hidden_channels, num_classes, kernel_size=1)
+
+        self._init_weights()
+
+    def _init_weights(self):
+        for m in self.modules():
+            if isinstance(m, (nn.Conv2d, nn.ConvTranspose2d)):
+                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+                if m.bias is not None:
+                    nn.init.constant_(m.bias, 0)
+
+    def forward(self, roi_features: torch.Tensor) -> torch.Tensor:
+        """Forward pass through mask head.
+
+        Args:
+            roi_features: ROI-aligned features [N, C, H, W]
+
+        Returns:
+            Mask logits [N, num_classes, mask_size, mask_size]
+        """
+        x = self.convs(roi_features)
+        x = F.relu(self.deconv(x))
+        x = self.mask_pred(x)
+        return x
