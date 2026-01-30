@@ -103,7 +103,9 @@ def main():
         devices=1,
         precision="16-mixed",  # Use mixed precision for faster training
         logger=[
-            LoggerConfig(backend="tensorboard", params={"save_dir": "logs/semantic_seg"}),
+            LoggerConfig(
+                backend="tensorboard", params={"save_dir": "logs/semantic_seg"}
+            ),
         ],
         checkpoint_monitor="val/mIoU",
         checkpoint_mode="max",

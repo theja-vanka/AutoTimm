@@ -44,12 +44,11 @@ class DiceLoss(nn.Module):
         probs = F.softmax(logits, dim=1)  # [B, C, H, W]
 
         # Create mask for valid pixels
-        valid_mask = (targets != self.ignore_index)  # [B, H, W]
+        valid_mask = targets != self.ignore_index  # [B, H, W]
 
         # One-hot encode targets
         targets_one_hot = F.one_hot(
-            targets.clamp(0, self.num_classes - 1),
-            num_classes=self.num_classes
+            targets.clamp(0, self.num_classes - 1), num_classes=self.num_classes
         )  # [B, H, W, C]
         targets_one_hot = targets_one_hot.permute(0, 3, 1, 2).float()  # [B, C, H, W]
 
@@ -68,7 +67,9 @@ class DiceLoss(nn.Module):
         cardinality = probs.sum(dim=2) + targets_one_hot.sum(dim=2)  # [B, C]
 
         # Dice coefficient
-        dice = (2.0 * intersection + self.smooth) / (cardinality + self.smooth)  # [B, C]
+        dice = (2.0 * intersection + self.smooth) / (
+            cardinality + self.smooth
+        )  # [B, C]
 
         # Dice loss
         dice_loss = 1.0 - dice  # [B, C]
@@ -127,7 +128,7 @@ class FocalLossPixelwise(nn.Module):
         probs = probs.permute(0, 2, 3, 1).reshape(-1, C)  # [B*H*W, C]
 
         # Create valid mask
-        valid_mask = (targets != self.ignore_index)
+        valid_mask = targets != self.ignore_index
 
         # Filter valid pixels
         logits = logits[valid_mask]
@@ -201,12 +202,11 @@ class TverskyLoss(nn.Module):
         probs = F.softmax(logits, dim=1)  # [B, C, H, W]
 
         # Create mask for valid pixels
-        valid_mask = (targets != self.ignore_index)  # [B, H, W]
+        valid_mask = targets != self.ignore_index  # [B, H, W]
 
         # One-hot encode targets
         targets_one_hot = F.one_hot(
-            targets.clamp(0, self.num_classes - 1),
-            num_classes=self.num_classes
+            targets.clamp(0, self.num_classes - 1), num_classes=self.num_classes
         )  # [B, H, W, C]
         targets_one_hot = targets_one_hot.permute(0, 3, 1, 2).float()  # [B, C, H, W]
 
@@ -225,7 +225,9 @@ class TverskyLoss(nn.Module):
         fn = ((1 - probs) * targets_one_hot).sum(dim=2)  # [B, C]
 
         # Tversky index
-        tversky = (tp + self.smooth) / (tp + self.alpha * fp + self.beta * fn + self.smooth)
+        tversky = (tp + self.smooth) / (
+            tp + self.alpha * fp + self.beta * fn + self.smooth
+        )
 
         # Tversky loss
         tversky_loss = 1.0 - tversky  # [B, C]
@@ -256,7 +258,9 @@ class MaskLoss(nn.Module):
         self.reduction = reduction
         self.pos_weight = pos_weight
 
-    def forward(self, pred_masks: torch.Tensor, target_masks: torch.Tensor) -> torch.Tensor:
+    def forward(
+        self, pred_masks: torch.Tensor, target_masks: torch.Tensor
+    ) -> torch.Tensor:
         """Compute binary cross-entropy loss for masks.
 
         Args:
@@ -280,9 +284,7 @@ class MaskLoss(nn.Module):
         pos_weight_tensor = None
         if self.pos_weight is not None:
             pos_weight_tensor = torch.tensor(
-                [self.pos_weight],
-                device=pred_masks.device,
-                dtype=pred_masks.dtype
+                [self.pos_weight], device=pred_masks.device, dtype=pred_masks.dtype
             )
 
         loss = F.binary_cross_entropy_with_logits(

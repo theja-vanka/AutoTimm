@@ -101,7 +101,9 @@ class SemanticSegmentor(pl.LightningModule):
                 num_classes=num_classes,
             )
         else:
-            raise ValueError(f"Unknown head_type: {head_type}. Use 'deeplabv3plus' or 'fcn'.")
+            raise ValueError(
+                f"Unknown head_type: {head_type}. Use 'deeplabv3plus' or 'fcn'."
+            )
 
         # Create loss function
         self.loss_type = loss_type
@@ -126,6 +128,7 @@ class SemanticSegmentor(pl.LightningModule):
             )
         else:
             from autotimm.losses.segmentation import FocalLossPixelwise
+
             if loss_type == "focal":
                 self.criterion = FocalLossPixelwise(
                     ignore_index=ignore_index,
@@ -140,12 +143,15 @@ class SemanticSegmentor(pl.LightningModule):
         if metrics is None:
             # Create empty metric dicts if no metrics provided
             from torch.nn import ModuleDict
+
             self._metric_manager = None
             self.train_metrics = ModuleDict()
             self.val_metrics = ModuleDict()
             self.test_metrics = ModuleDict()
         elif isinstance(metrics, list):
-            self._metric_manager = MetricManager(configs=metrics, num_classes=num_classes)
+            self._metric_manager = MetricManager(
+                configs=metrics, num_classes=num_classes
+            )
             # Register metrics as ModuleDicts for proper device handling
             self.train_metrics = self._metric_manager.get_train_metrics()
             self.val_metrics = self._metric_manager.get_val_metrics()
@@ -194,9 +200,7 @@ class SemanticSegmentor(pl.LightningModule):
         logits = self.head(features)
         return logits
 
-    def _compute_loss(
-        self, logits: torch.Tensor, masks: torch.Tensor
-    ) -> torch.Tensor:
+    def _compute_loss(self, logits: torch.Tensor, masks: torch.Tensor) -> torch.Tensor:
         """Compute segmentation loss.
 
         Args:
@@ -503,7 +507,7 @@ class SemanticSegmentor(pl.LightningModule):
             except RuntimeError:
                 # Trainer not attached yet
                 default_t_max = 1000
-            
+
             scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
                 optimizer,
                 T_max=sched_kwargs.pop("T_max", default_t_max),
@@ -535,7 +539,7 @@ class SemanticSegmentor(pl.LightningModule):
             except RuntimeError:
                 # Trainer not attached yet
                 default_total_steps = 1000
-            
+
             scheduler = torch.optim.lr_scheduler.OneCycleLR(
                 optimizer,
                 max_lr=sched_kwargs.pop("max_lr", self._lr * 10),

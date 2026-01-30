@@ -112,7 +112,9 @@ def main():
         precision="16-mixed",  # Use mixed precision
         gradient_clip_val=1.0,  # Clip gradients to prevent instability
         logger=[
-            LoggerConfig(backend="tensorboard", params={"save_dir": "logs/instance_seg"}),
+            LoggerConfig(
+                backend="tensorboard", params={"save_dir": "logs/instance_seg"}
+            ),
         ],
         checkpoint_monitor="val/mask_mAP",
         checkpoint_mode="max",

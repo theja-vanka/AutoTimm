@@ -9,11 +9,11 @@ from typing import Any
 import cv2
 import numpy as np
 import torch
-from PIL import Image
 from torch.utils.data import Dataset
 
 try:
     from pycocotools import mask as mask_utils
+
     HAS_PYCOCOTOOLS = True
 except ImportError:
     HAS_PYCOCOTOOLS = False

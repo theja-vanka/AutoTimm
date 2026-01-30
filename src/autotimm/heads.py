@@ -575,10 +575,12 @@ class MaskHead(nn.Module):
         convs = []
         for i in range(num_convs):
             in_ch = in_channels if i == 0 else hidden_channels
-            convs.extend([
-                nn.Conv2d(in_ch, hidden_channels, kernel_size=3, padding=1),
-                nn.ReLU(inplace=True),
-            ])
+            convs.extend(
+                [
+                    nn.Conv2d(in_ch, hidden_channels, kernel_size=3, padding=1),
+                    nn.ReLU(inplace=True),
+                ]
+            )
         self.convs = nn.Sequential(*convs)
 
         # Deconvolution to increase resolution

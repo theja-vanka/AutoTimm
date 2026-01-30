@@ -1,6 +1,5 @@
 """Tests for segmentation loss functions."""
 
-import pytest
 import torch
 
 from autotimm.losses.segmentation import (
@@ -137,7 +136,7 @@ class TestTverskyLoss:
         # Balanced (should be similar to Dice)
         loss_balanced = TverskyLoss(num_classes=5, alpha=0.5, beta=0.5)(logits, targets)
 
-        assert all(not torch.isnan(l) for l in [loss_fp, loss_fn, loss_balanced])
+        assert all(not torch.isnan(loss) for loss in [loss_fp, loss_fn, loss_balanced])
 
 
 class TestMaskLoss:
@@ -216,7 +215,7 @@ class TestCombinedSegmentationLoss:
             num_classes=5, ce_weight=1.0, dice_weight=1.0
         )(logits, targets)
 
-        assert all(not torch.isnan(l) for l in [loss_ce, loss_dice, loss_combined])
+        assert all(not torch.isnan(loss) for loss in [loss_ce, loss_dice, loss_combined])
 
     def test_combined_loss_class_weights(self):
         """Test with class weights."""

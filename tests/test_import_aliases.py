@@ -1,7 +1,5 @@
 """Tests for import aliases."""
 
-import pytest
-
 
 class TestImportAliases:
     """Test submodule import aliases."""

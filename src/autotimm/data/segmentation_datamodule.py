@@ -15,7 +15,6 @@ from autotimm.data.segmentation_dataset import (
 from autotimm.data.segmentation_transforms import (
     get_segmentation_preset,
     segmentation_eval_transforms,
-    segmentation_train_transforms,
 )
 
 
@@ -84,9 +83,7 @@ class SegmentationDataModule(pl.LightningDataModule):
         if self.custom_val_transforms is not None:
             val_transforms = self.custom_val_transforms
         else:
-            val_transforms = segmentation_eval_transforms(
-                image_size=self.image_size
-            )
+            val_transforms = segmentation_eval_transforms(image_size=self.image_size)
 
         # Setup datasets based on stage
         if stage == "fit" or stage is None:

@@ -152,7 +152,9 @@ class InstanceSegmentor(pl.LightningModule):
         self.centerness_loss_weight = centerness_loss_weight
         self.mask_loss_weight = mask_loss_weight
 
-        self.focal_loss = FocalLoss(alpha=focal_alpha, gamma=focal_gamma, reduction="sum")
+        self.focal_loss = FocalLoss(
+            alpha=focal_alpha, gamma=focal_gamma, reduction="sum"
+        )
         self.giou_loss = GIoULoss(reduction="sum")
         self.mask_loss_fn = MaskLoss(reduction="mean")
 
@@ -205,7 +207,9 @@ class InstanceSegmentor(pl.LightningModule):
             for config in self._metric_configs:
                 if config.backend == "torchmetrics":
                     if hasattr(torchmetrics.detection, config.metric_class):
-                        metric_cls = getattr(torchmetrics.detection, config.metric_class)
+                        metric_cls = getattr(
+                            torchmetrics.detection, config.metric_class
+                        )
                     elif hasattr(torchmetrics, config.metric_class):
                         metric_cls = getattr(torchmetrics, config.metric_class)
                     else:
@@ -309,7 +313,9 @@ class InstanceSegmentor(pl.LightningModule):
                 continue
 
             # Add batch index to boxes for ROI pooling
-            batch_indices = torch.full((len(boxes), 1), i, dtype=boxes.dtype, device=device)
+            batch_indices = torch.full(
+                (len(boxes), 1), i, dtype=boxes.dtype, device=device
+            )
             rois = torch.cat([batch_indices, boxes], dim=1)  # [N, 5]
 
             all_rois.append(rois)
@@ -334,12 +340,16 @@ class InstanceSegmentor(pl.LightningModule):
         )
 
         # Predict masks
-        mask_logits = self.mask_head(roi_features)  # [total_N, num_classes, mask_size, mask_size]
+        mask_logits = self.mask_head(
+            roi_features
+        )  # [total_N, num_classes, mask_size, mask_size]
 
         # Select masks for ground truth classes
         N = len(labels_batch)
         indices = torch.arange(N, device=device)
-        mask_logits = mask_logits[indices, labels_batch]  # [total_N, mask_size, mask_size]
+        mask_logits = mask_logits[
+            indices, labels_batch
+        ]  # [total_N, mask_size, mask_size]
 
         # Resize target masks to match prediction size
         target_masks_resized = F.interpolate(
@@ -383,7 +393,12 @@ class InstanceSegmentor(pl.LightningModule):
 
         # Compute mask loss (using ground truth boxes)
         mask_loss = self._compute_mask_loss(
-            fpn_features, target_boxes, target_labels, target_boxes, target_labels, target_masks
+            fpn_features,
+            target_boxes,
+            target_labels,
+            target_boxes,
+            target_labels,
+            target_masks,
         )
 
         # Total loss
@@ -503,7 +518,7 @@ class InstanceSegmentor(pl.LightningModule):
         with torch.no_grad():
             # Get features
             features = self.backbone(images)
-            fpn_features = self.fpn(features)
+            _ = self.fpn(features)
 
             # For simplicity, return empty predictions
             # In production, implement proper detection + mask prediction
@@ -511,12 +526,18 @@ class InstanceSegmentor(pl.LightningModule):
             predictions = []
 
             for i in range(batch_size):
-                predictions.append({
-                    "boxes": torch.empty((0, 4), device=images.device),
-                    "labels": torch.empty((0,), dtype=torch.long, device=images.device),
-                    "scores": torch.empty((0,), device=images.device),
-                    "masks": torch.empty((0, images.shape[2], images.shape[3]), device=images.device),
-                })
+                predictions.append(
+                    {
+                        "boxes": torch.empty((0, 4), device=images.device),
+                        "labels": torch.empty(
+                            (0,), dtype=torch.long, device=images.device
+                        ),
+                        "scores": torch.empty((0,), device=images.device),
+                        "masks": torch.empty(
+                            (0, images.shape[2], images.shape[3]), device=images.device
+                        ),
+                    }
+                )
 
             return predictions
 
@@ -587,14 +608,20 @@ class InstanceSegmentor(pl.LightningModule):
             sched_kwargs.update(sched_params)
             scheduler_cls = self._import_class(sched_class_path)
             scheduler = scheduler_cls(optimizer, **sched_kwargs)
-            return {"scheduler": scheduler, "interval": interval, "frequency": frequency}
+            return {
+                "scheduler": scheduler,
+                "interval": interval,
+                "frequency": frequency,
+            }
 
         scheduler_name = self._scheduler.lower()
 
         if scheduler_name == "cosine":
             scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
                 optimizer,
-                T_max=sched_kwargs.pop("T_max", self.trainer.estimated_stepping_batches),
+                T_max=sched_kwargs.pop(
+                    "T_max", self.trainer.estimated_stepping_batches
+                ),
                 **sched_kwargs,
             )
         elif scheduler_name == "step":

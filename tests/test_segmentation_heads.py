@@ -1,6 +1,5 @@
 """Tests for segmentation heads."""
 
-import pytest
 import torch
 
 from autotimm.heads import ASPP, DeepLabV3PlusHead, FCNHead, MaskHead
@@ -55,10 +54,10 @@ class TestDeepLabV3PlusHead:
 
         # Create feature maps at different scales
         features = [
-            torch.randn(2, 64, 128, 128),   # C2
-            torch.randn(2, 128, 64, 64),    # C3
-            torch.randn(2, 256, 32, 32),    # C4
-            torch.randn(2, 512, 16, 16),    # C5
+            torch.randn(2, 64, 128, 128),  # C2
+            torch.randn(2, 128, 64, 64),  # C3
+            torch.randn(2, 256, 32, 32),  # C4
+            torch.randn(2, 512, 16, 16),  # C5
         ]
 
         output = head(features)
@@ -107,7 +106,9 @@ class TestDeepLabV3PlusHead:
         # Only check gradients for features that are actually used by DeepLabV3+
         # DeepLabV3+ uses features[0] (low-level) and features[-1] (high-level)
         assert features[0].grad is not None, "Low-level features should have gradients"
-        assert features[-1].grad is not None, "High-level features should have gradients"
+        assert features[-1].grad is not None, (
+            "High-level features should have gradients"
+        )
 
 
 class TestFCNHead:

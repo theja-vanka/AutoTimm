@@ -61,10 +61,10 @@ from autotimm import tasks
 
 # Create module aliases by registering them in sys.modules
 # This allows: import autotimm.loss, from autotimm.loss import DiceLoss, etc.
-sys.modules['autotimm.loss'] = losses
-sys.modules['autotimm.metric'] = metrics_module
-sys.modules['autotimm.head'] = heads
-sys.modules['autotimm.task'] = tasks
+sys.modules["autotimm.loss"] = losses
+sys.modules["autotimm.metric"] = metrics_module
+sys.modules["autotimm.head"] = heads
+sys.modules["autotimm.task"] = tasks
 
 # Also make them available as attributes for: autotimm.loss.DiceLoss
 loss = losses

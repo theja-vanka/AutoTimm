@@ -7,6 +7,7 @@ def _require_albumentations():
     """Lazy import albumentations to avoid hard dependency."""
     try:
         import albumentations
+
         return albumentations
     except ImportError:
         raise ImportError(
@@ -36,29 +37,31 @@ def segmentation_train_transforms(
     """
     A = _require_albumentations()
     from albumentations.pytorch import ToTensorV2
-    
-    return A.Compose([
-        A.RandomScale(scale_limit=0.5, p=0.5),
-        A.PadIfNeeded(
-            min_height=image_size,
-            min_width=image_size,
-            border_mode=0,
-            value=0,
-            mask_value=255,
-        ),
-        A.RandomCrop(height=image_size, width=image_size),
-        A.HorizontalFlip(p=0.5),
-        A.ColorJitter(
-            brightness=0.4,
-            contrast=0.4,
-            saturation=0.4,
-            hue=0.1,
-            p=0.5,
-        ),
-        A.GaussianBlur(blur_limit=(3, 7), p=0.3),
-        A.Normalize(mean=mean, std=std),
-        ToTensorV2(),
-    ])
+
+    return A.Compose(
+        [
+            A.RandomScale(scale_limit=0.5, p=0.5),
+            A.PadIfNeeded(
+                min_height=image_size,
+                min_width=image_size,
+                border_mode=0,
+                value=0,
+                mask_value=255,
+            ),
+            A.RandomCrop(height=image_size, width=image_size),
+            A.HorizontalFlip(p=0.5),
+            A.ColorJitter(
+                brightness=0.4,
+                contrast=0.4,
+                saturation=0.4,
+                hue=0.1,
+                p=0.5,
+            ),
+            A.GaussianBlur(blur_limit=(3, 7), p=0.3),
+            A.Normalize(mean=mean, std=std),
+            ToTensorV2(),
+        ]
+    )
 
 
 def segmentation_eval_transforms(
@@ -80,12 +83,14 @@ def segmentation_eval_transforms(
     """
     A = _require_albumentations()
     from albumentations.pytorch import ToTensorV2
-    
-    return A.Compose([
-        A.Resize(height=image_size, width=image_size),
-        A.Normalize(mean=mean, std=std),
-        ToTensorV2(),
-    ])
+
+    return A.Compose(
+        [
+            A.Resize(height=image_size, width=image_size),
+            A.Normalize(mean=mean, std=std),
+            ToTensorV2(),
+        ]
+    )
 
 
 def instance_segmentation_transforms(
@@ -107,7 +112,7 @@ def instance_segmentation_transforms(
     """
     A = _require_albumentations()
     from albumentations.pytorch import ToTensorV2
-    
+
     if train:
         transforms = [
             A.RandomScale(scale_limit=0.3, p=0.5),
@@ -133,10 +138,12 @@ def instance_segmentation_transforms(
             A.Resize(height=image_size, width=image_size),
         ]
 
-    transforms.extend([
-        A.Normalize(mean=mean, std=std),
-        ToTensorV2(),
-    ])
+    transforms.extend(
+        [
+            A.Normalize(mean=mean, std=std),
+            ToTensorV2(),
+        ]
+    )
 
     return A.Compose(
         transforms,
@@ -168,40 +175,44 @@ def get_segmentation_preset(
 
     A = _require_albumentations()
     from albumentations.pytorch import ToTensorV2
-    
+
     if preset == "strong":
-        return A.Compose([
-            A.RandomScale(scale_limit=0.75, p=0.7),
-            A.PadIfNeeded(
-                min_height=image_size,
-                min_width=image_size,
-                border_mode=0,
-                value=0,
-                mask_value=255,
-            ),
-            A.RandomCrop(height=image_size, width=image_size),
-            A.HorizontalFlip(p=0.5),
-            A.VerticalFlip(p=0.2),
-            A.RandomRotate90(p=0.5),
-            A.ColorJitter(
-                brightness=0.5,
-                contrast=0.5,
-                saturation=0.5,
-                hue=0.15,
-                p=0.7,
-            ),
-            A.GaussianBlur(blur_limit=(3, 9), p=0.5),
-            A.GaussNoise(var_limit=(10.0, 50.0), p=0.3),
-            A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
-            ToTensorV2(),
-        ])
+        return A.Compose(
+            [
+                A.RandomScale(scale_limit=0.75, p=0.7),
+                A.PadIfNeeded(
+                    min_height=image_size,
+                    min_width=image_size,
+                    border_mode=0,
+                    value=0,
+                    mask_value=255,
+                ),
+                A.RandomCrop(height=image_size, width=image_size),
+                A.HorizontalFlip(p=0.5),
+                A.VerticalFlip(p=0.2),
+                A.RandomRotate90(p=0.5),
+                A.ColorJitter(
+                    brightness=0.5,
+                    contrast=0.5,
+                    saturation=0.5,
+                    hue=0.15,
+                    p=0.7,
+                ),
+                A.GaussianBlur(blur_limit=(3, 9), p=0.5),
+                A.GaussNoise(var_limit=(10.0, 50.0), p=0.3),
+                A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+                ToTensorV2(),
+            ]
+        )
     elif preset == "light":
-        return A.Compose([
-            A.Resize(height=image_size, width=image_size),
-            A.HorizontalFlip(p=0.5),
-            A.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, p=0.3),
-            A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
-            ToTensorV2(),
-        ])
+        return A.Compose(
+            [
+                A.Resize(height=image_size, width=image_size),
+                A.HorizontalFlip(p=0.5),
+                A.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, p=0.3),
+                A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+                ToTensorV2(),
+            ]
+        )
     else:  # default
         return segmentation_train_transforms(image_size=image_size)

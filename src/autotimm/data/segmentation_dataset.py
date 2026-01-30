@@ -9,7 +9,6 @@ from typing import Any
 import cv2
 import numpy as np
 import torch
-from PIL import Image
 from torch.utils.data import Dataset
 
 
@@ -89,11 +88,13 @@ class SemanticSegmentationDataset(Dataset):
                 if not mask_path.exists():
                     continue
 
-            samples.append({
-                "image_path": str(image_path),
-                "mask_path": str(mask_path),
-                "image_id": image_path.stem,
-            })
+            samples.append(
+                {
+                    "image_path": str(image_path),
+                    "mask_path": str(mask_path),
+                    "image_id": image_path.stem,
+                }
+            )
 
         return samples
 
@@ -112,15 +113,15 @@ class SemanticSegmentationDataset(Dataset):
         for img_info in coco_data["images"]:
             image_path = images_dir / img_info["file_name"]
             # Assume masks are in separate directory
-            mask_path = (
-                self.data_dir / f"{self.split}_masks" / f"{img_info['id']}.png"
-            )
+            mask_path = self.data_dir / f"{self.split}_masks" / f"{img_info['id']}.png"
 
-            samples.append({
-                "image_path": str(image_path),
-                "mask_path": str(mask_path) if mask_path.exists() else None,
-                "image_id": img_info["id"],
-            })
+            samples.append(
+                {
+                    "image_path": str(image_path),
+                    "mask_path": str(mask_path) if mask_path.exists() else None,
+                    "image_id": img_info["id"],
+                }
+            )
 
         return samples
 
@@ -143,16 +144,16 @@ class SemanticSegmentationDataset(Dataset):
                 # Find corresponding labelIds mask
                 city_name = city_dir.name
                 base_name = image_path.stem.replace("_leftImg8bit", "")
-                mask_path = (
-                    masks_dir / city_name / f"{base_name}_gtFine_labelIds.png"
-                )
+                mask_path = masks_dir / city_name / f"{base_name}_gtFine_labelIds.png"
 
                 if mask_path.exists():
-                    samples.append({
-                        "image_path": str(image_path),
-                        "mask_path": str(mask_path),
-                        "image_id": base_name,
-                    })
+                    samples.append(
+                        {
+                            "image_path": str(image_path),
+                            "mask_path": str(mask_path),
+                            "image_id": base_name,
+                        }
+                    )
 
         return samples
 
@@ -181,11 +182,13 @@ class SemanticSegmentationDataset(Dataset):
             mask_path = masks_dir / f"{image_id}.png"
 
             if image_path.exists() and mask_path.exists():
-                samples.append({
-                    "image_path": str(image_path),
-                    "mask_path": str(mask_path),
-                    "image_id": image_id,
-                })
+                samples.append(
+                    {
+                        "image_path": str(image_path),
+                        "mask_path": str(mask_path),
+                        "image_id": image_id,
+                    }
+                )
 
         return samples
 
