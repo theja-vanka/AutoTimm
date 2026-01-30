@@ -1,11 +1,14 @@
 """Demonstrate automatic learning rate and batch size finding.
 
-This example shows how to:
-- Use TunerConfig for automatic hyperparameter tuning
-- Find optimal learning rate before training
-- Find optimal batch size that fits in GPU memory
-- Combine both tuners or use them independently
-- Use MetricManager for metric configuration
+This example demonstrates:
+- Using TunerConfig for automatic hyperparameter tuning
+- Finding optimal learning rate before training
+- Finding optimal batch size that fits in GPU memory
+- Combining both tuners or using them independently
+- MetricManager for metric configuration
+
+Usage:
+    python examples/auto_tuning.py
 """
 
 from autotimm import (

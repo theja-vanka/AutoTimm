@@ -87,6 +87,10 @@ nav:
       - Training: user-guide/training.md
       - Metrics: user-guide/metrics.md
       - Logging: user-guide/logging.md
+      - HuggingFace Integration:
+          - Comparison Overview: user-guide/huggingface-integration-comparison.md
+          - HF Hub Integration: user-guide/huggingface-hub-integration.md
+          - HF Transformers Integration: user-guide/huggingface-transformers-integration.md
       - Inference:
           - Overview: user-guide/inference/index.md
           - Classification Inference: user-guide/inference/classification-inference.md
@@ -117,6 +121,7 @@ nav:
       - Object Detection: examples/object-detection.md
       - Semantic Segmentation: examples/semantic-segmentation.md
       - Instance Segmentation: examples/instance-segmentation.md
+      - Hugging Face Hub: examples/huggingface-hub.md
       - Data Handling: examples/data-handling.md
       - Training Utilities: examples/training-utilities.md
       - Logging & Metrics: examples/logging-metrics.md

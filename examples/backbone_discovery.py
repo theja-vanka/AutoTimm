@@ -1,10 +1,13 @@
 """Explore available timm backbones and inspect model properties.
 
-This example shows how to:
-- List available backbones by architecture family
-- Filter by pretrained availability
-- Inspect model properties (parameters, features)
-- Compare different model configurations
+This example demonstrates:
+- Listing available backbones by architecture family
+- Filtering by pretrained availability
+- Inspecting model properties (parameters, features)
+- Comparing different model configurations
+
+Usage:
+    python examples/backbone_discovery.py
 """
 
 import autotimm

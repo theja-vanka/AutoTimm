@@ -1,10 +1,13 @@
 """Demonstrate using multiple logging backends simultaneously.
 
-This example shows how to:
-- Configure multiple loggers (TensorBoard + CSV)
-- Use LoggerManager for centralized logger configuration
-- Use MetricManager for metric access
-- Log to multiple destinations in parallel
+This example demonstrates:
+- Configuring multiple loggers (TensorBoard + CSV)
+- Using LoggerManager for centralized logger configuration
+- Using MetricManager for metric access
+- Logging to multiple destinations in parallel
+
+Usage:
+    python examples/multiple_loggers.py
 """
 
 from autotimm import (
