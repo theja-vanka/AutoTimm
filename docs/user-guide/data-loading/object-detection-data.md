@@ -369,5 +369,5 @@ To use your own COCO-format dataset:
 ## See Also
 
 - [Image Classification Data](image-classification-data.md) - For classification datasets
-- [Object Detection Examples](../../examples/object-detection.md) - More examples and use cases
-- [Training Guide](../training.md) - How to train detection models
+- [Object Detection Examples](../../examples/tasks/object-detection.md) - More examples and use cases
+- [Training Guide](../training/training.md) - How to train detection models

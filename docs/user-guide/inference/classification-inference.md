@@ -467,4 +467,4 @@ image = Image.open("img.jpg").convert("RGB")
 
 - [Object Detection Inference](object-detection-inference.md) - For detection models
 - [Model Export](model-export.md) - Export to TorchScript/ONNX
-- [Training Guide](../training.md) - How to train models
+- [Training Guide](../training/training.md) - How to train models

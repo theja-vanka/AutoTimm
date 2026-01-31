@@ -365,7 +365,7 @@ model = ObjectDetector(
 )
 ```
 
-See [Object Detection Examples](../examples/object-detection.md#object-detection-on-coco) for more details.
+See [Object Detection Examples](../examples/tasks/object-detection.md#object-detection-on-coco) for more details.
 
 ### Alternative: RT-DETR
 
@@ -389,7 +389,7 @@ model = RTDetrForObjectDetection.from_pretrained(
 )
 ```
 
-See [RT-DETR Example](../examples/object-detection.md#rt-detr-real-time-detection-transformer) for complete integration.
+See [RT-DETR Example](../examples/tasks/object-detection.md#rt-detr-real-time-detection-transformer) for complete integration.
 
 ## Semantic Segmentation Quick Start
 
@@ -542,5 +542,5 @@ See [Instance Segmentation Guide](../user-guide/models/instance-segmentation.md)
 
 - [Data Loading](../user-guide/data-loading/index.md) - Learn about transforms and datasets
 - [Models](../user-guide/models/index.md) - Backbone configuration and customization
-- [Training](../user-guide/training.md) - Advanced training features
+- [Training](../user-guide/training/training.md) - Advanced training features
 - [Examples](../examples/index.md) - More complete examples

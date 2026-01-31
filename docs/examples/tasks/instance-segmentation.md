@@ -609,6 +609,6 @@ if __name__ == "__main__":
 
 ## See Also
 
-- [Instance Segmentation Guide](../user-guide/models/instance-segmentation.md)
-- [Data Loading Guide](../user-guide/data-loading/segmentation-data.md)
-- [API Reference](../api/segmentation.md)
+- [Instance Segmentation Guide](../../user-guide/models/instance-segmentation.md)
+- [Data Loading Guide](../../user-guide/data-loading/segmentation-data.md)
+- [API Reference](../../api/segmentation.md)

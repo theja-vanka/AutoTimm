@@ -424,7 +424,7 @@ custom_metric = MetricConfig(
 )
 ```
 
-See [Advanced Customization](advanced-customization.md) for creating custom metrics.
+See [Advanced Customization](../training/advanced-customization.md) for creating custom metrics.
 
 ---
 
@@ -678,5 +678,5 @@ if __name__ == "__main__":
 ## See Also
 
 - [Metrics Guide](metrics.md) - MetricConfig and MetricManager usage
-- [Training Guide](training.md) - Training configuration
-- [Advanced Customization](advanced-customization.md) - Custom metrics
+- [Training Guide](../training/training.md) - Training configuration
+- [Advanced Customization](../training/advanced-customization.md) - Custom metrics

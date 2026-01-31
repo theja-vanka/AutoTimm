@@ -839,6 +839,6 @@ model.head.load_state_dict(old_state["head"], strict=False)
 
 ## See Also
 
-- [Getting Started](../getting-started/quickstart.md) - Quick start guide
-- [Training Guide](training.md) - Training configuration
-- [Advanced Customization](advanced-customization.md) - Custom components
+- [Getting Started](../../getting-started/quickstart.md) - Quick start guide
+- [Training Guide](../training/training.md) - Training configuration
+- [Advanced Customization](../training/advanced-customization.md) - Custom components

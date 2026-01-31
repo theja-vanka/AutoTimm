@@ -352,5 +352,5 @@ trainer.test(model, datamodule=data)
 ## See Also
 
 - [Object Detection Data](object-detection-data.md) - For COCO format object detection datasets
-- [Data Handling Examples](../../examples/data-handling.md) - More examples and use cases
-- [Training Guide](../training.md) - How to train models with your data
+- [Data Handling Examples](../../examples/utilities/data-handling.md) - More examples and use cases
+- [Training Guide](../training/training.md) - How to train models with your data

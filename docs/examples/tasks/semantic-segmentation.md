@@ -540,6 +540,6 @@ if __name__ == "__main__":
 
 ## See Also
 
-- [Semantic Segmentation Guide](../user-guide/models/semantic-segmentation.md)
-- [Data Loading Guide](../user-guide/data-loading/segmentation-data.md)
-- [API Reference](../api/segmentation.md)
+- [Semantic Segmentation Guide](../../user-guide/models/semantic-segmentation.md)
+- [Data Loading Guide](../../user-guide/data-loading/segmentation-data.md)
+- [API Reference](../../api/segmentation.md)

@@ -131,5 +131,5 @@ metrics = [
 - [Object Detection Data](../data-loading/object-detection-data.md) - Data loading for detection
 - [Classification Inference](../inference/classification-inference.md) - Making predictions with classifiers
 - [Object Detection Inference](../inference/object-detection-inference.md) - Making predictions with detectors
-- [Training Guide](../training.md) - Training models with AutoTrainer
-- [Metrics](../metrics.md) - Configuring metrics and logging
+- [Training Guide](../training/training.md) - Training models with AutoTrainer
+- [Metrics](../evaluation/metrics.md) - Configuring metrics and logging

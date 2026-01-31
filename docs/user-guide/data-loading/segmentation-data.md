@@ -524,5 +524,5 @@ For albumentations:
 ## Examples
 
 See:
-- [Semantic Segmentation Example](../../examples/semantic-segmentation.md)
-- [Instance Segmentation Example](../../examples/instance-segmentation.md)
+- [Semantic Segmentation Example](../../examples/tasks/semantic-segmentation.md)
+- [Instance Segmentation Example](../../examples/tasks/instance-segmentation.md)
