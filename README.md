@@ -290,8 +290,8 @@ Ready-to-run scripts in the [`examples/`](examples/) directory:
 | [object_detection_coco.py](examples/object_detection_coco.py) | FCOS-style object detection on COCO dataset |
 | [object_detection_transformers.py](examples/object_detection_transformers.py) | Transformer-based detection (ViT, Swin, DeiT) |
 | [object_detection_rtdetr.py](examples/object_detection_rtdetr.py) | RT-DETR end-to-end detection (no NMS required) |
-| [semantic_segmentation_cityscapes.py](examples/semantic_segmentation_cityscapes.py) | DeepLabV3+ segmentation on Cityscapes |
-| [instance_segmentation_coco.py](examples/instance_segmentation_coco.py) | Mask R-CNN style instance segmentation |
+| [semantic_segmentation.py](examples/semantic_segmentation.py) | DeepLabV3+ semantic segmentation |
+| [instance_segmentation.py](examples/instance_segmentation.py) | Mask R-CNN style instance segmentation |
 | [vit_finetuning.py](examples/vit_finetuning.py) | Two-phase Vision Transformer fine-tuning |
 | [multi_gpu_training.py](examples/multi_gpu_training.py) | Distributed training with DDP |
 | [mlflow_tracking.py](examples/mlflow_tracking.py) | Experiment tracking with MLflow |
@@ -426,7 +426,7 @@ trainer.fit(model, datamodule=ImageDataModule(data_dir="./data"))
 
 **Key Features:**
 - ✅ All three approaches fully compatible with PyTorch Lightning and AutoTrainer
-- ✅ 47 automated tests with 100% pass rate
+- ✅ 184 automated tests (170 passed, 14 skipped)
 - ✅ Production-ready with checkpoint monitoring, early stopping, and mixed precision
 - ✅ No special configuration needed - all features "just work"
 
@@ -490,7 +490,7 @@ pytest tests/ -v
 
 ## Testing
 
-All tests pass successfully (130 passed, 3 skipped).
+All tests pass successfully (170 passed, 14 skipped).
 
 ```bash
 # Run all tests

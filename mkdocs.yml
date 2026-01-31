@@ -88,6 +88,14 @@ nav:
       - Training: user-guide/training.md
       - Metrics: user-guide/metrics.md
       - Logging: user-guide/logging.md
+      - Troubleshooting: user-guide/troubleshooting.md
+      - Loss Comparison: user-guide/loss-comparison.md
+      - Dataset Preparation: user-guide/dataset-preparation.md
+      - Metric Selection: user-guide/metric-selection.md
+      - Benchmarks: user-guide/benchmarks.md
+      - Deployment: user-guide/deployment.md
+      - Advanced Customization: user-guide/advanced-customization.md
+      - Migration Guide: user-guide/migration.md
       - HuggingFace Integration:
           - Comparison Overview: user-guide/huggingface-integration-comparison.md
           - HF Hub Integration: user-guide/huggingface-hub-integration.md

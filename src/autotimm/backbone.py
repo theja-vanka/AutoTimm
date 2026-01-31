@@ -256,6 +256,8 @@ def get_feature_info(backbone: nn.Module) -> list[dict[str, Any]]:
         - ``reduction``: Spatial reduction factor (stride) relative to input
         - ``module``: Name of the module producing this feature
 
+    Only returns info for features that are actually output (respecting out_indices).
+
     Raises ``AttributeError`` if the backbone was not created with features_only=True.
     """
     if not hasattr(backbone, "feature_info"):
@@ -263,22 +265,33 @@ def get_feature_info(backbone: nn.Module) -> list[dict[str, Any]]:
             "Backbone does not have 'feature_info'. "
             "Ensure it was created with features_only=True."
         )
-    return [info for info in backbone.feature_info]
+    # Use get_dicts() to get info only for the output indices
+    return backbone.feature_info.get_dicts()
 
 
 def get_feature_channels(backbone: nn.Module) -> list[int]:
     """Return the number of channels for each feature level.
 
     Convenience function that extracts just the channel counts from feature_info.
+    Only returns channels for features that are actually output (respecting out_indices).
     """
-    info = get_feature_info(backbone)
-    return [f["num_chs"] for f in info]
+    if not hasattr(backbone, "feature_info"):
+        raise AttributeError(
+            "Backbone does not have 'feature_info'. "
+            "Ensure it was created with features_only=True."
+        )
+    return backbone.feature_info.channels()
 
 
 def get_feature_strides(backbone: nn.Module) -> list[int]:
     """Return the stride (spatial reduction) for each feature level.
 
     Convenience function that extracts just the strides from feature_info.
+    Only returns strides for features that are actually output (respecting out_indices).
     """
-    info = get_feature_info(backbone)
-    return [f["reduction"] for f in info]
+    if not hasattr(backbone, "feature_info"):
+        raise AttributeError(
+            "Backbone does not have 'feature_info'. "
+            "Ensure it was created with features_only=True."
+        )
+    return backbone.feature_info.reduction()
