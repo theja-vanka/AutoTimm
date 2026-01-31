@@ -39,8 +39,11 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -e ".[docs]"
+          pip install mkdocs-macros-plugin requests
 
       - name: Build docs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: mkdocs build --strict --verbose --clean
 
       - name: Setup Pages
