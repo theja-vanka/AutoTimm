@@ -1,17 +1,18 @@
-"""Explore available timm backbones and inspect model properties.
+"""Explore available timm backbones and transform presets.
 
 This example demonstrates:
 - Listing available backbones by architecture family
 - Filtering by pretrained availability
 - Inspecting model properties (parameters, features)
 - Comparing different model configurations
+- Discovering available transform presets
 
 Usage:
     python examples/backbone_discovery.py
 """
 
 import autotimm
-from autotimm import BackboneConfig
+from autotimm import BackboneConfig, list_transform_presets
 
 
 def main():
@@ -177,8 +178,25 @@ def main():
         except Exception:
             pass
 
+    # ========================================================================
+    # Discover Transform Presets
+    # ========================================================================
+    print("\n" + "-" * 70)
+    print("Transform Preset Discovery")
+    print("-" * 70)
+
+    # List torchvision presets
+    print("\nTorchvision presets:")
+    for name, desc in list_transform_presets(backend="torchvision", verbose=True):
+        print(f"  {name:.<20} {desc}")
+
+    # List albumentations presets
+    print("\nAlbumentations presets:")
+    for name, desc in list_transform_presets(backend="albumentations", verbose=True):
+        print(f"  {name:.<20} {desc}")
+
     print("\n" + "=" * 70)
-    print("Done! Use autotimm.list_backbones() to explore more models.")
+    print("Done! Use autotimm.list_backbones() and list_transform_presets() to explore.")
     print("=" * 70)
 
 

@@ -1,5 +1,5 @@
 # AutoTimm
-![AutoTimm](autotimm.png)
+![AutoTimm](autotimm.png){ width="500" }
 
 Automated deep learning image tasks powered by [timm](https://github.com/huggingface/pytorch-image-models) and [PyTorch Lightning](https://github.com/Lightning-AI/pytorch-lightning).
 

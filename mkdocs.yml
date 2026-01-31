@@ -1,5 +1,5 @@
 site_name: AutoTimm
-site_description: Automated deep learning image tasks powered by timm and PyTorch Lightning
+site_description: Automatic PyTorch Image Models
 site_url: https://theja-vanka.github.io/AutoTimm
 repo_name: theja-vanka/AutoTimm
 repo_url: https://github.com/theja-vanka/AutoTimm
@@ -147,6 +147,8 @@ nav:
           - Backbone Utilities: examples/utilities/backbone-utilities.md
 
 extra:
-  social:
-    - icon: fontawesome/brands/github
-      link: https://github.com/theja-vanka/AutoTimm
+  generator: false
+
+copyright: |
+  Copyright &copy; 2026 <a href="https://github.com/theja-vanka" target="_blank">Krishnatheja Vanka</a>.
+  Built with ❤️
