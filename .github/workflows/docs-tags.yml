@@ -41,7 +41,7 @@ jobs:
           pip install -e ".[docs]"
 
       - name: Build docs
-        run: mkdocs build --strict --verbose
+        run: mkdocs build --strict --verbose --clean
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
