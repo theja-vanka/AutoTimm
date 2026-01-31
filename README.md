@@ -560,12 +560,6 @@ If you use AutoTimm in your research, please cite:
 }
 ```
 
-## License
-
-Apache 2.0 — see [LICENSE](LICENSE) for details.
-
----
-
 <p align="center">
   Built with <a href="https://github.com/huggingface/pytorch-image-models">timm</a> and <a href="https://github.com/Lightning-AI/pytorch-lightning">PyTorch Lightning</a>
 </p>
