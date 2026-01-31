@@ -250,6 +250,7 @@ head = autotimm.heads.DeepLabV3PlusHead(...)
 | `optimizer` | str \| dict | "adamw" | Optimizer name or config |
 | `scheduler` | str \| dict | "cosine" | Scheduler name or config |
 | `freeze_backbone` | bool | False | Whether to freeze backbone parameters |
+| `transform_config` | TransformConfig \| None | None | Transform config for preprocessing |
 
 ### InstanceSegmentor Parameters
 
@@ -278,6 +279,7 @@ head = autotimm.heads.DeepLabV3PlusHead(...)
 | `optimizer` | str \| dict | "adamw" | Optimizer name or config |
 | `scheduler` | str \| dict | "cosine" | Scheduler name or config |
 | `freeze_backbone` | bool | False | Whether to freeze backbone parameters |
+| `transform_config` | TransformConfig \| None | None | Transform config for preprocessing |
 
 ### SegmentationDataModule Parameters
 
@@ -293,6 +295,8 @@ head = autotimm.heads.DeepLabV3PlusHead(...)
 | `custom_val_transforms` | Any | None | Custom validation transforms |
 | `class_mapping` | dict | None | Mapping from dataset class IDs to contiguous IDs |
 | `ignore_index` | int | 255 | Index for ignored pixels (e.g., boundaries) |
+| `transform_config` | TransformConfig \| None | None | Unified transform configuration |
+| `backbone` | str \| nn.Module \| None | None | Backbone for model-specific normalization |
 
 ### InstanceSegmentationDataModule Parameters
 
@@ -307,6 +311,8 @@ head = autotimm.heads.DeepLabV3PlusHead(...)
 | `custom_val_transforms` | Any | None | Custom validation transforms |
 | `min_keypoints` | int | 0 | Minimum keypoints for valid instance |
 | `min_area` | float | 0.0 | Minimum area for valid instance |
+| `transform_config` | TransformConfig \| None | None | Unified transform configuration |
+| `backbone` | str \| nn.Module \| None | None | Backbone for model-specific normalization |
 
 ## Examples
 
@@ -439,6 +445,76 @@ model = SemanticSegmentor(
     ),
     freeze_backbone=False,  # Set True to freeze backbone
 )
+```
+
+### With TransformConfig (Preprocessing)
+
+Enable inference-time preprocessing with model-specific normalization:
+
+```python
+from autotimm import SemanticSegmentor, TransformConfig
+
+model = SemanticSegmentor(
+    backbone="resnet50",
+    num_classes=19,
+    head_type="deeplabv3plus",
+    metrics=[...],
+    transform_config=TransformConfig(image_size=512),  # Enable preprocess()
+)
+
+# Preprocess raw images for inference
+from PIL import Image
+image = Image.open("test.jpg")
+tensor = model.preprocess(image)  # Returns preprocessed tensor
+
+# Run inference
+model.eval()
+with torch.no_grad():
+    predictions = model(tensor)
+```
+
+### Shared Config for DataModule and Model
+
+```python
+from autotimm import SemanticSegmentor, SegmentationDataModule, TransformConfig
+
+# Shared config ensures same preprocessing
+config = TransformConfig(preset="default", image_size=512)
+backbone_name = "resnet50"
+
+# DataModule uses model's normalization
+data = SegmentationDataModule(
+    data_dir="./cityscapes",
+    format="cityscapes",
+    transform_config=config,
+    backbone=backbone_name,
+)
+
+# Model uses same config for inference preprocessing
+model = SemanticSegmentor(
+    backbone=backbone_name,
+    num_classes=19,
+    metrics=[...],
+    transform_config=config,
+)
+```
+
+### Instance Segmentation with Preprocessing
+
+```python
+from autotimm import InstanceSegmentor, TransformConfig
+
+model = InstanceSegmentor(
+    backbone="resnet50",
+    num_classes=80,
+    metrics=[...],
+    transform_config=TransformConfig(image_size=640),
+)
+
+# Get model's normalization config
+config = model.get_data_config()
+print(f"Mean: {config['mean']}")
+print(f"Std: {config['std']}")
 ```
 
 ## See Also

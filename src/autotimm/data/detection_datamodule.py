@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Callable
 
 import pytorch_lightning as pl
+import torch.nn as nn
 from torch.utils.data import DataLoader
 
 from autotimm.data.detection_dataset import COCODetectionDataset, detection_collate_fn
@@ -13,6 +14,7 @@ from autotimm.data.detection_transforms import (
     detection_eval_transforms,
     get_detection_transforms,
 )
+from autotimm.data.transform_config import TransformConfig
 
 
 class DetectionDataModule(pl.LightningDataModule):
@@ -46,6 +48,11 @@ class DetectionDataModule(pl.LightningDataModule):
         eval_transforms: Custom eval transforms. Must include bbox_params.
         augmentation_preset: Preset name (``"default"``, ``"strong"``).
             Ignored when train_transforms is provided.
+        transform_config: Optional :class:`TransformConfig` for unified transform
+            configuration. When provided along with ``backbone``, uses model-specific
+            normalization from timm. Takes precedence over individual transform args.
+        backbone: Optional backbone name or module. Used with ``transform_config``
+            to resolve model-specific normalization (mean, std, input_size).
         pin_memory: Pin memory for GPU transfer.
         persistent_workers: Keep worker processes alive between epochs.
         prefetch_factor: Number of batches prefetched per worker.
@@ -68,6 +75,8 @@ class DetectionDataModule(pl.LightningDataModule):
         train_transforms: Callable | None = None,
         eval_transforms: Callable | None = None,
         augmentation_preset: str = "default",
+        transform_config: TransformConfig | None = None,
+        backbone: str | nn.Module | None = None,
         pin_memory: bool = True,
         persistent_workers: bool = False,
         prefetch_factor: int | None = None,
@@ -106,9 +115,26 @@ class DetectionDataModule(pl.LightningDataModule):
         )
         self.test_images_dir = Path(test_images_dir) if test_images_dir else None
         self.test_ann_file = Path(test_ann_file) if test_ann_file else None
+        self.transform_config = transform_config
+        self.backbone = backbone
 
-        # Resolve transforms
-        if train_transforms is not None:
+        # Resolve transforms - TransformConfig takes precedence
+        if transform_config is not None and backbone is not None:
+            from autotimm.data.timm_transforms import get_transforms_from_backbone
+
+            self.train_transforms = get_transforms_from_backbone(
+                backbone=backbone,
+                transform_config=transform_config,
+                is_train=True,
+                task="detection",
+            )
+            self.eval_transforms = get_transforms_from_backbone(
+                backbone=backbone,
+                transform_config=transform_config,
+                is_train=False,
+                task="detection",
+            )
+        elif train_transforms is not None:
             self.train_transforms = train_transforms
         else:
             self.train_transforms = get_detection_transforms(
@@ -169,6 +195,37 @@ class DetectionDataModule(pl.LightningDataModule):
             )
             self.num_classes = self.val_dataset.num_classes
             self.class_names = self.val_dataset.class_names
+
+        # Automatically print data summary
+        self._print_summary()
+
+    def _print_summary(self) -> None:
+        """Print data summary automatically after setup."""
+        try:
+            from rich.console import Console
+
+            console = Console()
+            console.print(self.summary())
+        except ImportError:
+            # Fallback to basic print if rich is not available
+            print(f"\n{'='*50}")
+            print("DetectionDataModule Summary")
+            print(f"{'='*50}")
+            print(f"Data dir: {self.data_dir}")
+            print(f"Image size: {self.image_size}")
+            print(f"Batch size: {self.batch_size}")
+            if self.num_classes is not None:
+                print(f"Num classes: {self.num_classes}")
+            if self.train_dataset is not None:
+                print(f"Train images: {len(self.train_dataset)}")
+            if self.val_dataset is not None:
+                print(f"Val images: {len(self.val_dataset)}")
+            if self.test_dataset is not None:
+                print(f"Test images: {len(self.test_dataset)}")
+            print(f"{'='*50}\n")
+        except Exception:
+            # Silently ignore any errors in summary printing
+            pass
 
     def _loader_kwargs(self) -> dict:
         kwargs: dict = {

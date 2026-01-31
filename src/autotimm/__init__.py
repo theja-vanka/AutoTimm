@@ -15,11 +15,13 @@ except PackageNotFoundError:
 from autotimm.backbone import (
     BackboneConfig,
     FeatureBackboneConfig,
+    ModelSource,
     create_backbone,
     create_feature_backbone,
     get_feature_channels,
     get_feature_info,
     get_feature_strides,
+    get_model_source,
     list_backbones,
     list_hf_hub_backbones,
 )
@@ -27,6 +29,12 @@ from autotimm.data.datamodule import ImageDataModule
 from autotimm.data.detection_datamodule import DetectionDataModule
 from autotimm.data.instance_datamodule import InstanceSegmentationDataModule
 from autotimm.data.segmentation_datamodule import SegmentationDataModule
+from autotimm.data.timm_transforms import (
+    create_inference_transform,
+    get_transforms_from_backbone,
+    resolve_backbone_data_config,
+)
+from autotimm.data.transform_config import TransformConfig, list_transform_presets
 from autotimm.heads import (
     ASPP,
     ClassificationHead,
@@ -81,11 +89,13 @@ __all__ = [
     # Backbone
     "BackboneConfig",
     "FeatureBackboneConfig",
+    "ModelSource",
     "create_backbone",
     "create_feature_backbone",
     "get_feature_channels",
     "get_feature_info",
     "get_feature_strides",
+    "get_model_source",
     "list_backbones",
     "list_hf_hub_backbones",
     # Heads
@@ -106,6 +116,12 @@ __all__ = [
     "ImageDataModule",
     "InstanceSegmentationDataModule",
     "SegmentationDataModule",
+    # Transform config
+    "TransformConfig",
+    "create_inference_transform",
+    "get_transforms_from_backbone",
+    "list_transform_presets",
+    "resolve_backbone_data_config",
     # Losses
     "CenternessLoss",
     "CombinedSegmentationLoss",

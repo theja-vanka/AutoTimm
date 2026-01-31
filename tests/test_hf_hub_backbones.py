@@ -6,7 +6,7 @@ import pytest
 import torch
 
 import autotimm
-from autotimm.backbone import _is_hf_hub_model
+from autotimm.backbone import ModelSource, _is_hf_hub_model, get_model_source
 
 
 class TestHFHubDetection:
@@ -23,6 +23,26 @@ class TestHFHubDetection:
         assert not _is_hf_hub_model("resnet50")
         assert not _is_hf_hub_model("efficientnet_b0")
         assert not _is_hf_hub_model("vit_base_patch16_224")
+
+    def test_get_model_source_timm(self):
+        """Test that regular timm models return TIMM source."""
+        assert get_model_source("resnet50") == ModelSource.TIMM
+        assert get_model_source("efficientnet_b0") == ModelSource.TIMM
+        assert get_model_source("vit_base_patch16_224") == ModelSource.TIMM
+
+    def test_get_model_source_hf_hub(self):
+        """Test that HF Hub models return HF_HUB source."""
+        assert get_model_source("hf-hub:timm/resnet50.a1_in1k") == ModelSource.HF_HUB
+        assert get_model_source("hf_hub:timm/resnet50.a1_in1k") == ModelSource.HF_HUB
+        assert get_model_source("timm/resnet50.a1_in1k") == ModelSource.HF_HUB
+
+    def test_model_source_enum_values(self):
+        """Test ModelSource enum string values."""
+        assert ModelSource.TIMM.value == "timm"
+        assert ModelSource.HF_HUB.value == "hf_hub"
+        # Test that ModelSource is a string subclass
+        assert ModelSource.TIMM == "timm"
+        assert ModelSource.HF_HUB == "hf_hub"
 
 
 class TestHFHubBackboneCreation:
@@ -108,6 +128,22 @@ class TestListHFHubBackbones:
             # Should find at least some resnet models
             assert len(models) > 0
             assert all(m.startswith("hf-hub:") for m in models)
+        except ImportError:
+            pytest.skip("huggingface_hub not installed")
+        except Exception as e:
+            pytest.skip(f"Cannot access HF Hub: {e}")
+
+    @pytest.mark.slow
+    def test_list_hf_hub_backbones_with_source(self):
+        """Test listing HF Hub backbones with source tags (requires internet)."""
+        try:
+            models = autotimm.list_hf_hub_backbones(limit=5, with_source=True)
+            assert isinstance(models, list)
+            assert len(models) > 0
+            for name, source in models:
+                assert isinstance(name, str)
+                assert name.startswith("hf-hub:")
+                assert source == ModelSource.HF_HUB
         except ImportError:
             pytest.skip("huggingface_hub not installed")
         except Exception as e:

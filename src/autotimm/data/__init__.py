@@ -8,6 +8,12 @@ from autotimm.data.detection_transforms import (
     detection_train_transforms,
     get_detection_transforms,
 )
+from autotimm.data.timm_transforms import (
+    create_inference_transform,
+    get_transforms_from_backbone,
+    resolve_backbone_data_config,
+)
+from autotimm.data.transform_config import TransformConfig, list_transform_presets
 from autotimm.data.transforms import (
     albu_default_eval_transforms,
     albu_default_train_transforms,
@@ -21,6 +27,12 @@ from autotimm.data.transforms import (
 )
 
 __all__ = [
+    # Transform config
+    "TransformConfig",
+    # Timm transforms
+    "create_inference_transform",
+    "get_transforms_from_backbone",
+    "resolve_backbone_data_config",
     # Classification data
     "ImageDataModule",
     "ImageFolderCV2",

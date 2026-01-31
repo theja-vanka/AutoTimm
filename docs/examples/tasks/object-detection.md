@@ -293,7 +293,99 @@ pip install transformers
 
 ---
 
-## Running Object Detection Examples
+## Inference
+
+The [`detection_inference.py`](https://github.com/theja-vanka/AutoTimm/blob/main/examples/detection_inference.py) script provides a comprehensive toolkit for object detection inference.
+
+### Features
+
+- **Model Loading**: Load trained models from checkpoints
+- **Preprocessing**: Automatic image preprocessing using model's data config
+- **Single & Batch Prediction**: Run inference on individual or multiple images
+- **Visualization**: Draw bounding boxes with class labels and confidence scores
+- **Export Options**:
+  - JSON format with detection coordinates and metadata
+  - CSV format for spreadsheet analysis
+- **COCO Integration**: Pre-configured with COCO class names
+
+### Basic Usage
+
+```python
+from examples.detection_inference import (
+    load_model,
+    predict_single_image,
+    visualize_detections,
+    export_to_json,
+    COCO_CLASSES,
+)
+
+# Load trained model
+model = load_model(
+    checkpoint_path="best-detector.ckpt",
+    backbone="resnet50",
+    num_classes=80,
+    score_thresh=0.3,
+)
+model = model.cuda()
+
+# Single image inference
+detections = predict_single_image(
+    model,
+    "image.jpg",
+    class_names=COCO_CLASSES,
+)
+
+# Print results
+for det in detections:
+    print(f"{det['class']}: {det['confidence']:.2%} at {det['bbox']}")
+
+# Visualize
+visualize_detections(
+    "image.jpg",
+    detections,
+    "output.jpg",
+    threshold=0.3,
+)
+```
+
+### Batch Processing
+
+```python
+from examples.detection_inference import predict_batch, export_to_json
+
+# Process multiple images
+image_paths = ["img1.jpg", "img2.jpg", "img3.jpg"]
+results = predict_batch(
+    model,
+    image_paths,
+    class_names=COCO_CLASSES,
+    batch_size=4,
+)
+
+# Export all results to JSON
+export_to_json(
+    results,
+    "detections.json",
+    image_paths=image_paths,
+)
+```
+
+### Export to JSON/CSV
+
+```python
+from examples.detection_inference import export_to_json, export_to_csv
+
+export_to_json(results, "detections.json", image_paths=image_paths)
+export_to_csv(results, "detections.csv", image_paths=image_paths)
+```
+
+For a complete inference workflow, see the [Detection Inference Guide](../../user-guide/inference/object-detection-inference.md).
+
+### Running the Demo
+
+```bash
+python examples/detection_inference.py
+```
 
 Clone the repository and run examples:
 
@@ -305,9 +397,15 @@ pip install -e ".[all]"
 # Run COCO detection example
 python examples/object_detection_coco.py
 
-# Run transformer-based detection
+# Run detection examples
+python examples/object_detection_coco.py
 python examples/object_detection_transformers.py
-
-# Run RT-DETR detection
-python examples/object_detection_rtdetr.py
+python examples/detection_inference.py
 ```
+
+## See Also
+
+- [ObjectDetector Guide](../../user-guide/models/object-detector.md)
+- [Detection Inference](../../user-guide/inference/object-detection-inference.md)
+- [Detection Data Loading](../../user-guide/data-loading/object-detection-data.md)
+- [API Reference](../../api/detection.md)

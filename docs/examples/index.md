@@ -33,7 +33,9 @@ Browse examples by topic:
 | [`albumentations_custom_folder.py`](utilities/data-handling.md#custom-albumentations-pipeline) | Custom albumentations pipeline | Data Handling |
 | [`auto_tuning.py`](utilities/training-utilities.md#auto-tuning) | Automatic LR and batch size finding | Training Utilities |
 | [`multi_gpu_training.py`](utilities/training-utilities.md#multi-gpu-training) | Multi-GPU and distributed training | Training Utilities |
-| [`inference.py`](utilities/training-utilities.md#inference) | Model inference and batch prediction | Training Utilities |
+| [`inference.py`](../user-guide/inference/classification-inference.md) | Model inference and batch prediction | Inference |
+| [`detection_inference.py`](../user-guide/inference/object-detection-inference.md) | Object detection inference and visualization | Inference |
+| [`segmentation_inference.py`](../user-guide/inference/semantic-segmentation-inference.md) | Semantic segmentation inference and visualization | Inference |
 | [`multiple_loggers.py`](utilities/logging-metrics.md#multiple-loggers) | TensorBoard + CSV logging simultaneously | Logging & Metrics |
 | [`mlflow_tracking.py`](utilities/logging-metrics.md#mlflow-tracking) | MLflow experiment tracking | Logging & Metrics |
 | [`detailed_evaluation.py`](utilities/logging-metrics.md#detailed-evaluation) | Confusion matrix and per-class metrics | Logging & Metrics |
@@ -67,55 +69,21 @@ python examples/classify_cifar10.py
 
 ## Example Categories
 
-### Classification
-Learn how to train image classification models on standard and custom datasets. Includes examples for basic training, transfer learning, and Vision Transformer fine-tuning.
+### Tasks
+- **[Classification](tasks/classification.md)** - CIFAR-10, custom datasets, ViT fine-tuning
+- **[Object Detection](tasks/object-detection.md)** - FCOS, transformer detection, RT-DETR
+- **[Semantic Segmentation](tasks/semantic-segmentation.md)** - DeepLabV3+, FCN architectures
+- **[Instance Segmentation](tasks/instance-segmentation.md)** - Mask R-CNN style segmentation
 
-👉 [View Classification Examples](tasks/classification.md)
+### Utilities
+- **[Data Handling](utilities/data-handling.md)** - Balanced sampling, augmentation, transforms
+- **[Training Utilities](utilities/training-utilities.md)** - Auto-tuning, multi-GPU training
+- **[Logging & Metrics](utilities/logging-metrics.md)** - Multiple loggers, MLflow, metrics
+- **[Backbone Utilities](utilities/backbone-utilities.md)** - Discover and compare backbones
 
-### Object Detection
-Explore object detection with FCOS architecture, Vision Transformer backbones, and RT-DETR. Covers COCO format datasets and various detection strategies.
-
-👉 [View Object Detection Examples](tasks/object-detection.md)
-
-### Semantic Segmentation
-Learn semantic segmentation with DeepLabV3+ and FCN architectures. Covers multiple dataset formats (PNG, Cityscapes, COCO, VOC) and various loss functions.
-
-👉 [View Semantic Segmentation Examples](tasks/semantic-segmentation.md)
-
-### Instance Segmentation
-Master instance segmentation with Mask R-CNN style architecture. Includes COCO format datasets, detection + mask prediction, and comprehensive evaluation metrics.
-
-👉 [View Instance Segmentation Examples](tasks/instance-segmentation.md)
-
-### Data Handling
-Master data loading techniques including balanced sampling for imbalanced datasets, albumentations augmentation presets, and custom transform pipelines.
-
-👉 [View Data Handling Examples](utilities/data-handling.md)
-
-### Training Utilities
-Optimize training with auto-tuning for learning rates and batch sizes, multi-GPU distributed training, and efficient inference patterns.
-
-👉 [View Training Utilities Examples](utilities/training-utilities.md)
-
-### Logging & Metrics
-Track experiments effectively with multiple logger support, MLflow integration, and comprehensive metric evaluation including per-class analysis.
-
-👉 [View Logging & Metrics Examples](utilities/logging-metrics.md)
-
-### Backbone Utilities
-Discover and compare timm backbones, optimizers, and schedulers for your use case. Learn about different model families and how to select the right backbone, optimizer, and learning rate schedule.
-
-👉 [View Backbone Utilities Examples](utilities/backbone-utilities.md)
-
-### Hugging Face Hub
-Learn how to use thousands of timm-compatible models from Hugging Face Hub with AutoTimm. Covers model discovery, all tasks (classification, detection, segmentation), PyTorch Lightning compatibility, and advanced features.
-
-👉 [View Hugging Face Hub Examples](integration/huggingface-hub.md)
-
-### HuggingFace Transformers
-Use HuggingFace Transformers vision models (ViT, DeiT, BEiT, Swin) directly with PyTorch Lightning. Learn how to use specific model classes for full control without Auto classes.
-
-👉 [View HuggingFace Transformers Integration](../user-guide/integration/huggingface-transformers-integration.md)
+### Integrations
+- **[Hugging Face Hub](integration/huggingface-hub.md)** - Using HF Hub models
+- **[HuggingFace Transformers](../user-guide/integration/huggingface-transformers-integration.md)** - Direct HF Transformers integration
 
 
 

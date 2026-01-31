@@ -22,6 +22,7 @@ This section provides detailed API documentation for all AutoTimm classes and fu
 |-------|-------------|
 | [BackboneConfig](backbone.md#autotimm.BackboneConfig) | Timm backbone configuration |
 | [FeatureBackboneConfig](backbone.md#featurebackboneconfig) | Feature extraction backbone configuration |
+| [TransformConfig](transforms.md) | Unified transform configuration for models and data |
 | [MetricConfig](metrics.md#autotimm.MetricConfig) | Single metric configuration |
 | [MetricManager](metrics.md#autotimm.MetricManager) | Multiple metrics manager |
 | [LoggingConfig](metrics.md#autotimm.LoggingConfig) | Enhanced logging options |
@@ -85,6 +86,9 @@ This section provides detailed API documentation for all AutoTimm classes and fu
 | [get_feature_info](backbone.md#get_feature_info) | Get feature information from backbone |
 | [get_feature_channels](backbone.md#get_feature_channels) | Extract feature channels for each level |
 | [get_feature_strides](backbone.md#get_feature_strides) | Get stride information for FPN construction |
+| [resolve_backbone_data_config](transforms.md#resolve_backbone_data_config) | Get model-specific preprocessing config |
+| [get_transforms_from_backbone](transforms.md#get_transforms_from_backbone) | Create transforms with model normalization |
+| [create_inference_transform](transforms.md#create_inference_transform) | Create simple inference transforms |
 | [count_parameters](utils.md#autotimm.count_parameters) | Count model parameters |
 | [list_optimizers](utils.md#autotimm.list_optimizers) | List available optimizers |
 | [list_schedulers](utils.md#autotimm.list_schedulers) | List available schedulers |
@@ -100,6 +104,7 @@ from autotimm import (
     ImageDataModule,
     MetricConfig,
     MetricManager,
+    TransformConfig,  # For preprocessing
 )
 ```
 
@@ -199,6 +204,8 @@ autotimm/
 │   ├── datamodule.py          # ImageDataModule
 │   ├── dataset.py             # ImageFolderCV2
 │   ├── transforms.py          # Transform presets
+│   ├── transform_config.py    # TransformConfig
+│   ├── timm_transforms.py     # Model-specific transforms
 │   ├── detection_datamodule.py # DetectionDataModule
 │   ├── detection_dataset.py   # DetectionDataset
 │   ├── detection_transforms.py # Detection augmentations
@@ -219,7 +226,8 @@ autotimm/
 │   ├── classification.py      # ImageClassifier
 │   ├── object_detection.py    # ObjectDetector
 │   ├── semantic_segmentation.py # SemanticSegmentor
-│   └── instance_segmentation.py # InstanceSegmentor
+│   ├── instance_segmentation.py # InstanceSegmentor
+│   └── preprocessing_mixin.py # PreprocessingMixin
 ├── trainer.py                 # AutoTrainer, TunerConfig
 └── utils.py                   # Utility functions
 ```

@@ -5,7 +5,7 @@ This guide covers how to use trained object detection models for inference and p
 ## Loading a Detection Model
 
 ```python
-from autotimm import ObjectDetector, MetricConfig
+from autotimm import ObjectDetector, MetricConfig, TransformConfig
 
 # Define metrics
 metrics = [
@@ -18,19 +18,43 @@ metrics = [
     ),
 ]
 
-# Load model
+# Load model with TransformConfig for preprocessing
 model = ObjectDetector.load_from_checkpoint(
     "path/to/checkpoint.ckpt",
     backbone="resnet50",
     num_classes=80,
     metrics=metrics,
+    transform_config=TransformConfig(),  # Enable preprocess()
 )
 model.eval()
 ```
 
 ---
 
-## Single Image Detection
+## Single Image Detection (Recommended)
+
+Use the built-in `preprocess()` method for correct model-specific normalization:
+
+```python
+import torch
+from PIL import Image
+
+# Load image
+image = Image.open("image.jpg").convert("RGB")
+
+# Preprocess using model's native normalization
+input_tensor = model.preprocess(image)  # Returns (1, 3, 640, 640)
+
+# Detect objects
+with torch.no_grad():
+    detections = model.predict_step(input_tensor, batch_idx=0)
+```
+
+---
+
+## Single Image Detection (Manual)
+
+If you need manual control over transforms:
 
 ```python
 import torch
@@ -65,6 +89,15 @@ labels = detections["labels"]
 print(f"Found {len(boxes)} objects:")
 for box, score, label in zip(boxes, scores, labels):
     print(f"  Class {label.item()}: {score.item():.2%} confidence at {box.tolist()}")
+```
+
+**Tip:** Use `model.get_data_config()` to get the correct normalization values for manual transforms:
+
+```python
+config = model.get_data_config()
+print(f"Mean: {config['mean']}")
+print(f"Std: {config['std']}")
+print(f"Input size: {config['input_size']}")
 ```
 
 ---
@@ -174,13 +207,12 @@ for i, dets in enumerate(all_detections):
 
 ## Complete Detection Pipeline
 
-Production-ready detection pipeline with post-processing:
+Production-ready detection pipeline with TransformConfig:
 
 ```python
 import torch
 from PIL import Image
-from torchvision import transforms
-from autotimm import ObjectDetector, MetricConfig
+from autotimm import ObjectDetector, MetricConfig, TransformConfig
 
 
 class DetectionPipeline:
@@ -195,7 +227,7 @@ class DetectionPipeline:
         score_threshold=0.3,
         image_size=640,
     ):
-        # Load model
+        # Load model with TransformConfig for preprocessing
         metrics = [
             MetricConfig(
                 name="mAP",
@@ -211,6 +243,7 @@ class DetectionPipeline:
             backbone=backbone,
             num_classes=num_classes,
             metrics=metrics,
+            transform_config=TransformConfig(image_size=image_size),  # Enable preprocess()
         )
         self.model.eval()
 
@@ -222,22 +255,12 @@ class DetectionPipeline:
         self.score_threshold = score_threshold
         self.image_size = image_size
 
-        # Prepare transform
-        self.transform = transforms.Compose([
-            transforms.Resize((image_size, image_size)),
-            transforms.ToTensor(),
-            transforms.Normalize(
-                mean=[0.485, 0.456, 0.406],
-                std=[0.229, 0.224, 0.225]
-            ),
-        ])
-
     def predict(self, image_path):
         """Detect objects in a single image."""
-        # Load and transform
+        # Load and preprocess using model's native normalization
         image = Image.open(image_path).convert("RGB")
         original_size = image.size  # (width, height)
-        input_tensor = self.transform(image).unsqueeze(0).to(self.device)
+        input_tensor = self.model.preprocess(image).to(self.device)
 
         # Detect
         with torch.no_grad():

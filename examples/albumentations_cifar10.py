@@ -1,7 +1,8 @@
 """Train on CIFAR-10 using albumentations transforms (OpenCV backend).
 
 This example demonstrates:
-- Using albumentations for strong augmentations
+- Using TransformConfig for unified transform configuration
+- Discovering available presets with list_transform_presets()
 - Built-in dataset support with albumentations
 - MetricManager for metric configuration
 """
@@ -14,21 +15,33 @@ from autotimm import (
     LoggingConfig,
     MetricConfig,
     MetricManager,
+    TransformConfig,
+    list_transform_presets,
 )
 
 
 def main():
-    # Use albumentations with the "strong" augmentation preset.
+    # Discover available albumentations presets
+    print("Available albumentations presets:")
+    for name in list_transform_presets(backend="albumentations"):
+        print(f"  - {name}")
+
+    # Use TransformConfig for unified configuration.
     # Built-in datasets (CIFAR10, etc.) automatically convert PIL → numpy
     # so albumentations pipelines work seamlessly.
+    transform_config = TransformConfig(
+        preset="strong",
+        backend="albumentations",
+        image_size=224,
+    )
+
     data = ImageDataModule(
         data_dir="./data",
         dataset_name="CIFAR10",
-        image_size=224,
         batch_size=64,
         num_workers=4,
-        transform_backend="albumentations",
-        augmentation_preset="strong",
+        transform_config=transform_config,
+        backbone="resnet18",  # For normalization config
     )
 
     # Configure metrics

@@ -3,10 +3,23 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from enum import Enum
 from typing import Any
 
 import timm
 import torch.nn as nn
+
+
+class ModelSource(str, Enum):
+    """Source tag for backbone models.
+
+    Attributes:
+        TIMM: Model from the built-in timm library.
+        HF_HUB: Model from Hugging Face Hub.
+    """
+
+    TIMM = "timm"
+    HF_HUB = "hf_hub"
 
 try:
     from huggingface_hub import HfApi
@@ -46,6 +59,31 @@ def _is_hf_hub_model(model_name: str) -> bool:
         or model_name.startswith("hf_hub:")
         or model_name.startswith("timm/")
     )
+
+
+def get_model_source(model_name: str) -> ModelSource:
+    """Get the source tag for a model name.
+
+    Determines whether a model comes from the built-in timm library
+    or from Hugging Face Hub based on its name/prefix.
+
+    Parameters:
+        model_name: The model identifier string.
+
+    Returns:
+        ``ModelSource.HF_HUB`` if the model uses a HF Hub prefix
+        (``hf-hub:``, ``hf_hub:``, or ``timm/``),
+        otherwise ``ModelSource.TIMM``.
+
+    Examples::
+
+        get_model_source("resnet50")  # ModelSource.TIMM
+        get_model_source("hf-hub:timm/resnet50.a1_in1k")  # ModelSource.HF_HUB
+        get_model_source("timm/vit_base_patch16_224")  # ModelSource.HF_HUB
+    """
+    if _is_hf_hub_model(model_name):
+        return ModelSource.HF_HUB
+    return ModelSource.TIMM
 
 
 def create_backbone(cfg: BackboneConfig | str) -> nn.Module:
@@ -93,35 +131,55 @@ def get_backbone_out_features(backbone: nn.Module) -> int:
     return backbone.num_features
 
 
-def list_backbones(pattern: str = "", pretrained_only: bool = False) -> list[str]:
+def list_backbones(
+    pattern: str = "",
+    pretrained_only: bool = False,
+    with_source: bool = False,
+) -> list[str] | list[tuple[str, ModelSource]]:
     """List available timm backbones, optionally filtered by glob *pattern*.
 
     This lists models available in the timm library. To search Hugging Face Hub
     models, use ``list_hf_hub_backbones()``.
 
+    Parameters:
+        pattern: Glob pattern to filter model names (e.g., ``"*resnet*"``).
+        pretrained_only: If True, only list models with pretrained weights.
+        with_source: If True, return tuples of (model_name, ModelSource.TIMM).
+
+    Returns:
+        List of model names, or list of (model_name, source) tuples if
+        ``with_source=True``.
+
     Examples::
 
         list_backbones("*resnet*")
         list_backbones("*efficientnet*", pretrained_only=True)
+        list_backbones("*vit*", with_source=True)  # [(name, ModelSource.TIMM), ...]
     """
-    return timm.list_models(pattern or "*", pretrained=pretrained_only)
+    models = timm.list_models(pattern or "*", pretrained=pretrained_only)
+    if with_source:
+        return [(name, ModelSource.TIMM) for name in models]
+    return models
 
 
 def list_hf_hub_backbones(
     author: str = "timm",
     model_name: str | None = None,
     limit: int = 50,
-) -> list[str]:
+    with_source: bool = False,
+) -> list[str] | list[tuple[str, ModelSource]]:
     """List timm-compatible models available on Hugging Face Hub.
 
     Parameters:
         author: Filter by author/organization (default: ``"timm"`` for official timm models).
         model_name: Optional search query for model names.
         limit: Maximum number of results to return (default: 50).
+        with_source: If True, return tuples of (model_name, ModelSource.HF_HUB).
 
     Returns:
         List of model identifiers in ``hf-hub:`` format that can be used directly
         with ``create_backbone()`` or ``create_feature_backbone()``.
+        If ``with_source=True``, returns list of (model_name, source) tuples.
 
     Examples::
 
@@ -133,6 +191,9 @@ def list_hf_hub_backbones(
 
         # Search models from a specific author
         list_hf_hub_backbones(author="facebook", model_name="convnext")
+
+        # Get models with source tags
+        list_hf_hub_backbones(model_name="vit", with_source=True)
 
     Note:
         Requires ``huggingface_hub`` to be installed.
@@ -169,7 +230,11 @@ def list_hf_hub_backbones(
         result = []
         for model in models:
             model_id = model.id
-            result.append(f"hf-hub:{model_id}")
+            model_str = f"hf-hub:{model_id}"
+            if with_source:
+                result.append((model_str, ModelSource.HF_HUB))
+            else:
+                result.append(model_str)
 
         return result
 

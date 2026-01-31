@@ -24,6 +24,9 @@ End-to-end image classifier backed by a timm backbone.
         - test_step
         - predict_step
         - configure_optimizers
+        - preprocess
+        - get_data_config
+        - get_transform
 
 ## Usage Examples
 
@@ -136,6 +139,64 @@ model = ImageClassifier(
 )
 ```
 
+### With TransformConfig (Preprocessing)
+
+Enable inference-time preprocessing with model-specific normalization:
+
+```python
+from autotimm import TransformConfig
+
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    metrics=metrics,
+    transform_config=TransformConfig(),  # Use model's pretrained normalization
+)
+
+# Now you can preprocess raw images
+from PIL import Image
+image = Image.open("test.jpg")
+tensor = model.preprocess(image)  # Returns (1, 3, 224, 224)
+output = model(tensor)
+```
+
+### Preprocessing Multiple Images
+
+```python
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    metrics=metrics,
+    transform_config=TransformConfig(image_size=384),
+)
+
+# Preprocess a batch of images
+images = [Image.open(f"img{i}.jpg") for i in range(4)]
+tensor = model.preprocess(images)  # Returns (4, 3, 384, 384)
+
+# Forward pass
+model.eval()
+with torch.no_grad():
+    predictions = model(tensor).softmax(dim=1)
+```
+
+### Get Model's Data Config
+
+```python
+model = ImageClassifier(
+    backbone="vit_base_patch16_224",
+    num_classes=100,
+    metrics=metrics,
+    transform_config=TransformConfig(),
+)
+
+# Get normalization config
+config = model.get_data_config()
+print(f"Mean: {config['mean']}")      # (0.5, 0.5, 0.5) for ViT
+print(f"Std: {config['std']}")        # (0.5, 0.5, 0.5) for ViT
+print(f"Input size: {config['input_size']}")
+```
+
 ## Parameters
 
 | Parameter | Type | Default | Description |
@@ -144,6 +205,7 @@ model = ImageClassifier(
 | `num_classes` | `int` | Required | Number of target classes |
 | `metrics` | `MetricManager \| list[MetricConfig]` | Required | Metrics configuration |
 | `logging_config` | `LoggingConfig \| None` | `None` | Enhanced logging options |
+| `transform_config` | `TransformConfig \| None` | `None` | Transform config for preprocessing |
 | `lr` | `float` | `1e-3` | Learning rate |
 | `weight_decay` | `float` | `1e-4` | Weight decay |
 | `optimizer` | `str \| dict` | `"adamw"` | Optimizer name or config |

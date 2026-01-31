@@ -1,12 +1,13 @@
 """Train on a custom folder dataset using albumentations + OpenCV.
 
-When transform_backend="albumentations" is used with a folder dataset,
-images are loaded with OpenCV (cv2.imread) instead of PIL, and passed
-as RGB numpy arrays directly to the albumentations pipeline.
+When using albumentations backend with a folder dataset, images are loaded
+with OpenCV (cv2.imread) instead of PIL, and passed as RGB numpy arrays
+directly to the albumentations pipeline.
 
 This example demonstrates:
 - Custom albumentations pipeline definition
-- Using albumentations with folder datasets
+- Using TransformConfig with custom transforms
+- Discovering available presets with list_transform_presets()
 - MetricManager for metric configuration
 """
 
@@ -21,11 +22,20 @@ from autotimm import (
     LoggingConfig,
     MetricConfig,
     MetricManager,
+    TransformConfig,
+    list_transform_presets,
 )
 
 
 def main():
+    # Show available presets before defining custom transforms
+    print("Available albumentations presets:")
+    for name, desc in list_transform_presets(backend="albumentations", verbose=True):
+        print(f"  {name}: {desc}")
+    print()
+
     # Define a custom albumentations pipeline
+    # (For simpler cases, use TransformConfig with preset="strong")
     custom_train = A.Compose(
         [
             A.RandomResizedCrop(size=(224, 224)),
@@ -44,13 +54,19 @@ def main():
         ]
     )
 
+    # Use TransformConfig with albumentations backend
+    transform_config = TransformConfig(
+        backend="albumentations",
+        image_size=224,
+    )
+
     data = ImageDataModule(
         data_dir="/path/to/your/dataset",
-        image_size=224,
         batch_size=32,
         num_workers=4,
-        transform_backend="albumentations",
-        train_transforms=custom_train,  # overrides the default albumentations preset
+        transform_config=transform_config,
+        train_transforms=custom_train,  # Override with custom pipeline
+        backbone="convnext_tiny",  # For normalization config
     )
 
     data.setup("fit")

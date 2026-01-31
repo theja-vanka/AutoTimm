@@ -10,11 +10,13 @@ import torch.nn as nn
 import torchmetrics
 
 from autotimm.backbone import BackboneConfig, create_backbone, get_backbone_out_features
+from autotimm.data.transform_config import TransformConfig
 from autotimm.heads import ClassificationHead
 from autotimm.metrics import LoggingConfig, MetricConfig, MetricManager
+from autotimm.tasks.preprocessing_mixin import PreprocessingMixin
 
 
-class ImageClassifier(pl.LightningModule):
+class ImageClassifier(PreprocessingMixin, pl.LightningModule):
     """End-to-end image classifier backed by a timm backbone.
 
     Parameters:
@@ -23,6 +25,9 @@ class ImageClassifier(pl.LightningModule):
         metrics: A :class:`MetricManager` instance or list of :class:`MetricConfig`
             objects. Required - no default metrics are provided.
         logging_config: Optional :class:`LoggingConfig` for enhanced logging.
+        transform_config: Optional :class:`TransformConfig` for unified transform
+            configuration. When provided, enables the ``preprocess()`` method
+            for inference-time preprocessing using model-specific normalization.
         lr: Learning rate.
         weight_decay: Weight decay for optimizer.
         optimizer: Optimizer name (``"adamw"``, ``"adam"``, ``"sgd"``, etc.) or dict
@@ -57,7 +62,13 @@ class ImageClassifier(pl.LightningModule):
         ...         log_learning_rate=True,
         ...         log_gradient_norm=False,
         ...     ),
+        ...     transform_config=TransformConfig(use_timm_config=True),
         ... )
+        >>> # With transform_config, you can preprocess raw images
+        >>> from PIL import Image
+        >>> img = Image.open("test.jpg")
+        >>> tensor = model.preprocess(img)  # Returns (1, 3, 224, 224)
+        >>> output = model(tensor)
     """
 
     def __init__(
@@ -66,6 +77,7 @@ class ImageClassifier(pl.LightningModule):
         num_classes: int,
         metrics: MetricManager | list[MetricConfig],
         logging_config: LoggingConfig | None = None,
+        transform_config: TransformConfig | None = None,
         lr: float = 1e-3,
         weight_decay: float = 1e-4,
         optimizer: str | dict[str, Any] = "adamw",
@@ -78,7 +90,7 @@ class ImageClassifier(pl.LightningModule):
         mixup_alpha: float = 0.0,
     ):
         super().__init__()
-        self.save_hyperparameters(ignore=["metrics", "logging_config"])
+        self.save_hyperparameters(ignore=["metrics", "logging_config", "transform_config"])
 
         # Backbone and head
         self.backbone = create_backbone(backbone)
@@ -122,6 +134,9 @@ class ImageClassifier(pl.LightningModule):
         if freeze_backbone:
             for param in self.backbone.parameters():
                 param.requires_grad = False
+
+        # Setup transforms from config (PreprocessingMixin)
+        self._setup_transforms(transform_config, task="classification")
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         features = self.backbone(x)
