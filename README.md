@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="autotimm.png" alt="AutoTimm" width="400">
+  <img src="https://drive.google.com/uc?export=view&id=1IO383lY97phOg9qDVARnG9HQ2McOF7Zj" alt="AutoTimm" width="400">
 </p>
 
 <p align="center">
