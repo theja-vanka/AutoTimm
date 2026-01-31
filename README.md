@@ -37,8 +37,9 @@ AutoTimm combines the power of [timm](https://github.com/huggingface/pytorch-ima
 | **Explicit Metrics** | Configure exactly what you track with MetricManager and torchmetrics |
 | **Multi-Logger Support** | TensorBoard, MLflow, Weights & Biases, CSV — use them all at once |
 | **Auto-Tuning** | Automatic learning rate and batch size finding before training |
+| **Preset Manager** | Smart backend selection (torchvision vs albumentations) based on your task |
 | **TransformConfig** | Unified transform configuration with presets and model-specific normalization |
-| **Flexible Transforms** | Choose between torchvision (PIL) or albumentations (OpenCV) |
+| **Flexible Transforms** | Torchvision (PIL) and Albumentations (OpenCV) — both included by default |
 | **Production Ready** | Mixed precision, multi-GPU, gradient accumulation out of the box |
 
 ## Installation
@@ -47,19 +48,18 @@ AutoTimm combines the power of [timm](https://github.com/huggingface/pytorch-ima
 pip install autotimm
 ```
 
+**Includes:** PyTorch, timm, PyTorch Lightning, torchmetrics, albumentations, pycocotools, and more.
+
 <details>
-<summary><strong>More installation options</strong></summary>
+<summary><strong>Optional extras for logging</strong></summary>
 
 ```bash
-# With specific extras
-pip install autotimm[albumentations]  # OpenCV-based transforms
-pip install autotimm[detection]       # Object detection (includes pycocotools for mAP metrics)
-pip install autotimm[segmentation]    # Segmentation tasks (includes albumentations + pycocotools)
-pip install autotimm[tensorboard]     # TensorBoard logging
-pip install autotimm[wandb]           # Weights & Biases
-pip install autotimm[mlflow]          # MLflow tracking
+# Logger backends (optional)
+pip install autotimm[tensorboard]  # TensorBoard logging
+pip install autotimm[wandb]        # Weights & Biases
+pip install autotimm[mlflow]       # MLflow tracking
 
-# Everything
+# All optional extras
 pip install autotimm[all]
 
 # Development
@@ -248,6 +248,11 @@ loss = autotimm.loss.DiceLoss(...)
 # TransformConfig for unified transform settings
 from autotimm import TransformConfig, list_transform_presets
 config = TransformConfig(preset="randaugment", image_size=384)
+
+# Preset Manager for choosing the best backend (NEW!)
+from autotimm import recommend_backend, compare_backends
+rec = recommend_backend(task="detection")
+config = rec.to_config(image_size=640)
 
 # Original imports (still supported)
 from autotimm.losses import DiceLoss
@@ -492,7 +497,44 @@ model = ImageClassifier(
 tensor = model.preprocess(pil_image)
 ```
 
+### Preset Manager (NEW!)
+
+Intelligent backend selection based on your task requirements:
+
+```python
+from autotimm import recommend_backend, compare_backends
+
+# Get recommendation for your task
+rec = recommend_backend(task="detection")
+print(rec)
+# Recommended Backend: albumentations
+# Recommended Preset: default
+# Reasoning: Object Detection requires bbox/mask-aware transforms...
+
+# Convert to config
+config = rec.to_config(image_size=640)
+
+# Compare backends side-by-side
+compare_backends()  # Prints detailed comparison table
+
+# Advanced: Custom requirements
+rec = recommend_backend(
+    task="classification",
+    needs_advanced_augmentation=True,
+    needs_spatial_transforms=True,
+)
+config = rec.to_config()
+```
+
+**Why use the Preset Manager?**
+- **Smart recommendations**: Get the best backend for your specific task
+- **Reasoning provided**: Understand why a backend is recommended
+- **Easy integration**: Convert recommendations directly to `TransformConfig`
+- **Comparison tool**: See all differences between torchvision and albumentations
+
 ### Flexible Data Loading
+
+All transform backends and formats are included by default:
 
 - **Torchvision**: PIL-based transforms (fast CPU)
 - **Albumentations**: OpenCV-based transforms (advanced augmentations)
@@ -539,7 +581,9 @@ pytest tests/test_segmentation_losses.py
 pytest tests/ --cov=autotimm --cov-report=html
 ```
 
-**Recent Updates (v0.6.x):**
+**Recent Updates (v0.6.2):**
+- ✅ **Preset Manager**: Smart backend recommendation system (`recommend_backend`, `compare_backends`)
+- ✅ **Core dependencies updated**: `albumentations` and `pycocotools` now included by default (no extras needed)
 - ✅ Added `TransformConfig` for unified transform configuration with presets
 - ✅ Added `list_transform_presets()` to discover available transform presets
 - ✅ Added model `preprocess()` method for inference-time image preprocessing
