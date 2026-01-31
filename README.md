@@ -37,6 +37,7 @@ AutoTimm combines the power of [timm](https://github.com/huggingface/pytorch-ima
 | **Explicit Metrics** | Configure exactly what you track with MetricManager and torchmetrics |
 | **Multi-Logger Support** | TensorBoard, MLflow, Weights & Biases, CSV — use them all at once |
 | **Auto-Tuning** | Automatic learning rate and batch size finding before training |
+| **TransformConfig** | Unified transform configuration with presets and model-specific normalization |
 | **Flexible Transforms** | Choose between torchvision (PIL) or albumentations (OpenCV) |
 | **Production Ready** | Mixed precision, multi-GPU, gradient accumulation out of the box |
 
@@ -244,6 +245,10 @@ import autotimm
 model = autotimm.task.SemanticSegmentor(...)
 loss = autotimm.loss.DiceLoss(...)
 
+# TransformConfig for unified transform settings
+from autotimm import TransformConfig, list_transform_presets
+config = TransformConfig(preset="randaugment", image_size=384)
+
 # Original imports (still supported)
 from autotimm.losses import DiceLoss
 from autotimm.metrics import MetricConfig
@@ -426,7 +431,7 @@ trainer.fit(model, datamodule=ImageDataModule(data_dir="./data"))
 
 **Key Features:**
 - ✅ All three approaches fully compatible with PyTorch Lightning and AutoTrainer
-- ✅ 184 automated tests (170 passed, 14 skipped)
+- ✅ 200+ automated tests with comprehensive coverage
 - ✅ Production-ready with checkpoint monitoring, early stopping, and mixed precision
 - ✅ No special configuration needed - all features "just work"
 
@@ -457,6 +462,35 @@ trainer.fit(model, datamodule=ImageDataModule(data_dir="./data"))
 - Combined Loss (CE + Dice)
 - Focal Loss (class imbalance)
 - Tversky Loss (FP/FN weighting)
+
+### TransformConfig (NEW!)
+
+Unified configuration for image transforms with model-specific normalization:
+
+```python
+from autotimm import ImageClassifier, TransformConfig, list_transform_presets
+
+# List available presets
+list_transform_presets()  # ['default', 'autoaugment', 'randaugment', 'trivialaugment', 'light']
+list_transform_presets(backend="albumentations")  # ['default', 'strong', 'light']
+
+# Configure transforms with model-specific normalization
+config = TransformConfig(
+    preset="randaugment",
+    image_size=384,
+    use_timm_config=True,  # Auto-detect mean/std from model
+)
+
+# Model with preprocessing built-in
+model = ImageClassifier(
+    backbone="efficientnet_b4",
+    num_classes=10,
+    transform_config=config,
+)
+
+# Preprocess images using model's config
+tensor = model.preprocess(pil_image)
+```
 
 ### Flexible Data Loading
 
@@ -490,7 +524,7 @@ pytest tests/ -v
 
 ## Testing
 
-All tests pass successfully (170 passed, 14 skipped).
+Comprehensive test suite with 200+ tests.
 
 ```bash
 # Run all tests
@@ -505,8 +539,12 @@ pytest tests/test_segmentation_losses.py
 pytest tests/ --cov=autotimm --cov-report=html
 ```
 
-**Recent Fixes:**
-- ✅ Fixed `RuntimeError` when calling `configure_optimizers()` without attached trainer (semantic segmentation)
+**Recent Updates (v0.6.x):**
+- ✅ Added `TransformConfig` for unified transform configuration with presets
+- ✅ Added `list_transform_presets()` to discover available transform presets
+- ✅ Added model `preprocess()` method for inference-time image preprocessing
+- ✅ Python 3.10-3.14 support (dropped Python 3.9)
+- ✅ Fixed `RuntimeError` when calling `configure_optimizers()` without attached trainer
 - ✅ Improved scheduler initialization to handle cases where model is not yet attached to trainer
 
 ## Citation
