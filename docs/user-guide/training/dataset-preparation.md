@@ -883,7 +883,7 @@ class_weights = class_weights / class_weights.sum()  # Normalize
 
 ## See Also
 
-- [Data Loading Overview](data-loading/index.md) - Data module documentation
-- [Image Classification Data](data-loading/image-classification-data.md) - Classification details
-- [Object Detection Data](data-loading/object-detection-data.md) - Detection details
-- [Segmentation Data](data-loading/segmentation-data.md) - Segmentation details
+- [Data Loading Overview](../data-loading/index.md) - Data module documentation
+- [Image Classification Data](../data-loading/image-classification-data.md) - Classification details
+- [Object Detection Data](../data-loading/object-detection-data.md) - Detection details
+- [Segmentation Data](../data-loading/segmentation-data.md) - Segmentation details

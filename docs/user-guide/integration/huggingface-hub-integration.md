@@ -267,7 +267,7 @@ This happens when calling `configure_optimizers()` without a trainer. Either:
 
 ## Resources
 
-- [HF Hub Examples](../examples/huggingface-hub.md)
+- [HF Hub Examples](../../examples/integration/huggingface-hub.md)
 - [Hugging Face Hub](https://huggingface.co/timm)
 - [timm Documentation](https://huggingface.co/docs/timm)
 - [Model Cards](https://huggingface.co/docs/hub/model-cards)

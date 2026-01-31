@@ -883,6 +883,6 @@ if __name__ == "__main__":
 
 ## See Also
 
-- [Model Export](inference/model-export.md) - Detailed export documentation
-- [Benchmarks](benchmarks.md) - Model performance comparison
-- [Troubleshooting](troubleshooting.md) - Common deployment issues
+- [Model Export](../inference/model-export.md) - Detailed export documentation
+- [Benchmarks](../evaluation/benchmarks.md) - Model performance comparison
+- [Troubleshooting](../guides/troubleshooting.md) - Common deployment issues

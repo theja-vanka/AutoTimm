@@ -968,5 +968,5 @@ if __name__ == "__main__":
 
 - [Training Guide](training.md) - Training configuration
 - [Loss Comparison](loss-comparison.md) - Built-in loss functions
-- [Metric Selection](metric-selection.md) - Built-in metrics
-- [API Reference: Heads](../api/heads.md) - Head module API
+- [Metric Selection](../evaluation/metric-selection.md) - Built-in metrics
+- [API Reference: Heads](../../api/heads.md) - Head module API

@@ -373,7 +373,7 @@ All three approaches have **identical runtime performance**:
 ### Documentation
 - [HF Hub Integration Guide](huggingface-hub-integration.md)
 - [HF Transformers Integration Guide](huggingface-transformers-integration.md)
-- [HF Hub Examples](../examples/huggingface-hub.md)
+- [HF Hub Examples](../../examples/integration/huggingface-hub.md)
 
 ### Test Suites
 - HF Hub Lightning compatibility: `tests/test_hf_hub_lightning_compatibility.py`

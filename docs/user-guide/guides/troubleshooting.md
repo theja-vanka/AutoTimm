@@ -581,6 +581,6 @@ If you encounter an issue not covered here:
 
 ## See Also
 
-- [Training Guide](training.md) - Complete training documentation
-- [Metrics Guide](metrics.md) - Metric configuration
+- [Training Guide](../training/training.md) - Complete training documentation
+- [Metrics Guide](../evaluation/metrics.md) - Metric configuration
 - [Logging Guide](logging.md) - Logging configuration

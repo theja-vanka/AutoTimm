@@ -443,7 +443,7 @@ model = SemanticSegmentor(
 
 ## See Also
 
-- [Semantic Segmentation Examples](../examples/semantic-segmentation.md)
-- [Instance Segmentation Examples](../examples/instance-segmentation.md)
-- [Training Guide](../user-guide/training.md)
-- [Metrics Guide](../user-guide/metrics.md)
+- [Semantic Segmentation Examples](../examples/tasks/semantic-segmentation.md)
+- [Instance Segmentation Examples](../examples/tasks/instance-segmentation.md)
+- [Training Guide](../user-guide/training/training.md)
+- [Metrics Guide](../user-guide/evaluation/metrics.md)

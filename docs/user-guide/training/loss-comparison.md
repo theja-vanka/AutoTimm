@@ -531,5 +531,5 @@ if __name__ == "__main__":
 ## See Also
 
 - [Training Guide](training.md) - Complete training documentation
-- [Metric Selection](metric-selection.md) - Choosing metrics for your task
-- [API Reference: Losses](../api/losses.md) - Full API documentation
+- [Metric Selection](../evaluation/metric-selection.md) - Choosing metrics for your task
+- [API Reference: Losses](../../api/losses.md) - Full API documentation

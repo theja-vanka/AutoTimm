@@ -586,4 +586,4 @@ pipeline = DetectionPipeline(score_threshold=0.5)
 
 - [Classification Inference](classification-inference.md) - For classification models
 - [Model Export](model-export.md) - Export to TorchScript/ONNX
-- [Object Detection Examples](../../examples/object-detection.md) - More examples
+- [Object Detection Examples](../../examples/tasks/object-detection.md) - More examples

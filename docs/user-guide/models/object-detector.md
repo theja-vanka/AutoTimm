@@ -77,7 +77,7 @@ model = ObjectDetector(backbone="vit_base_patch16_224", num_classes=80, metrics=
 - Use lower learning rates (1e-4 to 1e-5) with transformer backbones
 - Two-phase training (freeze backbone → fine-tune) works well with transformers
 
-See [Transformer-Based Detection Example](../../examples/object-detection.md#transformer-based-object-detection) for detailed usage.
+See [Transformer-Based Detection Example](../../examples/tasks/object-detection.md#transformer-based-object-detection) for detailed usage.
 
 ## FPN Configuration
 
@@ -318,7 +318,7 @@ model = RTDetrForObjectDetection.from_pretrained(
 )
 ```
 
-See [RT-DETR Example](../../examples/object-detection.md#rt-detr-real-time-detection-transformer) for complete integration guide.
+See [RT-DETR Example](../../examples/tasks/object-detection.md#rt-detr-real-time-detection-transformer) for complete integration guide.
 
 **Available RT-DETR Models:**
 
@@ -366,4 +366,4 @@ All approaches support COCO format datasets and can use AutoTimm's `DetectionDat
 - [Object Detection Data](../data-loading/object-detection-data.md) - Data loading for detection
 - [Object Detection Inference](../inference/object-detection-inference.md) - Making predictions
 - [Image Classifier](image-classifier.md) - Classification models
-- [Object Detection Examples](../../examples/object-detection.md) - Complete examples
+- [Object Detection Examples](../../examples/tasks/object-detection.md) - Complete examples

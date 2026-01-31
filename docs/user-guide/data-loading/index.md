@@ -223,5 +223,5 @@ trainer.fit(model, datamodule=data)
 
 - [Image Classification Data Guide](image-classification-data.md)
 - [Object Detection Data Guide](object-detection-data.md)
-- [Data Handling Examples](../../examples/data-handling.md)
-- [Training Guide](../training.md)
+- [Data Handling Examples](../../examples/utilities/data-handling.md)
+- [Training Guide](../training/training.md)

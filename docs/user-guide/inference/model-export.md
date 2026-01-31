@@ -511,4 +511,4 @@ sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_AL
 
 - [Classification Inference](classification-inference.md) - Inference with PyTorch models
 - [Object Detection Inference](object-detection-inference.md) - Detection model inference
-- [Training Guide](../training.md) - How to train models
+- [Training Guide](../training/training.md) - How to train models
