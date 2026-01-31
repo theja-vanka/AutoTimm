@@ -474,10 +474,7 @@ config = resolve_backbone_data_config(
 - Faster for complex transforms (OpenCV backend)
 - Built-in bbox/mask handling
 - Better for detection/segmentation
-
-**Cons:**
-- Additional dependency
-- Requires `pip install autotimm[albumentations]`
+- Included by default in AutoTimm
 
 **Best for:** Object detection, segmentation, advanced augmentation
 
@@ -561,15 +558,14 @@ transform = transforms.Compose([
 ])
 ```
 
-### Albumentations Not Found
+### Albumentations Import Error
 
 **Problem:** `ImportError: Albumentations is required`
 
-**Solution:** Install with extras:
+**Solution:** Albumentations is included by default in AutoTimm. If you see this error:
 
-```bash
-pip install autotimm[albumentations]
-```
+1. Reinstall AutoTimm: `pip install --upgrade autotimm`
+2. Verify installation: `python -c "import albumentations; print(albumentations.__version__)"`
 
 ### Bounding Boxes Not Preserved
 

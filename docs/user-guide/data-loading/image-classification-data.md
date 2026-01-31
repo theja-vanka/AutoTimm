@@ -113,11 +113,7 @@ data = ImageDataModule(
 
 ### Albumentations
 
-OpenCV-based transforms (faster for some operations):
-
-```bash
-pip install autotimm[albumentations]
-```
+OpenCV-based transforms (faster for some operations, included by default):
 
 ```python
 data = ImageDataModule(

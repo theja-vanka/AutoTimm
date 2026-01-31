@@ -15,7 +15,7 @@ AutoTimm lets you train image classifiers, object detectors, and segmentation mo
 - **Multiple logger backends** - TensorBoard, MLflow, W&B, CSV simultaneously
 - **Auto-tuning** - Automatic learning rate and batch size finding
 - **Enhanced logging** - Learning rate, gradient norms, confusion matrices
-- **Flexible transforms** - Torchvision (PIL) or albumentations (OpenCV) with bbox and mask support
+- **Flexible transforms** - Torchvision (PIL) or albumentations (OpenCV) with bbox and mask support (both included by default)
 
 ## Quick Example
 

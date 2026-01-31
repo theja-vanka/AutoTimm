@@ -35,6 +35,11 @@ from autotimm.data.timm_transforms import (
     resolve_backbone_data_config,
 )
 from autotimm.data.transform_config import TransformConfig, list_transform_presets
+from autotimm.data.preset_manager import (
+    BackendRecommendation,
+    compare_backends,
+    recommend_backend,
+)
 from autotimm.heads import (
     ASPP,
     ClassificationHead,
@@ -122,6 +127,10 @@ __all__ = [
     "get_transforms_from_backbone",
     "list_transform_presets",
     "resolve_backbone_data_config",
+    # Preset manager
+    "BackendRecommendation",
+    "compare_backends",
+    "recommend_backend",
     # Losses
     "CenternessLoss",
     "CombinedSegmentationLoss",

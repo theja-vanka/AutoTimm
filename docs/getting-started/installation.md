@@ -14,7 +14,9 @@
 pip install autotimm
 ```
 
-This installs the core package with these dependencies:
+This installs the core package with **all** vision task dependencies:
+
+**Core Dependencies:**
 
 - `torch>=2.0`
 - `torchvision>=0.15`
@@ -22,41 +24,17 @@ This installs the core package with these dependencies:
 - `pytorch-lightning>=2.0`
 - `torchmetrics>=1.0`
 - `numpy>=1.23`
+- `albumentations>=1.3` *(now included by default)*
+- `opencv-python-headless>=4.8` *(now included by default)*
+- `pycocotools>=2.0` *(now included by default)*
+- `huggingface_hub>=0.20`
+- `watermark>=2.3`
+- `rich>=13.0`
+
+!!! note "All tasks supported out of the box"
+    The core installation now includes everything needed for classification, detection, segmentation, and instance segmentation tasks. No additional extras needed!
 
 ### Optional Dependencies
-
-#### Albumentations (OpenCV-based transforms)
-
-```bash
-pip install autotimm[albumentations]
-```
-
-Adds:
-
-- `albumentations>=1.3`
-- `opencv-python-headless>=4.8`
-
-#### Object Detection
-
-```bash
-pip install autotimm[detection]
-```
-
-Adds:
-
-- `pycocotools>=2.0` (required for mAP metrics)
-
-#### Semantic Segmentation
-
-```bash
-pip install autotimm[segmentation]
-```
-
-Adds:
-
-- `albumentations>=1.3`
-- `opencv-python-headless>=4.8`
-- `pycocotools>=2.0`
 
 #### Logger Backends
 
@@ -77,7 +55,7 @@ pip install autotimm[mlflow]
 pip install autotimm[all]
 ```
 
-Incudes all optional dependencies: tensorboard, mlflow, wandb, albumentations, and pycocotools.
+Includes all optional logger dependencies: tensorboard, mlflow, and wandb.
 
 ## Development Installation
 
