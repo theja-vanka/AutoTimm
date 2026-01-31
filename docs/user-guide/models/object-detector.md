@@ -318,48 +318,12 @@ model = RTDetrForObjectDetection.from_pretrained(
 )
 ```
 
-See [RT-DETR Example](../../examples/tasks/object-detection.md#rt-detr-real-time-detection-transformer) for complete integration guide.
-
-**Available RT-DETR Models:**
-
-| Model | Parameters | Best For |
-|-------|------------|----------|
-| `PekingU/rtdetr_r18vd` | 20M | Quick experiments |
-| `PekingU/rtdetr_r34vd` | 31M | Balanced performance |
-| `PekingU/rtdetr_r50vd` | 42M | Recommended (best balance) |
-| `PekingU/rtdetr_r101vd` | 76M | Maximum accuracy |
+See [RT-DETR Example](../../examples/tasks/object-detection.md#rt-detr-real-time-detection-transformer) for complete integration guide, model comparison tables, and when to use each architecture.
 
 **Requirements:**
 ```bash
 pip install transformers
 ```
-
-### Summary: Choosing a Detection Architecture
-
-**Use FCOS (ObjectDetector) when:**
-
-- Starting with object detection
-- Want seamless AutoTimm integration
-- Need efficient small object detection
-- Limited computational resources
-- Want to experiment with 1000+ timm backbones
-
-**Use Transformer Backbones (with ObjectDetector) when:**
-
-- Want to leverage vision transformers
-- Have sufficient GPU memory
-- Prefer hierarchical transformer features (Swin)
-- Want modern CNN alternatives
-
-**Use RT-DETR when:**
-
-- Need end-to-end transformer detection
-- Want to eliminate NMS
-- Have high memory budget
-- Detecting primarily large objects
-- Want query-based detection paradigm
-
-All approaches support COCO format datasets and can use AutoTimm's `DetectionDataModule` for efficient data loading.
 
 ## See Also
 

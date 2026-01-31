@@ -15,12 +15,14 @@ from autotimm.backbone import (
     create_feature_backbone,
     get_feature_channels,
 )
+from autotimm.data.transform_config import TransformConfig
 from autotimm.heads import DetectionHead, FPN
 from autotimm.losses import FocalLoss, GIoULoss
 from autotimm.metrics import LoggingConfig, MetricConfig, MetricManager
+from autotimm.tasks.preprocessing_mixin import PreprocessingMixin
 
 
-class ObjectDetector(pl.LightningModule):
+class ObjectDetector(PreprocessingMixin, pl.LightningModule):
     """End-to-end object detector using FCOS-style anchor-free detection.
 
     Architecture: timm backbone → FPN → FCOS Detection Head → NMS
@@ -31,6 +33,9 @@ class ObjectDetector(pl.LightningModule):
         metrics: A :class:`MetricManager` instance or list of :class:`MetricConfig`
             objects. Optional - if not provided, uses MeanAveragePrecision.
         logging_config: Optional :class:`LoggingConfig` for enhanced logging.
+        transform_config: Optional :class:`TransformConfig` for unified transform
+            configuration. When provided, enables the ``preprocess()`` method
+            for inference-time preprocessing using model-specific normalization.
         lr: Learning rate.
         weight_decay: Weight decay for optimizer.
         optimizer: Optimizer name (``"adamw"``, ``"adam"``, ``"sgd"``, etc.) or dict
@@ -76,6 +81,7 @@ class ObjectDetector(pl.LightningModule):
         num_classes: int,
         metrics: MetricManager | list[MetricConfig] | None = None,
         logging_config: LoggingConfig | None = None,
+        transform_config: TransformConfig | None = None,
         lr: float = 1e-4,
         weight_decay: float = 1e-4,
         optimizer: str | dict[str, Any] = "adamw",
@@ -97,7 +103,7 @@ class ObjectDetector(pl.LightningModule):
         regress_ranges: tuple[tuple[int, int], ...] | None = None,
     ):
         super().__init__()
-        self.save_hyperparameters(ignore=["metrics", "logging_config"])
+        self.save_hyperparameters(ignore=["metrics", "logging_config", "transform_config"])
 
         self.num_classes = num_classes
         self._lr = lr
@@ -186,6 +192,9 @@ class ObjectDetector(pl.LightningModule):
         if freeze_backbone:
             for param in self.backbone.parameters():
                 param.requires_grad = False
+
+        # Setup transforms from config (PreprocessingMixin)
+        self._setup_transforms(transform_config, task="detection")
 
     def _register_detection_metrics(self):
         """Register detection-specific metrics."""

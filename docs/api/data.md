@@ -115,6 +115,62 @@ data = ImageDataModule(
 )
 ```
 
+### With TransformConfig (Model-Specific Normalization)
+
+Use `TransformConfig` with a backbone to get model-specific normalization:
+
+```python
+from autotimm import ImageDataModule, TransformConfig
+
+# Create shared config
+config = TransformConfig(
+    preset="randaugment",
+    image_size=384,
+    use_timm_config=True,  # Use model's pretrained mean/std
+)
+
+data = ImageDataModule(
+    data_dir="./dataset",
+    transform_config=config,
+    backbone="efficientnet_b4",  # Required for model-specific normalization
+)
+```
+
+### Shared Config Between Model and Data
+
+```python
+from autotimm import ImageClassifier, ImageDataModule, TransformConfig, MetricConfig
+
+# Shared config ensures same preprocessing
+config = TransformConfig(preset="randaugment", image_size=384)
+backbone_name = "efficientnet_b4"
+
+# DataModule uses model's normalization
+data = ImageDataModule(
+    data_dir="./data",
+    dataset_name="CIFAR10",
+    transform_config=config,
+    backbone=backbone_name,
+)
+data.setup("fit")
+
+# Model uses same config for inference preprocessing
+metrics = [MetricConfig(
+    name="accuracy",
+    backend="torchmetrics",
+    metric_class="Accuracy",
+    params={"task": "multiclass"},
+    stages=["val"],
+)]
+
+model = ImageClassifier(
+    backbone=backbone_name,
+    num_classes=data.num_classes,
+    metrics=metrics,
+    transform_config=config,
+)
+```
+
 ## Parameters
 
 | Parameter | Type | Default | Description |
@@ -129,6 +185,8 @@ data = ImageDataModule(
 | `eval_transforms` | `Callable \| None` | `None` | Custom eval transforms |
 | `augmentation_preset` | `str \| None` | `None` | Preset name |
 | `transform_backend` | `str` | `"torchvision"` | `"torchvision"` or `"albumentations"` |
+| `transform_config` | `TransformConfig \| None` | `None` | Unified transform configuration |
+| `backbone` | `str \| nn.Module \| None` | `None` | Backbone for model-specific normalization |
 | `pin_memory` | `bool` | `True` | Pin memory for GPU |
 | `persistent_workers` | `bool` | `False` | Keep workers alive |
 | `prefetch_factor` | `int \| None` | `None` | Prefetch batches |

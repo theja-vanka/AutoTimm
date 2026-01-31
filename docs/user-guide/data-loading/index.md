@@ -1,9 +1,11 @@
 # Data Loading
 
-AutoTimm provides two specialized data modules for different computer vision tasks:
+AutoTimm provides specialized data modules for different computer vision tasks:
 
 - **[ImageDataModule](image-classification-data.md)**: Image classification datasets (CIFAR, MNIST, custom folders)
 - **[DetectionDataModule](object-detection-data.md)**: Object detection datasets in COCO format
+- **[SegmentationDataModule](segmentation-data.md)**: Semantic segmentation datasets
+- **[Transforms](transforms.md)**: Image transforms and augmentation system
 
 ## Quick Start
 
@@ -61,6 +63,30 @@ data = DetectionDataModule(
 
 Both data modules share these features:
 
+### Model-Specific Normalization with TransformConfig
+
+Use `TransformConfig` with a backbone to get model-specific normalization (mean/std):
+
+```python
+from autotimm import ImageDataModule, TransformConfig
+
+# Create shared config for data and model
+config = TransformConfig(
+    preset="randaugment",
+    image_size=384,
+    use_timm_config=True,  # Use model's pretrained normalization
+)
+
+data = ImageDataModule(
+    data_dir="./data",
+    dataset_name="CIFAR10",
+    transform_config=config,
+    backbone="efficientnet_b4",  # Required for model-specific normalization
+)
+```
+
+See [TransformConfig API](../../api/transforms.md) for full details.
+
 ### DataLoader Configuration
 
 ```python
@@ -112,6 +138,16 @@ Learn about:
 - Custom COCO datasets
 
 **[Read the Object Detection Data Guide →](object-detection-data.md)**
+
+### Transforms
+Learn about:
+- TransformConfig for unified configuration
+- Augmentation presets (torchvision and albumentations)
+- Model-specific normalization with timm
+- Custom transform pipelines
+- Backend comparison
+
+**[Read the Transforms Guide →](transforms.md)**
 
 ---
 

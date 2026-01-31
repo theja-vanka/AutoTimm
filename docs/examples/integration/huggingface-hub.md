@@ -175,22 +175,7 @@ python examples/hf_hub_instance_segmentation.py
 
 **File:** `hf_hub_advanced.py`
 
-**What it covers:**
-
-- Pretraining dataset comparison (ImageNet-1k/21k/22k, semi-supervised)
-- Architecture family analysis
-- Transfer learning strategies
-- Model versioning and reproducibility
-- Custom configurations
-- Inference speed benchmarking
-
-**Topics:**
-
-- **Pretraining**: IN1k vs IN21k vs IN22k vs Semi-supervised
-- **Architectures**: ResNet vs EfficientNet vs ViT vs ConvNeXt
-- **Transfer Learning**: Fine-tune all, freeze early layers, feature extraction, two-stage
-- **Versioning**: Recipe comparison (a1, a2, fb_swsl, etc.)
-- **Deployment**: Mobile, Web, Server, Research
+**What it covers:** Pretraining datasets (IN1k/21k/22k), architecture analysis, transfer learning, model versioning, deployment scenarios.
 
 **Run it:**
 
@@ -237,41 +222,18 @@ You can use any of these formats:
 
 ## Model Discovery
 
-### Search by Architecture
-
 ```python
 import autotimm
 
-# ResNet models
+# Search by architecture
 resnets = autotimm.list_hf_hub_backbones(model_name="resnet", limit=10)
-
-# Vision Transformers
 vits = autotimm.list_hf_hub_backbones(model_name="vit", limit=10)
 
-# ConvNeXt models
-convnexts = autotimm.list_hf_hub_backbones(model_name="convnext", limit=10)
-```
-
-### Search by Author
-
-```python
-# Official timm models
+# Search by author
 timm_models = autotimm.list_hf_hub_backbones(author="timm", limit=20)
 
-# Facebook models
-fb_models = autotimm.list_hf_hub_backbones(author="facebook", limit=10)
-```
-
-### Filter by Use Case
-
-```python
-# Efficient models for edge
+# Filter for efficient models
 efficient = autotimm.list_hf_hub_backbones(model_name="mobilenet", limit=5)
-efficient += autotimm.list_hf_hub_backbones(model_name="efficientnet", limit=5)
-
-# Large models for research
-large = autotimm.list_hf_hub_backbones(model_name="resnet101", limit=5)
-large += autotimm.list_hf_hub_backbones(model_name="convnext_large", limit=5)
 ```
 
 ## Quick Reference: Task-Specific Recommendations
@@ -379,62 +341,22 @@ backbone = autotimm.create_backbone(config)
 
 ## Troubleshooting
 
-### Model not found
+| Issue | Solution |
+|-------|----------|
+| Model not found | Verify model name with `list_hf_hub_backbones()` |
+| Out of memory | Reduce batch size, image size, or use smaller backbone |
+| Slow training | Enable mixed precision, reduce resolution, increase `num_workers` |
+| Poor accuracy | Use larger backbone, IN21k/22k pretrained models, or more epochs |
 
-**Solution**: Verify the model name exists on HF Hub. Use `list_hf_hub_backbones()` to search.
+## Benefits
 
-### Out of memory
-
-**Solution**:
-
-- Reduce batch size
-- Use smaller image size
-- Use gradient accumulation
-- Choose smaller backbone (e.g., ResNet18, MobileNet)
-
-### Slow training
-
-**Solution**:
-
-- Enable mixed precision (`precision="16-mixed"`)
-- Use smaller backbones
-- Reduce image resolution
-- Check data loading (increase `num_workers`)
-
-### Poor accuracy
-
-**Solution**:
-
-- Try larger backbones (ResNet50 → ResNet101)
-- Use models pretrained on larger datasets (IN21k/22k)
-- Increase training epochs
-- Check learning rate and weight decay
-
-## Benefits of HF Hub Integration
-
-1. **Version Control**: Exact model versions with reproducible results
-2. **Model Cards**: Detailed training information and metrics
-3. **Community**: Access community-trained models
-4. **Updates**: Get improved models without code changes
-5. **Metadata**: Training recipes, datasets, performance metrics
-6. **Centralized**: Single source for all model weights
-7. **Collaboration**: Easy sharing of fine-tuned models
-
-## Next Steps
-
-1. **Start Simple**: Run `huggingface_hub_models.py` to see basic usage
-2. **Task-Specific**: Choose the example matching your task
-3. **Advanced**: Explore `hf_hub_advanced.py` for optimization
-4. **Experiment**: Try different backbones for your specific dataset
-5. **Share**: Upload your fine-tuned models back to HF Hub
+- **Version Control**: Exact model versions with reproducible results
+- **Model Cards**: Detailed training info and metrics
+- **Community**: Access community-trained models
+- **Centralized**: Single source for all model weights
 
 ## Resources
 
-- [Hugging Face Hub](https://huggingface.co/timm)
+- [Hugging Face Hub - timm](https://huggingface.co/timm)
 - [timm Documentation](https://huggingface.co/docs/timm)
 - [AutoTimm Documentation](https://theja-vanka.github.io/AutoTimm/)
-- [Model Cards](https://huggingface.co/docs/hub/model-cards)
-
-## Contributing
-
-Found a useful HF Hub model or training recipe? Contributions welcome! Please submit examples via pull requests.

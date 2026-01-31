@@ -516,7 +516,7 @@ If you use AutoTimm in your research, please cite:
 ```bibtex
 @software{autotimm,
   author = {Krishnatheja Vanka},
-  title = {AutoTimm: Automated Deep Learning for Computer Vision},
+  title = {AutoTimm: Automatic Pytorch Image Models},
   url = {https://github.com/theja-vanka/AutoTimm},
   year = {2026}
 }

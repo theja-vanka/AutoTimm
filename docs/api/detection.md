@@ -123,6 +123,44 @@ model = ObjectDetector(
 )
 ```
 
+### With TransformConfig (Preprocessing)
+
+Enable inference-time preprocessing with model-specific normalization:
+
+```python
+from autotimm import ObjectDetector, TransformConfig
+
+model = ObjectDetector(
+    backbone="resnet50",
+    num_classes=80,
+    metrics=metrics,
+    transform_config=TransformConfig(),  # Enable preprocess()
+)
+
+# Now you can preprocess raw images
+from PIL import Image
+image = Image.open("test.jpg")
+tensor = model.preprocess(image)  # Returns preprocessed tensor
+output = model(tensor)
+```
+
+### Get Model's Data Config
+
+```python
+model = ObjectDetector(
+    backbone="swin_tiny_patch4_window7_224",
+    num_classes=80,
+    metrics=metrics,
+    transform_config=TransformConfig(),
+)
+
+# Get normalization config
+config = model.get_data_config()
+print(f"Mean: {config['mean']}")
+print(f"Std: {config['std']}")
+print(f"Input size: {config['input_size']}")
+```
+
 ### Frozen Backbone
 
 ```python
@@ -156,6 +194,7 @@ model = ObjectDetector(
 | `num_classes` | `int` | Required | Number of object classes |
 | `metrics` | `MetricManager \| list[MetricConfig]` | Required | Metrics configuration |
 | `logging_config` | `LoggingConfig \| None` | `None` | Enhanced logging options |
+| `transform_config` | `TransformConfig \| None` | `None` | Transform config for preprocessing |
 | `lr` | `float` | `1e-4` | Learning rate |
 | `weight_decay` | `float` | `1e-4` | Weight decay |
 | `optimizer` | `str \| dict` | `"adamw"` | Optimizer name or config |

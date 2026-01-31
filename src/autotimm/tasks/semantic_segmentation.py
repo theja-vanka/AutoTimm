@@ -14,12 +14,14 @@ from autotimm.backbone import (
     create_feature_backbone,
     get_feature_channels,
 )
+from autotimm.data.transform_config import TransformConfig
 from autotimm.heads import DeepLabV3PlusHead, FCNHead
 from autotimm.losses.segmentation import CombinedSegmentationLoss, DiceLoss
 from autotimm.metrics import LoggingConfig, MetricConfig, MetricManager
+from autotimm.tasks.preprocessing_mixin import PreprocessingMixin
 
 
-class SemanticSegmentor(pl.LightningModule):
+class SemanticSegmentor(PreprocessingMixin, pl.LightningModule):
     """End-to-end semantic segmentation model backed by a timm backbone.
 
     Parameters:
@@ -34,6 +36,9 @@ class SemanticSegmentor(pl.LightningModule):
         metrics: A :class:`MetricManager` instance or list of :class:`MetricConfig`
             objects. Required - no default metrics are provided.
         logging_config: Optional :class:`LoggingConfig` for enhanced logging.
+        transform_config: Optional :class:`TransformConfig` for unified transform
+            configuration. When provided, enables the ``preprocess()`` method
+            for inference-time preprocessing using model-specific normalization.
         lr: Learning rate.
         weight_decay: Weight decay for optimizer.
         optimizer: Optimizer name or dict with 'class' and 'params' keys.
@@ -74,6 +79,7 @@ class SemanticSegmentor(pl.LightningModule):
         class_weights: torch.Tensor | None = None,
         metrics: MetricManager | list[MetricConfig] | None = None,
         logging_config: LoggingConfig | None = None,
+        transform_config: TransformConfig | None = None,
         lr: float = 1e-4,
         weight_decay: float = 1e-4,
         optimizer: str | dict[str, Any] = "adamw",
@@ -83,7 +89,7 @@ class SemanticSegmentor(pl.LightningModule):
         freeze_backbone: bool = False,
     ):
         super().__init__()
-        self.save_hyperparameters(ignore=["metrics", "logging_config", "class_weights"])
+        self.save_hyperparameters(ignore=["metrics", "logging_config", "transform_config", "class_weights"])
 
         # Create feature backbone
         self.backbone = create_feature_backbone(backbone)
@@ -181,6 +187,9 @@ class SemanticSegmentor(pl.LightningModule):
         if freeze_backbone:
             for param in self.backbone.parameters():
                 param.requires_grad = False
+
+        # Setup transforms from config (PreprocessingMixin)
+        self._setup_transforms(transform_config, task="segmentation")
 
     @property
     def num_classes(self) -> int:

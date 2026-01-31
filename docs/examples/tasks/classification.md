@@ -182,19 +182,20 @@ if __name__ == "__main__":
 
 ## Running Classification Examples
 
-Clone the repository and run examples:
-
 ```bash
 git clone https://github.com/theja-vanka/AutoTimm.git
 cd AutoTimm
 pip install -e ".[all]"
 
-# Run CIFAR-10 example
+# Run examples
 python examples/classify_cifar10.py
-
-# Run custom folder example
 python examples/classify_custom_folder.py
-
-# Run ViT fine-tuning example
 python examples/vit_finetuning.py
 ```
+
+## See Also
+
+- [Image Classifier Guide](../../user-guide/models/image-classifier.md)
+- [Classification Inference](../../user-guide/inference/classification-inference.md)
+- [Data Loading](../../user-guide/data-loading/image-classification-data.md)
+- [API Reference](../../api/classifier.md)

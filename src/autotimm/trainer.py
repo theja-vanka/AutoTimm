@@ -10,6 +10,56 @@ from pytorch_lightning.tuner import Tuner
 
 from autotimm.loggers import LoggerConfig, LoggerManager
 
+# Module-level flag to ensure watermark is printed only once per session
+_WATERMARK_PRINTED = False
+
+
+def _print_watermark() -> None:
+    """Print environment watermark with package versions."""
+    global _WATERMARK_PRINTED
+    if _WATERMARK_PRINTED:
+        return
+    _WATERMARK_PRINTED = True
+
+    try:
+        from watermark import watermark
+
+        print(watermark(packages="torch,lightning,timm,transformers", python=True))
+    except ImportError:
+        # Fallback if watermark is not available
+        import sys
+
+        import torch
+
+        print(f"Python: {sys.version}")
+        print(f"PyTorch: {torch.__version__}")
+        try:
+            import lightning
+
+            print(f"Lightning: {lightning.__version__}")
+        except ImportError:
+            try:
+                import pytorch_lightning as pl_fallback
+
+                print(f"PyTorch Lightning: {pl_fallback.__version__}")
+            except Exception:
+                pass
+        try:
+            import timm
+
+            print(f"timm: {timm.__version__}")
+        except ImportError:
+            pass
+        try:
+            import transformers
+
+            print(f"transformers: {transformers.__version__}")
+        except ImportError:
+            pass
+    except Exception:
+        # Silently ignore any errors in watermark printing
+        pass
+
 
 @dataclass
 class TunerConfig:
@@ -136,6 +186,9 @@ class AutoTrainer(pl.Trainer):
         fast_dev_run: bool | int = False,
         **trainer_kwargs: Any,
     ) -> None:
+        # Print environment watermark on first AutoTrainer instantiation
+        _print_watermark()
+
         if isinstance(logger, LoggerManager):
             resolved_logger = logger.loggers
         elif (

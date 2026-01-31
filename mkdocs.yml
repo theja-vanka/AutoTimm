@@ -79,6 +79,7 @@ nav:
           - Image Classification Data: user-guide/data-loading/image-classification-data.md
           - Object Detection Data: user-guide/data-loading/object-detection-data.md
           - Segmentation Data: user-guide/data-loading/segmentation-data.md
+          - Transforms: user-guide/data-loading/transforms.md
       - Models:
           - Overview: user-guide/models/index.md
           - ImageClassifier: user-guide/models/image-classifier.md
@@ -104,6 +105,7 @@ nav:
           - Overview: user-guide/inference/index.md
           - Classification Inference: user-guide/inference/classification-inference.md
           - Object Detection Inference: user-guide/inference/object-detection-inference.md
+          - Segmentation Inference: user-guide/inference/semantic-segmentation-inference.md
           - Model Export: user-guide/inference/model-export.md
       - Guides:
           - Logging: user-guide/guides/logging.md
@@ -118,6 +120,7 @@ nav:
       - Data:
           - ImageDataModule: api/data.md
           - DetectionDataModule: api/detection_data.md
+          - TransformConfig: api/transforms.md
       - Training:
           - AutoTrainer: api/trainer.md
       - Models:

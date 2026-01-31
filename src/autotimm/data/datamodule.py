@@ -7,9 +7,11 @@ from pathlib import Path
 from typing import Callable
 
 import pytorch_lightning as pl
+import torch.nn as nn
 from torch.utils.data import DataLoader, WeightedRandomSampler, random_split
 from torchvision import datasets
 
+from autotimm.data.transform_config import TransformConfig
 from autotimm.data.transforms import (
     albu_default_eval_transforms,
     albu_default_train_transforms,
@@ -53,6 +55,11 @@ class ImageDataModule(pl.LightningDataModule):
             folder-mode datasets load images with OpenCV and built-in
             datasets convert PIL images to numpy for the augmentation
             pipeline.
+        transform_config: Optional :class:`TransformConfig` for unified transform
+            configuration. When provided along with ``backbone``, uses model-specific
+            normalization from timm. Takes precedence over individual transform args.
+        backbone: Optional backbone name or module. Used with ``transform_config``
+            to resolve model-specific normalization (mean, std, input_size).
         pin_memory: Pin memory for GPU transfer.
         persistent_workers: Keep worker processes alive between epochs.
             Reduces overhead when ``num_workers > 0``.
@@ -80,6 +87,8 @@ class ImageDataModule(pl.LightningDataModule):
         eval_transforms: Callable | None = None,
         augmentation_preset: str | None = None,
         transform_backend: str = "torchvision",
+        transform_config: TransformConfig | None = None,
+        backbone: str | nn.Module | None = None,
         pin_memory: bool = True,
         persistent_workers: bool = False,
         prefetch_factor: int | None = None,
@@ -104,9 +113,26 @@ class ImageDataModule(pl.LightningDataModule):
                 f"Choose from: torchvision, albumentations."
             )
         self.transform_backend = transform_backend
+        self.transform_config = transform_config
+        self.backbone = backbone
 
-        # Resolve transforms
-        if train_transforms is not None:
+        # Resolve transforms - TransformConfig takes precedence
+        if transform_config is not None and backbone is not None:
+            from autotimm.data.timm_transforms import get_transforms_from_backbone
+
+            self.train_transforms = get_transforms_from_backbone(
+                backbone=backbone,
+                transform_config=transform_config,
+                is_train=True,
+                task="classification",
+            )
+            self.eval_transforms = get_transforms_from_backbone(
+                backbone=backbone,
+                transform_config=transform_config,
+                is_train=False,
+                task="classification",
+            )
+        elif train_transforms is not None:
             self.train_transforms = train_transforms
         elif augmentation_preset is not None:
             self.train_transforms = get_train_transforms(
@@ -152,6 +178,9 @@ class ImageDataModule(pl.LightningDataModule):
             self._setup_folder_cv2(stage)
         else:
             self._setup_folder(stage)
+
+        # Automatically print data summary
+        self._print_summary()
 
     def _setup_builtin(self, stage: str | None) -> None:
         cls = self.BUILTIN_DATASETS[self.dataset_name]
@@ -292,6 +321,36 @@ class ImageDataModule(pl.LightningDataModule):
             shuffle=False,
             **self._loader_kwargs(),
         )
+
+    def _print_summary(self) -> None:
+        """Print data summary automatically after setup."""
+        try:
+            from rich.console import Console
+
+            console = Console()
+            console.print(self.summary())
+        except ImportError:
+            # Fallback to basic print if rich is not available
+            print(f"\n{'='*50}")
+            print("ImageDataModule Summary")
+            print(f"{'='*50}")
+            print(f"Data dir: {self.data_dir}")
+            if self.dataset_name:
+                print(f"Dataset: {self.dataset_name}")
+            print(f"Image size: {self.image_size}")
+            print(f"Batch size: {self.batch_size}")
+            if self.num_classes is not None:
+                print(f"Num classes: {self.num_classes}")
+            if self.train_dataset is not None:
+                print(f"Train samples: {len(self.train_dataset)}")
+            if self.val_dataset is not None:
+                print(f"Val samples: {len(self.val_dataset)}")
+            if self.test_dataset is not None:
+                print(f"Test samples: {len(self.test_dataset)}")
+            print(f"{'='*50}\n")
+        except Exception:
+            # Silently ignore any errors in summary printing
+            pass
 
     def summary(self):
         """Return a Rich Table summarizing the data module.

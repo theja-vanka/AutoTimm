@@ -538,9 +538,74 @@ if __name__ == "__main__":
 
 See [Instance Segmentation Guide](../user-guide/models/instance-segmentation.md) for more details.
 
+## Inference with Preprocessing
+
+AutoTimm models can preprocess raw images using model-specific normalization:
+
+```python
+from autotimm import ImageClassifier, TransformConfig, MetricConfig
+from PIL import Image
+
+# Create model with TransformConfig
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    metrics=[
+        MetricConfig(
+            name="accuracy",
+            backend="torchmetrics",
+            metric_class="Accuracy",
+            params={"task": "multiclass"},
+            stages=["val"],
+        ),
+    ],
+    transform_config=TransformConfig(),  # Enable preprocessing
+)
+
+# Preprocess raw images for inference
+image = Image.open("test.jpg")
+tensor = model.preprocess(image)  # Uses model's pretrained normalization
+
+# Run inference
+model.eval()
+with torch.no_grad():
+    predictions = model(tensor).softmax(dim=1)
+    predicted_class = predictions.argmax(dim=1).item()
+    print(f"Predicted class: {predicted_class}")
+```
+
+### Shared Config for Training and Inference
+
+```python
+from autotimm import ImageClassifier, ImageDataModule, TransformConfig
+
+# Create shared config
+config = TransformConfig(preset="randaugment", image_size=384)
+backbone = "efficientnet_b4"
+
+# DataModule uses model's normalization for training
+data = ImageDataModule(
+    data_dir="./data",
+    dataset_name="CIFAR10",
+    transform_config=config,
+    backbone=backbone,
+)
+
+# Model uses same config for inference preprocessing
+model = ImageClassifier(
+    backbone=backbone,
+    num_classes=10,
+    metrics=metrics,
+    transform_config=config,
+)
+```
+
+See [TransformConfig API](../api/transforms.md) for full details.
+
 ## Next Steps
 
 - [Data Loading](../user-guide/data-loading/index.md) - Learn about transforms and datasets
+- [TransformConfig](../api/transforms.md) - Model-specific preprocessing
 - [Models](../user-guide/models/index.md) - Backbone configuration and customization
 - [Training](../user-guide/training/training.md) - Advanced training features
 - [Examples](../examples/index.md) - More complete examples

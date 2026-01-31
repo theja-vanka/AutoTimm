@@ -288,88 +288,125 @@ if __name__ == "__main__":
     main()
 ```
 
-## Inference Example
+## Inference
 
-Load a trained model and run inference.
+The [`segmentation_inference.py`](https://github.com/theja-vanka/AutoTimm/blob/main/examples/segmentation_inference.py) script provides a comprehensive toolkit for semantic segmentation inference.
+
+### Features
+
+- **Model Loading**: Load trained models from checkpoints
+- **Preprocessing**: Automatic image preprocessing using model's data config
+- **Single & Batch Prediction**: Run inference on individual or multiple images
+- **Visualization**: Overlay segmentation masks on original images with customizable transparency
+- **Export Options**:
+  - Save colored segmentation masks as PNG
+  - Export per-class pixel statistics to JSON
+  - Create class legends for visualization
+- **Pre-configured Palettes**: Cityscapes and Pascal VOC color schemes
+
+### Basic Usage
 
 ```python
-import torch
-from PIL import Image
-from torchvision import transforms as T
-import matplotlib.pyplot as plt
-import numpy as np
-from autotimm import SemanticSegmentor
+from examples.segmentation_inference import (
+    load_model,
+    predict_single_image,
+    visualize_segmentation,
+    export_mask_to_png,
+    CITYSCAPES_CLASSES,
+    CITYSCAPES_COLORS,
+)
 
+# Load trained model
+model = load_model(
+    checkpoint_path="best-segmentor.ckpt",
+    backbone="resnet50",
+    num_classes=19,
+    image_size=512,
+)
+model = model.cuda()
 
-def visualize_segmentation(image, prediction, num_classes):
-    """Visualize segmentation results."""
-    # Create color map
-    colors = plt.cm.get_cmap('tab20', num_classes)
+# Single image inference
+result = predict_single_image(model, "street_scene.jpg")
 
-    # Create colored mask
-    colored_mask = np.zeros((*prediction.shape, 3))
-    for class_id in range(num_classes):
-        mask = prediction == class_id
-        colored_mask[mask] = colors(class_id)[:3]
+# Visualize with overlay (50% transparency)
+visualize_segmentation(
+    "street_scene.jpg",
+    result["mask"],
+    "output.jpg",
+    color_palette=CITYSCAPES_COLORS,
+    alpha=0.5,
+)
 
-    # Display
-    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-
-    axes[0].imshow(image)
-    axes[0].set_title("Input Image")
-    axes[0].axis('off')
-
-    axes[1].imshow(colored_mask)
-    axes[1].set_title("Segmentation")
-    axes[1].axis('off')
-
-    # Overlay
-    axes[2].imshow(image)
-    axes[2].imshow(colored_mask, alpha=0.5)
-    axes[2].set_title("Overlay")
-    axes[2].axis('off')
-
-    plt.tight_layout()
-    plt.savefig("segmentation_result.png")
-    plt.show()
-
-
-def main():
-    # Load model
-    model = SemanticSegmentor.load_from_checkpoint("best_model.ckpt")
-    model.eval()
-
-    # Load and preprocess image
-    image = Image.open("test_image.jpg")
-    original_size = image.size
-
-    transform = T.Compose([
-        T.Resize((512, 512)),
-        T.ToTensor(),
-        T.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
-    ])
-
-    image_tensor = transform(image).unsqueeze(0)
-
-    # Predict
-    with torch.no_grad():
-        prediction = model.predict(image_tensor)
-
-    # prediction shape: [1, H, W]
-    prediction = prediction[0].cpu().numpy()
-
-    # Resize to original size
-    prediction_pil = Image.fromarray(prediction.astype(np.uint8))
-    prediction_resized = prediction_pil.resize(original_size, Image.NEAREST)
-    prediction = np.array(prediction_resized)
-
-    # Visualize
-    visualize_segmentation(image, prediction, num_classes=19)
-
-
-if __name__ == "__main__":
-    main()
+# Export colored mask
+export_mask_to_png(
+    result["mask"],
+    "mask.png",
+    color_palette=CITYSCAPES_COLORS,
+)
 ```
+
+### Batch Processing
+
+```python
+from examples.segmentation_inference import predict_batch, export_to_json
+
+# Process multiple images
+image_paths = ["img1.jpg", "img2.jpg", "img3.jpg"]
+results = predict_batch(model, image_paths, batch_size=4)
+
+# Export statistics for all images
+masks = [r["mask"] for r in results]
+export_to_json(
+    masks,
+    "batch_statistics.json",
+    image_paths=image_paths,
+    class_names=CITYSCAPES_CLASSES,
+)
+```
+
+### Creating Class Legends
+
+```python
+from examples.segmentation_inference import create_legend
+
+# Generate legend image
+create_legend(
+    CITYSCAPES_CLASSES,
+    CITYSCAPES_COLORS,
+    "legend.png",
+)
+```
+
+### Custom Color Palettes
+
+```python
+# Define custom colors for your dataset
+CUSTOM_CLASSES = ["background", "building", "road", "vegetation", "vehicle"]
+CUSTOM_COLORS = [
+    (0, 0, 0),      # black - background
+    (128, 0, 0),    # maroon - building
+    (128, 128, 128), # gray - road
+    (0, 128, 0),    # green - vegetation
+    (0, 0, 255),    # blue - vehicle
+]
+
+# Use with inference
+visualize_segmentation(
+    "image.jpg",
+    result["mask"],
+    "output.jpg",
+    color_palette=CUSTOM_COLORS,
+    alpha=0.6,
+)
+```
+
+### Running the Demo
+
+```bash
+python examples/segmentation_inference.py
+```
+
+For a complete inference workflow, see the [Segmentation Inference Guide](../../user-guide/inference/semantic-segmentation-inference.md).
 
 ## Using Swin Transformer
 

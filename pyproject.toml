@@ -34,6 +34,8 @@ dependencies = [
     "numpy>=1.23",
     "opencv-python-headless>=4.8",
     "huggingface_hub>=0.20",
+    "watermark>=2.3",
+    "rich>=13.0",
 ]
 
 [project.optional-dependencies]

@@ -6,7 +6,7 @@ This guide covers how to use trained classification models for inference and pre
 
 ```python
 import torch
-from autotimm import ImageClassifier, MetricConfig
+from autotimm import ImageClassifier, MetricConfig, TransformConfig
 
 # Define metrics (required for loading)
 metrics = [
@@ -19,19 +19,48 @@ metrics = [
     ),
 ]
 
-# Load from checkpoint
+# Load from checkpoint with TransformConfig for preprocessing
 model = ImageClassifier.load_from_checkpoint(
     "path/to/checkpoint.ckpt",
     backbone="resnet50",
     num_classes=10,
     metrics=metrics,
+    transform_config=TransformConfig(),  # Enable preprocessing
 )
 model.eval()
 ```
 
 ---
 
-## Single Image Prediction
+## Single Image Prediction (Recommended)
+
+Use the built-in `preprocess()` method for correct model-specific normalization:
+
+```python
+from PIL import Image
+
+# Load image
+image = Image.open("image.jpg")
+
+# Preprocess using model's native normalization
+input_tensor = model.preprocess(image)  # Returns (1, 3, 224, 224)
+
+# Predict
+with torch.no_grad():
+    logits = model(input_tensor)
+    probabilities = torch.softmax(logits, dim=1)
+    predicted_class = probabilities.argmax(dim=1).item()
+    confidence = probabilities.max().item()
+
+print(f"Predicted class: {predicted_class}")
+print(f"Confidence: {confidence:.2%}")
+```
+
+---
+
+## Single Image Prediction (Manual)
+
+If you need manual control over transforms:
 
 ```python
 from PIL import Image
@@ -60,9 +89,40 @@ print(f"Predicted class: {predicted_class}")
 print(f"Confidence: {confidence:.2%}")
 ```
 
+**Tip:** Use `model.get_data_config()` to get the correct normalization values:
+
+```python
+config = model.get_data_config()
+print(f"Mean: {config['mean']}")  # Use these values in your transforms
+print(f"Std: {config['std']}")
+```
+
 ---
 
 ## Batch Prediction
+
+### Using preprocess() (Recommended)
+
+```python
+from PIL import Image
+
+# Load multiple images
+image_paths = ["img1.jpg", "img2.jpg", "img3.jpg", "img4.jpg"]
+images = [Image.open(p) for p in image_paths]
+
+# Preprocess all at once
+input_tensor = model.preprocess(images)  # Returns (4, 3, 224, 224)
+
+# Predict
+model.eval()
+with torch.no_grad():
+    logits = model(input_tensor)
+    probs = torch.softmax(logits, dim=1)
+    preds = probs.argmax(dim=1)
+
+for path, pred, prob in zip(image_paths, preds, probs):
+    print(f"{path}: class {pred.item()} ({prob[pred].item():.2%})")
+```
 
 ### Using DataLoader
 
@@ -185,13 +245,12 @@ fish: 0.04%
 
 ## Complete Inference Pipeline
 
-Production-ready inference pipeline with error handling and caching:
+Production-ready inference pipeline with TransformConfig:
 
 ```python
 import torch
 from PIL import Image
-from torchvision import transforms
-from autotimm import ImageClassifier, MetricConfig
+from autotimm import ImageClassifier, MetricConfig, TransformConfig
 
 
 class InferencePipeline:
@@ -209,12 +268,13 @@ class InferencePipeline:
             ),
         ]
 
-        # Load model
+        # Load model with TransformConfig for preprocessing
         self.model = ImageClassifier.load_from_checkpoint(
             checkpoint_path,
             backbone=backbone,
             num_classes=num_classes,
             metrics=metrics,
+            transform_config=TransformConfig(),  # Enable preprocess()
         )
         self.model.eval()
 
@@ -225,22 +285,11 @@ class InferencePipeline:
         self.class_names = class_names
         self.num_classes = num_classes
 
-        # Prepare transform
-        self.transform = transforms.Compose([
-            transforms.Resize(256),
-            transforms.CenterCrop(224),
-            transforms.ToTensor(),
-            transforms.Normalize(
-                mean=[0.485, 0.456, 0.406],
-                std=[0.229, 0.224, 0.225]
-            ),
-        ])
-
     def predict(self, image_path, top_k=1):
         """Predict class for a single image."""
-        # Load image
+        # Load and preprocess image using model's native normalization
         image = Image.open(image_path).convert("RGB")
-        input_tensor = self.transform(image).unsqueeze(0).to(self.device)
+        input_tensor = self.model.preprocess(image).to(self.device)
 
         # Predict
         with torch.no_grad():

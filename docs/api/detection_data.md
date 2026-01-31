@@ -97,6 +97,61 @@ data = DetectionDataModule(
 )
 ```
 
+### With TransformConfig (Model-Specific Normalization)
+
+Use `TransformConfig` with a backbone to get model-specific normalization:
+
+```python
+from autotimm import DetectionDataModule, TransformConfig
+
+# Create shared config
+config = TransformConfig(
+    preset="default",
+    image_size=640,
+    use_timm_config=True,  # Use model's pretrained mean/std
+)
+
+data = DetectionDataModule(
+    data_dir="./coco",
+    transform_config=config,
+    backbone="resnet50",  # Required for model-specific normalization
+)
+```
+
+### Shared Config Between Model and Data
+
+```python
+from autotimm import ObjectDetector, DetectionDataModule, TransformConfig, MetricConfig
+
+# Shared config ensures same preprocessing
+config = TransformConfig(preset="default", image_size=640)
+backbone_name = "resnet50"
+
+# DataModule uses model's normalization
+data = DetectionDataModule(
+    data_dir="./coco",
+    transform_config=config,
+    backbone=backbone_name,
+)
+data.setup("fit")
+
+# Model uses same config for inference preprocessing
+metrics = [MetricConfig(
+    name="mAP",
+    backend="torchmetrics",
+    metric_class="MeanAveragePrecision",
+    params={"box_format": "xyxy"},
+    stages=["val"],
+)]
+
+model = ObjectDetector(
+    backbone=backbone_name,
+    num_classes=data.num_classes,
+    metrics=metrics,
+    transform_config=config,
+)
+```
+
 ## Parameters
 
 | Parameter | Type | Default | Description |
@@ -112,6 +167,8 @@ data = DetectionDataModule(
 | `pin_memory` | `bool` | `True` | Pin memory for GPU |
 | `persistent_workers` | `bool` | `False` | Keep workers alive |
 | `prefetch_factor` | `int \| None` | `None` | Prefetch batches |
+| `transform_config` | `TransformConfig \| None` | `None` | Unified transform configuration |
+| `backbone` | `str \| nn.Module \| None` | `None` | Backbone for model-specific normalization |
 
 ## Attributes
 
