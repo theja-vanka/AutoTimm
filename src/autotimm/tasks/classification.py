@@ -23,7 +23,8 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
         backbone: A timm model name (str) or a :class:`BackboneConfig`.
         num_classes: Number of target classes.
         metrics: A :class:`MetricManager` instance or list of :class:`MetricConfig`
-            objects. Required - no default metrics are provided.
+            objects. Optional - if ``None``, no metrics will be computed during training.
+            This is useful for inference-only scenarios.
         logging_config: Optional :class:`LoggingConfig` for enhanced logging.
         transform_config: Optional :class:`TransformConfig` for unified transform
             configuration. When provided, enables the ``preprocess()`` method
@@ -45,6 +46,7 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
         mixup_alpha: If > 0, apply Mixup augmentation with this alpha.
 
     Example:
+        >>> # For training with metrics
         >>> model = ImageClassifier(
         ...     backbone="resnet50",
         ...     num_classes=10,
@@ -64,6 +66,13 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
         ...     ),
         ...     transform_config=TransformConfig(use_timm_config=True),
         ... )
+        >>>
+        >>> # For inference only (no metrics needed)
+        >>> model = ImageClassifier(
+        ...     backbone="resnet50",
+        ...     num_classes=10,
+        ...     transform_config=TransformConfig(use_timm_config=True),
+        ... )
         >>> # With transform_config, you can preprocess raw images
         >>> from PIL import Image
         >>> img = Image.open("test.jpg")
@@ -75,7 +84,7 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
         self,
         backbone: str | BackboneConfig,
         num_classes: int,
-        metrics: MetricManager | list[MetricConfig],
+        metrics: MetricManager | list[MetricConfig] | None = None,
         logging_config: LoggingConfig | None = None,
         transform_config: TransformConfig | None = None,
         lr: float = 1e-3,
@@ -100,14 +109,20 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
         self.criterion = nn.CrossEntropyLoss(label_smoothing=label_smoothing)
 
         # Initialize metrics from config
-        if isinstance(metrics, list):
-            metrics = MetricManager(configs=metrics, num_classes=num_classes)
-        self._metric_manager = metrics
-
-        # Register metrics as ModuleDicts for proper device handling
-        self.train_metrics = metrics.get_train_metrics()
-        self.val_metrics = metrics.get_val_metrics()
-        self.test_metrics = metrics.get_test_metrics()
+        if metrics is not None:
+            if isinstance(metrics, list):
+                metrics = MetricManager(configs=metrics, num_classes=num_classes)
+            self._metric_manager = metrics
+            # Register metrics as ModuleDicts for proper device handling
+            self.train_metrics = metrics.get_train_metrics()
+            self.val_metrics = metrics.get_val_metrics()
+            self.test_metrics = metrics.get_test_metrics()
+        else:
+            self._metric_manager = None
+            # Create empty ModuleDicts when no metrics are provided
+            self.train_metrics = nn.ModuleDict()
+            self.val_metrics = nn.ModuleDict()
+            self.test_metrics = nn.ModuleDict()
 
         # Logging configuration
         self._logging_config = logging_config or LoggingConfig(
@@ -170,17 +185,18 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
         self.log("train/loss", loss, prog_bar=True)
 
         # Update and log all train metrics
-        for name, metric in self.train_metrics.items():
-            config = self._metric_manager.get_metric_config("train", name)
-            metric.update(preds, y)
-            if config:
-                self.log(
-                    f"train/{name}",
-                    metric,
-                    on_step=config.log_on_step,
-                    on_epoch=config.log_on_epoch,
-                    prog_bar=config.prog_bar,
-                )
+        if self._metric_manager is not None:
+            for name, metric in self.train_metrics.items():
+                config = self._metric_manager.get_metric_config("train", name)
+                metric.update(preds, y)
+                if config:
+                    self.log(
+                        f"train/{name}",
+                        metric,
+                        on_step=config.log_on_step,
+                        on_epoch=config.log_on_epoch,
+                        prog_bar=config.prog_bar,
+                    )
 
         # Enhanced logging: learning rate
         if self._logging_config.log_learning_rate:
@@ -230,17 +246,18 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
         self.log("val/loss", loss, prog_bar=True)
 
         # Update and log all val metrics
-        for name, metric in self.val_metrics.items():
-            config = self._metric_manager.get_metric_config("val", name)
-            metric.update(preds, y)
-            if config:
-                self.log(
-                    f"val/{name}",
-                    metric,
-                    on_step=config.log_on_step,
-                    on_epoch=config.log_on_epoch,
-                    prog_bar=config.prog_bar,
-                )
+        if self._metric_manager is not None:
+            for name, metric in self.val_metrics.items():
+                config = self._metric_manager.get_metric_config("val", name)
+                metric.update(preds, y)
+                if config:
+                    self.log(
+                        f"val/{name}",
+                        metric,
+                        on_step=config.log_on_step,
+                        on_epoch=config.log_on_epoch,
+                        prog_bar=config.prog_bar,
+                    )
 
         # Update confusion matrix if enabled
         if self._logging_config.log_confusion_matrix:
@@ -384,17 +401,18 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
         self.log("test/loss", loss)
 
         # Update and log all test metrics
-        for name, metric in self.test_metrics.items():
-            config = self._metric_manager.get_metric_config("test", name)
-            metric.update(preds, y)
-            if config:
-                self.log(
-                    f"test/{name}",
-                    metric,
-                    on_step=config.log_on_step,
-                    on_epoch=config.log_on_epoch,
-                    prog_bar=config.prog_bar,
-                )
+        if self._metric_manager is not None:
+            for name, metric in self.test_metrics.items():
+                config = self._metric_manager.get_metric_config("test", name)
+                metric.update(preds, y)
+                if config:
+                    self.log(
+                        f"test/{name}",
+                        metric,
+                        on_step=config.log_on_step,
+                        on_epoch=config.log_on_epoch,
+                        prog_bar=config.prog_bar,
+                    )
 
     def predict_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
         x = batch[0] if isinstance(batch, (tuple, list)) else batch

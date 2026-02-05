@@ -16,20 +16,22 @@ from autotimm.backbone import (
     get_feature_channels,
 )
 from autotimm.data.transform_config import TransformConfig
-from autotimm.heads import DetectionHead, FPN
+from autotimm.heads import DetectionHead, FPN, YOLOXHead
 from autotimm.losses import FocalLoss, GIoULoss
 from autotimm.metrics import LoggingConfig, MetricConfig, MetricManager
 from autotimm.tasks.preprocessing_mixin import PreprocessingMixin
 
 
 class ObjectDetector(PreprocessingMixin, pl.LightningModule):
-    """End-to-end object detector using FCOS-style anchor-free detection.
+    """End-to-end object detector supporting FCOS and YOLOX architectures.
 
-    Architecture: timm backbone → FPN → FCOS Detection Head → NMS
+    Architecture: timm backbone → FPN → Detection Head (FCOS/YOLOX) → NMS
 
     Parameters:
         backbone: A timm model name (str) or a :class:`FeatureBackboneConfig`.
         num_classes: Number of object classes (excluding background).
+        detection_arch: Detection architecture to use. Options: ``"fcos"`` or ``"yolox"``.
+            Default is ``"fcos"``. YOLOX uses a decoupled head and no centerness prediction.
         metrics: A :class:`MetricManager` instance or list of :class:`MetricConfig`
             objects. Optional - if not provided, uses MeanAveragePrecision.
         logging_config: Optional :class:`LoggingConfig` for enhanced logging.
@@ -50,13 +52,13 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
         focal_gamma: Gamma parameter for focal loss.
         cls_loss_weight: Weight for classification loss.
         reg_loss_weight: Weight for regression loss.
-        centerness_loss_weight: Weight for centerness loss.
+        centerness_loss_weight: Weight for centerness loss (FCOS only).
         score_thresh: Score threshold for detections during inference.
         nms_thresh: IoU threshold for NMS.
         max_detections_per_image: Maximum detections to keep per image.
         freeze_backbone: If ``True``, backbone parameters are frozen.
         strides: FPN output strides. Default (8, 16, 32, 64, 128) for P3-P7.
-        regress_ranges: Regression ranges for each FPN level.
+        regress_ranges: Regression ranges for each FPN level (FCOS only).
 
     Example:
         >>> model = ObjectDetector(
@@ -79,6 +81,7 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
         self,
         backbone: str | FeatureBackboneConfig,
         num_classes: int,
+        detection_arch: str = "fcos",
         metrics: MetricManager | list[MetricConfig] | None = None,
         logging_config: LoggingConfig | None = None,
         transform_config: TransformConfig | None = None,
@@ -105,6 +108,11 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
         super().__init__()
         self.save_hyperparameters(ignore=["metrics", "logging_config", "transform_config"])
 
+        # Validate detection architecture
+        if detection_arch not in ["fcos", "yolox"]:
+            raise ValueError(f"detection_arch must be 'fcos' or 'yolox', got '{detection_arch}'")
+
+        self.detection_arch = detection_arch
         self.num_classes = num_classes
         self._lr = lr
         self._weight_decay = weight_decay
@@ -119,6 +127,7 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
         self.strides = strides
 
         # Default regression ranges for FCOS (P3-P7)
+        # Note: YOLOX doesn't use regression ranges (handles all scales dynamically)
         if regress_ranges is None:
             self.regress_ranges = (
                 (-1, 64),
@@ -140,12 +149,22 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
             num_extra_levels=2,  # P6, P7 from P5
         )
 
-        self.head = DetectionHead(
-            in_channels=fpn_channels,
-            num_classes=num_classes,
-            num_convs=head_num_convs,
-            prior_prob=0.01,
-        )
+        # Create detection head based on architecture
+        if detection_arch == "fcos":
+            self.head = DetectionHead(
+                in_channels=fpn_channels,
+                num_classes=num_classes,
+                num_convs=head_num_convs,
+                prior_prob=0.01,
+            )
+        elif detection_arch == "yolox":
+            self.head = YOLOXHead(
+                in_channels=fpn_channels,
+                num_classes=num_classes,
+                num_convs=head_num_convs if head_num_convs <= 2 else 2,  # YOLOX typically uses 2 convs
+                prior_prob=0.01,
+                activation="silu",
+            )
 
         # Losses
         self.cls_loss_weight = cls_loss_weight
@@ -227,7 +246,7 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
 
     def forward(
         self, images: torch.Tensor
-    ) -> tuple[list[torch.Tensor], list[torch.Tensor], list[torch.Tensor]]:
+    ) -> tuple[list[torch.Tensor], list[torch.Tensor], list[torch.Tensor] | None]:
         """Forward pass through the detector.
 
         Args:
@@ -235,10 +254,19 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
 
         Returns:
             Tuple of (cls_outputs, reg_outputs, centerness_outputs) per FPN level.
+            For YOLOX, centerness_outputs is None.
         """
         features = self.backbone(images)
         fpn_features = self.fpn(features)
-        cls_outputs, reg_outputs, centerness_outputs = self.head(fpn_features)
+
+        if self.detection_arch == "fcos":
+            cls_outputs, reg_outputs, centerness_outputs = self.head(fpn_features)
+        elif self.detection_arch == "yolox":
+            cls_outputs, reg_outputs = self.head(fpn_features)
+            centerness_outputs = None
+        else:
+            raise ValueError(f"Unknown detection_arch: {self.detection_arch}")
+
         return cls_outputs, reg_outputs, centerness_outputs
 
     def training_step(self, batch: dict[str, Any], batch_idx: int) -> torch.Tensor:
@@ -260,8 +288,15 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
         total_centerness_loss = torch.tensor(0.0, device=device)
         num_pos = 0
 
+        # Prepare centerness outputs for iteration
+        if centerness_outputs is None:
+            # YOLOX doesn't use centerness
+            centerness_iter = [None] * len(cls_outputs)
+        else:
+            centerness_iter = centerness_outputs
+
         for level_idx, (cls_out, reg_out, cent_out) in enumerate(
-            zip(cls_outputs, reg_outputs, centerness_outputs)
+            zip(cls_outputs, reg_outputs, centerness_iter)
         ):
             stride = self.strides[level_idx]
             feat_h, feat_w = cls_out.shape[-2:]
@@ -280,7 +315,7 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
             # Compute targets for this level
             level_cls_targets = []
             level_reg_targets = []
-            level_centerness_targets = []
+            level_centerness_targets = [] if self.detection_arch == "fcos" else None
 
             for b in range(batch_size):
                 boxes = target_boxes[b]  # [N, 4] in xyxy format
@@ -292,7 +327,7 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
                         (feat_h, feat_w), -1, dtype=torch.long, device=device
                     )
                     reg_target = torch.zeros(feat_h, feat_w, 4, device=device)
-                    cent_target = torch.zeros(feat_h, feat_w, device=device)
+                    cent_target = torch.zeros(feat_h, feat_w, device=device) if self.detection_arch == "fcos" else None
                 else:
                     cls_target, reg_target, cent_target = (
                         self._compute_targets_per_level(
@@ -302,12 +337,13 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
 
                 level_cls_targets.append(cls_target)
                 level_reg_targets.append(reg_target)
-                level_centerness_targets.append(cent_target)
+                if self.detection_arch == "fcos":
+                    level_centerness_targets.append(cent_target)
 
             # Stack batch
             cls_targets = torch.stack(level_cls_targets)  # [B, H, W]
             reg_targets = torch.stack(level_reg_targets)  # [B, H, W, 4]
-            cent_targets = torch.stack(level_centerness_targets)  # [B, H, W]
+            cent_targets = torch.stack(level_centerness_targets) if self.detection_arch == "fcos" else None  # [B, H, W]
 
             # Compute classification loss (all locations except ignored=-1)
             cls_out_flat = cls_out.permute(0, 2, 3, 1).reshape(-1, self.num_classes)
@@ -327,18 +363,19 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
             if pos_mask.any():
                 pos_reg_pred = reg_out.permute(0, 2, 3, 1)[pos_mask]  # [N_pos, 4]
                 pos_reg_target = reg_targets[pos_mask]  # [N_pos, 4]
-                pos_cent_pred = cent_out.squeeze(1)[pos_mask]  # [N_pos]
-                pos_cent_target = cent_targets[pos_mask]  # [N_pos]
 
                 # IoU-based regression loss
                 reg_loss = self._compute_iou_loss(pos_reg_pred, pos_reg_target)
                 total_reg_loss = total_reg_loss + reg_loss
 
-                # Centerness BCE loss
-                cent_loss = F.binary_cross_entropy_with_logits(
-                    pos_cent_pred, pos_cent_target, reduction="sum"
-                )
-                total_centerness_loss = total_centerness_loss + cent_loss
+                # Centerness BCE loss (FCOS only)
+                if self.detection_arch == "fcos" and cent_out is not None:
+                    pos_cent_pred = cent_out.squeeze(1)[pos_mask]  # [N_pos]
+                    pos_cent_target = cent_targets[pos_mask]  # [N_pos]
+                    cent_loss = F.binary_cross_entropy_with_logits(
+                        pos_cent_pred, pos_cent_target, reduction="sum"
+                    )
+                    total_centerness_loss = total_centerness_loss + cent_loss
 
                 num_pos += pos_mask.sum().item()
 
@@ -347,14 +384,21 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
 
         cls_loss = self.cls_loss_weight * total_cls_loss / num_pos
         reg_loss = self.reg_loss_weight * total_reg_loss / num_pos
-        centerness_loss = self.centerness_loss_weight * total_centerness_loss / num_pos
-        total_loss = cls_loss + reg_loss + centerness_loss
+
+        # Centerness loss only for FCOS
+        if self.detection_arch == "fcos":
+            centerness_loss = self.centerness_loss_weight * total_centerness_loss / num_pos
+            total_loss = cls_loss + reg_loss + centerness_loss
+        else:
+            centerness_loss = torch.tensor(0.0, device=device)
+            total_loss = cls_loss + reg_loss
 
         # Log losses
         self.log("train/loss", total_loss, prog_bar=True)
         self.log("train/cls_loss", cls_loss)
         self.log("train/reg_loss", reg_loss)
-        self.log("train/centerness_loss", centerness_loss)
+        if self.detection_arch == "fcos":
+            self.log("train/centerness_loss", centerness_loss)
         self.log("train/num_pos", float(num_pos))
 
         # Enhanced logging
@@ -596,13 +640,19 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
 
         all_detections = []
 
+        # Prepare centerness outputs for iteration
+        if centerness_outputs is None:
+            centerness_iter = [None] * len(cls_outputs)
+        else:
+            centerness_iter = centerness_outputs
+
         for b in range(batch_size):
             all_boxes = []
             all_scores = []
             all_labels = []
 
             for level_idx, (cls_out, reg_out, cent_out) in enumerate(
-                zip(cls_outputs, reg_outputs, centerness_outputs)
+                zip(cls_outputs, reg_outputs, centerness_iter)
             ):
                 stride = self.strides[level_idx]
                 feat_h, feat_w = cls_out.shape[-2:]
@@ -610,7 +660,6 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
                 # Get predictions for this image
                 cls_logits = cls_out[b]  # [C, H, W]
                 reg_pred = reg_out[b]  # [4, H, W]
-                cent_pred = cent_out[b, 0]  # [H, W]
 
                 # Generate grid points
                 grid_y, grid_x = torch.meshgrid(
@@ -626,14 +675,20 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
                     -1, self.num_classes
                 )  # [H*W, C]
                 reg_pred = reg_pred.permute(1, 2, 0).reshape(-1, 4)  # [H*W, 4]
-                cent_pred = cent_pred.reshape(-1)  # [H*W]
                 points_x = points_x.reshape(-1)
                 points_y = points_y.reshape(-1)
 
-                # Compute scores: classification * centerness
+                # Compute scores
                 cls_scores = cls_logits.sigmoid()
-                centerness = cent_pred.sigmoid()
-                scores = cls_scores * centerness.unsqueeze(-1)  # [H*W, C]
+                if cent_out is not None:
+                    # FCOS: classification * centerness
+                    cent_pred = cent_out[b, 0]  # [H, W]
+                    cent_pred = cent_pred.reshape(-1)  # [H*W]
+                    centerness = cent_pred.sigmoid()
+                    scores = cls_scores * centerness.unsqueeze(-1)  # [H*W, C]
+                else:
+                    # YOLOX: just use classification scores
+                    scores = cls_scores  # [H*W, C]
 
                 # Get max score per location
                 max_scores, class_ids = scores.max(dim=-1)  # [H*W]

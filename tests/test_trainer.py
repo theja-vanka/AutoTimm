@@ -46,12 +46,24 @@ def test_auto_trainer_no_checkpoint():
 class TestTunerConfig:
     """Tests for TunerConfig dataclass."""
 
+    def test_default_config(self):
+        """Test that default TunerConfig enables both auto_lr and auto_batch_size."""
+        config = TunerConfig()
+        assert config.auto_lr is True
+        assert config.auto_batch_size is True
+        # Default kwargs should be populated
+        assert "min_lr" in config.lr_find_kwargs
+        assert "max_lr" in config.lr_find_kwargs
+        assert "mode" in config.batch_size_kwargs
+        assert "init_val" in config.batch_size_kwargs
+
     def test_valid_config(self):
         config = TunerConfig(auto_lr=True, auto_batch_size=True)
         assert config.auto_lr is True
         assert config.auto_batch_size is True
-        assert config.lr_find_kwargs == {}
-        assert config.batch_size_kwargs == {}
+        # With new defaults, kwargs should be populated
+        assert isinstance(config.lr_find_kwargs, dict)
+        assert isinstance(config.batch_size_kwargs, dict)
 
     def test_config_with_kwargs(self):
         config = TunerConfig(
@@ -92,5 +104,24 @@ def test_auto_trainer_with_tuner_config():
 
 
 def test_auto_trainer_without_tuner_config():
+    """Test that AutoTrainer creates default TunerConfig when none is provided."""
     trainer = AutoTrainer(max_epochs=1, logger=False, enable_checkpointing=False)
+    # Default behavior: auto-tuning enabled
+    assert trainer.tuner_config is not None
+    assert isinstance(trainer.tuner_config, TunerConfig)
+    assert trainer.tuner_config.auto_lr is True
+    assert trainer.tuner_config.auto_batch_size is True
+
+
+def test_auto_trainer_disable_tuning():
+    """Test that AutoTrainer can disable tuning by passing False."""
+    trainer = AutoTrainer(
+        max_epochs=1, logger=False, enable_checkpointing=False, tuner_config=False
+    )
+    assert trainer.tuner_config is None
+
+
+def test_auto_trainer_fast_dev_run_disables_tuning():
+    """Test that fast_dev_run automatically disables auto-tuning."""
+    trainer = AutoTrainer(max_epochs=1, logger=False, fast_dev_run=True)
     assert trainer.tuner_config is None

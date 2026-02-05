@@ -28,12 +28,12 @@ Image classification with any timm backbone and flexible training options.
 
 ### [ObjectDetector](object-detector.md)
 
-FCOS-style anchor-free object detection with Feature Pyramid Networks.
+FCOS-style and YOLOX-style anchor-free object detection with flexible backbones.
 
 **Key Features:**
 
 - Any timm backbone (CNNs and transformers)
-- FCOS detection architecture (anchor-free)
+- FCOS or YOLOX detection architectures (anchor-free)
 - Feature Pyramid Network (FPN) for multi-scale detection
 - Focal loss for hard example mining
 - Configurable inference thresholds and NMS
@@ -44,22 +44,45 @@ FCOS-style anchor-free object detection with Feature Pyramid Networks.
 - Object detection on COCO or custom datasets
 - Real-time detection applications
 - Multi-scale object detection
-- Transformer-based detection
+- Experimentation with different backbones
 
 [Learn more about ObjectDetector →](object-detector.md)
 
+### [YOLOXDetector](yolox-detector.md)
+
+Official YOLOX object detection with CSPDarknet backbone and optimized training settings.
+
+**Key Features:**
+
+- Official YOLOX architecture (CSPDarknet + YOLOXPAFPN)
+- All YOLOX variants: nano, tiny, s, m, l, x
+- Official training settings (SGD, warmup, cosine decay)
+- Optimized for COCO dataset
+- Production-ready performance
+- Matches official YOLOX paper results
+
+**Use Cases:**
+
+- Reproducing official YOLOX results
+- Production deployments
+- High-performance object detection
+- Edge device deployment (nano, tiny)
+
+[Learn more about YOLOXDetector →](yolox-detector.md)
+
 ## Quick Comparison
 
-| Feature | ImageClassifier | ObjectDetector |
-|---------|-----------------|----------------|
-| Task | Image classification | Object detection |
-| Output | Class labels + confidence | Bounding boxes + classes |
-| Architecture | Backbone + Classifier head | Backbone + FPN + Detection head |
-| Backbones | 1000+ timm models | 1000+ timm models |
-| Loss | CrossEntropy (+ Label smoothing) | Focal + GIoU + Centerness |
-| Training speed | Fast | Moderate |
-| Inference speed | Very fast | Fast |
-| Memory usage | Low | Moderate |
+| Feature | ImageClassifier | ObjectDetector | YOLOXDetector |
+|---------|-----------------|----------------|---------------|
+| Task | Image classification | Object detection | Object detection |
+| Output | Class labels + confidence | Bounding boxes + classes | Bounding boxes + classes |
+| Architecture | Backbone + Classifier head | Backbone + FPN + Detection head | CSPDarknet + PAFPN + YOLOX head |
+| Backbones | 1000+ timm models | 1000+ timm models | CSPDarknet (official) |
+| Loss | CrossEntropy | Focal + GIoU + Centerness/None | Focal + GIoU |
+| Training speed | Fast | Moderate | Moderate |
+| Inference speed | Very fast | Fast | Fast |
+| Memory usage | Low | Moderate | Moderate |
+| Use case | Classification | Flexible detection | Official YOLOX |
 
 ## Common Concepts
 

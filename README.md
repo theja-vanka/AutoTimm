@@ -36,7 +36,7 @@ AutoTimm combines the power of [timm](https://github.com/huggingface/pytorch-ima
 | **Advanced Architectures** | DeepLabV3+, FCOS, Mask R-CNN style heads with feature pyramids |
 | **Explicit Metrics** | Configure exactly what you track with MetricManager and torchmetrics |
 | **Multi-Logger Support** | TensorBoard, MLflow, Weights & Biases, CSV — use them all at once |
-| **Auto-Tuning** | Automatic learning rate and batch size finding before training |
+| **Auto-Tuning (Default)** | Automatic learning rate and batch size finding — enabled by default |
 | **Preset Manager** | Smart backend selection (torchvision vs albumentations) based on your task |
 | **TransformConfig** | Unified transform configuration with presets and model-specific normalization |
 | **Flexible Transforms** | Torchvision (PIL) and Albumentations (OpenCV) — both included by default |
@@ -105,9 +105,43 @@ model = ImageClassifier(
     lr=1e-3,
 )
 
+# AutoTrainer with auto-tuning enabled by default
+# Automatically finds optimal learning rate and batch size
 trainer = AutoTrainer(max_epochs=10)
 trainer.fit(model, datamodule=data)
+
+# To disable auto-tuning (use manual values)
+# trainer = AutoTrainer(max_epochs=10, tuner_config=False)
 ```
+
+> **Note:** Auto-tuning (learning rate and batch size finding) is **enabled by default**. The trainer will automatically find optimal values before training starts. To disable, pass `tuner_config=False`.
+
+### Inference Without Metrics
+
+For inference-only scenarios, metrics are now **optional**:
+
+```python
+from autotimm import ImageClassifier
+from PIL import Image
+
+# Create model without metrics for inference
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    # No metrics parameter needed!
+)
+
+# Load checkpoint and run inference
+model = model.load_from_checkpoint("path/to/checkpoint.ckpt")
+model.eval()
+
+# Predict on a single image
+img = Image.open("test.jpg")
+tensor = model.preprocess(img)
+predictions = model(tensor).softmax(dim=-1)
+```
+
+> **Use Case:** Perfect for production deployments, batch inference, and any scenario where you don't need to track metrics.
 
 ### Semantic Segmentation
 
@@ -153,7 +187,7 @@ trainer = AutoTrainer(max_epochs=100)
 trainer.fit(model, datamodule=data)
 ```
 
-### Object Detection
+### Object Detection (FCOS)
 
 ```python
 from autotimm import ObjectDetector, DetectionDataModule, MetricConfig
@@ -177,16 +211,112 @@ metrics = [
     ),
 ]
 
-# Model & Train
+# FCOS Model
 model = ObjectDetector(
     backbone="resnet50",
     num_classes=80,
+    detection_arch="fcos",  # Default: FCOS architecture
     metrics=metrics,
 )
 
 trainer = AutoTrainer(max_epochs=100)
 trainer.fit(model, datamodule=data)
 ```
+
+### Object Detection (YOLOX-Style with timm Backbones)
+
+Use YOLOX-style detection head with any timm backbone:
+
+```python
+from autotimm import ObjectDetector, DetectionDataModule
+
+# YOLOX-style head with flexible timm backbone
+model = ObjectDetector(
+    backbone="resnet50",  # Any timm backbone: efficientnet, convnext, etc.
+    num_classes=80,
+    detection_arch="yolox",  # YOLOX-style decoupled head
+    fpn_channels=256,
+    head_num_convs=2,  # YOLOX uses 2 convs per branch
+    cls_loss_weight=1.0,
+    reg_loss_weight=5.0,  # Higher for YOLOX
+)
+
+trainer = AutoTrainer(max_epochs=300)
+trainer.fit(model, datamodule=data)
+```
+
+**Use Case**: Experiment with different backbones while using YOLOX architecture
+
+### Official YOLOX Models
+
+Use the official YOLOX architecture with official training settings:
+
+```python
+from autotimm import YOLOXDetector, DetectionDataModule, MetricConfig
+
+# Data
+data = DetectionDataModule(
+    data_dir="./coco",
+    image_size=640,
+    batch_size=64,  # Official YOLOX uses batch size 64
+)
+
+# Metrics (optional)
+metrics = [
+    MetricConfig(
+        name="mAP",
+        backend="torchmetrics",
+        metric_class="MeanAveragePrecision",
+        params={"box_format": "xyxy", "iou_type": "bbox"},
+        stages=["val", "test"],
+        prog_bar=True,
+    ),
+]
+
+# Official YOLOX Model with official training settings
+model = YOLOXDetector(
+    model_name="yolox-s",  # nano, tiny, s, m, l, x
+    num_classes=80,
+    metrics=metrics,
+    lr=0.01,  # Base LR for batch size 64
+    weight_decay=5e-4,
+    optimizer="sgd",  # SGD with momentum=0.9, nesterov=True
+    scheduler="yolox",  # Warmup + cosine decay
+    total_epochs=300,
+    warmup_epochs=5,
+    no_aug_epochs=15,
+    reg_loss_weight=5.0,
+)
+
+trainer = AutoTrainer(max_epochs=300, precision="16-mixed")
+trainer.fit(model, datamodule=data)
+```
+
+**Available Models:** `yolox-nano`, `yolox-tiny`, `yolox-s`, `yolox-m`, `yolox-l`, `yolox-x`
+
+**Official Training Settings:**
+- Optimizer: SGD with momentum=0.9, nesterov=True
+- Learning Rate: 0.01 (for batch size 64, scale linearly)
+- Weight Decay: 5e-4
+- Scheduler: Warmup (5 epochs) + Cosine decay
+- No Augmentation: Last 15 epochs
+- Regression Loss Weight: 5.0
+
+**Use Case**: Reproduce official YOLOX results or use optimized YOLOX architecture
+
+**Key Differences**:
+- **YOLOXDetector**: Official YOLOX (CSPDarknet + YOLOXPAFPN + official settings)
+- **ObjectDetector (yolox)**: YOLOX-style head with any timm backbone (flexible)
+
+**When to Use**:
+- Use **YOLOXDetector** for: Official results, production deployments, YOLOX paper benchmarks
+- Use **ObjectDetector (yolox)** for: Experimentation, different backbones, transfer learning
+
+Based on the official YOLOX implementation from [Megvii-BaseDetection/YOLOX](https://github.com/Megvii-BaseDetection/YOLOX).
+
+**📖 [Complete YOLOX Guide](docs/user-guide/models/yolox-detector.md)** - Comprehensive guide with examples, settings, and comparisons
+
+**⚡ [YOLOX Quick Reference](docs/user-guide/guides/yolox-quick-reference.md)** - Fast reference card
 
 ### Instance Segmentation
 
@@ -269,9 +399,10 @@ from autotimm.tasks import SemanticSegmentor
 - **Datasets**: Torchvision datasets, ImageFolder, custom loaders
 
 ### Object Detection
-- **Architecture**: FCOS-style anchor-free detection
-- **Components**: FPN, Detection Head (classification + bbox regression + centerness)
-- **Losses**: Focal Loss, GIoU Loss, Centerness Loss
+- **Architectures**: FCOS and YOLOX anchor-free detection
+- **FCOS**: FPN + Detection Head (classification + bbox regression + centerness)
+- **YOLOX**: FPN + Decoupled Head (separate cls/reg branches, no centerness)
+- **Losses**: Focal Loss, GIoU Loss, Centerness Loss (FCOS only)
 - **Datasets**: COCO format, custom annotations
 
 ### Semantic Segmentation
@@ -295,9 +426,13 @@ Ready-to-run scripts in the [`examples/`](examples/) directory:
 |---------|-------------|
 | [classify_cifar10.py](examples/classify_cifar10.py) | Basic classification with MetricManager and auto-tuning |
 | [classify_custom_folder.py](examples/classify_custom_folder.py) | Train on your own dataset |
+| [inference_without_metrics.py](examples/inference_without_metrics.py) | Inference-only without metrics (production deployment) |
 | [huggingface_hub_models.py](examples/huggingface_hub_models.py) | Using Hugging Face Hub models with AutoTimm |
 | [hf_hub_*.py](examples/) | Comprehensive HF Hub integration examples (classification, detection, segmentation) |
 | [object_detection_coco.py](examples/object_detection_coco.py) | FCOS-style object detection on COCO dataset |
+| [object_detection_yolox.py](examples/object_detection_yolox.py) | YOLOX-style head with timm backbones (flexible) |
+| [yolox_official.py](examples/yolox_official.py) | Official YOLOX with CSPDarknet + official training settings |
+| [explore_yolox_models.py](examples/explore_yolox_models.py) | Explore YOLOX models, backbones, necks, and heads |
 | [object_detection_transformers.py](examples/object_detection_transformers.py) | Transformer-based detection (ViT, Swin, DeiT) |
 | [object_detection_rtdetr.py](examples/object_detection_rtdetr.py) | RT-DETR end-to-end detection (no NMS required) |
 | [semantic_segmentation.py](examples/semantic_segmentation.py) | DeepLabV3+ semantic segmentation |
@@ -335,6 +470,52 @@ autotimm.list_hf_hub_backbones(author="facebook", model_name="convnext")
 
 # Inspect a model
 backbone = autotimm.create_backbone("convnext_tiny")
+```
+
+## Explore YOLOX Models
+
+Discover available YOLOX models, backbones, necks, and heads:
+
+```python
+import autotimm
+
+# List all YOLOX models
+models = autotimm.list_yolox_models()
+# ['yolox-nano', 'yolox-tiny', 'yolox-s', 'yolox-m', 'yolox-l', 'yolox-x']
+
+# Get detailed table with params, FLOPs, mAP
+autotimm.list_yolox_models(verbose=True)
+# Model        Depth    Width    Params     FLOPs      mAP      Description
+# yolox-nano   0.33     0.25     0.9M       1.1G       25.8     Smallest YOLOX...
+# yolox-s      0.33     0.5      9.0M       26.8G      40.5     Small YOLOX...
+# yolox-x      1.33     1.25     99.1M      281.9G     51.5     Extra large...
+
+# List YOLOX backbones (CSPDarknet variants)
+backbones = autotimm.list_yolox_backbones()
+# ['csp_darknet_nano', 'csp_darknet_tiny', 'csp_darknet_s', ...]
+
+# List YOLOX necks (PAFPN variants)
+necks = autotimm.list_yolox_necks()
+# ['yolox_pafpn_nano', 'yolox_pafpn_tiny', 'yolox_pafpn_s', ...]
+
+# List YOLOX detection heads
+heads = autotimm.list_yolox_heads()
+# ['yolox_head']
+
+# Get detailed info for a specific model
+info = autotimm.get_yolox_model_info("yolox-s")
+print(f"Model: {info['backbone']} + {info['neck']}")
+print(f"Params: {info['params']}, FLOPs: {info['flops']}, mAP: {info['mAP']}")
+print(f"Channels: {info['backbone_channels']} -> {info['neck_channels']}")
+# Model: csp_darknet_s + yolox_pafpn_s
+# Params: 9.0M, FLOPs: 26.8G, mAP: 40.5
+# Channels: (128, 256, 512) -> 128
+
+# Run interactive explorer
+# python examples/explore_yolox_models.py
+```
+
+All utility functions support verbose mode for detailed tables and descriptions.
 print(f"Features: {backbone.num_features}, Params: {autotimm.count_parameters(backbone):,}")
 
 # Use models from Hugging Face Hub
@@ -409,7 +590,7 @@ All HuggingFace integration approaches work seamlessly with AutoTimm's AutoTrain
 - ✅ Early stopping callbacks
 - ✅ Gradient accumulation
 - ✅ Mixed precision training
-- ✅ Automatic LR and batch size finding
+- ✅ Automatic LR and batch size finding (enabled by default)
 - ✅ Multiple logger support
 - ✅ ImageDataModule integration
 
@@ -543,12 +724,37 @@ All transform backends and formats are included by default:
 
 ### Advanced Training Features
 
-- **Auto-tuning**: LR finder and batch size finder
+- **Auto-tuning (Enabled by Default)**: Automatic LR and batch size finding before training — no configuration needed
 - **Multi-GPU**: Distributed training with DDP
 - **Mixed Precision**: Automatic mixed precision (AMP)
 - **Gradient Accumulation**: Train larger batch sizes
 - **Early Stopping**: Prevent overfitting
 - **Checkpointing**: Save best models automatically
+
+#### Auto-tuning Details
+
+AutoTimm automatically finds optimal hyperparameters before training:
+
+```python
+from autotimm import AutoTrainer, TunerConfig
+
+# Default: auto-tuning enabled (recommended for most users)
+trainer = AutoTrainer(max_epochs=10)
+trainer.fit(model, datamodule=data)
+
+# Disable auto-tuning (use manual learning rate and batch size)
+trainer = AutoTrainer(max_epochs=10, tuner_config=False)
+
+# Custom tuning configuration
+trainer = AutoTrainer(
+    max_epochs=10,
+    tuner_config=TunerConfig(
+        auto_lr=True,
+        auto_batch_size=False,  # Disable batch size tuning only
+        lr_find_kwargs={"min_lr": 1e-6, "max_lr": 1.0},
+    ),
+)
+```
 
 ## Contributing
 
