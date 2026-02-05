@@ -80,12 +80,14 @@ nav:
           - Object Detection Data: user-guide/data-loading/object-detection-data.md
           - Segmentation Data: user-guide/data-loading/segmentation-data.md
           - Transforms: user-guide/data-loading/transforms.md
+          - Preset Manager: user-guide/data-loading/preset-manager.md
       - Models:
           - Overview: user-guide/models/index.md
           - ImageClassifier: user-guide/models/image-classifier.md
           - ObjectDetector: user-guide/models/object-detector.md
           - SemanticSegmentor: user-guide/models/semantic-segmentation.md
           - InstanceSegmentor: user-guide/models/instance-segmentation.md
+          - YOLOXDetector: user-guide/models/yolox-detector.md
       - Training:
           - Overview: user-guide/training/training.md
           - Dataset Preparation: user-guide/training/dataset-preparation.md
@@ -111,6 +113,7 @@ nav:
           - Logging: user-guide/guides/logging.md
           - Troubleshooting: user-guide/guides/troubleshooting.md
           - Migration Guide: user-guide/guides/migration.md
+          - YOLOX Quick Reference: user-guide/guides/yolox-quick-reference.md
   - API Reference:
       - Overview: api/index.md
       - Tasks:
