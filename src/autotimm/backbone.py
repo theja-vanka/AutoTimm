@@ -21,6 +21,7 @@ class ModelSource(str, Enum):
     TIMM = "timm"
     HF_HUB = "hf_hub"
 
+
 try:
     from huggingface_hub import HfApi
 except ImportError:

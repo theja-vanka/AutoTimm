@@ -77,7 +77,7 @@ def main():
     print("YOLOX Object Detection with AutoTimm")
     print("=" * 70)
     print(f"Backbone: {args.backbone}")
-    print(f"Detection Architecture: YOLOX")
+    print("Detection Architecture: YOLOX")
     print(f"Image Size: {args.image_size}")
     print(f"Batch Size: {args.batch_size}")
     print(f"Max Epochs: {args.max_epochs}")
@@ -126,13 +126,13 @@ def main():
     )
 
     print("\nYOLOX Architecture Details:")
-    print(f"  - Decoupled head (separate cls/reg branches)")
-    print(f"  - SiLU activation")
-    print(f"  - No centerness prediction")
-    print(f"  - Anchor-free detection")
-    print(f"  - Head convs: 2 per branch")
-    print(f"  - Classification loss weight: 1.0")
-    print(f"  - Regression loss weight: 5.0 (higher for YOLOX)")
+    print("  - Decoupled head (separate cls/reg branches)")
+    print("  - SiLU activation")
+    print("  - No centerness prediction")
+    print("  - Anchor-free detection")
+    print("  - Head convs: 2 per branch")
+    print("  - Classification loss weight: 1.0")
+    print("  - Regression loss weight: 5.0 (higher for YOLOX)")
     print()
 
     # Trainer Configuration
@@ -149,9 +149,9 @@ def main():
     )
 
     print("Training Configuration:")
-    print(f"  - Precision: 16-mixed (faster training)")
-    print(f"  - Checkpoint monitor: val/mAP")
-    print(f"  - Auto-tuning: Disabled (YOLOX uses specific hyperparameters)")
+    print("  - Precision: 16-mixed (faster training)")
+    print("  - Checkpoint monitor: val/mAP")
+    print("  - Auto-tuning: Disabled (YOLOX uses specific hyperparameters)")
     print()
 
     # Training

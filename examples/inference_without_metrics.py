@@ -35,8 +35,8 @@ def main():
     )
 
     print("\n✓ Model created successfully without metrics")
-    print(f"  Backbone: resnet18")
-    print(f"  Number of classes: 10")
+    print("  Backbone: resnet18")
+    print("  Number of classes: 10")
     print(f"  Metrics defined: {model._metric_manager is not None}")
 
     # Load a checkpoint (optional)

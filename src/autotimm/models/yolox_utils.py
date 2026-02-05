@@ -433,8 +433,7 @@ def get_yolox_model_info(model_name: str) -> dict:
     if model_name not in models:
         available = list(models.keys())
         raise ValueError(
-            f"Unknown YOLOX model: {model_name}. "
-            f"Available models: {available}"
+            f"Unknown YOLOX model: {model_name}. Available models: {available}"
         )
 
     return models[model_name]

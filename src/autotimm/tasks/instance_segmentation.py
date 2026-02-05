@@ -109,7 +109,9 @@ class InstanceSegmentor(PreprocessingMixin, pl.LightningModule):
         mask_threshold: float = 0.5,
     ):
         super().__init__()
-        self.save_hyperparameters(ignore=["metrics", "logging_config", "transform_config"])
+        self.save_hyperparameters(
+            ignore=["metrics", "logging_config", "transform_config"]
+        )
 
         self.num_classes = num_classes
         self._lr = lr

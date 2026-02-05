@@ -12,7 +12,6 @@ Usage:
 """
 
 import json
-from pathlib import Path
 
 import numpy as np
 import torch
@@ -26,30 +25,95 @@ from autotimm import (
 
 # Cityscapes color palette (19 classes + background)
 CITYSCAPES_CLASSES = [
-    "road", "sidewalk", "building", "wall", "fence", "pole", "traffic light",
-    "traffic sign", "vegetation", "terrain", "sky", "person", "rider", "car",
-    "truck", "bus", "train", "motorcycle", "bicycle",
+    "road",
+    "sidewalk",
+    "building",
+    "wall",
+    "fence",
+    "pole",
+    "traffic light",
+    "traffic sign",
+    "vegetation",
+    "terrain",
+    "sky",
+    "person",
+    "rider",
+    "car",
+    "truck",
+    "bus",
+    "train",
+    "motorcycle",
+    "bicycle",
 ]
 
 CITYSCAPES_COLORS = [
-    (128, 64, 128), (244, 35, 232), (70, 70, 70), (102, 102, 156), (190, 153, 153),
-    (153, 153, 153), (250, 170, 30), (220, 220, 0), (107, 142, 35), (152, 251, 152),
-    (70, 130, 180), (220, 20, 60), (255, 0, 0), (0, 0, 142), (0, 0, 70),
-    (0, 60, 100), (0, 80, 100), (0, 0, 230), (119, 11, 32),
+    (128, 64, 128),
+    (244, 35, 232),
+    (70, 70, 70),
+    (102, 102, 156),
+    (190, 153, 153),
+    (153, 153, 153),
+    (250, 170, 30),
+    (220, 220, 0),
+    (107, 142, 35),
+    (152, 251, 152),
+    (70, 130, 180),
+    (220, 20, 60),
+    (255, 0, 0),
+    (0, 0, 142),
+    (0, 0, 70),
+    (0, 60, 100),
+    (0, 80, 100),
+    (0, 0, 230),
+    (119, 11, 32),
 ]
 
 # VOC color palette (21 classes)
 VOC_CLASSES = [
-    "background", "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car",
-    "cat", "chair", "cow", "dining table", "dog", "horse", "motorbike", "person",
-    "potted plant", "sheep", "sofa", "train", "tv/monitor",
+    "background",
+    "aeroplane",
+    "bicycle",
+    "bird",
+    "boat",
+    "bottle",
+    "bus",
+    "car",
+    "cat",
+    "chair",
+    "cow",
+    "dining table",
+    "dog",
+    "horse",
+    "motorbike",
+    "person",
+    "potted plant",
+    "sheep",
+    "sofa",
+    "train",
+    "tv/monitor",
 ]
 
 VOC_COLORS = [
-    (0, 0, 0), (128, 0, 0), (0, 128, 0), (128, 128, 0), (0, 0, 128),
-    (128, 0, 128), (0, 128, 128), (128, 128, 128), (64, 0, 0), (192, 0, 0),
-    (64, 128, 0), (192, 128, 0), (64, 0, 128), (192, 0, 128), (64, 128, 128),
-    (192, 128, 128), (0, 64, 0), (128, 64, 0), (0, 192, 0), (128, 192, 0),
+    (0, 0, 0),
+    (128, 0, 0),
+    (0, 128, 0),
+    (128, 128, 0),
+    (0, 0, 128),
+    (128, 0, 128),
+    (0, 128, 128),
+    (128, 128, 128),
+    (64, 0, 0),
+    (192, 0, 0),
+    (64, 128, 0),
+    (192, 128, 0),
+    (64, 0, 128),
+    (192, 0, 128),
+    (64, 128, 128),
+    (192, 128, 128),
+    (0, 64, 0),
+    (128, 64, 0),
+    (0, 192, 0),
+    (128, 192, 0),
     (0, 64, 128),
 ]
 
@@ -179,7 +243,7 @@ def predict_batch(
     all_results = []
 
     for i in range(0, len(image_paths), batch_size):
-        batch_paths = image_paths[i:i + batch_size]
+        batch_paths = image_paths[i : i + batch_size]
         batch_images = [Image.open(p).convert("RGB") for p in batch_paths]
         original_sizes = [img.size for img in batch_images]
 
@@ -200,11 +264,13 @@ def predict_batch(
             mask_pil = mask_pil.resize(orig_size, Image.NEAREST)
             mask = np.array(mask_pil)
 
-            all_results.append({
-                "mask": mask,
-                "probabilities": probabilities,
-                "original_size": orig_size,
-            })
+            all_results.append(
+                {
+                    "mask": mask,
+                    "probabilities": probabilities,
+                    "original_size": orig_size,
+                }
+            )
 
     return all_results
 
@@ -227,8 +293,7 @@ def mask_to_color(
         num_classes = int(mask.max()) + 1
         np.random.seed(42)
         color_palette = [
-            tuple(np.random.randint(0, 255, 3).tolist())
-            for _ in range(num_classes)
+            tuple(np.random.randint(0, 255, 3).tolist()) for _ in range(num_classes)
         ]
 
     h, w = mask.shape
@@ -320,13 +385,18 @@ def export_to_json(
         image_paths: Optional list of image paths for batch results.
         class_names: Optional list of class names.
     """
+
     def compute_stats(m):
         """Compute per-class pixel counts."""
         unique, counts = np.unique(m, return_counts=True)
         total_pixels = m.size
         stats = {}
         for cls_idx, count in zip(unique, counts):
-            class_name = class_names[cls_idx] if class_names and cls_idx < len(class_names) else f"class_{cls_idx}"
+            class_name = (
+                class_names[cls_idx]
+                if class_names and cls_idx < len(class_names)
+                else f"class_{cls_idx}"
+            )
             stats[class_name] = {
                 "class_idx": int(cls_idx),
                 "pixel_count": int(count),
@@ -635,9 +705,13 @@ def main():
     print("=" * 60)
 
     import os
+
     for path in [
-        demo_image_path, "/tmp/demo_segmentation_output.jpg",
-        "/tmp/mask.png", "/tmp/statistics.json", "/tmp/legend.png",
+        demo_image_path,
+        "/tmp/demo_segmentation_output.jpg",
+        "/tmp/mask.png",
+        "/tmp/statistics.json",
+        "/tmp/legend.png",
     ]:
         if os.path.exists(path):
             os.remove(path)

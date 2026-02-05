@@ -99,7 +99,9 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
         mixup_alpha: float = 0.0,
     ):
         super().__init__()
-        self.save_hyperparameters(ignore=["metrics", "logging_config", "transform_config"])
+        self.save_hyperparameters(
+            ignore=["metrics", "logging_config", "transform_config"]
+        )
 
         # Backbone and head
         self.backbone = create_backbone(backbone)

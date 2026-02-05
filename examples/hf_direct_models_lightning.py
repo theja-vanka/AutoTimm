@@ -135,9 +135,7 @@ class ViTClassifier(pl.LightningModule):
 
     def configure_optimizers(self):
         """Configure AdamW optimizer with cosine schedule."""
-        optimizer = torch.optim.AdamW(
-            self.parameters(), lr=self.lr, weight_decay=0.01
-        )
+        optimizer = torch.optim.AdamW(self.parameters(), lr=self.lr, weight_decay=0.01)
 
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
             optimizer, T_max=self.trainer.max_epochs if self.trainer else 100
@@ -220,7 +218,9 @@ def demonstrate_manual_vit():
         lr=1e-4,
     )
 
-    print(f"\n✓ Model created: {sum(p.numel() for p in model.parameters()):,} parameters")
+    print(
+        f"\n✓ Model created: {sum(p.numel() for p in model.parameters()):,} parameters"
+    )
 
     # Test forward pass
     dummy_input = torch.randn(2, 3, 224, 224)
@@ -254,7 +254,9 @@ def demonstrate_pretrained_vit():
             pretrained_model_name="google/vit-base-patch16-224-in21k",
         )
 
-        print(f"✓ Loaded pretrained model: {sum(p.numel() for p in model.parameters()):,} parameters")
+        print(
+            f"✓ Loaded pretrained model: {sum(p.numel() for p in model.parameters()):,} parameters"
+        )
 
         # Test forward pass
         dummy_input = torch.randn(1, 3, 224, 224)
@@ -293,9 +295,7 @@ def demonstrate_image_processor():
     from PIL import Image
     import numpy as np
 
-    img = Image.fromarray(
-        np.random.randint(0, 255, (300, 300, 3), dtype=np.uint8)
-    )
+    img = Image.fromarray(np.random.randint(0, 255, (300, 300, 3), dtype=np.uint8))
 
     # Process image
     inputs = processor(images=img, return_tensors="pt")
@@ -407,7 +407,9 @@ def demonstrate_other_models():
 
     # DeiT
     deit_model = DeiTClassifier(num_classes=10, hidden_size=384, num_layers=4)
-    print(f"✓ DeiT model: {sum(p.numel() for p in deit_model.parameters()):,} parameters")
+    print(
+        f"✓ DeiT model: {sum(p.numel() for p in deit_model.parameters()):,} parameters"
+    )
 
     # Test forward
     x = torch.randn(2, 3, 224, 224)

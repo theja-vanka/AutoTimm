@@ -100,7 +100,9 @@ class SegmentationDataModule(pl.LightningDataModule):
             if self.custom_val_transforms is not None:
                 val_transforms = self.custom_val_transforms
             else:
-                val_transforms = segmentation_eval_transforms(image_size=self.image_size)
+                val_transforms = segmentation_eval_transforms(
+                    image_size=self.image_size
+                )
         else:
             train_transforms = get_segmentation_preset(
                 preset=self.augmentation_preset,
@@ -110,7 +112,9 @@ class SegmentationDataModule(pl.LightningDataModule):
             if self.custom_val_transforms is not None:
                 val_transforms = self.custom_val_transforms
             else:
-                val_transforms = segmentation_eval_transforms(image_size=self.image_size)
+                val_transforms = segmentation_eval_transforms(
+                    image_size=self.image_size
+                )
 
         # Setup datasets based on stage
         if stage == "fit" or stage is None:
@@ -173,9 +177,9 @@ class SegmentationDataModule(pl.LightningDataModule):
             console.print(self.summary())
         except ImportError:
             # Fallback to basic print if rich is not available
-            print(f"\n{'='*50}")
+            print(f"\n{'=' * 50}")
             print("SegmentationDataModule Summary")
-            print(f"{'='*50}")
+            print(f"{'=' * 50}")
             print(f"Data dir: {self.data_dir}")
             print(f"Format: {self.format}")
             print(f"Image size: {self.image_size}")
@@ -186,7 +190,7 @@ class SegmentationDataModule(pl.LightningDataModule):
                 print(f"Val samples: {len(self.val_dataset)}")
             if self.test_dataset is not None:
                 print(f"Test samples: {len(self.test_dataset)}")
-            print(f"{'='*50}\n")
+            print(f"{'=' * 50}\n")
         except Exception:
             # Silently ignore any errors in summary printing
             pass

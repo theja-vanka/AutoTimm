@@ -356,8 +356,7 @@ def build_csp_darknet(model_name: str = "yolox-s") -> CSPDarknet:
 
     if model_name not in configs:
         raise ValueError(
-            f"Unknown model: {model_name}. "
-            f"Available: {list(configs.keys())}"
+            f"Unknown model: {model_name}. Available: {list(configs.keys())}"
         )
 
     config = configs[model_name]

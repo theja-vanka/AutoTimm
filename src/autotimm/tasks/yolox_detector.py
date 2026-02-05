@@ -10,7 +10,6 @@ from typing import Any
 import pytorch_lightning as pl
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torchvision.ops as ops
 
 from autotimm.data.transform_config import TransformConfig
@@ -99,7 +98,9 @@ class YOLOXDetector(PreprocessingMixin, pl.LightningModule):
         max_detections_per_image: int = 100,
     ):
         super().__init__()
-        self.save_hyperparameters(ignore=["metrics", "logging_config", "transform_config"])
+        self.save_hyperparameters(
+            ignore=["metrics", "logging_config", "transform_config"]
+        )
 
         self.model_name = model_name
         self.num_classes = num_classes
@@ -146,7 +147,9 @@ class YOLOXDetector(PreprocessingMixin, pl.LightningModule):
         # Metrics
         if metrics is not None:
             if isinstance(metrics, list):
-                self._metric_manager = MetricManager(configs=metrics, num_classes=num_classes)
+                self._metric_manager = MetricManager(
+                    configs=metrics, num_classes=num_classes
+                )
             else:
                 self._metric_manager = metrics
 
@@ -317,7 +320,6 @@ class YOLOXDetector(PreprocessingMixin, pl.LightningModule):
 
         ltrb = torch.stack([left, top, right, bottom], dim=-1)
         is_in_boxes = ltrb.min(dim=-1).values > 0
-        max_ltrb = ltrb.max(dim=-1).values
 
         # For YOLOX, we use all points inside boxes (no per-level regression ranges)
         is_valid = is_in_boxes
@@ -364,7 +366,9 @@ class YOLOXDetector(PreprocessingMixin, pl.LightningModule):
             all_scores = []
             all_labels = []
 
-            for level_idx, (cls_out, reg_out) in enumerate(zip(cls_outputs, reg_outputs)):
+            for level_idx, (cls_out, reg_out) in enumerate(
+                zip(cls_outputs, reg_outputs)
+            ):
                 stride = self.strides[level_idx]
                 feat_h, feat_w = cls_out.shape[-2:]
 
@@ -566,7 +570,9 @@ class YOLOXDetector(PreprocessingMixin, pl.LightningModule):
             # Official YOLOX scheduler with warmup
             scheduler = YOLOXLRScheduler(
                 optimizer,
-                total_epochs=self._scheduler_kwargs.get("total_epochs", self._total_epochs),
+                total_epochs=self._scheduler_kwargs.get(
+                    "total_epochs", self._total_epochs
+                ),
                 warmup_epochs=self._scheduler_kwargs.get(
                     "warmup_epochs", self._warmup_epochs
                 ),

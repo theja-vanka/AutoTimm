@@ -63,7 +63,9 @@ class BackendRecommendation:
 
 
 def recommend_backend(
-    task: Literal["classification", "detection", "segmentation", "instance_segmentation"]
+    task: Literal[
+        "classification", "detection", "segmentation", "instance_segmentation"
+    ]
     | None = None,
     needs_advanced_augmentation: bool = False,
     needs_spatial_transforms: bool = False,
@@ -194,15 +196,19 @@ def recommend_backend(
 
     # Alternative recommendation
     alternative = None
-    if backend == "torchvision" and (task in ("detection", "segmentation", "instance_segmentation")):
+    if backend == "torchvision" and (
+        task in ("detection", "segmentation", "instance_segmentation")
+    ):
         alternative = (
             "Consider albumentations for more advanced augmentations specific to "
             "detection/segmentation tasks."
         )
-    elif backend == "albumentations" and task == "classification" and not needs_advanced_augmentation:
-        alternative = (
-            "Torchvision with RandAugment/AutoAugment is simpler and often sufficient for classification."
-        )
+    elif (
+        backend == "albumentations"
+        and task == "classification"
+        and not needs_advanced_augmentation
+    ):
+        alternative = "Torchvision with RandAugment/AutoAugment is simpler and often sufficient for classification."
 
     return BackendRecommendation(
         backend=backend,
@@ -288,14 +294,26 @@ def _print_comparison(comparison: dict) -> None:
 
         console = Console()
 
-        table = Table(title="Transform Backend Comparison", show_header=True, header_style="bold magenta")
+        table = Table(
+            title="Transform Backend Comparison",
+            show_header=True,
+            header_style="bold magenta",
+        )
         table.add_column("Feature", style="cyan", width=20)
         table.add_column("Torchvision", style="green", width=35)
         table.add_column("Albumentations", style="yellow", width=35)
 
         # Add rows
-        table.add_row("Backend", comparison["torchvision"]["backend"], comparison["albumentations"]["backend"])
-        table.add_row("Speed", comparison["torchvision"]["speed"], comparison["albumentations"]["speed"])
+        table.add_row(
+            "Backend",
+            comparison["torchvision"]["backend"],
+            comparison["albumentations"]["backend"],
+        )
+        table.add_row(
+            "Speed",
+            comparison["torchvision"]["speed"],
+            comparison["albumentations"]["speed"],
+        )
         table.add_row(
             "Augmentations",
             comparison["torchvision"]["augmentations"],

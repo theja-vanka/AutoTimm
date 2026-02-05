@@ -35,7 +35,7 @@ def main():
     print("\nDetailed Info for YOLOX-S:")
     print("-" * 80)
     info = get_yolox_model_info("yolox-s")
-    print(f"  Model Name:        yolox-s")
+    print("  Model Name:        yolox-s")
     print(f"  Depth Multiplier:  {info['depth']}")
     print(f"  Width Multiplier:  {info['width']}")
     print(f"  Backbone:          {info['backbone']}")
@@ -102,27 +102,27 @@ def main():
     print("-" * 80)
     print(
         f"{'Parameters':<20} {nano_info['params']:<15} "
-        f"{x_info['params']:<15} {99.1/0.9:.1f}x"
+        f"{x_info['params']:<15} {99.1 / 0.9:.1f}x"
     )
     print(
         f"{'FLOPs':<20} {nano_info['flops']:<15} "
-        f"{x_info['flops']:<15} {281.9/1.1:.1f}x"
+        f"{x_info['flops']:<15} {281.9 / 1.1:.1f}x"
     )
     print(
         f"{'mAP (COCO)':<20} {nano_info['mAP']:<15} "
-        f"{x_info['mAP']:<15} {x_info['mAP']/nano_info['mAP']:.2f}x"
+        f"{x_info['mAP']:<15} {x_info['mAP'] / nano_info['mAP']:.2f}x"
     )
     print(
         f"{'Input Size':<20} {nano_info['input_size']:<15} "
-        f"{x_info['input_size']:<15} {x_info['input_size']/nano_info['input_size']:.2f}x"
+        f"{x_info['input_size']:<15} {x_info['input_size'] / nano_info['input_size']:.2f}x"
     )
     print(
         f"{'Depth Multiplier':<20} {nano_info['depth']:<15} "
-        f"{x_info['depth']:<15} {x_info['depth']/nano_info['depth']:.2f}x"
+        f"{x_info['depth']:<15} {x_info['depth'] / nano_info['depth']:.2f}x"
     )
     print(
         f"{'Width Multiplier':<20} {nano_info['width']:<15} "
-        f"{x_info['width']:<15} {x_info['width']/nano_info['width']:.2f}x"
+        f"{x_info['width']:<15} {x_info['width'] / nano_info['width']:.2f}x"
     )
     print()
 

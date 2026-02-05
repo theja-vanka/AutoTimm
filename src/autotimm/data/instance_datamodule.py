@@ -164,9 +164,9 @@ class InstanceSegmentationDataModule(pl.LightningDataModule):
             console.print(self.summary())
         except ImportError:
             # Fallback to basic print if rich is not available
-            print(f"\n{'='*50}")
+            print(f"\n{'=' * 50}")
             print("InstanceSegmentationDataModule Summary")
-            print(f"{'='*50}")
+            print(f"{'=' * 50}")
             print(f"Data dir: {self.data_dir}")
             print(f"Image size: {self.image_size}")
             print(f"Batch size: {self.batch_size}")
@@ -176,7 +176,7 @@ class InstanceSegmentationDataModule(pl.LightningDataModule):
                 print(f"Val samples: {len(self.val_dataset)}")
             if self.test_dataset is not None:
                 print(f"Test samples: {len(self.test_dataset)}")
-            print(f"{'='*50}\n")
+            print(f"{'=' * 50}\n")
         except Exception:
             # Silently ignore any errors in summary printing
             pass
@@ -200,7 +200,7 @@ class InstanceSegmentationDataModule(pl.LightningDataModule):
 
         if self.train_dataset is not None:
             table.add_row("Train samples", str(len(self.train_dataset)))
-            if hasattr(self.train_dataset, 'num_classes'):
+            if hasattr(self.train_dataset, "num_classes"):
                 table.add_row("Num classes", str(self.train_dataset.num_classes))
         if self.val_dataset is not None:
             table.add_row("Val samples", str(len(self.val_dataset)))

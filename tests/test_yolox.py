@@ -17,7 +17,7 @@ def test_yolox_head_forward():
         torch.randn(2, 256, 40, 40),  # P4
         torch.randn(2, 256, 20, 20),  # P5
         torch.randn(2, 256, 10, 10),  # P6
-        torch.randn(2, 256, 5, 5),    # P7
+        torch.randn(2, 256, 5, 5),  # P7
     ]
 
     cls_outputs, reg_outputs = head(fpn_features)
@@ -28,7 +28,7 @@ def test_yolox_head_forward():
 
     # Check shapes
     assert cls_outputs[0].shape == (2, 80, 80, 80)  # [B, C, H, W]
-    assert reg_outputs[0].shape == (2, 4, 80, 80)   # [B, 4, H, W]
+    assert reg_outputs[0].shape == (2, 4, 80, 80)  # [B, 4, H, W]
 
     # YOLOXHead should not return centerness
 

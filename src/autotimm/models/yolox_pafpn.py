@@ -61,9 +61,7 @@ class YOLOXPAFPN(nn.Module):
 
         # Top-down FPN pathway
         # Reduce channels from C5
-        self.lateral_conv0 = BaseConv(
-            in_channels[2], in_channels[1], 1, 1, act=act
-        )
+        self.lateral_conv0 = BaseConv(in_channels[2], in_channels[1], 1, 1, act=act)
         # C3 + C4 fusion
         self.C3_p4 = CSPLayer(
             2 * in_channels[1],
@@ -75,9 +73,7 @@ class YOLOXPAFPN(nn.Module):
         )
 
         # Reduce channels from C4
-        self.reduce_conv1 = BaseConv(
-            in_channels[1], in_channels[0], 1, 1, act=act
-        )
+        self.reduce_conv1 = BaseConv(in_channels[1], in_channels[0], 1, 1, act=act)
         # C2 + C3 fusion
         self.C3_p3 = CSPLayer(
             2 * in_channels[0],
@@ -90,9 +86,7 @@ class YOLOXPAFPN(nn.Module):
 
         # Bottom-up PAN pathway
         # P3 -> P4
-        self.bu_conv2 = Conv(
-            in_channels[0], in_channels[0], 3, 2, act=act
-        )
+        self.bu_conv2 = Conv(in_channels[0], in_channels[0], 3, 2, act=act)
         # C3 + C4 fusion
         self.C3_n3 = CSPLayer(
             in_channels[0] + in_channels[1],
@@ -104,9 +98,7 @@ class YOLOXPAFPN(nn.Module):
         )
 
         # P4 -> P5
-        self.bu_conv1 = Conv(
-            in_channels[1], in_channels[1], 3, 2, act=act
-        )
+        self.bu_conv1 = Conv(in_channels[1], in_channels[1], 3, 2, act=act)
         # C4 + C5 fusion
         self.C3_n4 = CSPLayer(
             in_channels[1] + in_channels[2],

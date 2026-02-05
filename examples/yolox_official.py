@@ -36,7 +36,14 @@ def main():
         "--model-name",
         type=str,
         default="yolox-s",
-        choices=["yolox-nano", "yolox-tiny", "yolox-s", "yolox-m", "yolox-l", "yolox-x"],
+        choices=[
+            "yolox-nano",
+            "yolox-tiny",
+            "yolox-s",
+            "yolox-m",
+            "yolox-l",
+            "yolox-x",
+        ],
         help="YOLOX model variant",
     )
     parser.add_argument(

@@ -106,11 +106,15 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
         regress_ranges: tuple[tuple[int, int], ...] | None = None,
     ):
         super().__init__()
-        self.save_hyperparameters(ignore=["metrics", "logging_config", "transform_config"])
+        self.save_hyperparameters(
+            ignore=["metrics", "logging_config", "transform_config"]
+        )
 
         # Validate detection architecture
         if detection_arch not in ["fcos", "yolox"]:
-            raise ValueError(f"detection_arch must be 'fcos' or 'yolox', got '{detection_arch}'")
+            raise ValueError(
+                f"detection_arch must be 'fcos' or 'yolox', got '{detection_arch}'"
+            )
 
         self.detection_arch = detection_arch
         self.num_classes = num_classes
@@ -161,7 +165,9 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
             self.head = YOLOXHead(
                 in_channels=fpn_channels,
                 num_classes=num_classes,
-                num_convs=head_num_convs if head_num_convs <= 2 else 2,  # YOLOX typically uses 2 convs
+                num_convs=head_num_convs
+                if head_num_convs <= 2
+                else 2,  # YOLOX typically uses 2 convs
                 prior_prob=0.01,
                 activation="silu",
             )
@@ -327,7 +333,11 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
                         (feat_h, feat_w), -1, dtype=torch.long, device=device
                     )
                     reg_target = torch.zeros(feat_h, feat_w, 4, device=device)
-                    cent_target = torch.zeros(feat_h, feat_w, device=device) if self.detection_arch == "fcos" else None
+                    cent_target = (
+                        torch.zeros(feat_h, feat_w, device=device)
+                        if self.detection_arch == "fcos"
+                        else None
+                    )
                 else:
                     cls_target, reg_target, cent_target = (
                         self._compute_targets_per_level(
@@ -343,7 +353,11 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
             # Stack batch
             cls_targets = torch.stack(level_cls_targets)  # [B, H, W]
             reg_targets = torch.stack(level_reg_targets)  # [B, H, W, 4]
-            cent_targets = torch.stack(level_centerness_targets) if self.detection_arch == "fcos" else None  # [B, H, W]
+            cent_targets = (
+                torch.stack(level_centerness_targets)
+                if self.detection_arch == "fcos"
+                else None
+            )  # [B, H, W]
 
             # Compute classification loss (all locations except ignored=-1)
             cls_out_flat = cls_out.permute(0, 2, 3, 1).reshape(-1, self.num_classes)
@@ -387,7 +401,9 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
 
         # Centerness loss only for FCOS
         if self.detection_arch == "fcos":
-            centerness_loss = self.centerness_loss_weight * total_centerness_loss / num_pos
+            centerness_loss = (
+                self.centerness_loss_weight * total_centerness_loss / num_pos
+            )
             total_loss = cls_loss + reg_loss + centerness_loss
         else:
             centerness_loss = torch.tensor(0.0, device=device)

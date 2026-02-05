@@ -11,7 +11,6 @@ import torch
 import pytorch_lightning as pl
 
 try:
-    import transformers
     from transformers import ViTModel, ViTConfig, ViTImageProcessor
 
     HAS_TRANSFORMERS = True
@@ -202,7 +201,9 @@ class TestHFDirectModels:
             from PIL import Image
             import numpy as np
 
-            img = Image.fromarray(np.random.randint(0, 255, (224, 224, 3), dtype=np.uint8))
+            img = Image.fromarray(
+                np.random.randint(0, 255, (224, 224, 3), dtype=np.uint8)
+            )
 
             # Process image
             inputs = processor(images=img, return_tensors="pt")
@@ -253,7 +254,10 @@ class TestHFDirectModels:
 
             # Save
             trainer = pl.Trainer(
-                max_epochs=1, logger=False, enable_checkpointing=False, accelerator="cpu"
+                max_epochs=1,
+                logger=False,
+                enable_checkpointing=False,
+                accelerator="cpu",
             )
             trainer.strategy.connect(model)
             trainer.save_checkpoint(checkpoint_path)
