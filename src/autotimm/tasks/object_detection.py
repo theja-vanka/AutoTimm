@@ -144,6 +144,28 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
             self.regress_ranges = regress_ranges
 
         # Build model
+        # For object detection, we typically use 3 backbone features (C3, C4, C5)
+        # which combined with 2 extra FPN levels gives us P3-P7 (5 levels total)
+        if isinstance(backbone, str):
+            from autotimm.backbone import FeatureBackboneConfig
+
+            backbone = FeatureBackboneConfig(
+                model_name=backbone, out_indices=(2, 3, 4)
+            )
+        elif not hasattr(backbone, "out_indices"):
+            # If it's a FeatureBackboneConfig without out_indices set, use (2, 3, 4)
+            if hasattr(backbone, "model_name"):
+                from autotimm.backbone import FeatureBackboneConfig
+
+                backbone = FeatureBackboneConfig(
+                    model_name=backbone.model_name,
+                    pretrained=getattr(backbone, "pretrained", True),
+                    out_indices=(2, 3, 4),
+                    drop_rate=getattr(backbone, "drop_rate", 0.0),
+                    drop_path_rate=getattr(backbone, "drop_path_rate", 0.0),
+                    extra_kwargs=getattr(backbone, "extra_kwargs", {}),
+                )
+
         self.backbone = create_feature_backbone(backbone)
         in_channels = get_feature_channels(self.backbone)
 
