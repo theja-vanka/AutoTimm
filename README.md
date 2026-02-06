@@ -2,8 +2,6 @@
   <img src="https://drive.google.com/uc?export=view&id=1IO383lY97phOg9qDVARnG9HQ2McOF7Zj" alt="AutoTimm" width="400">
 </p>
 
-<h1 align="center">AutoTimm</h1>
-
 <p align="center">
   <strong>🚀 Train state-of-the-art vision models with minimal code</strong><br>
   From prototype to production in minutes, not hours
@@ -35,7 +33,7 @@ AutoTimm is a **production-ready** computer vision framework that combines [timm
 - 🎓 **Students** learning computer vision with modern best practices
 - 🚀 **Startups** rapidly prototyping vision applications
 
-## ✨ What's New in v0.6.2
+## ✨ What's New in v0.7.0
 
 - **YOLOX Models** 🎯 Official YOLOX implementation (nano to X) with CSPDarknet backbone
 - **Smart Backend Selection** 🧠 AI-powered recommendation for optimal transform backends
