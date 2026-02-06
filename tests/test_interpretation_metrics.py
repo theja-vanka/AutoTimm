@@ -9,6 +9,16 @@ from PIL import Image
 from autotimm.interpretation import GradCAM, ExplanationMetrics
 
 
+# Set random seeds for reproducibility
+@pytest.fixture(autouse=True)
+def set_random_seeds():
+    """Set random seeds for all tests to ensure reproducibility."""
+    torch.manual_seed(42)
+    np.random.seed(42)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(42)
+
+
 # Test fixtures
 @pytest.fixture
 def simple_cnn():

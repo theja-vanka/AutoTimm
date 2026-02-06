@@ -251,6 +251,6 @@ TensorRT (GPU):       2 ms/image  (25x faster)
 
 ## See Also
 
-- [Deployment Guide](../../user-guide/deployment.md)
+- [Deployment Guide](../../user-guide/deployment/deployment.md)
 - [ONNX Documentation](https://onnx.ai/)
 - [TorchScript Guide](https://pytorch.org/docs/stable/jit.html)

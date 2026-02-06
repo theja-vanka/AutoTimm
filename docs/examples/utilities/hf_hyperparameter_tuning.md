@@ -333,5 +333,5 @@ study.optimize(objective, n_trials=50)  # Continue
 ## See Also
 
 - [Optuna Documentation](https://optuna.readthedocs.io/)
-- [Hyperparameter Tuning Guide](../../user-guide/hyperparameters.md)
-- [Training Tips](../../user-guide/training.md)
+- [Training Guide](../../user-guide/training/training.md)
+- [Advanced Customization](../../user-guide/training/advanced-customization.md)

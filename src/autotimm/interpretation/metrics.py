@@ -239,9 +239,15 @@ class ExplanationMetrics:
         except AttributeError:
             # Fallback for older numpy versions
             auc = np.trapz(scores, dx=1.0 / steps) / original_score
-        final_rise = (scores[-1] - baseline_score) / (
-            original_score - baseline_score + 1e-8
-        )
+
+        # Compute final rise - handle edge case where baseline >= original
+        denominator = original_score - baseline_score
+        if abs(denominator) < 1e-6:
+            # Baseline and original are essentially the same
+            final_rise = 0.0
+        else:
+            # Use absolute value to avoid negative denominators
+            final_rise = (scores[-1] - baseline_score) / abs(denominator)
 
         return {
             "auc": auc,

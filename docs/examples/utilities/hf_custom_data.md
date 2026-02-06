@@ -316,6 +316,6 @@ python examples/data_training/hf_custom_data.py
 
 ## See Also
 
-- [Data Module Guide](../../user-guide/data.md)
-- [Augmentation Techniques](../../user-guide/augmentation.md)
+- [Data Module Guide](../../user-guide/data-loading/index.md)
+- [Augmentation Techniques](../../user-guide/data-loading/transforms.md)
 - [Custom Datasets](../../api/data.md#custom-datasets)

@@ -166,5 +166,5 @@ The example generates:
 ## See Also
 
 - [Interpretation Guide](../../user-guide/interpretation/methods.md)
-- [GradCAM Documentation](../../api/interpretation.md#gradcam)
-- [Attention Visualization](../../api/interpretation.md#attention)
+- [Interpretation Metrics](../../user-guide/interpretation/metrics.md)
+- [Interactive Visualizations](../../user-guide/interpretation/interactive-visualizations.md)
