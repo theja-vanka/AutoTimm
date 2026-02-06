@@ -33,6 +33,31 @@ AutoTimm is a **production-ready** computer vision framework that combines [timm
 - **Students** learning computer vision with modern best practices
 - **Startups** rapidly prototyping vision applications
 
+## Why AutoTimm?
+
+<table>
+<tr>
+<td width="33%">
+<h3 align="center">Fast</h3>
+<p align="center">
+From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-GPU out of the box.
+</p>
+</td>
+<td width="33%">
+<h3 align="center">Flexible</h3>
+<p align="center">
+1000+ backbones, 4 vision tasks, multiple transform backends. Use what works best.
+</p>
+</td>
+<td width="33%">
+<h3 align="center">Production Ready</h3>
+<p align="center">
+200+ tests, comprehensive logging, checkpoint management. Deploy with confidence.
+</p>
+</td>
+</tr>
+</table>
+
 ## What's New in v0.7.1
 
 - **Model Interpretation** - Complete explainability toolkit with 6 interpretation methods, 6 quality metrics, interactive Plotly visualizations, and up to 100x speedup with optimization
@@ -659,31 +684,6 @@ For major changes, please open an issue first.
   version = {0.7.1}
 }
 ```
-
-## Why AutoTimm?
-
-<table>
-<tr>
-<td width="33%">
-<h3 align="center">Fast</h3>
-<p align="center">
-From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-GPU out of the box.
-</p>
-</td>
-<td width="33%">
-<h3 align="center">Flexible</h3>
-<p align="center">
-1000+ backbones, 4 vision tasks, multiple transform backends. Use what works best.
-</p>
-</td>
-<td width="33%">
-<h3 align="center">Production Ready</h3>
-<p align="center">
-200+ tests, comprehensive logging, checkpoint management. Deploy with confidence.
-</p>
-</td>
-</tr>
-</table>
 
 ---
 
