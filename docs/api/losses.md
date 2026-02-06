@@ -57,12 +57,14 @@ loss = loss_fn(pred, target)
 ### How It Works
 
 **Alpha (α):**
+
 - Controls the relative importance of positive vs negative examples
 - `α = 0.25` means positive examples get 25% weight, negatives get 75%
 - Higher α → focus more on positives (foreground)
 - Standard value: 0.25
 
 **Gamma (γ):**
+
 - Controls how much to down-weight easy examples
 - `γ = 0`: Equivalent to standard cross-entropy
 - `γ = 2`: Standard focal loss (down-weights easy examples significantly)
@@ -70,6 +72,7 @@ loss = loss_fn(pred, target)
 - Standard value: 2.0
 
 **Effect:**
+
 - Easy examples (high confidence, correct predictions): Very low loss
 - Hard examples (low confidence): High loss
 - Result: Model focuses on learning hard negatives
@@ -77,11 +80,13 @@ loss = loss_fn(pred, target)
 ### When to Use
 
 **Use Focal Loss when:**
+
 - Extreme class imbalance (e.g., 1:1000 positive:negative ratio in detection)
 - One-stage detectors (FCOS, RetinaNet, YOLO)
 - Many easy negatives dominate the loss
 
 **Alternatives:**
+
 - Balanced Cross Entropy: Simpler, use when imbalance is moderate
 - Weighted BCE: Manual class weights
 
@@ -151,12 +156,14 @@ loss = loss_fn(pred_boxes, target_boxes)
 ### How It Works
 
 **Standard IoU:**
+
 - Range: [0, 1]
 - 1 = perfect overlap
 - 0 = no overlap
 - Problem: Zero gradient when boxes don't overlap
 
 **GIoU Improvement:**
+
 - Range: [-1, 1]
 - Considers the area of the smallest enclosing box
 - Provides gradient signal even for non-overlapping boxes
@@ -181,12 +188,14 @@ loss = loss_fn(pred_boxes, target_boxes)
 ### When to Use
 
 **Use GIoU Loss when:**
+
 - Training object detectors
 - Need scale-invariant regression
 - Boxes can be non-overlapping during training
 - Want to optimize IoU metric directly
 
 **Alternatives:**
+
 - **IoU Loss**: Simpler, but undefined for non-overlapping boxes
 - **DIoU Loss**: Faster convergence, considers center distance
 - **CIoU Loss**: Best for accurate localization, considers aspect ratio explicitly
@@ -266,6 +275,7 @@ loss = loss_fn(pred, target)
 4. Multiply with classification score during inference
 
 **Purpose:**
+
 - Suppress low-quality detections far from object centers
 - Alternative to NMS (though FCOS still uses NMS)
 - Improve localization quality by favoring central predictions
@@ -281,11 +291,13 @@ Location at (30, 10): Edge → centerness ≈ 0.5
 ### When to Use
 
 **Use Centerness Loss when:**
+
 - Implementing FCOS or similar anchor-free detectors
 - Want to suppress low-quality detections
 - Training point-based detectors
 
 **Not needed for:**
+
 - Anchor-based detectors (Faster R-CNN, etc.)
 - Methods with different quality measures (e.g., IoU prediction)
 

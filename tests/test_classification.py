@@ -150,3 +150,50 @@ def test_test_step():
 
     # Should not raise
     model.test_step((x, y), batch_idx=0)
+
+
+def test_inference_without_metrics():
+    """Test that ImageClassifier works for inference without metrics."""
+    model = ImageClassifier(
+        backbone="resnet18",
+        num_classes=5,
+        metrics=None,  # No metrics for inference
+    )
+    model.eval()
+
+    # Forward pass should work
+    x = torch.randn(2, 3, 224, 224)
+    with torch.no_grad():
+        out = model(x)
+    assert out.shape == (2, 5)
+
+    # Predict step should work
+    with torch.no_grad():
+        probs = model.predict_step((x,), batch_idx=0)
+    assert probs.shape == (2, 5)
+    assert torch.allclose(probs.sum(dim=-1), torch.ones(2), atol=1e-5)
+
+
+def test_training_without_metrics():
+    """Test that training steps work without metrics (only loss is logged)."""
+    model = ImageClassifier(
+        backbone="resnet18",
+        num_classes=5,
+        metrics=None,  # No metrics
+    )
+    model.train()
+
+    x = torch.randn(4, 3, 224, 224)
+    y = torch.randint(0, 5, (4,))
+
+    # Training step should work (logs loss only)
+    loss = model.training_step((x, y), batch_idx=0)
+    assert loss.ndim == 0
+    assert loss.requires_grad
+
+    # Validation step should work
+    model.eval()
+    model.validation_step((x, y), batch_idx=0)
+
+    # Test step should work
+    model.test_step((x, y), batch_idx=0)

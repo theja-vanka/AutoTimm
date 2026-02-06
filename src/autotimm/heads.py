@@ -616,3 +616,184 @@ class MaskHead(nn.Module):
         x = F.relu(self.deconv(x))
         x = self.mask_pred(x)
         return x
+
+
+class YOLOXHead(nn.Module):
+    """YOLOX-style detection head with decoupled classification and regression branches.
+
+    YOLOX is an anchor-free detection head that improves upon FCOS with:
+    - Decoupled head: Separate feature processing for classification and regression
+    - No centerness prediction (uses objectness implicitly in classification)
+    - SiLU activation for better performance
+    - Optional depthwise separable convolutions for efficiency
+
+    Key differences from FCOS DetectionHead:
+    - Classification and regression branches don't share features
+    - Uses SiLU activation instead of ReLU
+    - No centerness branch
+    - Can use depthwise convolutions for mobile deployment
+
+    Parameters:
+        in_channels: Number of input channels from FPN.
+        num_classes: Number of object classes (excluding background).
+        num_convs: Number of conv layers in each branch before prediction.
+        prior_prob: Prior probability for focal loss initialization.
+        use_group_norm: Whether to use GroupNorm after conv layers.
+        num_groups: Number of groups for GroupNorm.
+        use_depthwise: Whether to use depthwise separable convolutions.
+        activation: Activation function ("silu" or "relu").
+
+    Example:
+        >>> head = YOLOXHead(in_channels=256, num_classes=80)
+        >>> fpn_features = [torch.randn(2, 256, h, w) for h, w in [(80, 80), (40, 40), (20, 20)]]
+        >>> cls_outputs, reg_outputs = head(fpn_features)
+        >>> print(cls_outputs[0].shape)  # [2, 80, 80, 80]
+        >>> print(reg_outputs[0].shape)  # [2, 4, 80, 80]
+    """
+
+    def __init__(
+        self,
+        in_channels: int = 256,
+        num_classes: int = 80,
+        num_convs: int = 2,
+        prior_prob: float = 0.01,
+        use_group_norm: bool = True,
+        num_groups: int = 32,
+        use_depthwise: bool = False,
+        activation: str = "silu",
+    ):
+        super().__init__()
+        self.num_classes = num_classes
+        self.in_channels = in_channels
+        self.use_depthwise = use_depthwise
+
+        # Select activation function
+        if activation == "silu":
+            act_fn = nn.SiLU(inplace=True)
+        elif activation == "relu":
+            act_fn = nn.ReLU(inplace=True)
+        else:
+            raise ValueError(f"Unsupported activation: {activation}")
+
+        # Stem conv to process FPN features
+        self.stem_conv = self._make_conv_block(
+            in_channels, in_channels, use_group_norm, num_groups, act_fn
+        )
+
+        # Decoupled classification branch
+        cls_convs = []
+        for _ in range(num_convs):
+            cls_convs.append(
+                self._make_conv_block(
+                    in_channels, in_channels, use_group_norm, num_groups, act_fn
+                )
+            )
+        self.cls_convs = nn.Sequential(*cls_convs)
+
+        # Decoupled regression branch
+        reg_convs = []
+        for _ in range(num_convs):
+            reg_convs.append(
+                self._make_conv_block(
+                    in_channels, in_channels, use_group_norm, num_groups, act_fn
+                )
+            )
+        self.reg_convs = nn.Sequential(*reg_convs)
+
+        # Prediction layers
+        self.cls_pred = nn.Conv2d(in_channels, num_classes, kernel_size=1)
+        self.reg_pred = nn.Conv2d(in_channels, 4, kernel_size=1)
+
+        # Per-level learnable scales for regression
+        self.scales = nn.ModuleList([ScaleModule(1.0) for _ in range(5)])
+
+        self._init_weights(prior_prob)
+
+    def _make_conv_block(
+        self,
+        in_channels: int,
+        out_channels: int,
+        use_group_norm: bool,
+        num_groups: int,
+        act_fn: nn.Module,
+    ) -> nn.Sequential:
+        """Create a convolutional block with optional depthwise conv, norm, and activation."""
+        layers = []
+
+        if self.use_depthwise:
+            # Depthwise separable convolution
+            layers.extend(
+                [
+                    nn.Conv2d(
+                        in_channels,
+                        in_channels,
+                        kernel_size=3,
+                        padding=1,
+                        groups=in_channels,
+                    ),
+                    nn.Conv2d(in_channels, out_channels, kernel_size=1),
+                ]
+            )
+        else:
+            # Standard convolution
+            layers.append(
+                nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1)
+            )
+
+        if use_group_norm:
+            layers.append(nn.GroupNorm(num_groups, out_channels))
+
+        layers.append(act_fn)
+
+        return nn.Sequential(*layers)
+
+    def _init_weights(self, prior_prob: float):
+        """Initialize weights with special handling for classification bias."""
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.normal_(m.weight, std=0.01)
+                if m.bias is not None:
+                    nn.init.constant_(m.bias, 0)
+
+        # Initialize classification bias for focal loss
+        bias_value = -math.log((1 - prior_prob) / prior_prob)
+        nn.init.constant_(self.cls_pred.bias, bias_value)
+
+    def forward(
+        self, features: list[torch.Tensor]
+    ) -> tuple[list[torch.Tensor], list[torch.Tensor]]:
+        """Forward pass through YOLOX detection head.
+
+        Args:
+            features: List of FPN features [P3, P4, P5, P6, P7].
+
+        Returns:
+            Tuple of (cls_outputs, reg_outputs), each a list of tensors with shapes:
+            - cls: [B, num_classes, H, W]
+            - reg: [B, 4, H, W] (left, top, right, bottom distances)
+
+        Note:
+            Unlike FCOS, YOLOX does not produce centerness outputs.
+        """
+        cls_outputs = []
+        reg_outputs = []
+
+        for i, feat in enumerate(features):
+            # Process through stem
+            x = self.stem_conv(feat)
+
+            # Decoupled branches process features independently
+            cls_feat = self.cls_convs(x)
+            reg_feat = self.reg_convs(x)
+
+            # Classification prediction
+            cls_out = self.cls_pred(cls_feat)
+
+            # Regression prediction (with per-level scaling)
+            scale_idx = min(i, len(self.scales) - 1)
+            reg_out = self.scales[scale_idx](self.reg_pred(reg_feat))
+
+            cls_outputs.append(cls_out)
+            reg_outputs.append(reg_out)
+
+        return cls_outputs, reg_outputs

@@ -196,7 +196,9 @@ def main():
         print(f"  {name:.<20} {desc}")
 
     print("\n" + "=" * 70)
-    print("Done! Use autotimm.list_backbones() and list_transform_presets() to explore.")
+    print(
+        "Done! Use autotimm.list_backbones() and list_transform_presets() to explore."
+    )
     print("=" * 70)
 
 

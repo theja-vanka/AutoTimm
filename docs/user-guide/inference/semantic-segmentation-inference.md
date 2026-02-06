@@ -7,18 +7,21 @@ This guide covers how to perform inference with trained semantic segmentation mo
 The [`segmentation_inference.py`](https://github.com/theja-vanka/AutoTimm/blob/main/examples/segmentation_inference.py) script provides a comprehensive toolkit for semantic segmentation inference with the following features:
 
 **Core Features:**
+
 - Load trained segmentation models from checkpoints
 - Single image and batch prediction
 - Automatic preprocessing using model's data config
 - Support for multiple datasets (Cityscapes, Pascal VOC, custom)
 
 **Visualization:**
+
 - Overlay segmentation masks on original images
 - Adjustable transparency for overlays
 - Pre-configured color palettes (Cityscapes, Pascal VOC)
 - Create class legends with color boxes and labels
 
 **Export Options:**
+
 - Save colored or grayscale masks as PNG
 - Export per-class pixel statistics to JSON
 - Batch processing with comprehensive statistics

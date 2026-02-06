@@ -69,17 +69,28 @@ class TunerConfig:
         auto_lr: Whether to use the learning rate finder before training.
             If ``True``, the optimal learning rate will be found and applied.
             If ``False``, the user-specified learning rate is used.
+            Default: ``True`` (enabled by default).
         auto_batch_size: Whether to use the batch size finder before training.
             If ``True``, the optimal batch size will be found and applied.
             If ``False``, the user-specified batch size is used.
+            Default: ``True`` (enabled by default).
         lr_find_kwargs: Additional kwargs passed to ``Tuner.lr_find()``.
             Common options: ``min_lr``, ``max_lr``, ``num_training``,
             ``mode`` ("exponential" or "linear"), ``early_stop_threshold``.
+            Default values are set if not provided.
         batch_size_kwargs: Additional kwargs passed to ``Tuner.scale_batch_size()``.
             Common options: ``mode`` ("power" or "binsearch"), ``steps_per_trial``,
             ``init_val``, ``max_trials``.
+            Default values are set if not provided.
 
     Example:
+        >>> # Use defaults (both auto_lr and auto_batch_size enabled)
+        >>> config = TunerConfig()
+
+        >>> # Disable auto-tuning
+        >>> config = TunerConfig(auto_lr=False, auto_batch_size=False)
+
+        >>> # Custom configuration
         >>> config = TunerConfig(
         ...     auto_lr=True,
         ...     auto_batch_size=True,
@@ -88,24 +99,41 @@ class TunerConfig:
         ... )
     """
 
-    auto_lr: bool
-    auto_batch_size: bool
+    auto_lr: bool = True
+    auto_batch_size: bool = True
     lr_find_kwargs: dict[str, Any] | None = None
     batch_size_kwargs: dict[str, Any] | None = None
 
     def __post_init__(self) -> None:
+        # Set sensible defaults for LR finder if not provided
         if self.lr_find_kwargs is None:
-            self.lr_find_kwargs = {}
+            self.lr_find_kwargs = {
+                "min_lr": 1e-7,
+                "max_lr": 1.0,
+                "num_training": 100,
+                "mode": "exponential",
+                "early_stop_threshold": 4.0,
+            }
+
+        # Set sensible defaults for batch size finder if not provided
         if self.batch_size_kwargs is None:
-            self.batch_size_kwargs = {}
+            self.batch_size_kwargs = {
+                "mode": "power",
+                "steps_per_trial": 3,
+                "init_val": 16,
+                "max_trials": 25,
+            }
 
 
 class AutoTrainer(pl.Trainer):
     """A configured ``pl.Trainer`` with sensible defaults for autotimm.
 
     This is a convenience class that wires up the logger, checkpointing,
-    and optional hyperparameter tuning. All ``**trainer_kwargs`` are
+    and automatic hyperparameter tuning. All ``**trainer_kwargs`` are
     forwarded to ``pl.Trainer``, so any Lightning Trainer argument works.
+
+    **Auto-tuning is enabled by default** - both learning rate and batch size
+    finding will run automatically before training unless explicitly disabled.
 
     Parameters:
         max_epochs: Number of training epochs.
@@ -115,9 +143,10 @@ class AutoTrainer(pl.Trainer):
         logger: A ``LoggerManager`` instance, a list of ``LoggerConfig``
             objects, a pre-built Logger instance/list, or ``False`` to
             disable logging.
-        tuner_config: A ``TunerConfig`` instance to enable automatic learning
-            rate and/or batch size finding. If ``None``, no tuning is performed
-            and user-specified values are used directly.
+        tuner_config: A ``TunerConfig`` instance to configure automatic learning
+            rate and/or batch size finding. If ``None``, a default ``TunerConfig()``
+            is created with both auto_lr and auto_batch_size enabled.
+            To disable auto-tuning completely, pass ``False``.
         checkpoint_monitor: Metric to monitor for checkpointing (e.g.,
             ``"val/accuracy"``). If ``None``, no automatic checkpoint
             callback is added.
@@ -135,28 +164,26 @@ class AutoTrainer(pl.Trainer):
         **trainer_kwargs: Any other ``pl.Trainer`` argument.
 
     Example:
-        >>> # Manual hyperparameters (no tuning)
+        >>> # Default: auto-tuning enabled (both LR and batch size)
         >>> trainer = AutoTrainer(max_epochs=10)
         >>> trainer.fit(model, datamodule=data)
 
-        >>> # With automatic LR and batch size finding
+        >>> # Disable all auto-tuning
+        >>> trainer = AutoTrainer(max_epochs=10, tuner_config=False)
+        >>> trainer.fit(model, datamodule=data)
+
+        >>> # Custom tuning configuration
         >>> trainer = AutoTrainer(
         ...     max_epochs=10,
         ...     tuner_config=TunerConfig(
         ...         auto_lr=True,
-        ...         auto_batch_size=True,
+        ...         auto_batch_size=False,
         ...         lr_find_kwargs={"min_lr": 1e-6, "max_lr": 1.0},
         ...     ),
         ... )
         >>> trainer.fit(model, datamodule=data)
 
-        >>> # Only LR finding, manual batch size
-        >>> trainer = AutoTrainer(
-        ...     max_epochs=10,
-        ...     tuner_config=TunerConfig(auto_lr=True, auto_batch_size=False),
-        ... )
-
-        >>> # Quick debugging with fast_dev_run
+        >>> # Quick debugging with fast_dev_run (auto-tuning disabled automatically)
         >>> trainer = AutoTrainer(fast_dev_run=True)
         >>> trainer.fit(model, datamodule=data)  # Runs 1 batch only
     """
@@ -174,7 +201,7 @@ class AutoTrainer(pl.Trainer):
             | list[pl.loggers.Logger]
             | bool
         ) = False,
-        tuner_config: TunerConfig | None = None,
+        tuner_config: TunerConfig | None | bool = None,
         checkpoint_monitor: str | None = None,
         checkpoint_mode: str = "max",
         callbacks: list[pl.Callback] | None = None,
@@ -216,7 +243,15 @@ class AutoTrainer(pl.Trainer):
                     )
                 )
 
-        self._tuner_config = tuner_config
+        # Configure auto-tuning behavior
+        # Disable auto-tuning during fast_dev_run or if explicitly set to False
+        if fast_dev_run or tuner_config is False:
+            self._tuner_config = None
+        elif tuner_config is None:
+            # Enable auto-tuning by default with sensible defaults
+            self._tuner_config = TunerConfig()
+        else:
+            self._tuner_config = tuner_config
 
         super().__init__(
             max_epochs=max_epochs,

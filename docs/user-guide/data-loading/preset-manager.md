@@ -205,23 +205,27 @@ The Preset Manager uses the following logic to make recommendations:
 ### Torchvision
 
 **Best for:**
+
 - Image classification
 - Quick prototyping
 - Simple augmentation pipelines
 - When speed is critical (for basic transforms)
 
 **Pros:**
+
 - Built into PyTorch ecosystem
 - Fast for basic transforms
 - Well-documented
 - No extra dependencies (included in AutoTimm)
 
 **Cons:**
+
 - Limited spatial transforms
 - No built-in bbox/mask handling
 - Fewer augmentation options
 
 **Available Presets:**
+
 - `default`: RandomResizedCrop, HorizontalFlip, ColorJitter
 - `autoaugment`: AutoAugment (ImageNet policy)
 - `randaugment`: RandAugment with configurable ops/magnitude
@@ -231,22 +235,26 @@ The Preset Manager uses the following logic to make recommendations:
 ### Albumentations
 
 **Best for:**
+
 - Object detection
 - Semantic/instance segmentation
 - Advanced augmentation pipelines
 - Spatial transforms (rotation, affine, elastic)
 
 **Pros:**
+
 - Rich augmentation library (80+ transforms)
 - Built-in bbox/mask support
 - Spatial transforms (affine, elastic, etc.)
 - Highly optimized (included in AutoTimm)
 
 **Cons:**
+
 - Slightly more complex API
 - OpenCV-based (different from PIL)
 
 **Available Presets:**
+
 - `default`: RandomResizedCrop, HorizontalFlip, ColorJitter
 - `strong`: Affine, blur/noise, ColorJitter, CoarseDropout
 - `light`: RandomResizedCrop, HorizontalFlip only

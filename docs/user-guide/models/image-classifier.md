@@ -135,9 +135,11 @@ model = ImageClassifier(
 Available optimizers:
 
 **Torch:**
+
 - `adamw`, `adam`, `sgd`, `rmsprop`, `adagrad`
 
 **Timm (if installed):**
+
 - `adamp`, `sgdp`, `adabelief`, `radam`, `lamb`, `lars`, `madgrad`, `novograd`
 
 Custom optimizer:
@@ -168,9 +170,11 @@ model = ImageClassifier(
 Available schedulers:
 
 **Torch:**
+
 - `cosine`, `step`, `multistep`, `exponential`, `onecycle`, `plateau`
 
 **Timm:**
+
 - `cosine_with_restarts`
 
 Custom scheduler:

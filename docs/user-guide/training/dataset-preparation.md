@@ -166,6 +166,7 @@ coco_dataset/
 ```
 
 **Important Notes:**
+
 - `bbox` format is `[x, y, width, height]` (top-left corner + dimensions)
 - `category_id` is 1-indexed in COCO format
 - `area` should be `width * height` of the bounding box

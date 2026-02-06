@@ -215,7 +215,9 @@ class TestCombinedSegmentationLoss:
             num_classes=5, ce_weight=1.0, dice_weight=1.0
         )(logits, targets)
 
-        assert all(not torch.isnan(loss) for loss in [loss_ce, loss_dice, loss_combined])
+        assert all(
+            not torch.isnan(loss) for loss in [loss_ce, loss_dice, loss_combined]
+        )
 
     def test_combined_loss_class_weights(self):
         """Test with class weights."""

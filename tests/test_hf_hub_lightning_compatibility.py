@@ -9,11 +9,8 @@ import pytest
 import torch
 import pytorch_lightning as pl
 
-import autotimm
 from autotimm import (
-    AutoTrainer,
     ImageClassifier,
-    ImageDataModule,
     MetricConfig,
     ObjectDetector,
     SemanticSegmentor,

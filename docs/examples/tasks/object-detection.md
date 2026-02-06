@@ -177,6 +177,7 @@ if __name__ == "__main__":
 | `deit_base_patch16_224` | Slow | Best | High | Limited data |
 
 **Tips:**
+
 - Use smaller batch sizes (8-16) - transformers need more memory
 - Two-phase training works very well with transformers
 - Gradient clipping (1.0) is important for stability
@@ -275,12 +276,14 @@ if __name__ == "__main__":
 | `PekingU/rtdetr_r101vd` | 76M | Slower | Maximum accuracy |
 
 **When to use RT-DETR:**
+
 - Need end-to-end differentiable pipeline
 - Want to avoid NMS post-processing
 - Detecting large objects or scenes
 - Have sufficient GPU memory
 
 **When to use FCOS:**
+
 - Need maximum efficiency
 - Detecting small objects
 - Limited GPU memory

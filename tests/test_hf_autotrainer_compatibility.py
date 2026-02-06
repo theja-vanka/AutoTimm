@@ -76,12 +76,13 @@ class TestHFHubWithAutoTrainer:
             lr=1e-3,
         )
 
-        # Use AutoTrainer
+        # Use AutoTrainer (disable auto-tuning for tests)
         trainer = AutoTrainer(
             max_epochs=2,
             accelerator="cpu",
             logger=False,
             enable_checkpointing=False,
+            tuner_config=False,
         )
 
         # Train
@@ -117,6 +118,7 @@ class TestHFHubWithAutoTrainer:
                 logger=False,
                 callbacks=[checkpoint_callback],
                 enable_checkpointing=True,  # Explicitly enable
+                tuner_config=False,
             )
 
             trainer.fit(model, train_loader, val_loader)
@@ -148,6 +150,7 @@ class TestHFHubWithAutoTrainer:
             logger=False,
             enable_checkpointing=False,
             callbacks=[early_stop],
+            tuner_config=False,
         )
 
         trainer.fit(model, train_loader, val_loader)
@@ -171,6 +174,7 @@ class TestHFHubWithAutoTrainer:
             accelerator="cpu",
             logger=False,
             enable_checkpointing=False,
+            tuner_config=False,
         )
 
         # Train
@@ -208,6 +212,7 @@ class TestHFHubWithAutoTrainer:
                 accelerator="cpu",
                 logger=False,
                 enable_checkpointing=False,
+                tuner_config=False,
             )
 
             trainer.fit(model, train_loader, val_loader)
@@ -269,6 +274,7 @@ class TestHFDirectWithAutoTrainer:
             accelerator="cpu",
             logger=False,
             enable_checkpointing=False,
+            tuner_config=False,
         )
 
         trainer.fit(model, train_loader, val_loader)
@@ -333,6 +339,7 @@ class TestHFDirectWithAutoTrainer:
                 accelerator="cpu",
                 logger=False,
                 callbacks=[checkpoint_callback],
+                tuner_config=False,
             )
 
             trainer.fit(model, train_loader, val_loader)
@@ -383,6 +390,7 @@ class TestAutoTrainerFeatures:
                 accelerator="cpu",
                 logger=False,
                 callbacks=[checkpoint_callback, early_stop, progress_bar],
+                tuner_config=False,
             )
 
             trainer.fit(model, train_loader, val_loader)
@@ -406,6 +414,7 @@ class TestAutoTrainerFeatures:
             logger=False,
             enable_checkpointing=False,
             accumulate_grad_batches=2,
+            tuner_config=False,
         )
 
         trainer.fit(model, train_loader, val_loader)
@@ -429,6 +438,7 @@ class TestAutoTrainerFeatures:
             logger=False,
             enable_checkpointing=False,
             precision="16-mixed" if torch.cuda.is_available() else "32-true",
+            tuner_config=False,
         )
 
         trainer.fit(model, train_loader, val_loader)
@@ -453,6 +463,7 @@ class TestAutoTrainerFeatures:
             enable_checkpointing=False,
             limit_train_batches=2,
             limit_val_batches=2,
+            tuner_config=False,
         )
 
         trainer.fit(model, train_loader, val_loader)
@@ -505,6 +516,7 @@ class TestAutoTrainerWithDataModule:
                 accelerator="cpu",
                 logger=False,
                 enable_checkpointing=False,
+                tuner_config=False,
             )
 
             trainer.fit(model, datamodule=datamodule)

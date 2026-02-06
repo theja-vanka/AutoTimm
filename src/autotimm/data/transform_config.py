@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Literal
 
 
@@ -179,7 +179,9 @@ def list_transform_presets(
     elif backend == "albumentations":
         presets = ALBUMENTATIONS_PRESETS
     else:
-        raise ValueError(f"Unknown backend: {backend}. Use 'torchvision' or 'albumentations'.")
+        raise ValueError(
+            f"Unknown backend: {backend}. Use 'torchvision' or 'albumentations'."
+        )
 
     if verbose:
         return list(presets.items())

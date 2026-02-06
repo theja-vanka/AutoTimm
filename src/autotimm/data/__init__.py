@@ -29,6 +29,7 @@ from autotimm.data.transforms import (
 __all__ = [
     # Transform config
     "TransformConfig",
+    "list_transform_presets",
     # Timm transforms
     "create_inference_transform",
     "get_transforms_from_backbone",

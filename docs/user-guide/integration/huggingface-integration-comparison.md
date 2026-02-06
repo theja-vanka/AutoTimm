@@ -36,17 +36,20 @@ model = ImageClassifier(
 **Status:** ✅ **Fully Compatible** (Recommended for timm models)
 
 **Requirements:**
+
 - `timm` library
 - `huggingface_hub` library
 - Does NOT require `transformers`
 
 **Best for:**
+
 - CNN backbones (ResNet, EfficientNet, ConvNeXt)
 - timm-compatible models on HF Hub
 - Direct integration with AutoTimm tasks
 - Production deployments with proven architectures
 
 **Advantages:**
+
 - Seamless AutoTimm integration
 - Access to 1000+ timm models
 - Version control via HF Hub
@@ -84,15 +87,18 @@ class ViTClassifier(pl.LightningModule):
 **Status:** ✅ **Fully Compatible** (Recommended for transformers)
 
 **Requirements:**
+
 - `transformers` library
 
 **Best for:**
+
 - Vision Transformers (ViT, DeiT, BEiT, Swin)
 - Full control over model architecture
 - Custom configurations
 - Production use with explicit specifications
 
 **Advantages:**
+
 - Full control and transparency
 - No abstraction layer
 - Better IDE support and type hints
@@ -116,9 +122,11 @@ processor = AutoImageProcessor.from_pretrained("google/vit-base-patch16-224")
 **Status:** ✅ **Compatible** (but not necessary)
 
 **Requirements:**
+
 - `transformers` library
 
 **Best for:**
+
 - Quick prototyping
 - Dynamic model selection
 - Multi-model pipelines
@@ -391,6 +399,7 @@ All three approaches have **identical runtime performance**:
 ✅ **Three approaches, all fully compatible with PyTorch Lightning**
 
 ✅ **Choose based on use case:**
+
 - CNNs → HF Hub timm via AutoTimm
 - Vision Transformers → HF Direct classes
 - Quick prototyping → HF Auto classes
@@ -675,18 +684,21 @@ trainer.test(model, datamodule=datamodule)
 ### 🎯 Quick Decision Guide
 
 **Choose HF Hub timm when:**
+
 - Working with CNNs (ResNet, EfficientNet, ConvNeXt)
 - Want seamless AutoTimm integration
 - Need all AutoTimm tasks (classification, detection, segmentation)
 - Building production systems
 
 **Choose HF Direct when:**
+
 - Using Vision Transformers (ViT, DeiT, BEiT, Swin)
 - Need full control over architecture
 - Want explicit configuration
 - Building custom models
 
 **Choose HF Auto when:**
+
 - Rapid prototyping
 - Quick experimentation
 - Testing multiple architectures

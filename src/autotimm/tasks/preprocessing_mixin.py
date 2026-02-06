@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any, Union
 
 import torch
-import torch.nn as nn
 from PIL import Image
 
 from autotimm.data.transform_config import TransformConfig

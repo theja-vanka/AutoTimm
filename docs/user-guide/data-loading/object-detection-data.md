@@ -158,6 +158,7 @@ This:
 - Updates `num_classes` automatically
 
 **Use Cases:**
+
 - Training specialized detectors (e.g., only vehicles)
 - Reducing dataset size for faster experimentation
 - Domain-specific applications
@@ -183,6 +184,7 @@ This filters out bounding boxes smaller than the specified area, which helps:
 - Improve model focus on detectable objects
 
 **Guidelines:**
+
 - `min_bbox_area=32.0`: Standard for most applications
 - `min_bbox_area=64.0`: For large object detection
 - `min_bbox_area=16.0`: When small objects are critical

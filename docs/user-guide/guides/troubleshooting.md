@@ -579,6 +579,612 @@ If you encounter an issue not covered here:
 
 ---
 
+## Data Loading Issues
+
+### Corrupted or Missing Images
+
+```python
+# Enable validation to skip corrupted images
+from autotimm import ImageDataModule
+
+data = ImageDataModule(
+    data_dir="./data",
+    dataset_name="custom",
+    validate_images=True,  # Skip corrupted images
+)
+```
+
+### Dataset Not Found
+
+```python
+import os
+
+# Verify data directory structure
+print("Data directory contents:")
+print(os.listdir("./data"))
+
+# For COCO format detection
+# Expected structure:
+# data/
+#   ├── images/
+#   │   ├── train/
+#   │   └── val/
+#   └── annotations/
+#       ├── instances_train.json
+#       └── instances_val.json
+```
+
+### Annotation Format Issues
+
+**Symptoms:** KeyError, ValueError when loading annotations
+
+**Solutions:**
+
+```python
+# For COCO format, verify structure
+import json
+
+with open("data/annotations/instances_train.json") as f:
+    coco_data = json.load(f)
+
+# Check required keys
+required_keys = ["images", "annotations", "categories"]
+for key in required_keys:
+    assert key in coco_data, f"Missing key: {key}"
+
+# Verify image IDs match
+image_ids = {img["id"] for img in coco_data["images"]}
+ann_image_ids = {ann["image_id"] for ann in coco_data["annotations"]}
+print(f"Images: {len(image_ids)}, Annotated: {len(ann_image_ids)}")
+```
+
+### Class Imbalance Warnings
+
+```python
+from collections import Counter
+
+# Check class distribution
+def check_class_distribution(datamodule):
+    train_labels = []
+    for batch in datamodule.train_dataloader():
+        labels = batch["labels"] if isinstance(batch, dict) else batch[1]
+        train_labels.extend(labels.tolist())
+
+    counts = Counter(train_labels)
+    print("Class distribution:", counts)
+
+    # If imbalanced, use weighted loss
+    class_weights = [1.0 / count for count in counts.values()]
+    return class_weights
+
+# Apply weighted loss
+from autotimm import ImageClassifier
+class_weights = check_class_distribution(data)
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    loss_fn="crossentropyloss",
+    loss_kwargs={"weight": torch.tensor(class_weights)},
+)
+```
+
+---
+
+## Model Loading and Checkpoint Issues
+
+### Checkpoint Compatibility
+
+```python
+import torch
+
+# Check checkpoint contents
+checkpoint = torch.load("path/to/checkpoint.ckpt")
+print("Checkpoint keys:", checkpoint.keys())
+print("State dict keys:", checkpoint["state_dict"].keys() if "state_dict" in checkpoint else "No state_dict")
+
+# Load with strict=False to ignore mismatched keys
+model = ImageClassifier.load_from_checkpoint(
+    "path/to/checkpoint.ckpt",
+    strict=False,  # Ignore missing/unexpected keys
+)
+```
+
+### Pretrained Model Download Failures
+
+```python
+# If download fails, manually specify cache directory
+import os
+os.environ["TORCH_HOME"] = "/path/to/cache"
+
+# Or disable pretrained weights
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    pretrained=False,  # Train from scratch
+)
+```
+
+### Version Mismatch Errors
+
+```bash
+# Check installed versions
+pip list | grep torch
+pip list | grep timm
+pip list | grep autotimm
+
+# Upgrade to compatible versions
+pip install --upgrade torch torchvision timm
+```
+
+---
+
+## Metric Calculation Issues
+
+### Unexpected Metric Values
+
+**Problem:** Metrics return 0, NaN, or unexpected values
+
+**Solutions:**
+
+```python
+from autotimm import MetricConfig
+
+# 1. Verify metric configuration matches task
+metrics = [
+    MetricConfig(
+        name="accuracy",
+        backend="torchmetrics",
+        metric_class="Accuracy",
+        params={
+            "task": "multiclass",  # Must match: binary, multiclass, multilabel
+            "num_classes": 10,
+        },
+        stages=["train", "val"],
+    )
+]
+
+# 2. Check prediction format
+def debug_predictions(model, batch):
+    outputs = model(batch["images"])
+    print(f"Output shape: {outputs.shape}")
+    print(f"Output range: [{outputs.min():.3f}, {outputs.max():.3f}]")
+    print(f"Label shape: {batch['labels'].shape}")
+    print(f"Label range: [{batch['labels'].min()}, {batch['labels'].max()}]")
+
+# 3. Verify label encoding
+# For classification: labels should be integers 0 to num_classes-1
+# For detection: check bbox format (xyxy, xywh, cxcywh)
+```
+
+### Detection mAP Issues
+
+```python
+# Common issue: bbox format mismatch
+from autotimm import ObjectDetector
+
+# Specify bbox format explicitly
+model = ObjectDetector(
+    backbone="resnet50",
+    num_classes=10,
+    bbox_format="xyxy",  # Options: xyxy, xywh, cxcywh
+)
+
+# Verify annotation format
+# COCO format uses [x, y, width, height]
+# Model expects format specified in bbox_format parameter
+```
+
+---
+
+## Export and Inference Issues
+
+### ONNX Export Failures
+
+```python
+import torch
+
+# 1. Export with dynamic axes for variable input sizes
+model = ImageClassifier.load_from_checkpoint("checkpoint.ckpt")
+model.eval()
+
+dummy_input = torch.randn(1, 3, 224, 224)
+torch.onnx.export(
+    model,
+    dummy_input,
+    "model.onnx",
+    input_names=["image"],
+    output_names=["output"],
+    dynamic_axes={
+        "image": {0: "batch_size"},
+        "output": {0: "batch_size"}
+    },
+    opset_version=14,  # Use higher opset for better compatibility
+)
+
+# 2. If export fails, simplify model
+model.to_torchscript(
+    file_path="model.pt",
+    method="trace",  # Try "script" if trace fails
+)
+```
+
+### TorchScript Issues
+
+```python
+# Some operations don't support TorchScript
+# Try tracing instead of scripting
+traced_model = torch.jit.trace(model, dummy_input)
+traced_model.save("model_traced.pt")
+
+# Or freeze the model
+frozen_model = torch.jit.freeze(traced_model)
+frozen_model.save("model_frozen.pt")
+```
+
+### Inference Optimization
+
+```python
+# 1. Compile model for faster inference (PyTorch 2.0+)
+import torch
+model = torch.compile(model, mode="reduce-overhead")
+
+# 2. Use half precision for inference
+model = model.half()
+input_tensor = input_tensor.half()
+
+# 3. Disable gradient computation
+with torch.no_grad():
+    with torch.cuda.amp.autocast():  # Automatic mixed precision
+        outputs = model(inputs)
+```
+
+---
+
+## Integration Issues
+
+### Weights & Biases (WandB) Issues
+
+```python
+# 1. Login issues
+import wandb
+wandb.login(key="your_api_key")
+
+# 2. Disable online sync for offline training
+trainer = AutoTrainer(
+    max_epochs=10,
+    logger="wandb",
+    logger_kwargs={
+        "project": "my-project",
+        "offline": True,  # Save logs locally
+    },
+)
+
+# 3. Resume run
+trainer = AutoTrainer(
+    logger_kwargs={
+        "project": "my-project",
+        "id": "run_id",
+        "resume": "must",
+    },
+)
+```
+
+### TensorBoard Issues
+
+```python
+from autotimm import LoggingConfig
+
+# Specify custom log directory
+logging_config = LoggingConfig(
+    log_dir="./custom_logs",
+    log_hyperparameters=True,
+)
+
+# View logs
+# tensorboard --logdir ./custom_logs
+
+# If port is occupied
+# tensorboard --logdir ./custom_logs --port 6007
+```
+
+### HuggingFace Hub Issues
+
+```python
+from huggingface_hub import login
+
+# Login to HuggingFace
+login(token="your_token")
+
+# Push model with retry
+model.push_to_hub(
+    repo_id="username/model-name",
+    commit_message="Initial commit",
+    private=True,  # Make repository private
+)
+
+# If push fails, check permissions
+# https://huggingface.co/settings/tokens
+```
+
+---
+
+## Reproducibility Issues
+
+### Setting Random Seeds
+
+```python
+import torch
+import random
+import numpy as np
+import pytorch_lightning as pl
+
+def set_seed(seed=42):
+    """Set seeds for reproducibility"""
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    pl.seed_everything(seed, workers=True)
+
+set_seed(42)
+
+# Use deterministic algorithms
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+
+# Configure trainer
+trainer = AutoTrainer(
+    max_epochs=10,
+    deterministic=True,
+)
+```
+
+### Non-Deterministic Operations
+
+```python
+# Some operations are non-deterministic by design
+# To identify them:
+import torch
+torch.use_deterministic_algorithms(True)
+
+# This will raise errors for non-deterministic operations
+# Common culprits:
+# - torch.nn.functional.interpolate (bilinear mode)
+# - torch.scatter_add_
+# - Atomic operations in CUDA
+
+# Workaround: disable or replace non-deterministic ops
+```
+
+---
+
+## Data Augmentation Issues
+
+### Augmentation Too Strong
+
+**Symptoms:** Training accuracy remains low, loss doesn't converge
+
+```python
+# Use weaker augmentation preset
+data = ImageDataModule(
+    data_dir="./data",
+    augmentation_preset="light",  # Instead of "strong"
+)
+
+# Or disable augmentation temporarily
+data = ImageDataModule(
+    data_dir="./data",
+    augmentation_preset=None,
+)
+```
+
+### Custom Transform Errors
+
+```python
+from autotimm import TransformConfig
+
+# Debug transforms
+transform_config = TransformConfig(
+    train_preset="light",
+    additional_transforms=[
+        {
+            "transform": "ColorJitter",
+            "params": {"brightness": 0.2, "contrast": 0.2},
+        }
+    ],
+)
+
+# Test transform on single image
+from PIL import Image
+img = Image.open("test_image.jpg")
+transforms = transform_config.get_train_transforms(image_size=224)
+
+try:
+    transformed = transforms(img)
+    print(f"Transform successful: {transformed.shape}")
+except Exception as e:
+    print(f"Transform failed: {e}")
+```
+
+### Bbox Transforms for Detection
+
+```python
+# Ensure bbox transforms are compatible
+from autotimm import DetectionDataModule
+
+data = DetectionDataModule(
+    data_dir="./data",
+    image_size=640,
+    bbox_format="xyxy",  # Must match your annotations
+    # Geometric transforms automatically handle bboxes
+    augmentation_preset="medium",
+)
+```
+
+---
+
+## Performance Profiling
+
+### Identifying Bottlenecks
+
+```python
+import torch.profiler
+
+# Profile training
+with torch.profiler.profile(
+    activities=[
+        torch.profiler.ProfilerActivity.CPU,
+        torch.profiler.ProfilerActivity.CUDA,
+    ],
+    record_shapes=True,
+    profile_memory=True,
+) as prof:
+    # Run a few training steps
+    for i, batch in enumerate(train_loader):
+        if i >= 10:  # Profile 10 batches
+            break
+        outputs = model(batch["images"])
+        loss = criterion(outputs, batch["labels"])
+        loss.backward()
+        optimizer.step()
+        optimizer.zero_grad()
+
+# Print results
+print(prof.key_averages().table(sort_by="cuda_time_total", row_limit=10))
+
+# Export for visualization
+prof.export_chrome_trace("trace.json")
+# View in chrome://tracing
+```
+
+### Data Loading Profiling
+
+```python
+import time
+
+# Measure data loading time
+loader = datamodule.train_dataloader()
+times = []
+
+for i, batch in enumerate(loader):
+    start = time.time()
+    # Just iterate, don't process
+    end = time.time()
+    times.append(end - start)
+    if i >= 100:
+        break
+
+print(f"Average batch load time: {sum(times)/len(times):.4f}s")
+print(f"Max batch load time: {max(times):.4f}s")
+
+# If slow, increase num_workers
+data = ImageDataModule(
+    num_workers=8,
+    persistent_workers=True,
+    pin_memory=True,
+)
+```
+
+---
+
+## Distributed Training Issues
+
+### DDP Hangs or Deadlocks
+
+```python
+# 1. Set environment variables
+import os
+os.environ["NCCL_DEBUG"] = "INFO"  # Debug NCCL issues
+
+# 2. Use timeout to detect hangs
+trainer = AutoTrainer(
+    accelerator="gpu",
+    devices=2,
+    strategy="ddp",
+    plugins=[
+        {"timeout": 1800}  # 30 minute timeout
+    ],
+)
+
+# 3. If still hangs, try ddp_spawn
+trainer = AutoTrainer(
+    strategy="ddp_spawn",
+    devices=2,
+)
+```
+
+### Multi-Node Training Issues
+
+```bash
+# Set master node address
+export MASTER_ADDR=192.168.1.1
+export MASTER_PORT=29500
+
+# Run on each node
+python train.py --num_nodes=2 --node_rank=0  # Master node
+python train.py --num_nodes=2 --node_rank=1  # Worker node
+```
+
+```python
+# In code
+trainer = AutoTrainer(
+    accelerator="gpu",
+    devices=4,
+    num_nodes=2,
+    strategy="ddp",
+)
+```
+
+---
+
+## Callback and Hook Errors
+
+### Custom Callback Issues
+
+```python
+from pytorch_lightning.callbacks import Callback
+
+class DebugCallback(Callback):
+    def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
+        # Check if outputs is correct
+        if batch_idx % 100 == 0:
+            print(f"Batch {batch_idx}: loss = {outputs['loss']:.4f}")
+
+# Add to trainer
+trainer = AutoTrainer(
+    callbacks=[DebugCallback()],
+)
+```
+
+### Hook Registration Issues
+
+```python
+# Register hooks for debugging
+def forward_hook(module, input, output):
+    print(f"{module.__class__.__name__}: {output.shape}")
+
+# Attach to specific layer
+model.backbone.register_forward_hook(forward_hook)
+
+# Remove hook after debugging
+handle = model.backbone.register_forward_hook(forward_hook)
+handle.remove()
+```
+
+---
+
+## Common Warning Messages
+
+| Warning | Meaning | Action |
+|---------|---------|--------|
+| `UserWarning: The dataloader does not have many workers` | Slow data loading | Increase `num_workers` |
+| `UserWarning: Trying to infer the batch_size` | Can't determine batch size | Explicitly set in datamodule |
+| `UserWarning: The number of training batches is very small` | Epoch finishes quickly | Increase dataset size or reduce batch size |
+| `FutureWarning: Passing (type, 1) for ndim` | Deprecated numpy usage | Update to latest version |
+| `UserWarning: Mixed precision is not supported on CPU` | Using wrong accelerator | Switch to GPU or remove precision flag |
+
+---
+
 ## See Also
 
 - [Training Guide](../training/training.md) - Complete training documentation

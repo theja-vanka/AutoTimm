@@ -35,11 +35,13 @@ accuracy = MetricConfig(
 ```
 
 **When to Use:**
+
 - Balanced class distribution
 - All classes equally important
 - Simple model comparison
 
 **When NOT to Use:**
+
 - Imbalanced datasets (accuracy can be misleading)
 - When false positives/negatives have different costs
 
@@ -58,6 +60,7 @@ top5_accuracy = MetricConfig(
 ```
 
 **When to Use:**
+
 - Many similar classes (ImageNet-style tasks)
 - Fine-grained classification
 - When near-misses are acceptable
@@ -97,6 +100,7 @@ f1_per_class = MetricConfig(
 ```
 
 **When to Use:**
+
 - Imbalanced datasets
 - When both precision and recall matter
 - Medical diagnosis, fraud detection
@@ -154,6 +158,7 @@ auroc_multiclass = MetricConfig(
 ```
 
 **When to Use:**
+
 - Binary classification
 - When you need to compare models at different thresholds
 - Medical diagnosis (sensitivity vs specificity trade-off)
@@ -230,6 +235,7 @@ Measures detection coverage at different numbers of detections.
 ```
 
 **Interpretation:**
+
 - `mar_1`: Recall with max 1 detection per image
 - `mar_10`: Recall with max 10 detections per image
 - `mar_100`: Recall with max 100 detections per image
@@ -271,6 +277,7 @@ iou_per_class = MetricConfig(
 ```
 
 **When to Use:**
+
 - Semantic segmentation evaluation
 - Standard benchmark comparison
 - When region overlap matters
@@ -319,6 +326,7 @@ pixel_accuracy = MetricConfig(
 ```
 
 **Limitations:**
+
 - Biased toward dominant classes
 - Background often dominates, inflating scores
 - Use mIoU for more balanced evaluation
@@ -351,6 +359,7 @@ MetricConfig(
 | `test` | Final evaluation | Reporting final results |
 
 **Recommendations:**
+
 - `train`: Accuracy only (fast metrics)
 - `val`: Primary metrics for checkpointing
 - `test`: All metrics for comprehensive evaluation
@@ -392,6 +401,7 @@ AutoTimm uses [torchmetrics](https://torchmetrics.readthedocs.io/) for metric co
 ### Available Metric Classes
 
 **Classification:**
+
 - `Accuracy` - Classification accuracy
 - `F1Score` - F1 score
 - `Precision` - Precision
@@ -403,9 +413,11 @@ AutoTimm uses [torchmetrics](https://torchmetrics.readthedocs.io/) for metric co
 - `MatthewsCorrCoef` - Matthews correlation
 
 **Detection:**
+
 - `MeanAveragePrecision` - mAP for detection
 
 **Segmentation:**
+
 - `JaccardIndex` - IoU / Jaccard index
 - `Dice` - Dice coefficient
 

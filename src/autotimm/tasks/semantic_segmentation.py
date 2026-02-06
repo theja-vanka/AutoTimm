@@ -89,7 +89,9 @@ class SemanticSegmentor(PreprocessingMixin, pl.LightningModule):
         freeze_backbone: bool = False,
     ):
         super().__init__()
-        self.save_hyperparameters(ignore=["metrics", "logging_config", "transform_config", "class_weights"])
+        self.save_hyperparameters(
+            ignore=["metrics", "logging_config", "transform_config", "class_weights"]
+        )
 
         # Create feature backbone
         self.backbone = create_feature_backbone(backbone)

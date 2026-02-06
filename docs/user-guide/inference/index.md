@@ -79,6 +79,7 @@ torch.onnx.export(model, torch.randn(1, 3, 224, 224), "model.onnx")
 | ONNX Runtime | 20-40% | Cross-platform |
 
 **Checklist:**
+
 - Use `model.eval()` before inference
 - Wrap predictions in `torch.no_grad()`
 - Process multiple images in batches

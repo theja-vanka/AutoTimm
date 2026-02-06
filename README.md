@@ -3,7 +3,8 @@
 </p>
 
 <p align="center">
-  <strong>Train state-of-the-art vision models with minimal code</strong>
+  <strong>🚀 Train state-of-the-art vision models with minimal code</strong><br>
+  From prototype to production in minutes, not hours
 </p>
 
 <p align="center">
@@ -14,65 +15,55 @@
 </p>
 
 <p align="center">
-  <a href="https://theja-vanka.github.io/AutoTimm/">Documentation</a> •
-  <a href="https://theja-vanka.github.io/AutoTimm/getting-started/quickstart/">Quick Start</a> •
-  <a href="https://theja-vanka.github.io/AutoTimm/examples/">Examples</a> •
-  <a href="https://theja-vanka.github.io/AutoTimm/api/">API Reference</a>
+  <a href="https://theja-vanka.github.io/AutoTimm/">📖 Documentation</a> •
+  <a href="https://theja-vanka.github.io/AutoTimm/getting-started/quickstart/">⚡ Quick Start</a> •
+  <a href="https://theja-vanka.github.io/AutoTimm/examples/">💡 Examples</a> •
+  <a href="https://theja-vanka.github.io/AutoTimm/api/">🔧 API Reference</a>
 </p>
 
 ---
 
-AutoTimm combines the power of [timm](https://github.com/huggingface/pytorch-image-models) (1000+ pretrained models) with [PyTorch Lightning](https://github.com/Lightning-AI/pytorch-lightning) for a seamless training experience. Train image classifiers, object detectors, and segmentation models with any timm backbone. Go from idea to trained model in minutes, not hours.
+## 🎯 What is AutoTimm?
 
-## Highlights
+AutoTimm is a **production-ready** computer vision framework that combines [timm](https://github.com/huggingface/pytorch-image-models) (1000+ pretrained models) with [PyTorch Lightning](https://github.com/Lightning-AI/pytorch-lightning). Train image classifiers, object detectors, and segmentation models with any timm backbone using a simple, intuitive API.
 
-| | |
-|---|---|
-| **4 Vision Tasks** | Classification, Object Detection, Semantic Segmentation, Instance Segmentation |
-| **1000+ Backbones** | Access ResNet, EfficientNet, ViT, ConvNeXt, Swin, and more from timm |
-| **Hugging Face Hub** | Load timm-compatible models directly from HF Hub with `hf-hub:` prefix |
-| **HF Transformers** | Direct integration with HuggingFace Transformers vision models (ViT, DeiT, BEiT, Swin) |
-| **AutoTrainer Compatible** | All HF models work with AutoTrainer (checkpointing, tuning, multi-logger, etc.) |
-| **Advanced Architectures** | DeepLabV3+, FCOS, Mask R-CNN style heads with feature pyramids |
-| **Explicit Metrics** | Configure exactly what you track with MetricManager and torchmetrics |
-| **Multi-Logger Support** | TensorBoard, MLflow, Weights & Biases, CSV — use them all at once |
-| **Auto-Tuning** | Automatic learning rate and batch size finding before training |
-| **Preset Manager** | Smart backend selection (torchvision vs albumentations) based on your task |
-| **TransformConfig** | Unified transform configuration with presets and model-specific normalization |
-| **Flexible Transforms** | Torchvision (PIL) and Albumentations (OpenCV) — both included by default |
-| **Production Ready** | Mixed precision, multi-GPU, gradient accumulation out of the box |
+**Perfect for:**
+- 🧑‍🔬 **Researchers** needing reproducible experiments and quick iterations
+- 👨‍💻 **Engineers** building production ML systems with minimal boilerplate
+- 🎓 **Students** learning computer vision with modern best practices
+- 🚀 **Startups** rapidly prototyping vision applications
 
-## Installation
+## ✨ What's New in v0.7.0
+
+- **YOLOX Models** 🎯 Official YOLOX implementation (nano to X) with CSPDarknet backbone
+- **Smart Backend Selection** 🧠 AI-powered recommendation for optimal transform backends
+- **TransformConfig** ⚙️ Unified transform configuration with presets and model-specific normalization
+- **Optional Metrics** 🔧 Metrics now optional for inference-only deployments
+- **Python 3.10-3.14** 🐍 Latest Python support
+
+## 🚀 Quick Start
+
+### Installation
 
 ```bash
 pip install autotimm
 ```
 
-**Includes:** PyTorch, timm, PyTorch Lightning, torchmetrics, albumentations, pycocotools, and more.
+**Everything included:** PyTorch, timm, PyTorch Lightning, torchmetrics, albumentations, pycocotools, and more.
 
 <details>
-<summary><strong>Optional extras for logging</strong></summary>
+<summary><strong>Optional logging backends</strong></summary>
 
 ```bash
-# Logger backends (optional)
-pip install autotimm[tensorboard]  # TensorBoard logging
+pip install autotimm[tensorboard]  # TensorBoard
 pip install autotimm[wandb]        # Weights & Biases
-pip install autotimm[mlflow]       # MLflow tracking
-
-# All optional extras
-pip install autotimm[all]
-
-# Development
-git clone https://github.com/theja-vanka/AutoTimm.git
-cd AutoTimm
-pip install -e ".[dev,all]"
+pip install autotimm[mlflow]       # MLflow
+pip install autotimm[all]          # All extras
 ```
 
 </details>
 
-## Quick Start
-
-### Image Classification
+### Your First Model in 30 Seconds
 
 ```python
 from autotimm import AutoTrainer, ImageClassifier, ImageDataModule, MetricConfig
@@ -94,516 +85,445 @@ metrics = [
         params={"task": "multiclass"},
         stages=["train", "val", "test"],
         prog_bar=True,
-    ),
+    )
 ]
 
-# Model & Train
+# Model
 model = ImageClassifier(
-    backbone="resnet18",
+    backbone="resnet18",  # Try efficientnet_b0, vit_base_patch16_224, etc.
     num_classes=10,
     metrics=metrics,
     lr=1e-3,
+)
+
+# Train with auto-tuning (finds optimal LR and batch size automatically!)
+trainer = AutoTrainer(max_epochs=10)
+trainer.fit(model, datamodule=data)
+```
+
+> 💡 **Auto-tuning is enabled by default.** Disable with `tuner_config=False` for manual control.
+
+## 🎨 Key Features
+
+<table>
+<tr>
+<td><strong>🎯 4 Vision Tasks</strong></td>
+<td>Classification • Object Detection • Semantic Segmentation • Instance Segmentation</td>
+</tr>
+<tr>
+<td><strong>🧠 1000+ Backbones</strong></td>
+<td>ResNet • EfficientNet • ViT • ConvNeXt • Swin • DeiT • BEiT • and more from timm</td>
+</tr>
+<tr>
+<td><strong>🤗 HuggingFace Integration</strong></td>
+<td>Load models from HF Hub with <code>hf-hub:</code> prefix + Direct Transformers support</td>
+</tr>
+<tr>
+<td><strong>🎯 YOLOX Support</strong></td>
+<td>Official YOLOX models (nano → X) + YOLOX-style heads with any timm backbone</td>
+</tr>
+<tr>
+<td><strong>🏗️ Advanced Architectures</strong></td>
+<td>DeepLabV3+ • FCOS • YOLOX • Mask R-CNN • Feature Pyramids</td>
+</tr>
+<tr>
+<td><strong>⚡ Auto-Tuning</strong></td>
+<td>Automatic LR and batch size finding—enabled by default</td>
+</tr>
+<tr>
+<td><strong>🧠 Smart Transforms</strong></td>
+<td>AI-powered backend recommendations + unified TransformConfig with presets</td>
+</tr>
+<tr>
+<td><strong>📈 Multi-Logger Support</strong></td>
+<td>TensorBoard • MLflow • Weights & Biases • CSV—use simultaneously</td>
+</tr>
+<tr>
+<td><strong>🏭 Production Ready</strong></td>
+<td>Mixed precision • Multi-GPU • Gradient accumulation • 200+ tests</td>
+</tr>
+</table>
+
+## 📚 Task Examples
+
+### 🖼️ Image Classification
+
+```python
+from autotimm import ImageClassifier
+
+# Use any timm backbone or HuggingFace model
+model = ImageClassifier(
+    backbone="efficientnet_b0",  # or "hf-hub:timm/resnet50.a1_in1k"
+    num_classes=10,
+    metrics=metrics,  # Optional for inference!
 )
 
 trainer = AutoTrainer(max_epochs=10)
 trainer.fit(model, datamodule=data)
 ```
 
-### Semantic Segmentation
+### 🎯 Object Detection with YOLOX
+
+**Official YOLOX (matches paper benchmarks):**
 
 ```python
-from autotimm import SemanticSegmentor, SegmentationDataModule, MetricConfig
+from autotimm import YOLOXDetector, DetectionDataModule
 
-# Data
-data = SegmentationDataModule(
-    data_dir="./cityscapes",
-    format="cityscapes",  # or "png", "coco", "voc"
-    image_size=512,
-    batch_size=8,
+model = YOLOXDetector(
+    model_name="yolox-s",  # nano, tiny, s, m, l, x
+    num_classes=80,
+    lr=0.01,
+    optimizer="sgd",
+    scheduler="yolox",
+    total_epochs=300,
 )
 
-# Metrics
-metrics = [
-    MetricConfig(
-        name="iou",
-        backend="torchmetrics",
-        metric_class="JaccardIndex",
-        params={
-            "task": "multiclass",
-            "num_classes": 19,
-            "average": "macro",
-            "ignore_index": 255,
-        },
-        stages=["val", "test"],
-        prog_bar=True,
-    ),
-]
+trainer = AutoTrainer(max_epochs=300, precision="16-mixed")
+trainer.fit(model, datamodule=DetectionDataModule(data_dir="./coco", image_size=640))
+```
 
-# Model & Train
+**YOLOX-style head with any timm backbone:**
+
+```python
+from autotimm import ObjectDetector
+
+model = ObjectDetector(
+    backbone="resnet50",  # Experiment with any backbone!
+    num_classes=80,
+    detection_arch="yolox",
+    fpn_channels=256,
+)
+```
+
+📖 **[Complete YOLOX Guide](https://theja-vanka.github.io/AutoTimm/user-guide/models/yolox-detector/)** • ⚡ **[Quick Reference](https://theja-vanka.github.io/AutoTimm/user-guide/guides/yolox-quick-reference/)**
+
+### 🗺️ Semantic Segmentation
+
+```python
+from autotimm import SemanticSegmentor, SegmentationDataModule
+
 model = SemanticSegmentor(
     backbone="resnet50",
     num_classes=19,
-    head_type="deeplabv3plus",  # or "fcn"
-    loss_type="combined",        # CE + Dice
-    dice_weight=1.0,
-    metrics=metrics,
+    head_type="deeplabv3plus",
+    loss_type="combined",  # CE + Dice for better boundaries
+)
+
+data = SegmentationDataModule(
+    data_dir="./cityscapes",
+    format="cityscapes",  # or "coco", "voc", "png"
+    image_size=512,
 )
 
 trainer = AutoTrainer(max_epochs=100)
 trainer.fit(model, datamodule=data)
 ```
 
-### Object Detection
+### 🎭 Instance Segmentation
 
 ```python
-from autotimm import ObjectDetector, DetectionDataModule, MetricConfig
+from autotimm import InstanceSegmentor, InstanceSegmentationDataModule
 
-# Data
-data = DetectionDataModule(
-    data_dir="./coco",
-    image_size=640,
-    batch_size=4,
-)
-
-# Metrics
-metrics = [
-    MetricConfig(
-        name="mAP",
-        backend="torchmetrics",
-        metric_class="MeanAveragePrecision",
-        params={"box_format": "xyxy", "iou_type": "bbox"},
-        stages=["val", "test"],
-        prog_bar=True,
-    ),
-]
-
-# Model & Train
-model = ObjectDetector(
-    backbone="resnet50",
-    num_classes=80,
-    metrics=metrics,
-)
-
-trainer = AutoTrainer(max_epochs=100)
-trainer.fit(model, datamodule=data)
-```
-
-### Instance Segmentation
-
-```python
-from autotimm import InstanceSegmentor, InstanceSegmentationDataModule, MetricConfig
-
-# Data
-data = InstanceSegmentationDataModule(
-    data_dir="./coco",
-    image_size=640,
-    batch_size=4,
-)
-
-# Metrics
-metrics = [
-    MetricConfig(
-        name="mask_mAP",
-        backend="torchmetrics",
-        metric_class="MeanAveragePrecision",
-        params={"box_format": "xyxy", "iou_type": "segm"},
-        stages=["val", "test"],
-        prog_bar=True,
-    ),
-]
-
-# Model & Train
 model = InstanceSegmentor(
     backbone="resnet50",
     num_classes=80,
     mask_loss_weight=1.0,
-    metrics=metrics,
 )
 
 trainer = AutoTrainer(max_epochs=100)
-trainer.fit(model, datamodule=data)
+trainer.fit(model, datamodule=InstanceSegmentationDataModule(data_dir="./coco"))
 ```
 
-**[See the full documentation for more examples and features →](https://theja-vanka.github.io/AutoTimm/)**
+## 🤗 HuggingFace Integration
 
-## Import Styles
+### Three Approaches
 
-AutoTimm supports flexible import styles for convenience:
+<table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Best For</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>HF Hub timm</strong></td>
+<td>CNNs, Production</td>
+<td><code>"hf-hub:timm/resnet50.a1_in1k"</code></td>
+</tr>
+<tr>
+<td><strong>HF Transformers Direct</strong></td>
+<td>Vision Transformers</td>
+<td><code>ViTModel.from_pretrained(...)</code></td>
+</tr>
+<tr>
+<td><strong>HF Transformers Auto</strong></td>
+<td>Quick Prototyping</td>
+<td><code>AutoModel.from_pretrained(...)</code></td>
+</tr>
+</tbody>
+</table>
 
-```python
-# Direct imports
-from autotimm import SemanticSegmentor, DiceLoss, MetricConfig
-
-# Submodule aliases (NEW!)
-from autotimm.task import SemanticSegmentor, InstanceSegmentor
-from autotimm.loss import DiceLoss, CombinedSegmentationLoss
-from autotimm.metric import MetricConfig, MetricManager
-from autotimm.head import DeepLabV3PlusHead, MaskHead
-
-# Namespace access
-import autotimm
-model = autotimm.task.SemanticSegmentor(...)
-loss = autotimm.loss.DiceLoss(...)
-
-# TransformConfig for unified transform settings
-from autotimm import TransformConfig, list_transform_presets
-config = TransformConfig(preset="randaugment", image_size=384)
-
-# Preset Manager for choosing the best backend (NEW!)
-from autotimm import recommend_backend, compare_backends
-rec = recommend_backend(task="detection")
-config = rec.to_config(image_size=640)
-
-# Original imports (still supported)
-from autotimm.losses import DiceLoss
-from autotimm.metrics import MetricConfig
-from autotimm.tasks import SemanticSegmentor
-```
-
-## Supported Tasks & Architectures
-
-### Classification
-- **Models**: Any timm backbone (1000+ models)
-- **Head**: Linear classification head with dropout
-- **Losses**: CrossEntropy with label smoothing, Mixup support
-- **Datasets**: Torchvision datasets, ImageFolder, custom loaders
-
-### Object Detection
-- **Architecture**: FCOS-style anchor-free detection
-- **Components**: FPN, Detection Head (classification + bbox regression + centerness)
-- **Losses**: Focal Loss, GIoU Loss, Centerness Loss
-- **Datasets**: COCO format, custom annotations
-
-### Semantic Segmentation
-- **Architectures**: DeepLabV3+ (ASPP + decoder), FCN
-- **Losses**: CrossEntropy, Dice, Focal, Combined (CE + Dice), Tversky
-- **Datasets**: PNG masks, COCO stuff, Cityscapes, Pascal VOC
-- **Metrics**: IoU (Jaccard Index), pixel accuracy, per-class metrics
-
-### Instance Segmentation
-- **Architecture**: FCOS detection + Mask R-CNN style mask head
-- **Components**: FPN, Detection Head, Mask Head with ROI Align
-- **Losses**: Detection losses + Binary mask loss
-- **Datasets**: COCO instance segmentation format
-- **Metrics**: Mask mAP, bbox mAP
-
-## Examples
-
-Ready-to-run scripts in the [`examples/`](examples/) directory:
-
-| Example | Description |
-|---------|-------------|
-| [classify_cifar10.py](examples/classify_cifar10.py) | Basic classification with MetricManager and auto-tuning |
-| [classify_custom_folder.py](examples/classify_custom_folder.py) | Train on your own dataset |
-| [huggingface_hub_models.py](examples/huggingface_hub_models.py) | Using Hugging Face Hub models with AutoTimm |
-| [hf_hub_*.py](examples/) | Comprehensive HF Hub integration examples (classification, detection, segmentation) |
-| [object_detection_coco.py](examples/object_detection_coco.py) | FCOS-style object detection on COCO dataset |
-| [object_detection_transformers.py](examples/object_detection_transformers.py) | Transformer-based detection (ViT, Swin, DeiT) |
-| [object_detection_rtdetr.py](examples/object_detection_rtdetr.py) | RT-DETR end-to-end detection (no NMS required) |
-| [semantic_segmentation.py](examples/semantic_segmentation.py) | DeepLabV3+ semantic segmentation |
-| [instance_segmentation.py](examples/instance_segmentation.py) | Mask R-CNN style instance segmentation |
-| [vit_finetuning.py](examples/vit_finetuning.py) | Two-phase Vision Transformer fine-tuning |
-| [multi_gpu_training.py](examples/multi_gpu_training.py) | Distributed training with DDP |
-| [mlflow_tracking.py](examples/mlflow_tracking.py) | Experiment tracking with MLflow |
-
-**[Browse all examples →](https://theja-vanka.github.io/AutoTimm/examples/)**
-
-## Documentation
-
-| Section | Description |
-|---------|-------------|
-| [Quick Start](https://theja-vanka.github.io/AutoTimm/getting-started/quickstart/) | Get up and running in 5 minutes |
-| [User Guide](https://theja-vanka.github.io/AutoTimm/user-guide/data-loading/) | In-depth guides for all features |
-| [HF Integration Overview](https://theja-vanka.github.io/AutoTimm/user-guide/huggingface-integration-comparison/) | Compare HF Hub timm vs HF Transformers approaches |
-| [HF Hub Integration](https://theja-vanka.github.io/AutoTimm/user-guide/huggingface-hub-integration/) | Using Hugging Face Hub models |
-| [HF Transformers](https://theja-vanka.github.io/AutoTimm/user-guide/huggingface-transformers-integration/) | HuggingFace Transformers vision models with Lightning |
-| [API Reference](https://theja-vanka.github.io/AutoTimm/api/) | Complete API documentation |
-| [Examples](https://theja-vanka.github.io/AutoTimm/examples/) | Runnable code examples |
-
-## Explore Backbones
-
-```python
-import autotimm
-
-# Search 1000+ timm models
-autotimm.list_backbones("*efficientnet*", pretrained_only=True)
-autotimm.list_backbones("*vit*")
-
-# Search Hugging Face Hub models
-autotimm.list_hf_hub_backbones(model_name="resnet", limit=10)
-autotimm.list_hf_hub_backbones(author="facebook", model_name="convnext")
-
-# Inspect a model
-backbone = autotimm.create_backbone("convnext_tiny")
-print(f"Features: {backbone.num_features}, Params: {autotimm.count_parameters(backbone):,}")
-
-# Use models from Hugging Face Hub
-hf_backbone = autotimm.create_backbone("hf-hub:timm/resnet50.a1_in1k")
-print(f"HF Hub model loaded: {hf_backbone.num_features} features")
-```
-
-## Hugging Face Hub Integration
-
-AutoTimm seamlessly integrates with Hugging Face Hub, allowing you to use thousands of community-contributed timm models:
+**All approaches fully support AutoTrainer** (checkpointing, early stopping, mixed precision, multi-GPU, auto-tuning).
 
 ```python
 from autotimm import ImageClassifier, list_hf_hub_backbones
 
-# Discover models on HF Hub
+# Discover models
 models = list_hf_hub_backbones(model_name="resnet", limit=5)
-print(models)
-# ['hf-hub:timm/resnet50.a1_in1k', 'hf-hub:timm/resnet18.a1_in1k', ...]
 
-# Use HF Hub model as backbone (just add 'hf-hub:' prefix)
-model = ImageClassifier(
-    backbone="hf-hub:timm/resnet50.a1_in1k",
-    num_classes=10,
-)
-
-# Works with all tasks
-from autotimm import SemanticSegmentor, ObjectDetector
-
-seg_model = SemanticSegmentor(
-    backbone="hf-hub:timm/convnext_tiny.fb_in22k",
-    num_classes=19,
-)
-
-det_model = ObjectDetector(
-    backbone="hf-hub:timm/efficientnet_b0.ra_in1k",
-    num_classes=80,
-)
-```
-
-### Three Integration Approaches
-
-AutoTimm supports multiple ways to work with HuggingFace models:
-
-| Approach | Best For | AutoTrainer | Integration |
-|----------|----------|-------------|-------------|
-| **HF Hub timm** | CNNs, Production | ✅ Full | Native |
-| **HF Direct** | Vision Transformers | ✅ Full | Manual |
-| **HF Auto** | Prototyping | ✅ Full | Manual |
-
-1. **HF Hub timm Models** (via AutoTimm) - Recommended for CNNs
-   - Use timm models from HF Hub: `"hf-hub:timm/resnet50.a1_in1k"`
-   - Native AutoTimm integration
-   - Works with all tasks
-
-2. **HF Transformers Direct** - Recommended for Vision Transformers
-   - Use specific model classes: `ViTModel`, `DeiTModel`, `BeitModel`
-   - Full control and transparency
-   - Manual PyTorch Lightning integration
-
-3. **HF Transformers Auto** - For quick prototyping
-   - Use Auto classes: `AutoModel`, `AutoConfig`
-   - Quick experimentation
-   - Less explicit
-
-[Learn more about choosing the right approach →](https://theja-vanka.github.io/AutoTimm/user-guide/huggingface-integration-comparison/)
-
-### Full AutoTrainer Support
-
-All HuggingFace integration approaches work seamlessly with AutoTimm's AutoTrainer, including:
-
-- ✅ Checkpoint monitoring and saving
-- ✅ Early stopping callbacks
-- ✅ Gradient accumulation
-- ✅ Mixed precision training
-- ✅ Automatic LR and batch size finding
-- ✅ Multiple logger support
-- ✅ ImageDataModule integration
-
-```python
-from autotimm import AutoTrainer, ImageClassifier, ImageDataModule
-import pytorch_lightning as pl
-
+# Use any HF Hub model (just add 'hf-hub:' prefix!)
 model = ImageClassifier(
     backbone="hf-hub:timm/convnext_base.fb_in22k_ft_in1k",
     num_classes=100,
 )
-
-trainer = AutoTrainer(
-    max_epochs=100,
-    precision="16-mixed",
-    callbacks=[
-        pl.callbacks.ModelCheckpoint(monitor="val/accuracy", mode="max"),
-        pl.callbacks.EarlyStopping(monitor="val/accuracy", patience=10),
-    ],
-)
-
-trainer.fit(model, datamodule=ImageDataModule(data_dir="./data"))
 ```
 
-**Key Features:**
-- ✅ All three approaches fully compatible with PyTorch Lightning and AutoTrainer
-- ✅ 200+ automated tests with comprehensive coverage
-- ✅ Production-ready with checkpoint monitoring, early stopping, and mixed precision
-- ✅ No special configuration needed - all features "just work"
+📖 **[HF Integration Comparison](https://theja-vanka.github.io/AutoTimm/user-guide/integration/huggingface-integration-comparison/)** • **[HF Hub Guide](https://theja-vanka.github.io/AutoTimm/user-guide/integration/huggingface-hub-integration/)** • **[HF Transformers Guide](https://theja-vanka.github.io/AutoTimm/user-guide/integration/huggingface-transformers-integration/)**
 
-[Learn more about choosing the right approach →](https://theja-vanka.github.io/AutoTimm/user-guide/huggingface-integration-comparison/)
+## 🧠 Smart Features
 
-**Benefits:**
-- **Centralized hosting**: Access thousands of pretrained models
-- **Version control**: Use specific model versions and configurations
-- **Model cards**: View training details, datasets, and performance
-- **Community models**: Share and use custom trained models
-- **Same API**: Works exactly like standard timm models
-
-## Key Features
-
-### Multiple Loss Functions
-
-**Classification**
-- CrossEntropy with label smoothing
-- Mixup augmentation
-
-**Detection**
-- Focal Loss (handles class imbalance)
-- GIoU Loss (bbox regression)
-- Centerness Loss (prediction quality)
-
-**Segmentation**
-- Dice Loss (overlap-based)
-- Combined Loss (CE + Dice)
-- Focal Loss (class imbalance)
-- Tversky Loss (FP/FN weighting)
-
-### TransformConfig (NEW!)
-
-Unified configuration for image transforms with model-specific normalization:
+### Smart Backend Selection
 
 ```python
-from autotimm import ImageClassifier, TransformConfig, list_transform_presets
+from autotimm import recommend_backend, compare_backends
 
-# List available presets
-list_transform_presets()  # ['default', 'autoaugment', 'randaugment', 'trivialaugment', 'light']
-list_transform_presets(backend="albumentations")  # ['default', 'strong', 'light']
+# Get AI-powered recommendation
+rec = recommend_backend(task="detection")
+config = rec.to_config(image_size=640)
 
-# Configure transforms with model-specific normalization
+# Compare backends side-by-side
+compare_backends()
+```
+
+### Unified Transform Configuration
+
+```python
+from autotimm import TransformConfig, list_transform_presets
+
+# Discover presets
+list_transform_presets()  # ['default', 'autoaugment', 'randaugment', ...]
+
+# Configure with model-specific normalization
 config = TransformConfig(
     preset="randaugment",
     image_size=384,
-    use_timm_config=True,  # Auto-detect mean/std from model
+    use_timm_config=True,  # Auto-detect mean/std from backbone
 )
 
-# Model with preprocessing built-in
 model = ImageClassifier(
     backbone="efficientnet_b4",
     num_classes=10,
     transform_config=config,
 )
-
-# Preprocess images using model's config
-tensor = model.preprocess(pil_image)
 ```
 
-### Preset Manager (NEW!)
-
-Intelligent backend selection based on your task requirements:
+### Custom Auto-Tuning
 
 ```python
-from autotimm import recommend_backend, compare_backends
+from autotimm import AutoTrainer, TunerConfig
 
-# Get recommendation for your task
-rec = recommend_backend(task="detection")
-print(rec)
-# Recommended Backend: albumentations
-# Recommended Preset: default
-# Reasoning: Object Detection requires bbox/mask-aware transforms...
+# Default: Full auto-tuning
+trainer = AutoTrainer(max_epochs=10)
 
-# Convert to config
-config = rec.to_config(image_size=640)
+# Disable auto-tuning
+trainer = AutoTrainer(max_epochs=10, tuner_config=False)
 
-# Compare backends side-by-side
-compare_backends()  # Prints detailed comparison table
-
-# Advanced: Custom requirements
-rec = recommend_backend(
-    task="classification",
-    needs_advanced_augmentation=True,
-    needs_spatial_transforms=True,
+# Custom configuration
+trainer = AutoTrainer(
+    max_epochs=10,
+    tuner_config=TunerConfig(
+        auto_lr=True,
+        auto_batch_size=True,
+        lr_find_kwargs={"min_lr": 1e-6, "max_lr": 1.0},
+    ),
 )
-config = rec.to_config()
 ```
 
-**Why use the Preset Manager?**
-- **Smart recommendations**: Get the best backend for your specific task
-- **Reasoning provided**: Understand why a backend is recommended
-- **Easy integration**: Convert recommendations directly to `TransformConfig`
-- **Comparison tool**: See all differences between torchvision and albumentations
+### Optional Metrics for Inference
 
-### Flexible Data Loading
+```python
+# Training with metrics
+model = ImageClassifier(backbone="resnet50", num_classes=10, metrics=metrics)
 
-All transform backends and formats are included by default:
-
-- **Torchvision**: PIL-based transforms (fast CPU)
-- **Albumentations**: OpenCV-based transforms (advanced augmentations)
-- **Multiple Formats**: COCO, Cityscapes, Pascal VOC, ImageFolder, PNG masks
-- **Custom Datasets**: Easy integration with PyTorch DataLoaders
-
-### Advanced Training Features
-
-- **Auto-tuning**: LR finder and batch size finder
-- **Multi-GPU**: Distributed training with DDP
-- **Mixed Precision**: Automatic mixed precision (AMP)
-- **Gradient Accumulation**: Train larger batch sizes
-- **Early Stopping**: Prevent overfitting
-- **Checkpointing**: Save best models automatically
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
-
-```bash
-# Setup development environment
-git clone https://github.com/theja-vanka/AutoTimm.git
-cd AutoTimm
-pip install -e ".[dev,all]"
-
-# Run tests
-pytest tests/ -v
+# Inference without metrics
+model = ImageClassifier(backbone="resnet50", num_classes=10)
+model = model.load_from_checkpoint("checkpoint.ckpt")
+predictions = model(image)
 ```
 
-## Testing
+## 🔧 Explore Models
 
-Comprehensive test suite with 200+ tests.
+### YOLOX Models
+
+```python
+import autotimm
+
+# List all YOLOX variants
+autotimm.list_yolox_models()  # ['yolox-nano', 'yolox-tiny', 'yolox-s', ...]
+
+# Get detailed specs (params, FLOPs, mAP)
+autotimm.list_yolox_models(verbose=True)
+
+# Get model info
+info = autotimm.get_yolox_model_info("yolox-s")
+print(f"Params: {info['params']}, mAP: {info['mAP']}")  # Params: 9.0M, mAP: 40.5
+
+# List components
+autotimm.list_yolox_backbones()
+autotimm.list_yolox_necks()
+autotimm.list_yolox_heads()
+```
+
+### timm Backbones
+
+```python
+# Search 1000+ timm models
+autotimm.list_backbones("*efficientnet*", pretrained_only=True)
+autotimm.list_backbones("*vit*")
+
+# Search HuggingFace Hub
+autotimm.list_hf_hub_backbones(model_name="resnet", limit=10)
+
+# Inspect a model
+backbone = autotimm.create_backbone("convnext_tiny")
+print(f"Features: {backbone.num_features}, Params: {autotimm.count_parameters(backbone):,}")
+```
+
+## 📖 Documentation & Examples
+
+### Documentation
+
+| Section | Description |
+|---------|-------------|
+| [Quick Start](https://theja-vanka.github.io/AutoTimm/getting-started/quickstart/) | Get up and running in 5 minutes |
+| [User Guide](https://theja-vanka.github.io/AutoTimm/user-guide/data-loading/) | In-depth guides for all features |
+| [YOLOX Guide](https://theja-vanka.github.io/AutoTimm/user-guide/models/yolox-detector/) | Complete YOLOX implementation guide |
+| [API Reference](https://theja-vanka.github.io/AutoTimm/api/) | Complete API documentation |
+| [Examples](https://theja-vanka.github.io/AutoTimm/examples/) | 30+ runnable code examples |
+
+### Ready-to-Run Examples
+
+**Classification**
+- [classify_cifar10.py](examples/classify_cifar10.py) - Basic classification with auto-tuning
+- [classify_custom_folder.py](examples/classify_custom_folder.py) - Train on custom dataset
+- [vit_finetuning.py](examples/vit_finetuning.py) - Two-phase ViT fine-tuning
+- [inference_without_metrics.py](examples/inference_without_metrics.py) - Production deployment
+
+**Object Detection**
+- [yolox_official.py](examples/yolox_official.py) - Official YOLOX models
+- [object_detection_yolox.py](examples/object_detection_yolox.py) - YOLOX-style with timm
+- [object_detection_coco.py](examples/object_detection_coco.py) - FCOS detection
+- [object_detection_rtdetr.py](examples/object_detection_rtdetr.py) - RT-DETR (no NMS!)
+- [explore_yolox_models.py](examples/explore_yolox_models.py) - Interactive YOLOX explorer
+
+**Segmentation**
+- [semantic_segmentation.py](examples/semantic_segmentation.py) - DeepLabV3+
+- [instance_segmentation.py](examples/instance_segmentation.py) - Mask R-CNN style
+
+**HuggingFace & Advanced**
+- [huggingface_hub_models.py](examples/huggingface_hub_models.py) - HF Hub basics
+- [hf_hub_*.py](examples/) - Comprehensive HF examples
+- [multi_gpu_training.py](examples/multi_gpu_training.py) - Distributed training
+- [mlflow_tracking.py](examples/mlflow_tracking.py) - MLflow tracking
+- [preset_manager.py](examples/preset_manager.py) - Smart backend selection
+
+**[Browse all examples →](https://theja-vanka.github.io/AutoTimm/examples/)**
+
+## 🏗️ Supported Architectures
+
+**Classification**
+- Models: Any timm backbone (1000+)
+- Losses: CrossEntropy with label smoothing, Mixup
+
+**Object Detection**
+- Architectures: FCOS, YOLOX (official & custom)
+- Losses: Focal Loss, GIoU Loss, Centerness Loss
+
+**Semantic Segmentation**
+- Architectures: DeepLabV3+, FCN
+- Losses: CrossEntropy, Dice, Focal, Combined, Tversky
+- Formats: PNG masks, COCO stuff, Cityscapes, Pascal VOC
+
+**Instance Segmentation**
+- Architecture: FCOS + Mask R-CNN style mask head
+- Losses: Detection losses + Binary mask loss
+
+## 🧪 Testing
+
+Comprehensive test suite with **200+ tests**:
 
 ```bash
 # Run all tests
 pytest tests/ -v
 
-# Run specific test modules
+# Specific modules
 pytest tests/test_classification.py
-pytest tests/test_semantic_segmentation.py
-pytest tests/test_segmentation_losses.py
+pytest tests/test_yolox.py
 
 # With coverage
 pytest tests/ --cov=autotimm --cov-report=html
 ```
 
-**Recent Updates (v0.6.2):**
-- ✅ **Preset Manager**: Smart backend recommendation system (`recommend_backend`, `compare_backends`)
-- ✅ **Core dependencies updated**: `albumentations` and `pycocotools` now included by default (no extras needed)
-- ✅ Added `TransformConfig` for unified transform configuration with presets
-- ✅ Added `list_transform_presets()` to discover available transform presets
-- ✅ Added model `preprocess()` method for inference-time image preprocessing
-- ✅ Python 3.10-3.14 support (dropped Python 3.9)
-- ✅ Fixed `RuntimeError` when calling `configure_optimizers()` without attached trainer
-- ✅ Improved scheduler initialization to handle cases where model is not yet attached to trainer
+## 🤝 Contributing
 
-## Citation
+We welcome contributions!
 
-If you use AutoTimm in your research, please cite:
+```bash
+git clone https://github.com/theja-vanka/AutoTimm.git
+cd AutoTimm
+pip install -e ".[dev,all]"
+pytest tests/ -v
+```
+
+For major changes, please open an issue first.
+
+## 📄 Citation
 
 ```bibtex
-@software{autotimm,
+@software{autotimm2026,
   author = {Krishnatheja Vanka},
-  title = {AutoTimm: Automatic Pytorch Image Models},
+  title = {AutoTimm: Automatic PyTorch Image Models},
   url = {https://github.com/theja-vanka/AutoTimm},
-  year = {2026}
+  year = {2026},
+  version = {0.6.2}
 }
 ```
 
+## 🌟 Why AutoTimm?
+
+<table>
+<tr>
+<td width="33%">
+<h3 align="center">🚀 Fast</h3>
 <p align="center">
-  Built with <a href="https://github.com/huggingface/pytorch-image-models">timm</a> and <a href="https://github.com/Lightning-AI/pytorch-lightning">PyTorch Lightning</a>
+From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-GPU out of the box.
+</p>
+</td>
+<td width="33%">
+<h3 align="center">🔧 Flexible</h3>
+<p align="center">
+1000+ backbones, 4 vision tasks, multiple transform backends. Use what works best.
+</p>
+</td>
+<td width="33%">
+<h3 align="center">🏭 Production Ready</h3>
+<p align="center">
+200+ tests, comprehensive logging, checkpoint management. Deploy with confidence.
+</p>
+</td>
+</tr>
+</table>
+
+---
+
+<p align="center">
+  <strong>Built with ❤️ using <a href="https://github.com/huggingface/pytorch-image-models">timm</a> and <a href="https://github.com/Lightning-AI/pytorch-lightning">PyTorch Lightning</a></strong>
+</p>
+
+<p align="center">
+  <a href="https://github.com/theja-vanka/AutoTimm">⭐ Star us on GitHub</a> •
+  <a href="https://github.com/theja-vanka/AutoTimm/issues">🐛 Report Issues</a> •
+  <a href="https://theja-vanka.github.io/AutoTimm/">📖 Read the Docs</a>
 </p>

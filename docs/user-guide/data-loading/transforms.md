@@ -456,12 +456,14 @@ config = resolve_backbone_data_config(
 ### Torchvision
 
 **Pros:**
+
 - Native PyTorch integration
 - No additional dependencies
 - PIL-based (good for web images)
 - Faster for simple transforms
 
 **Cons:**
+
 - Limited augmentation variety
 - No spatial transforms that preserve bboxes
 
@@ -470,6 +472,7 @@ config = resolve_backbone_data_config(
 ### Albumentations
 
 **Pros:**
+
 - Rich augmentation library
 - Faster for complex transforms (OpenCV backend)
 - Built-in bbox/mask handling

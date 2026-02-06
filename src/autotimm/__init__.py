@@ -25,6 +25,13 @@ from autotimm.backbone import (
     list_backbones,
     list_hf_hub_backbones,
 )
+from autotimm.models import (
+    get_yolox_model_info,
+    list_yolox_backbones,
+    list_yolox_heads,
+    list_yolox_models,
+    list_yolox_necks,
+)
 from autotimm.data.datamodule import ImageDataModule
 from autotimm.data.detection_datamodule import DetectionDataModule
 from autotimm.data.instance_datamodule import InstanceSegmentationDataModule
@@ -48,6 +55,7 @@ from autotimm.heads import (
     FCNHead,
     FPN,
     MaskHead,
+    YOLOXHead,
 )
 from autotimm.loggers import LoggerConfig, LoggerManager
 from autotimm.losses import CenternessLoss, FCOSLoss, FocalLoss, GIoULoss
@@ -63,6 +71,7 @@ from autotimm.tasks.classification import ImageClassifier
 from autotimm.tasks.instance_segmentation import InstanceSegmentor
 from autotimm.tasks.object_detection import ObjectDetector
 from autotimm.tasks.semantic_segmentation import SemanticSegmentor
+from autotimm.tasks.yolox_detector import YOLOXDetector
 from autotimm.trainer import AutoTrainer, TunerConfig
 from autotimm.utils import count_parameters, list_optimizers, list_schedulers
 
@@ -111,11 +120,13 @@ __all__ = [
     "FCNHead",
     "FPN",
     "MaskHead",
+    "YOLOXHead",
     # Tasks
     "ImageClassifier",
     "InstanceSegmentor",
     "ObjectDetector",
     "SemanticSegmentor",
+    "YOLOXDetector",
     # Data
     "DetectionDataModule",
     "ImageDataModule",
@@ -151,6 +162,12 @@ __all__ = [
     "count_parameters",
     "list_optimizers",
     "list_schedulers",
+    # YOLOX Utils
+    "list_yolox_models",
+    "list_yolox_backbones",
+    "list_yolox_necks",
+    "list_yolox_heads",
+    "get_yolox_model_info",
     # Submodules
     "data",
     "heads",

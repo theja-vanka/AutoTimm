@@ -192,6 +192,7 @@ with torch.no_grad():
 ```
 
 **Performance Tips:**
+
 - Always move model to GPU before inference
 - Use `.to(device, non_blocking=True)` for faster transfers
 - Process larger batches on GPU for better efficiency

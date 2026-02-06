@@ -61,6 +61,7 @@ scripted_model.save("model_scripted.pt")
 ```
 
 **When to use:**
+
 - **Trace**: Faster, works for most models, but doesn't preserve control flow
 - **Script**: Preserves control flow (if/else, loops), but may be slower
 

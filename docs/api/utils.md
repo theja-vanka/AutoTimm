@@ -102,6 +102,7 @@ print(optimizers["torch"])
 ### Available Optimizers
 
 **Torch:**
+
 - `adamw` - AdamW
 - `adam` - Adam
 - `sgd` - SGD
@@ -109,6 +110,7 @@ print(optimizers["torch"])
 - `adagrad` - Adagrad
 
 **Timm:**
+
 - `adamp` - AdamP
 - `sgdp` - SGDP
 - `adabelief` - AdaBelief
@@ -167,6 +169,7 @@ print(schedulers["torch"])
 Schedulers are dynamically discovered from PyTorch and timm. Common schedulers include:
 
 **PyTorch (15 total):**
+
 - `chainedscheduler` - ChainedScheduler
 - `constantlr` - ConstantLR
 - `cosineannealinglr` - CosineAnnealingLR
@@ -184,6 +187,7 @@ Schedulers are dynamically discovered from PyTorch and timm. Common schedulers i
 - `steplr` - StepLR
 
 **Timm (6 total):**
+
 - `cosinelrscheduler` - CosineLRScheduler
 - `multisteplrscheduler` - MultiStepLRScheduler
 - `plateaulrscheduler` - PlateauLRScheduler

@@ -69,7 +69,9 @@ class TestRecommendBackend:
         """Test recommendation for semantic segmentation."""
         rec = recommend_backend(task="segmentation")
         assert rec.backend == "albumentations"
-        assert "mask" in rec.reasoning.lower() or "segmentation" in rec.reasoning.lower()
+        assert (
+            "mask" in rec.reasoning.lower() or "segmentation" in rec.reasoning.lower()
+        )
 
     def test_instance_segmentation(self):
         """Test recommendation for instance segmentation."""
@@ -199,9 +201,6 @@ class TestIntegration:
     def test_recommendation_with_semantic_segmentor(self):
         """Test using recommendation with SemanticSegmentor."""
         from autotimm import MetricConfig, SemanticSegmentor
-
-        rec = recommend_backend(task="segmentation")
-        config = rec.to_config(image_size=512)
 
         metrics = [
             MetricConfig(

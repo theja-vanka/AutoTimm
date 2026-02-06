@@ -12,7 +12,6 @@ Usage:
 """
 
 import json
-from pathlib import Path
 
 import torch
 from PIL import Image, ImageDraw, ImageFont
@@ -25,17 +24,85 @@ from autotimm import (
 
 # COCO class names (80 classes)
 COCO_CLASSES = [
-    "person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck",
-    "boat", "traffic light", "fire hydrant", "stop sign", "parking meter", "bench",
-    "bird", "cat", "dog", "horse", "sheep", "cow", "elephant", "bear", "zebra",
-    "giraffe", "backpack", "umbrella", "handbag", "tie", "suitcase", "frisbee",
-    "skis", "snowboard", "sports ball", "kite", "baseball bat", "baseball glove",
-    "skateboard", "surfboard", "tennis racket", "bottle", "wine glass", "cup",
-    "fork", "knife", "spoon", "bowl", "banana", "apple", "sandwich", "orange",
-    "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "chair", "couch",
-    "potted plant", "bed", "dining table", "toilet", "tv", "laptop", "mouse",
-    "remote", "keyboard", "cell phone", "microwave", "oven", "toaster", "sink",
-    "refrigerator", "book", "clock", "vase", "scissors", "teddy bear", "hair drier",
+    "person",
+    "bicycle",
+    "car",
+    "motorcycle",
+    "airplane",
+    "bus",
+    "train",
+    "truck",
+    "boat",
+    "traffic light",
+    "fire hydrant",
+    "stop sign",
+    "parking meter",
+    "bench",
+    "bird",
+    "cat",
+    "dog",
+    "horse",
+    "sheep",
+    "cow",
+    "elephant",
+    "bear",
+    "zebra",
+    "giraffe",
+    "backpack",
+    "umbrella",
+    "handbag",
+    "tie",
+    "suitcase",
+    "frisbee",
+    "skis",
+    "snowboard",
+    "sports ball",
+    "kite",
+    "baseball bat",
+    "baseball glove",
+    "skateboard",
+    "surfboard",
+    "tennis racket",
+    "bottle",
+    "wine glass",
+    "cup",
+    "fork",
+    "knife",
+    "spoon",
+    "bowl",
+    "banana",
+    "apple",
+    "sandwich",
+    "orange",
+    "broccoli",
+    "carrot",
+    "hot dog",
+    "pizza",
+    "donut",
+    "cake",
+    "chair",
+    "couch",
+    "potted plant",
+    "bed",
+    "dining table",
+    "toilet",
+    "tv",
+    "laptop",
+    "mouse",
+    "remote",
+    "keyboard",
+    "cell phone",
+    "microwave",
+    "oven",
+    "toaster",
+    "sink",
+    "refrigerator",
+    "book",
+    "clock",
+    "vase",
+    "scissors",
+    "teddy bear",
+    "hair drier",
     "toothbrush",
 ]
 
@@ -149,12 +216,14 @@ def predict_single_image(
         class_idx = label.item()
         class_name = class_names[class_idx] if class_names else str(class_idx)
 
-        results.append({
-            "class": class_name,
-            "class_idx": class_idx,
-            "confidence": score.item(),
-            "bbox": [x1, y1, x2, y2],
-        })
+        results.append(
+            {
+                "class": class_name,
+                "class_idx": class_idx,
+                "confidence": score.item(),
+                "bbox": [x1, y1, x2, y2],
+            }
+        )
 
     return results
 
@@ -180,7 +249,7 @@ def predict_batch(
     all_results = []
 
     for i in range(0, len(image_paths), batch_size):
-        batch_paths = image_paths[i:i + batch_size]
+        batch_paths = image_paths[i : i + batch_size]
         batch_images = [Image.open(p).convert("RGB") for p in batch_paths]
         original_sizes = [img.size for img in batch_images]
 
@@ -212,12 +281,14 @@ def predict_batch(
                 class_idx = label.item()
                 class_name = class_names[class_idx] if class_names else str(class_idx)
 
-                image_results.append({
-                    "class": class_name,
-                    "class_idx": class_idx,
-                    "confidence": score.item(),
-                    "bbox": [x1, y1, x2, y2],
-                })
+                image_results.append(
+                    {
+                        "class": class_name,
+                        "class_idx": class_idx,
+                        "confidence": score.item(),
+                        "bbox": [x1, y1, x2, y2],
+                    }
+                )
 
             all_results.append(image_results)
 
@@ -257,8 +328,18 @@ def visualize_detections(
 
     # Color palette for different classes
     colors = [
-        "#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF",
-        "#FFA500", "#800080", "#008000", "#000080", "#808000", "#800000",
+        "#FF0000",
+        "#00FF00",
+        "#0000FF",
+        "#FFFF00",
+        "#FF00FF",
+        "#00FFFF",
+        "#FFA500",
+        "#800080",
+        "#008000",
+        "#000080",
+        "#808000",
+        "#800000",
     ]
 
     for det in detections:
@@ -343,32 +424,43 @@ def export_to_csv(
 
     with open(output_path, "w", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow([
-            "image_path", "class", "class_idx", "confidence",
-            "x1", "y1", "x2", "y2"
-        ])
+        writer.writerow(
+            ["image_path", "class", "class_idx", "confidence", "x1", "y1", "x2", "y2"]
+        )
 
         if image_paths:
             # Batch format
             for path, image_dets in zip(image_paths, detections):
                 for det in image_dets:
                     bbox = det["bbox"]
-                    writer.writerow([
-                        str(path), det["class"], det["class_idx"],
-                        f"{det['confidence']:.4f}",
-                        f"{bbox[0]:.2f}", f"{bbox[1]:.2f}",
-                        f"{bbox[2]:.2f}", f"{bbox[3]:.2f}",
-                    ])
+                    writer.writerow(
+                        [
+                            str(path),
+                            det["class"],
+                            det["class_idx"],
+                            f"{det['confidence']:.4f}",
+                            f"{bbox[0]:.2f}",
+                            f"{bbox[1]:.2f}",
+                            f"{bbox[2]:.2f}",
+                            f"{bbox[3]:.2f}",
+                        ]
+                    )
         else:
             # Single image format
             for det in detections:
                 bbox = det["bbox"]
-                writer.writerow([
-                    "", det["class"], det["class_idx"],
-                    f"{det['confidence']:.4f}",
-                    f"{bbox[0]:.2f}", f"{bbox[1]:.2f}",
-                    f"{bbox[2]:.2f}", f"{bbox[3]:.2f}",
-                ])
+                writer.writerow(
+                    [
+                        "",
+                        det["class"],
+                        det["class_idx"],
+                        f"{det['confidence']:.4f}",
+                        f"{bbox[0]:.2f}",
+                        f"{bbox[1]:.2f}",
+                        f"{bbox[2]:.2f}",
+                        f"{bbox[3]:.2f}",
+                    ]
+                )
 
     print(f"Saved detections to: {output_path}")
 
@@ -462,6 +554,7 @@ def main():
     print("\n2. Demonstrating preprocessing...")
 
     import numpy as np
+
     demo_image = Image.fromarray(
         np.random.randint(0, 255, (480, 640, 3), dtype=np.uint8)
     )
@@ -571,8 +664,13 @@ def main():
     print("=" * 60)
 
     import os
-    for path in [demo_image_path, "/tmp/demo_detection_output.jpg",
-                 "/tmp/detections.json", "/tmp/detections.csv"]:
+
+    for path in [
+        demo_image_path,
+        "/tmp/demo_detection_output.jpg",
+        "/tmp/detections.json",
+        "/tmp/detections.csv",
+    ]:
         if os.path.exists(path):
             os.remove(path)
 

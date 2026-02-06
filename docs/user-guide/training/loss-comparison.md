@@ -32,11 +32,13 @@ loss = loss_fn(predictions, targets)
 | `reduction` | str | "mean" | Reduction method: "none", "mean", or "sum" |
 
 **When to Use:**
+
 - Class imbalanced detection datasets
 - When background overwhelms foreground examples
 - Standard choice for anchor-free detectors
 
 **Tuning Guidelines:**
+
 - `gamma=2.0`: Standard for most cases
 - `gamma=1.5`: Less aggressive focusing (for balanced datasets)
 - `gamma=3.0`: More aggressive (for severe imbalance)
@@ -69,6 +71,7 @@ loss = loss_fn(pred_boxes, target_boxes)
 | `eps` | float | 1e-7 | Small value for numerical stability |
 
 **When to Use:**
+
 - Bounding box regression in detection tasks
 - When boxes may not overlap (early training)
 - Better convergence than L1/L2 losses for boxes
@@ -105,6 +108,7 @@ loss = loss_fn(pred_centerness, target_centerness)
 | `reduction` | str | "mean" | Reduction method: "none", "mean", or "sum" |
 
 **When to Use:**
+
 - FCOS-style anchor-free detection
 - Quality prediction for bounding boxes
 - Combined with classification and regression losses
@@ -147,11 +151,13 @@ losses = loss_fn(
 | `centerness_weight` | float | 1.0 | Weight for centerness loss |
 
 **When to Use:**
+
 - Complete FCOS training pipeline
 - Anchor-free object detection
 - Multi-scale detection
 
 **Tuning Guidelines:**
+
 - Default weights (1:1:1) work well for most cases
 - Increase `reg_weight` if localization is poor
 - Increase `cls_weight` if classification accuracy is low
@@ -201,11 +207,13 @@ loss = loss_fn(logits, targets)  # [B, C, H, W], [B, H, W]
 | `reduction` | str | "mean" | Reduction method: "none", "mean", or "sum" |
 
 **When to Use:**
+
 - Class-imbalanced segmentation
 - Small object segmentation
 - Medical image segmentation
 
 **Tuning Guidelines:**
+
 - `smooth=1.0`: Standard, prevents NaN for empty masks
 - `smooth=0.01`: Less smoothing, sharper gradients
 - `ignore_index=255`: Standard for Pascal VOC/Cityscapes
@@ -240,6 +248,7 @@ loss = loss_fn(logits, targets)  # [B, C, H, W], [B, H, W]
 | `reduction` | str | "mean" | Reduction method |
 
 **When to Use:**
+
 - Severely imbalanced pixel distributions
 - When some classes are much rarer than others
 - Scene parsing with many small objects
@@ -278,6 +287,7 @@ loss = loss_fn(logits, targets)
 | `reduction` | str | "mean" | Reduction method |
 
 **When to Use:**
+
 - Control precision vs recall trade-off
 - Medical imaging (minimize false negatives)
 - Small object detection (minimize false positives)
@@ -316,6 +326,7 @@ loss = loss_fn(pred_masks, target_masks)  # [N, H, W], [N, H, W]
 | `pos_weight` | float | None | Weight for positive (foreground) pixels |
 
 **When to Use:**
+
 - Instance segmentation tasks
 - Per-object binary mask prediction
 - Mask R-CNN style architectures
@@ -362,11 +373,13 @@ loss = loss_fn(logits, targets)
 | `class_weights` | Tensor | None | Per-class weights for CE loss |
 
 **When to Use:**
+
 - Default choice for semantic segmentation
 - Combines pixel-wise accuracy (CE) with region overlap (Dice)
 - Robust to class imbalance
 
 **Tuning Guidelines:**
+
 - Start with equal weights (1:1)
 - Increase `dice_weight` for better IoU scores
 - Increase `ce_weight` for better pixel accuracy
