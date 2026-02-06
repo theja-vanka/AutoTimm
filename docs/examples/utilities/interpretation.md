@@ -307,7 +307,7 @@ if __name__ == "__main__":
 
 ## Comprehensive Tutorial
 
-The [`comprehensive_interpretation_tutorial.ipynb`](https://github.com/theja-vanka/AutoTimm/blob/main/examples/comprehensive_interpretation_tutorial.ipynb) notebook provides a complete guide to model interpretation.
+The [`comprehensive_interpretation_tutorial.ipynb`](https://github.com/theja-vanka/AutoTimm/blob/main/examples/interpretation/comprehensive_interpretation_tutorial.ipynb) notebook provides a complete guide to model interpretation.
 
 **Topics Covered:**
 
@@ -347,7 +347,7 @@ The [`comprehensive_interpretation_tutorial.ipynb`](https://github.com/theja-van
 pip install jupyter notebook
 
 # Launch notebook
-jupyter notebook examples/comprehensive_interpretation_tutorial.ipynb
+jupyter notebook examples/interpretation/comprehensive_interpretation_tutorial.ipynb
 ```
 
 ---
@@ -355,14 +355,14 @@ jupyter notebook examples/comprehensive_interpretation_tutorial.ipynb
 ## Running Examples
 
 ```bash
-python examples/interpretation_demo.py
-python examples/interpretation_metrics_demo.py
-python examples/interpretation_phase2_demo.py
-python examples/interpretation_phase3_demo.py
-python examples/interactive_visualization_demo.py
+python examples/interpretation/interpretation_demo.py
+python examples/interpretation/interpretation_metrics_demo.py
+python examples/interpretation/interpretation_phase2_demo.py
+python examples/interpretation/interpretation_phase3_demo.py
+python examples/interpretation/interactive_visualization_demo.py
 
 # Run the comprehensive notebook
-jupyter notebook examples/comprehensive_interpretation_tutorial.ipynb
+jupyter notebook examples/interpretation/comprehensive_interpretation_tutorial.ipynb
 ```
 
 ## See Also

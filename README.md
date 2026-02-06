@@ -409,6 +409,7 @@ trainer.fit(model, datamodule=data)
 ```
 
 **Features:**
+
 - **6 interpretation methods** for different use cases
 - **6 quality metrics** for quantitative evaluation
 - **Interactive visualizations** with Plotly (zoom/pan/hover)
@@ -591,35 +592,28 @@ print(f"Features: {backbone.num_features}, Params: {autotimm.count_parameters(ba
 
 ### Ready-to-Run Examples
 
-**Classification**
+**🚀 Getting Started**
 - [classify_cifar10.py](examples/classify_cifar10.py) - Basic classification with auto-tuning
 - [classify_custom_folder.py](examples/classify_custom_folder.py) - Train on custom dataset
 - [vit_finetuning.py](examples/vit_finetuning.py) - Two-phase ViT fine-tuning
-- [inference_without_metrics.py](examples/inference_without_metrics.py) - Production deployment
 
-**Object Detection**
-- [yolox_official.py](examples/yolox_official.py) - Official YOLOX models
-- [object_detection_yolox.py](examples/object_detection_yolox.py) - YOLOX-style with timm
-- [object_detection_coco.py](examples/object_detection_coco.py) - FCOS detection
-- [object_detection_rtdetr.py](examples/object_detection_rtdetr.py) - RT-DETR (no NMS!)
-- [explore_yolox_models.py](examples/explore_yolox_models.py) - Interactive YOLOX explorer
+**🎯 Computer Vision Tasks**
+- Object Detection: [yolox_official.py](examples/computer_vision/yolox_official.py), [object_detection_yolox.py](examples/computer_vision/object_detection_yolox.py), [object_detection_coco.py](examples/computer_vision/object_detection_coco.py), [object_detection_rtdetr.py](examples/computer_vision/object_detection_rtdetr.py)
+- Segmentation: [semantic_segmentation.py](examples/computer_vision/semantic_segmentation.py), [instance_segmentation.py](examples/computer_vision/instance_segmentation.py)
 
-**Segmentation**
-- [semantic_segmentation.py](examples/semantic_segmentation.py) - DeepLabV3+
-- [instance_segmentation.py](examples/instance_segmentation.py) - Mask R-CNN style
+**🤗 HuggingFace Hub (14 examples)**
+- Basic: [huggingface_hub_models.py](examples/huggingface/huggingface_hub_models.py), [hf_hub_*.py](examples/huggingface/) (8 task-specific files)
+- Advanced: [hf_interpretation.py](examples/huggingface/hf_interpretation.py), [hf_transfer_learning.py](examples/huggingface/hf_transfer_learning.py), [hf_ensemble.py](examples/huggingface/hf_ensemble.py), [hf_deployment.py](examples/huggingface/hf_deployment.py)
 
-**Interpretation & Explainability**
-- [comprehensive_interpretation_tutorial.ipynb](examples/comprehensive_interpretation_tutorial.ipynb) - Complete tutorial (40+ cells)
-- [interpretation_metrics_demo.py](examples/interpretation_metrics_demo.py) - Quality metrics
-- [interactive_visualization_demo.py](examples/interactive_visualization_demo.py) - Plotly visualizations
-- [performance_optimization_demo.py](examples/performance_optimization_demo.py) - Caching & optimization
+**📊 Data & Training**
+- Data: [hf_custom_data.py](examples/data_training/hf_custom_data.py) - Advanced augmentation, multi-label
+- Training: [multi_gpu_training.py](examples/data_training/multi_gpu_training.py), [hf_hyperparameter_tuning.py](examples/data_training/hf_hyperparameter_tuning.py)
+- Optimization: [preset_manager.py](examples/data_training/preset_manager.py), [performance_optimization_demo.py](examples/data_training/performance_optimization_demo.py)
 
-**HuggingFace & Advanced**
-- [huggingface_hub_models.py](examples/huggingface_hub_models.py) - HF Hub basics
-- [hf_hub_*.py](examples/) - Comprehensive HF examples
-- [multi_gpu_training.py](examples/multi_gpu_training.py) - Distributed training
-- [mlflow_tracking.py](examples/mlflow_tracking.py) - MLflow tracking
-- [preset_manager.py](examples/preset_manager.py) - Smart backend selection
+**🔍 Model Understanding**
+- Interpretation: [comprehensive_interpretation_tutorial.ipynb](examples/interpretation/comprehensive_interpretation_tutorial.ipynb) (40+ cells), [interpretation_metrics_demo.py](examples/interpretation/interpretation_metrics_demo.py)
+- Visualization: [interactive_visualization_demo.py](examples/interpretation/interactive_visualization_demo.py) - Interactive Plotly
+- Tracking: [mlflow_tracking.py](examples/logging_inference/mlflow_tracking.py) - MLflow experiment tracking
 
 **[Browse all examples →](https://theja-vanka.github.io/AutoTimm/examples/)**
 

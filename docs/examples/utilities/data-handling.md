@@ -121,9 +121,9 @@ print(f"Classes: {data.num_classes}, Training: {len(data.train_dataset)}")
 ## Running Examples
 
 ```bash
-python examples/balanced_sampling.py
-python examples/albumentations_cifar10.py
-python examples/albumentations_custom_folder.py
+python examples/data_training/balanced_sampling.py
+python examples/data_training/albumentations_cifar10.py
+python examples/data_training/albumentations_custom_folder.py
 ```
 
 **See Also:**

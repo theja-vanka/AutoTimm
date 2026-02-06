@@ -29,9 +29,9 @@ def create_sample_image():
 
 def example_1_integrated_gradients():
     """Example 1: Integrated Gradients."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 1: Integrated Gradients")
-    print("="*60)
+    print("=" * 60)
 
     model = ImageClassifier(backbone="resnet18", num_classes=10)
     model.eval()
@@ -39,15 +39,17 @@ def example_1_integrated_gradients():
     image = create_sample_image()
 
     # Integrated Gradients with different baselines
-    for baseline in ['black', 'white', 'blur']:
+    for baseline in ["black", "white", "blur"]:
         ig = IntegratedGradients(model, baseline=baseline, steps=50)
         attribution = ig(image, target_class=5)
 
-        print(f"✓ IG with {baseline} baseline: shape={attribution.shape}, "
-              f"range=[{attribution.min():.3f}, {attribution.max():.3f}]")
+        print(
+            f"✓ IG with {baseline} baseline: shape={attribution.shape}, "
+            f"range=[{attribution.min():.3f}, {attribution.max():.3f}]"
+        )
 
     # Visualize polarity
-    ig = IntegratedGradients(model, baseline='black', steps=30)
+    ig = IntegratedGradients(model, baseline="black", steps=30)
     attribution = ig(image, target_class=5)
     ig.visualize_polarity(attribution, image, save_path="ig_polarity.png")
     print("✓ Saved polarity visualization to: ig_polarity.png")
@@ -59,9 +61,9 @@ def example_1_integrated_gradients():
 
 def example_2_smoothgrad():
     """Example 2: SmoothGrad for noise reduction."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 2: SmoothGrad")
-    print("="*60)
+    print("=" * 60)
 
     model = ImageClassifier(backbone="resnet18", num_classes=10)
     model.eval()
@@ -76,20 +78,22 @@ def example_2_smoothgrad():
     smooth_explainer = SmoothGrad(
         base_explainer,
         noise_level=0.15,
-        num_samples=20  # Using fewer samples for speed
+        num_samples=20,  # Using fewer samples for speed
     )
     smooth_heatmap = smooth_explainer(image, target_class=5)
 
     print(f"✓ Base GradCAM: shape={base_heatmap.shape}")
     print(f"✓ SmoothGrad: shape={smooth_heatmap.shape}")
-    print(f"✓ Variance reduction: {base_heatmap.std():.3f} → {smooth_heatmap.std():.3f}")
+    print(
+        f"✓ Variance reduction: {base_heatmap.std():.3f} → {smooth_heatmap.std():.3f}"
+    )
 
 
 def example_3_high_level_api_ig():
     """Example 3: Integrated Gradients via high-level API."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 3: High-Level API with Integrated Gradients")
-    print("="*60)
+    print("=" * 60)
 
     model = ImageClassifier(backbone="resnet18", num_classes=10)
     model.eval()
@@ -115,9 +119,9 @@ def example_3_high_level_api_ig():
 
 def example_4_attention_visualization():
     """Example 4: Attention Visualization (ViT)."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 4: Attention Visualization for ViT")
-    print("="*60)
+    print("=" * 60)
     print("⚠ Note: This example requires a Vision Transformer model.")
     print("        Skipping for now with standard ResNet model.")
     print("        To use: model = ImageClassifier(backbone='vit_base_patch16_224')")
@@ -150,9 +154,9 @@ def example_4_attention_visualization():
 
 def example_5_compare_all_methods():
     """Example 5: Compare all interpretation methods."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 5: Compare Multiple Methods")
-    print("="*60)
+    print("=" * 60)
 
     model = ImageClassifier(backbone="resnet34", num_classes=10)
     model.eval()
@@ -163,8 +167,8 @@ def example_5_compare_all_methods():
     methods = {
         "GradCAM": GradCAM(model),
         "GradCAM++ (Smooth)": SmoothGrad(GradCAM(model), num_samples=10),
-        "IG (Black)": IntegratedGradients(model, baseline='black', steps=30),
-        "IG (Blur)": IntegratedGradients(model, baseline='blur', steps=30),
+        "IG (Black)": IntegratedGradients(model, baseline="black", steps=30),
+        "IG (Blur)": IntegratedGradients(model, baseline="blur", steps=30),
     }
 
     print(f"Comparing {len(methods)} methods...")
@@ -175,9 +179,9 @@ def example_5_compare_all_methods():
 
 def main():
     """Run all Phase 2 examples."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("AutoTimm Phase 2: Advanced Interpretation Demo")
-    print("="*60)
+    print("=" * 60)
 
     # Run examples
     example_1_integrated_gradients()
@@ -186,9 +190,9 @@ def main():
     example_4_attention_visualization()
     example_5_compare_all_methods()
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("✓ All Phase 2 examples completed successfully!")
-    print("="*60)
+    print("=" * 60)
     print("\nGenerated files:")
     print("  - ig_polarity.png")
     print("  - ig_explanation.png")

@@ -9,7 +9,11 @@ from PIL import Image
 
 from autotimm.interpretation import GradCAM, GradCAMPlusPlus
 from autotimm.interpretation import explain_prediction, compare_methods, visualize_batch
-from autotimm.interpretation import FeatureVisualizer, InterpretationCallback, FeatureMonitorCallback
+from autotimm.interpretation import (
+    FeatureVisualizer,
+    InterpretationCallback,
+    FeatureMonitorCallback,
+)
 from autotimm.interpretation.visualization.heatmap import (
     apply_colormap,
     overlay_heatmap,
@@ -21,6 +25,7 @@ from autotimm.interpretation.visualization.heatmap import (
 @pytest.fixture
 def simple_cnn():
     """Create a simple CNN for testing."""
+
     class SimpleCNN(nn.Module):
         def __init__(self):
             super().__init__()
@@ -230,6 +235,7 @@ class TestVisualization:
 
         assert fig is not None
         import matplotlib.pyplot as plt
+
         plt.close(fig)
 
     def test_create_comparison_figure_layouts(self, test_image):
@@ -238,11 +244,10 @@ class TestVisualization:
         titles = ["Method 1", "Method 2"]
 
         for layout in ["grid", "horizontal", "vertical"]:
-            fig = create_comparison_figure(
-                test_image, heatmaps, titles, layout=layout
-            )
+            fig = create_comparison_figure(test_image, heatmaps, titles, layout=layout)
             assert fig is not None
             import matplotlib.pyplot as plt
+
             plt.close(fig)
 
 
@@ -334,10 +339,7 @@ class TestHighLevelAPI:
 
 # Integration Tests
 class TestIntegration:
-    @pytest.mark.skipif(
-        not torch.cuda.is_available(),
-        reason="CUDA not available"
-    )
+    @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA not available")
     def test_gradcam_cuda(self, simple_cnn, test_image):
         """Test GradCAM on CUDA."""
         explainer = GradCAM(simple_cnn, use_cuda=True)
@@ -348,6 +350,7 @@ class TestIntegration:
 
     def test_gradcam_with_dict_output(self, test_image):
         """Test GradCAM with model that returns dict."""
+
         class DictOutputModel(nn.Module):
             def __init__(self):
                 super().__init__()
@@ -423,6 +426,7 @@ class TestFeatureVisualizer:
         assert save_path.exists()
 
         import matplotlib.pyplot as plt
+
         plt.close(fig)
 
     def test_plot_feature_maps_sort_methods(self, simple_cnn, test_image):
@@ -439,6 +443,7 @@ class TestFeatureVisualizer:
             assert fig is not None
 
             import matplotlib.pyplot as plt
+
             plt.close(fig)
 
     def test_compare_layers(self, simple_cnn, test_image, tmp_path):

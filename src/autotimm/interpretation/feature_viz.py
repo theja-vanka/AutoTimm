@@ -103,26 +103,30 @@ class FeatureVisualizer:
 
             # Normalize for visualization
             if feature_map.max() > feature_map.min():
-                feature_map = (feature_map - feature_map.min()) / (feature_map.max() - feature_map.min())
+                feature_map = (feature_map - feature_map.min()) / (
+                    feature_map.max() - feature_map.min()
+                )
 
-            ax.imshow(feature_map, cmap='viridis')
+            ax.imshow(feature_map, cmap="viridis")
             ax.set_title(f"Ch {selected_indices[idx]}", fontsize=10)
-            ax.axis('off')
+            ax.axis("off")
 
             # Add activation info
             mean_act = selected_features[idx].mean().item()
             ax.text(
-                0.02, 0.98, f"{mean_act:.2f}",
+                0.02,
+                0.98,
+                f"{mean_act:.2f}",
                 transform=ax.transAxes,
-                verticalalignment='top',
-                bbox=dict(boxstyle='round', facecolor='white', alpha=0.7),
-                fontsize=8
+                verticalalignment="top",
+                bbox=dict(boxstyle="round", facecolor="white", alpha=0.7),
+                fontsize=8,
             )
 
-        plt.suptitle(f"Feature Maps: {layer_name}", fontsize=14, fontweight='bold')
+        plt.suptitle(f"Feature Maps: {layer_name}", fontsize=14, fontweight="bold")
 
         if save_path:
-            fig.savefig(save_path, dpi=150, bbox_inches='tight')
+            fig.savefig(save_path, dpi=150, bbox_inches="tight")
 
         return fig
 
@@ -191,14 +195,14 @@ class FeatureVisualizer:
         features = self.get_features(image, layer_name)
 
         stats = {
-            'mean': features.mean().item(),
-            'std': features.std().item(),
-            'sparsity': (features == 0).float().mean().item(),
-            'max': features.max().item(),
-            'min': features.min().item(),
-            'active_channels': (features.mean(dim=(2, 3)) > 0.01).sum().item(),
-            'num_channels': features.shape[1],
-            'spatial_size': (features.shape[2], features.shape[3]),
+            "mean": features.mean().item(),
+            "std": features.std().item(),
+            "sparsity": (features == 0).float().mean().item(),
+            "max": features.max().item(),
+            "min": features.min().item(),
+            "active_channels": (features.mean(dim=(2, 3)) > 0.01).sum().item(),
+            "num_channels": features.shape[1],
+            "spatial_size": (features.shape[2], features.shape[3]),
         }
 
         return stats
@@ -245,11 +249,11 @@ class FeatureVisualizer:
     ):
         """Plot comparison of layer statistics."""
         fig, axes = plt.subplots(2, 2, figsize=(12, 10))
-        fig.suptitle("Layer Statistics Comparison", fontsize=14, fontweight='bold')
+        fig.suptitle("Layer Statistics Comparison", fontsize=14, fontweight="bold")
 
         layer_names = list(all_stats.keys())
-        metrics = ['mean', 'std', 'sparsity', 'active_channels']
-        titles = ['Mean Activation', 'Std Deviation', 'Sparsity', 'Active Channels']
+        metrics = ["mean", "std", "sparsity", "active_channels"]
+        titles = ["Mean Activation", "Std Deviation", "Sparsity", "Active Channels"]
 
         for idx, (metric, title) in enumerate(zip(metrics, titles)):
             ax = axes[idx // 2, idx % 2]
@@ -257,16 +261,18 @@ class FeatureVisualizer:
 
             ax.bar(range(len(layer_names)), values)
             ax.set_xticks(range(len(layer_names)))
-            ax.set_xticklabels([name.split('.')[-1] for name in layer_names], rotation=45)
-            ax.set_title(title, fontweight='bold')
-            ax.grid(axis='y', alpha=0.3)
+            ax.set_xticklabels(
+                [name.split(".")[-1] for name in layer_names], rotation=45
+            )
+            ax.set_title(title, fontweight="bold")
+            ax.grid(axis="y", alpha=0.3)
 
             # Add values on bars
             for i, v in enumerate(values):
-                ax.text(i, v, f'{v:.2f}', ha='center', va='bottom', fontsize=9)
+                ax.text(i, v, f"{v:.2f}", ha="center", va="bottom", fontsize=9)
 
         plt.tight_layout()
-        fig.savefig(save_path, dpi=150, bbox_inches='tight')
+        fig.savefig(save_path, dpi=150, bbox_inches="tight")
         plt.close(fig)
 
     def get_top_activating_features(
@@ -299,7 +305,9 @@ class FeatureVisualizer:
         channel_means = features.mean(dim=(2, 3)).squeeze()  # (C,)
 
         # Get top-k
-        top_values, top_indices = torch.topk(channel_means, k=min(top_k, len(channel_means)))
+        top_values, top_indices = torch.topk(
+            channel_means, k=min(top_k, len(channel_means))
+        )
 
         return [(idx.item(), val.item()) for idx, val in zip(top_indices, top_values)]
 
@@ -340,7 +348,9 @@ class FeatureVisualizer:
             h, w = baseline_features.shape[2:]
             position = (h // 2, w // 2)
 
-        baseline_activation = baseline_features[0, channel, position[0], position[1]].item()
+        baseline_activation = baseline_features[
+            0, channel, position[0], position[1]
+        ].item()
 
         # Prepare image
         input_tensor = self._preprocess_image(image)
@@ -357,14 +367,18 @@ class FeatureVisualizer:
             for x in range(0, img_w - patch_size, stride):
                 # Create occluded image
                 occluded = input_tensor.clone()
-                occluded[:, :, y:y+patch_size, x:x+patch_size] = 0
+                occluded[:, :, y : y + patch_size, x : x + patch_size] = 0
 
                 # Get features
                 occluded_features = self.get_features(occluded, layer_name)
-                occluded_activation = occluded_features[0, channel, position[0], position[1]].item()
+                occluded_activation = occluded_features[
+                    0, channel, position[0], position[1]
+                ].item()
 
                 # Compute sensitivity
-                sensitivity[y:y+patch_size, x:x+patch_size] = baseline_activation - occluded_activation
+                sensitivity[y : y + patch_size, x : x + patch_size] = (
+                    baseline_activation - occluded_activation
+                )
 
         # Normalize
         sensitivity = np.abs(sensitivity)
@@ -381,15 +395,17 @@ class FeatureVisualizer:
                 img_np = (img_np * 255).astype(np.uint8)
             axes[0].imshow(img_np)
             axes[0].set_title("Original Image")
-            axes[0].axis('off')
+            axes[0].axis("off")
 
             # Receptive field
-            axes[1].imshow(sensitivity, cmap='hot')
-            axes[1].set_title(f"Receptive Field\nLayer: {layer_name}, Channel: {channel}")
-            axes[1].axis('off')
+            axes[1].imshow(sensitivity, cmap="hot")
+            axes[1].set_title(
+                f"Receptive Field\nLayer: {layer_name}, Channel: {channel}"
+            )
+            axes[1].axis("off")
 
             plt.tight_layout()
-            fig.savefig(save_path, dpi=150, bbox_inches='tight')
+            fig.savefig(save_path, dpi=150, bbox_inches="tight")
             plt.close(fig)
 
         return sensitivity
@@ -451,6 +467,7 @@ class FeatureVisualizer:
 
         # Convert PIL to tensor
         import torchvision.transforms as T
+
         transform = T.Compose([T.ToTensor()])
         tensor = transform(image).unsqueeze(0)
         return tensor.to(self.device)

@@ -27,6 +27,7 @@ from autotimm.interpretation.metrics import ExplanationMetrics
 # Optional: Interactive visualization (requires plotly)
 try:
     from autotimm.interpretation.interactive import InteractiveVisualizer
+
     _INTERACTIVE_AVAILABLE = True
 except ImportError:
     _INTERACTIVE_AVAILABLE = False

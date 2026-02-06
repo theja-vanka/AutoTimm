@@ -134,18 +134,15 @@ class BaseInterpreter(ABC):
 
     def _register_hooks(self):
         """Register forward and backward hooks to capture activations and gradients."""
+
         def forward_hook(module, input, output):
             self.activations = output.detach()
 
         def backward_hook(module, grad_input, grad_output):
             self.gradients = grad_output[0].detach()
 
-        self._hooks.append(
-            self.target_layer.register_forward_hook(forward_hook)
-        )
-        self._hooks.append(
-            self.target_layer.register_full_backward_hook(backward_hook)
-        )
+        self._hooks.append(self.target_layer.register_forward_hook(forward_hook))
+        self._hooks.append(self.target_layer.register_full_backward_hook(backward_hook))
 
     def _remove_hooks(self):
         """Remove all registered hooks."""
@@ -183,9 +180,11 @@ class BaseInterpreter(ABC):
             return image.to(self.device)
 
         # Convert PIL Image to tensor
-        transform = T.Compose([
-            T.ToTensor(),
-        ])
+        transform = T.Compose(
+            [
+                T.ToTensor(),
+            ]
+        )
 
         tensor = transform(image).unsqueeze(0)
         return tensor.to(self.device)
@@ -218,6 +217,7 @@ class BaseInterpreter(ABC):
         # Resize if needed
         if target_size is not None:
             import cv2
+
             heatmap = cv2.resize(heatmap, target_size)
 
         return heatmap
@@ -227,7 +227,7 @@ class BaseInterpreter(ABC):
         self,
         image: Union[Image.Image, np.ndarray, torch.Tensor],
         target_class: Optional[int] = None,
-        **kwargs
+        **kwargs,
     ) -> np.ndarray:
         """
         Generate explanation for input image.
@@ -246,7 +246,7 @@ class BaseInterpreter(ABC):
         self,
         image: Union[Image.Image, np.ndarray, torch.Tensor],
         target_class: Optional[int] = None,
-        **kwargs
+        **kwargs,
     ) -> np.ndarray:
         """Convenience method for explain()."""
         return self.explain(image, target_class, **kwargs)
@@ -275,7 +275,7 @@ class BaseInterpreter(ABC):
 
     def __del__(self):
         """Cleanup hooks on deletion."""
-        if hasattr(self, '_hooks'):
+        if hasattr(self, "_hooks"):
             self._remove_hooks()
 
     def __repr__(self) -> str:

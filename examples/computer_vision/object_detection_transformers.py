@@ -174,8 +174,7 @@ def main():
     print("\n" + "=" * 60)
     print("Transformer Backbone Comparison")
     print("=" * 60)
-    print(
-        """
+    print("""
 ┌─────────────────────────────┬─────────┬──────────┬─────────────┐
 │ Backbone                    │ Speed   │ Accuracy │ Memory      │
 ├─────────────────────────────┼─────────┼──────────┼─────────────┤
@@ -199,8 +198,7 @@ Tips:
 - Gradient clipping (1.0) is important for stable training
 - Lower learning rates (1e-4 to 1e-5) work better than CNNs
 - Longer warmup can help (first 1-2 epochs)
-"""
-    )
+""")
 
 
 if __name__ == "__main__":

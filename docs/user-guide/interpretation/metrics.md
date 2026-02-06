@@ -448,7 +448,7 @@ print(f"Mean deletion AUC: {mean_deletion:.3f}")
 
 ## Examples
 
-See `examples/interpretation_metrics_demo.py` for comprehensive examples including:
+See `examples/interpretation/interpretation_metrics_demo.py` for comprehensive examples including:
 - Computing faithfulness metrics
 - Analyzing sensitivity
 - Running sanity checks

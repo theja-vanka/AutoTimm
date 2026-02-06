@@ -38,7 +38,7 @@ model = ImageClassifier(
 **Run it:**
 
 ```bash
-python examples/huggingface_hub_models.py
+python examples/huggingface/huggingface_hub_models.py
 ```
 
 **Key Features:**
@@ -69,7 +69,7 @@ python examples/huggingface_hub_models.py
 **Run it:**
 
 ```bash
-python examples/hf_hub_classification.py
+python examples/huggingface/hf_hub_classification.py
 ```
 
 **Use cases:**
@@ -99,7 +99,7 @@ python examples/hf_hub_classification.py
 **Run it:**
 
 ```bash
-python examples/hf_hub_segmentation.py
+python examples/huggingface/hf_hub_segmentation.py
 ```
 
 **Scenarios:**
@@ -130,7 +130,7 @@ python examples/hf_hub_segmentation.py
 **Run it:**
 
 ```bash
-python examples/hf_hub_object_detection.py
+python examples/huggingface/hf_hub_object_detection.py
 ```
 
 **Configurations:**
@@ -161,7 +161,7 @@ python examples/hf_hub_object_detection.py
 **Run it:**
 
 ```bash
-python examples/hf_hub_instance_segmentation.py
+python examples/huggingface/hf_hub_instance_segmentation.py
 ```
 
 **Tips:**
@@ -180,7 +180,7 @@ python examples/hf_hub_instance_segmentation.py
 **Run it:**
 
 ```bash
-python examples/hf_hub_advanced.py
+python examples/huggingface/hf_hub_advanced.py
 ```
 
 ## Model Naming Convention

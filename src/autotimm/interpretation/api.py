@@ -2,6 +2,7 @@
 
 from typing import Optional, Union, List, Dict, Any
 from pathlib import Path
+import torch
 import torch.nn as nn
 from PIL import Image
 import numpy as np
@@ -75,7 +76,7 @@ def explain_prediction(
     elif method.lower() == "gradcam++" or method.lower() == "gradcampp":
         explainer = GradCAMPlusPlus(model, target_layer=target_layer)
     elif method.lower() == "integrated_gradients" or method.lower() == "ig":
-        explainer = IntegratedGradients(model, baseline='black', steps=50)
+        explainer = IntegratedGradients(model, baseline="black", steps=50)
     else:
         raise ValueError(
             f"Unknown method '{method}'. Supported: 'gradcam', 'gradcam++', 'integrated_gradients'"
@@ -198,8 +199,9 @@ def compare_methods(
 
     # Save if requested
     if save_path is not None:
-        fig.savefig(str(save_path), dpi=dpi, bbox_inches='tight')
+        fig.savefig(str(save_path), dpi=dpi, bbox_inches="tight")
         import matplotlib.pyplot as plt
+
         plt.close(fig)
 
     return results
@@ -341,9 +343,6 @@ def quick_explain(
         show_original=True,
         dpi=150,
     )
-
-
-import torch
 
 
 __all__ = [

@@ -21,9 +21,7 @@ explainer = GradCAM(
 **Parameters:**
 
 - `model` (nn.Module): The model to interpret
-- `target_layer` (Optional[Union[str, nn.Module]]): Layer to use for interpretation
-  - If `None`, automatically detects the last convolutional layer
-  - Can be a string (e.g., "backbone.layer4") or module reference
+- `target_layer` (Optional[Union[str, nn.Module]]): Layer to use for interpretation. If `None`, automatically detects the last convolutional layer. Can be a string (e.g., "backbone.layer4") or module reference
 - `use_cuda` (bool): Whether to use CUDA if available
 
 **Methods:**
@@ -139,11 +137,7 @@ explainer = IntegratedGradients(
 **Parameters:**
 
 - `model` (nn.Module): The model to interpret
-- `baseline` (str): Baseline for path integration
-  - `'black'`: All zeros (default)
-  - `'white'`: All ones
-  - `'blur'`: Gaussian blurred version of input
-  - `'random'`: Random noise
+- `baseline` (str): Baseline for path integration. Options: `'black'` (all zeros, default), `'white'` (all ones), `'blur'` (Gaussian blurred version of input), `'random'` (random noise)
 - `steps` (int): Number of integration steps (more = more accurate but slower)
 - `use_cuda` (bool): Whether to use CUDA
 
@@ -295,10 +289,7 @@ explainer = AttentionRollout(
 **Parameters:**
 
 - `model` (nn.Module): Vision Transformer model
-- `head_fusion` (str): How to fuse multi-head attention
-  - `'mean'`: Average across heads (default)
-  - `'max'`: Maximum across heads
-  - `'min'`: Minimum across heads
+- `head_fusion` (str): How to fuse multi-head attention. Options: `'mean'` (average across heads, default), `'max'` (maximum across heads), `'min'` (minimum across heads)
 - `discard_ratio` (float): Fraction of lowest attentions to discard (0.0-1.0)
 - `use_cuda` (bool): Whether to use CUDA
 

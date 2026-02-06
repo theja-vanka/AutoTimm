@@ -63,10 +63,10 @@ class BackendRecommendation:
 
 
 def recommend_backend(
-    task: Literal[
-        "classification", "detection", "segmentation", "instance_segmentation"
-    ]
-    | None = None,
+    task: (
+        Literal["classification", "detection", "segmentation", "instance_segmentation"]
+        | None
+    ) = None,
     needs_advanced_augmentation: bool = False,
     needs_spatial_transforms: bool = False,
     prioritize_speed: bool = False,

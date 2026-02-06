@@ -149,20 +149,20 @@ autotimm.list_yolox_necks()
 autotimm.get_yolox_model_info("yolox-s")
 
 # Explore interactively
-python examples/explore_yolox_models.py
+python examples/computer_vision/explore_yolox_models.py
 ```
 
 ## Examples
 
 ```bash
 # Official YOLOX training
-python examples/yolox_official.py --model-name yolox-s --batch-size 64
+python examples/computer_vision/yolox_official.py --model-name yolox-s --batch-size 64
 
 # YOLOX-style with timm backbone
-python examples/object_detection_yolox.py --backbone resnet50
+python examples/computer_vision/object_detection_yolox.py --backbone resnet50
 
 # Explore models
-python examples/explore_yolox_models.py
+python examples/computer_vision/explore_yolox_models.py
 ```
 
 ## Troubleshooting

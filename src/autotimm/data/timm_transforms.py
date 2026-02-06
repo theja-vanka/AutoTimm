@@ -79,21 +79,31 @@ def resolve_backbone_data_config(
 
     # Apply overrides
     result = {
-        "mean": override_mean
-        if override_mean is not None
-        else tuple(data_config.get("mean", IMAGENET_MEAN)),
-        "std": override_std
-        if override_std is not None
-        else tuple(data_config.get("std", IMAGENET_STD)),
-        "input_size": override_input_size
-        if override_input_size is not None
-        else tuple(data_config.get("input_size", (3, 224, 224))),
-        "interpolation": override_interpolation
-        if override_interpolation is not None
-        else data_config.get("interpolation", "bicubic"),
-        "crop_pct": override_crop_pct
-        if override_crop_pct is not None
-        else data_config.get("crop_pct", 0.875),
+        "mean": (
+            override_mean
+            if override_mean is not None
+            else tuple(data_config.get("mean", IMAGENET_MEAN))
+        ),
+        "std": (
+            override_std
+            if override_std is not None
+            else tuple(data_config.get("std", IMAGENET_STD))
+        ),
+        "input_size": (
+            override_input_size
+            if override_input_size is not None
+            else tuple(data_config.get("input_size", (3, 224, 224)))
+        ),
+        "interpolation": (
+            override_interpolation
+            if override_interpolation is not None
+            else data_config.get("interpolation", "bicubic")
+        ),
+        "crop_pct": (
+            override_crop_pct
+            if override_crop_pct is not None
+            else data_config.get("crop_pct", 0.875)
+        ),
     }
 
     return result
@@ -143,12 +153,12 @@ def get_transforms_from_backbone(
     # Resolve data config from backbone
     data_config = resolve_backbone_data_config(
         backbone,
-        override_mean=transform_config.mean
-        if not transform_config.use_timm_config
-        else None,
-        override_std=transform_config.std
-        if not transform_config.use_timm_config
-        else None,
+        override_mean=(
+            transform_config.mean if not transform_config.use_timm_config else None
+        ),
+        override_std=(
+            transform_config.std if not transform_config.use_timm_config else None
+        ),
         override_interpolation=transform_config.interpolation,
         override_crop_pct=transform_config.crop_pct,
     )
