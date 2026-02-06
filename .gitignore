@@ -35,3 +35,19 @@ checkpoints/
 *.ckpt
 wandb/
 mlruns/
+
+# Documentation builds
+site/
+
+# Demo artifacts
+demo_cache/
+*_cache/
+.ruff_cache/
+
+# Temporary demo outputs (root level only)
+/*.html
+/*.png
+/*.jpg
+
+# Temporary completion summaries
+*_COMPLETE.md

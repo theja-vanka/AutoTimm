@@ -75,12 +75,33 @@ from autotimm.tasks.yolox_detector import YOLOXDetector
 from autotimm.trainer import AutoTrainer, TunerConfig
 from autotimm.utils import count_parameters, list_optimizers, list_schedulers
 
+# Interpretation
+from autotimm.interpretation import (
+    GradCAM,
+    GradCAMPlusPlus,
+    IntegratedGradients,
+    SmoothGrad,
+    AttentionRollout,
+    AttentionFlow,
+    explain_prediction,
+    compare_methods,
+    visualize_batch,
+    explain_detection,
+    explain_segmentation,
+    FeatureVisualizer,
+    InterpretationCallback,
+    FeatureMonitorCallback,
+    ExplanationMetrics,
+    InteractiveVisualizer,
+)
+
 # Import submodules for convenient access
 from autotimm import data
 from autotimm import heads
 from autotimm import losses
 from autotimm import metrics as metrics_module
 from autotimm import tasks
+from autotimm import interpretation
 
 # Create module aliases by registering them in sys.modules
 # This allows: import autotimm.loss, from autotimm.loss import DiceLoss, etc.
@@ -168,12 +189,30 @@ __all__ = [
     "list_yolox_necks",
     "list_yolox_heads",
     "get_yolox_model_info",
+    # Interpretation
+    "GradCAM",
+    "GradCAMPlusPlus",
+    "IntegratedGradients",
+    "SmoothGrad",
+    "AttentionRollout",
+    "AttentionFlow",
+    "explain_prediction",
+    "compare_methods",
+    "visualize_batch",
+    "explain_detection",
+    "explain_segmentation",
+    "FeatureVisualizer",
+    "InterpretationCallback",
+    "FeatureMonitorCallback",
+    "ExplanationMetrics",
+    "InteractiveVisualizer",
     # Submodules
     "data",
     "heads",
     "losses",
     "metrics_module",
     "tasks",
+    "interpretation",
     # Submodule aliases
     "loss",
     "metric",

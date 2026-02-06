@@ -97,6 +97,15 @@ nav:
           - Metrics: user-guide/evaluation/metrics.md
           - Metric Selection: user-guide/evaluation/metric-selection.md
           - Benchmarks: user-guide/evaluation/benchmarks.md
+      - Interpretation:
+          - Overview: user-guide/interpretation/index.md
+          - Interpretation Methods: user-guide/interpretation/methods.md
+          - Quality Metrics: user-guide/interpretation/metrics.md
+          - Interactive Visualizations: user-guide/interpretation/interactive-visualizations.md
+          - Performance Optimization: user-guide/interpretation/optimization.md
+          - Feature Visualization: user-guide/interpretation/feature-visualization.md
+          - Training Callbacks: user-guide/interpretation/callbacks.md
+          - Task-Specific Adapters: user-guide/interpretation/task-adapters.md
       - Integration:
           - Comparison Overview: user-guide/integration/huggingface-integration-comparison.md
           - HF Hub Integration: user-guide/integration/huggingface-hub-integration.md
