@@ -77,6 +77,167 @@ if __name__ == "__main__":
 
 ---
 
+## YOLOX Object Detection
+
+YOLOX is a high-performance anchor-free detector that achieves state-of-the-art results with excellent speed-accuracy trade-offs.
+
+```python
+from autotimm import AutoTrainer, DetectionDataModule, LoggerConfig, MetricConfig
+from autotimm.detection import YOLOXDetector
+
+
+def main():
+    # Data - COCO format detection dataset
+    data = DetectionDataModule(
+        data_dir="./coco",
+        image_size=640,
+        batch_size=8,
+        num_workers=4,
+        augmentation_preset="yolox",  # YOLOX-specific augmentation
+    )
+
+    # Metrics
+    metric_configs = [
+        MetricConfig(
+            name="mAP",
+            backend="torchmetrics",
+            metric_class="MeanAveragePrecision",
+            params={"box_format": "xyxy", "iou_type": "bbox"},
+            stages=["val", "test"],
+            prog_bar=True,
+        ),
+    ]
+
+    # Model - YOLOX detector
+    model = YOLOXDetector(
+        model_size="s",  # Options: 'nano', 'tiny', 's', 'm', 'l', 'x'
+        num_classes=80,
+        metrics=metric_configs,
+        lr=0.01,
+        warmup_epochs=5,
+    )
+
+    # Train
+    trainer = AutoTrainer(
+        max_epochs=300,
+        logger=[LoggerConfig(backend="tensorboard", params={"save_dir": "logs/yolox"})],
+        checkpoint_monitor="val/map",
+        checkpoint_mode="max",
+    )
+
+    trainer.fit(model, datamodule=data)
+    trainer.test(model, datamodule=data)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+**YOLOX Model Sizes:**
+
+| Model | Params | FLOPs | Speed (V100) | COCO mAP |
+|-------|--------|-------|-------------|----------|
+| YOLOX-Nano | 0.91M | 1.08G | ~2000 FPS | 25.8% |
+| YOLOX-Tiny | 5.06M | 6.45G | ~1000 FPS | 32.8% |
+| YOLOX-S | 9.0M | 26.8G | ~340 FPS | 40.5% |
+| YOLOX-M | 25.3M | 73.8G | ~175 FPS | 46.9% |
+| YOLOX-L | 54.2M | 155.6G | ~90 FPS | 49.7% |
+| YOLOX-X | 99.1M | 281.9G | ~55 FPS | 51.5% |
+
+**Key Features:**
+
+- **Anchor-free design**: Simplified architecture without anchor boxes
+- **Strong augmentation**: Mosaic and MixUp for improved generalization
+- **SimOTA assignment**: Advanced label assignment strategy
+- **Decoupled head**: Separate classification and localization heads
+- **Multiple model sizes**: From Nano (edge devices) to X (maximum accuracy)
+
+---
+
+## Explore YOLOX Models
+
+Compare and visualize different YOLOX model architectures.
+
+```python
+from autotimm.detection import YOLOXDetector
+import torch
+
+
+def main():
+    # Compare model sizes
+    sizes = ["nano", "tiny", "s", "m", "l", "x"]
+    
+    for size in sizes:
+        model = YOLOXDetector(model_size=size, num_classes=80)
+        
+        # Count parameters
+        params = sum(p.numel() for p in model.parameters())
+        print(f"YOLOX-{size.upper()}: {params/1e6:.2f}M parameters")
+        
+        # Test inference
+        dummy_input = torch.randn(1, 3, 640, 640)
+        with torch.no_grad():
+            output = model(dummy_input)
+        print(f"  Output shape: {output.shape}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+---
+
+## YOLOX Official
+
+Use the official YOLOX implementation with AutoTimm's data pipeline.
+
+```python
+from autotimm import AutoTrainer, DetectionDataModule
+from autotimm.detection import YOLOXDetector
+
+
+def main():
+    # Use official YOLOX training recipe
+    data = DetectionDataModule(
+        data_dir="./coco",
+        image_size=640,
+        batch_size=8,
+        num_workers=8,
+        augmentation_preset="yolox",
+    )
+
+    model = YOLOXDetector(
+        model_size="s",
+        num_classes=80,
+        lr=0.01,
+        warmup_epochs=5,
+        no_aug_epochs=15,  # Last epochs without augmentation
+    )
+
+    trainer = AutoTrainer(
+        max_epochs=300,
+        precision="fp16-mixed",  # Use mixed precision for speed
+        gradient_clip_val=1.0,
+    )
+
+    trainer.fit(model, datamodule=data)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+**Official Training Recipe:**
+
+- **Total epochs**: 300
+- **Warmup**: 5 epochs
+- **No augmentation**: Last 15 epochs
+- **Optimizer**: SGD with momentum
+- **Learning rate schedule**: Cosine annealing
+- **Augmentation**: Mosaic + MixUp
+
+---
+
 ## Transformer-Based Object Detection
 
 Use Vision Transformers (ViT, Swin, DeiT) as backbones for object detection.
@@ -397,12 +558,17 @@ git clone https://github.com/theja-vanka/AutoTimm.git
 cd AutoTimm
 pip install -e ".[all]"
 
-# Run COCO detection example
+# Run object detection examples
 python examples/object_detection_coco.py
-
-# Run detection examples
-python examples/object_detection_coco.py
+python examples/object_detection_yolox.py
 python examples/object_detection_transformers.py
+python examples/object_detection_rtdetr.py
+
+# Explore YOLOX models
+python examples/explore_yolox_models.py
+python examples/yolox_official.py
+
+# Run inference
 python examples/detection_inference.py
 ```
 

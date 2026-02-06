@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <strong>🚀 Train state-of-the-art vision models with minimal code</strong><br>
+  <strong>Train state-of-the-art vision models with minimal code</strong><br>
   From prototype to production in minutes, not hours
 </p>
 
@@ -15,33 +15,60 @@
 </p>
 
 <p align="center">
-  <a href="https://theja-vanka.github.io/AutoTimm/">📖 Documentation</a> •
-  <a href="https://theja-vanka.github.io/AutoTimm/getting-started/quickstart/">⚡ Quick Start</a> •
-  <a href="https://theja-vanka.github.io/AutoTimm/examples/">💡 Examples</a> •
-  <a href="https://theja-vanka.github.io/AutoTimm/api/">🔧 API Reference</a>
+  <a href="https://theja-vanka.github.io/AutoTimm/">Documentation</a> •
+  <a href="https://theja-vanka.github.io/AutoTimm/getting-started/quickstart/">Quick Start</a> •
+  <a href="https://theja-vanka.github.io/AutoTimm/examples/">Examples</a> •
+  <a href="https://theja-vanka.github.io/AutoTimm/api/">API Reference</a>
 </p>
 
 ---
 
-## 🎯 What is AutoTimm?
+## What is AutoTimm?
 
 AutoTimm is a **production-ready** computer vision framework that combines [timm](https://github.com/huggingface/pytorch-image-models) (1000+ pretrained models) with [PyTorch Lightning](https://github.com/Lightning-AI/pytorch-lightning). Train image classifiers, object detectors, and segmentation models with any timm backbone using a simple, intuitive API.
 
 **Perfect for:**
-- 🧑‍🔬 **Researchers** needing reproducible experiments and quick iterations
-- 👨‍💻 **Engineers** building production ML systems with minimal boilerplate
-- 🎓 **Students** learning computer vision with modern best practices
-- 🚀 **Startups** rapidly prototyping vision applications
+- **Researchers** needing reproducible experiments and quick iterations
+- **Engineers** building production ML systems with minimal boilerplate
+- **Students** learning computer vision with modern best practices
+- **Startups** rapidly prototyping vision applications
 
-## ✨ What's New in v0.7.0
+## Why AutoTimm?
 
-- **YOLOX Models** 🎯 Official YOLOX implementation (nano to X) with CSPDarknet backbone
-- **Smart Backend Selection** 🧠 AI-powered recommendation for optimal transform backends
-- **TransformConfig** ⚙️ Unified transform configuration with presets and model-specific normalization
-- **Optional Metrics** 🔧 Metrics now optional for inference-only deployments
-- **Python 3.10-3.14** 🐍 Latest Python support
+<table>
+<tr>
+<td width="33%">
+<h3 align="center">Fast</h3>
+<p align="center">
+From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-GPU out of the box.
+</p>
+</td>
+<td width="33%">
+<h3 align="center">Flexible</h3>
+<p align="center">
+1000+ backbones, 4 vision tasks, multiple transform backends. Use what works best.
+</p>
+</td>
+<td width="33%">
+<h3 align="center">Production Ready</h3>
+<p align="center">
+200+ tests, comprehensive logging, checkpoint management. Deploy with confidence.
+</p>
+</td>
+</tr>
+</table>
 
-## 🚀 Quick Start
+## What's New in v0.7.1
+
+- **Model Interpretation** - Complete explainability toolkit with 6 interpretation methods, 6 quality metrics, interactive Plotly visualizations, and up to 100x speedup with optimization
+- **Tutorial Notebook** - Comprehensive Jupyter notebook covering all interpretation features end-to-end
+- **YOLOX Models** - Official YOLOX implementation (nano to X) with CSPDarknet backbone
+- **Smart Backend Selection** - AI-powered recommendation for optimal transform backends
+- **TransformConfig** - Unified transform configuration with presets and model-specific normalization
+- **Optional Metrics** - Metrics now optional for inference-only deployments
+- **Python 3.10-3.14** - Latest Python support
+
+## Quick Start
 
 ### Installation
 
@@ -52,13 +79,19 @@ pip install autotimm
 **Everything included:** PyTorch, timm, PyTorch Lightning, torchmetrics, albumentations, pycocotools, and more.
 
 <details>
-<summary><strong>Optional logging backends</strong></summary>
+<summary><strong>Optional extras</strong></summary>
 
 ```bash
+# Logging backends
 pip install autotimm[tensorboard]  # TensorBoard
 pip install autotimm[wandb]        # Weights & Biases
 pip install autotimm[mlflow]       # MLflow
-pip install autotimm[all]          # All extras
+
+# Interpretation
+pip install autotimm[interactive]  # Interactive Plotly visualizations
+
+# All extras
+pip install autotimm[all]          # Everything
 ```
 
 </details>
@@ -101,52 +134,56 @@ trainer = AutoTrainer(max_epochs=10)
 trainer.fit(model, datamodule=data)
 ```
 
-> 💡 **Auto-tuning is enabled by default.** Disable with `tuner_config=False` for manual control.
+> **Auto-tuning is enabled by default.** Disable with `tuner_config=False` for manual control.
 
-## 🎨 Key Features
+## Key Features
 
 <table>
 <tr>
-<td><strong>🎯 4 Vision Tasks</strong></td>
+<td><strong>4 Vision Tasks</strong></td>
 <td>Classification • Object Detection • Semantic Segmentation • Instance Segmentation</td>
 </tr>
 <tr>
-<td><strong>🧠 1000+ Backbones</strong></td>
+<td><strong>1000+ Backbones</strong></td>
 <td>ResNet • EfficientNet • ViT • ConvNeXt • Swin • DeiT • BEiT • and more from timm</td>
 </tr>
 <tr>
-<td><strong>🤗 HuggingFace Integration</strong></td>
+<td><strong>Model Interpretation</strong></td>
+<td>6 explanation methods • 6 quality metrics • Interactive visualizations • Up to 100x speedup</td>
+</tr>
+<tr>
+<td><strong>HuggingFace Integration</strong></td>
 <td>Load models from HF Hub with <code>hf-hub:</code> prefix + Direct Transformers support</td>
 </tr>
 <tr>
-<td><strong>🎯 YOLOX Support</strong></td>
+<td><strong>YOLOX Support</strong></td>
 <td>Official YOLOX models (nano → X) + YOLOX-style heads with any timm backbone</td>
 </tr>
 <tr>
-<td><strong>🏗️ Advanced Architectures</strong></td>
+<td><strong>Advanced Architectures</strong></td>
 <td>DeepLabV3+ • FCOS • YOLOX • Mask R-CNN • Feature Pyramids</td>
 </tr>
 <tr>
-<td><strong>⚡ Auto-Tuning</strong></td>
+<td><strong>Auto-Tuning</strong></td>
 <td>Automatic LR and batch size finding—enabled by default</td>
 </tr>
 <tr>
-<td><strong>🧠 Smart Transforms</strong></td>
+<td><strong>Smart Transforms</strong></td>
 <td>AI-powered backend recommendations + unified TransformConfig with presets</td>
 </tr>
 <tr>
-<td><strong>📈 Multi-Logger Support</strong></td>
+<td><strong>Multi-Logger Support</strong></td>
 <td>TensorBoard • MLflow • Weights & Biases • CSV—use simultaneously</td>
 </tr>
 <tr>
-<td><strong>🏭 Production Ready</strong></td>
+<td><strong>Production Ready</strong></td>
 <td>Mixed precision • Multi-GPU • Gradient accumulation • 200+ tests</td>
 </tr>
 </table>
 
-## 📚 Task Examples
+## Task Examples
 
-### 🖼️ Image Classification
+### Image Classification
 
 ```python
 from autotimm import ImageClassifier
@@ -162,7 +199,7 @@ trainer = AutoTrainer(max_epochs=10)
 trainer.fit(model, datamodule=data)
 ```
 
-### 🎯 Object Detection with YOLOX
+### Object Detection with YOLOX
 
 **Official YOLOX (matches paper benchmarks):**
 
@@ -195,9 +232,9 @@ model = ObjectDetector(
 )
 ```
 
-📖 **[Complete YOLOX Guide](https://theja-vanka.github.io/AutoTimm/user-guide/models/yolox-detector/)** • ⚡ **[Quick Reference](https://theja-vanka.github.io/AutoTimm/user-guide/guides/yolox-quick-reference/)**
+**[Complete YOLOX Guide](https://theja-vanka.github.io/AutoTimm/user-guide/models/yolox-detector/)** • **[Quick Reference](https://theja-vanka.github.io/AutoTimm/user-guide/guides/yolox-quick-reference/)**
 
-### 🗺️ Semantic Segmentation
+### Semantic Segmentation
 
 ```python
 from autotimm import SemanticSegmentor, SegmentationDataModule
@@ -219,7 +256,7 @@ trainer = AutoTrainer(max_epochs=100)
 trainer.fit(model, datamodule=data)
 ```
 
-### 🎭 Instance Segmentation
+### Instance Segmentation
 
 ```python
 from autotimm import InstanceSegmentor, InstanceSegmentationDataModule
@@ -234,7 +271,155 @@ trainer = AutoTrainer(max_epochs=100)
 trainer.fit(model, datamodule=InstanceSegmentationDataModule(data_dir="./coco"))
 ```
 
-## 🤗 HuggingFace Integration
+## Model Interpretation & Explainability
+
+Understand what your models learn and how they make decisions with comprehensive interpretation tools.
+
+### Quick Explanation
+
+```python
+from autotimm.interpretation import quick_explain
+
+# One-line explanation
+result = quick_explain(
+    model,
+    image,
+    method="gradcam",
+    save_path="explanation.png"
+)
+```
+
+### 6 Interpretation Methods
+
+```python
+from autotimm.interpretation import (
+    GradCAM,                # Fast, class-discriminative (CNNs)
+    GradCAMPlusPlus,        # Better for multiple objects
+    IntegratedGradients,    # Theoretically sound, pixel-level
+    SmoothGrad,             # Noise-reduced gradients
+    AttentionRollout,       # Vision Transformers
+    AttentionFlow,          # Vision Transformers
+)
+
+# Use any method
+explainer = GradCAM(model)
+heatmap = explainer.explain(image, target_class=5)
+explainer.visualize(image, heatmap, save_path="gradcam.png")
+```
+
+### Quantitative Evaluation
+
+```python
+from autotimm.interpretation import ExplanationMetrics
+
+metrics = ExplanationMetrics(model, explainer)
+
+# Faithfulness metrics
+deletion = metrics.deletion(image, target_class=5, steps=50)
+insertion = metrics.insertion(image, target_class=5, steps=50)
+
+# Stability metric
+sensitivity = metrics.sensitivity_n(image, n_samples=50)
+
+# Sanity checks
+param_test = metrics.model_parameter_randomization_test(image)
+data_test = metrics.data_randomization_test(image)
+
+# Localization metric
+pointing = metrics.pointing_game(image, bbox=(50, 50, 150, 150))
+
+print(f"Deletion AUC: {deletion['auc']:.4f}")  # Lower = better
+print(f"Insertion AUC: {insertion['auc']:.4f}")  # Higher = better
+print(f"Sensitivity: {sensitivity['sensitivity']:.4f}")  # Lower = more stable
+```
+
+### Interactive Visualizations
+
+```python
+from autotimm.interpretation import InteractiveVisualizer
+
+viz = InteractiveVisualizer(model)
+
+# Create interactive HTML with zoom/pan/hover
+fig = viz.visualize_explanation(
+    image,
+    explainer,
+    colorscale="Viridis",
+    save_path="interactive.html"
+)
+
+# Compare methods side-by-side
+explainers = {
+    'GradCAM': GradCAM(model),
+    'GradCAM++': GradCAMPlusPlus(model),
+    'Integrated Gradients': IntegratedGradients(model),
+}
+viz.compare_methods(image, explainers, save_path="comparison.html")
+
+# Generate comprehensive report
+viz.create_report(image, explainer, save_path="report.html")
+```
+
+### Performance Optimization
+
+```python
+from autotimm.interpretation.optimization import (
+    ExplanationCache,        # 10-50x speedup
+    BatchProcessor,          # 2-5x speedup
+    PerformanceProfiler,     # Identify bottlenecks
+    optimize_for_inference,  # 1.5-3x speedup
+)
+
+# Enable caching
+cache = ExplanationCache(cache_dir="./cache", max_size_mb=5000)
+
+# Optimize model
+model = optimize_for_inference(model, use_fp16=True)
+
+# Batch processing
+processor = BatchProcessor(model, explainer, batch_size=32)
+heatmaps = processor.process_batch(images)
+
+# Profile performance
+profiler = PerformanceProfiler(enabled=True)
+with profiler.profile("explanation"):
+    heatmap = explainer.explain(image)
+profiler.print_stats()
+```
+
+### Training Integration
+
+```python
+from autotimm import AutoTrainer
+from autotimm.interpretation import InterpretationCallback
+
+# Monitor interpretations during training
+callback = InterpretationCallback(
+    sample_images=val_images,
+    method="gradcam",
+    log_every_n_epochs=5,
+)
+
+trainer = AutoTrainer(
+    max_epochs=100,
+    callbacks=[callback],
+    logger="tensorboard",
+)
+trainer.fit(model, datamodule=data)
+```
+
+**Features:**
+- **6 interpretation methods** for different use cases
+- **6 quality metrics** for quantitative evaluation
+- **Interactive visualizations** with Plotly (zoom/pan/hover)
+- **Up to 100x speedup** with caching and optimization
+- **Feature visualization** and receptive field analysis
+- **Training callbacks** for automatic monitoring
+- **Comprehensive tutorial** notebook included
+
+**[Interpretation Guide](https://theja-vanka.github.io/AutoTimm/user-guide/interpretation/)** • **[Tutorial Notebook](examples/comprehensive_interpretation_tutorial.ipynb)**
+
+## HuggingFace Integration
 
 ### Three Approaches
 
@@ -280,9 +465,9 @@ model = ImageClassifier(
 )
 ```
 
-📖 **[HF Integration Comparison](https://theja-vanka.github.io/AutoTimm/user-guide/integration/huggingface-integration-comparison/)** • **[HF Hub Guide](https://theja-vanka.github.io/AutoTimm/user-guide/integration/huggingface-hub-integration/)** • **[HF Transformers Guide](https://theja-vanka.github.io/AutoTimm/user-guide/integration/huggingface-transformers-integration/)**
+**[HF Integration Comparison](https://theja-vanka.github.io/AutoTimm/user-guide/integration/huggingface-integration-comparison/)** • **[HF Hub Guide](https://theja-vanka.github.io/AutoTimm/user-guide/integration/huggingface-hub-integration/)** • **[HF Transformers Guide](https://theja-vanka.github.io/AutoTimm/user-guide/integration/huggingface-transformers-integration/)**
 
-## 🧠 Smart Features
+## Smart Features
 
 ### Smart Backend Selection
 
@@ -353,7 +538,7 @@ model = model.load_from_checkpoint("checkpoint.ckpt")
 predictions = model(image)
 ```
 
-## 🔧 Explore Models
+## Explore Models
 
 ### YOLOX Models
 
@@ -391,7 +576,7 @@ backbone = autotimm.create_backbone("convnext_tiny")
 print(f"Features: {backbone.num_features}, Params: {autotimm.count_parameters(backbone):,}")
 ```
 
-## 📖 Documentation & Examples
+## Documentation & Examples
 
 ### Documentation
 
@@ -399,9 +584,10 @@ print(f"Features: {backbone.num_features}, Params: {autotimm.count_parameters(ba
 |---------|-------------|
 | [Quick Start](https://theja-vanka.github.io/AutoTimm/getting-started/quickstart/) | Get up and running in 5 minutes |
 | [User Guide](https://theja-vanka.github.io/AutoTimm/user-guide/data-loading/) | In-depth guides for all features |
+| [Interpretation Guide](https://theja-vanka.github.io/AutoTimm/user-guide/interpretation/) | Model explainability and visualization |
 | [YOLOX Guide](https://theja-vanka.github.io/AutoTimm/user-guide/models/yolox-detector/) | Complete YOLOX implementation guide |
 | [API Reference](https://theja-vanka.github.io/AutoTimm/api/) | Complete API documentation |
-| [Examples](https://theja-vanka.github.io/AutoTimm/examples/) | 30+ runnable code examples |
+| [Examples](https://theja-vanka.github.io/AutoTimm/examples/) | 40+ runnable code examples |
 
 ### Ready-to-Run Examples
 
@@ -422,6 +608,12 @@ print(f"Features: {backbone.num_features}, Params: {autotimm.count_parameters(ba
 - [semantic_segmentation.py](examples/semantic_segmentation.py) - DeepLabV3+
 - [instance_segmentation.py](examples/instance_segmentation.py) - Mask R-CNN style
 
+**Interpretation & Explainability**
+- [comprehensive_interpretation_tutorial.ipynb](examples/comprehensive_interpretation_tutorial.ipynb) - Complete tutorial (40+ cells)
+- [interpretation_metrics_demo.py](examples/interpretation_metrics_demo.py) - Quality metrics
+- [interactive_visualization_demo.py](examples/interactive_visualization_demo.py) - Plotly visualizations
+- [performance_optimization_demo.py](examples/performance_optimization_demo.py) - Caching & optimization
+
 **HuggingFace & Advanced**
 - [huggingface_hub_models.py](examples/huggingface_hub_models.py) - HF Hub basics
 - [hf_hub_*.py](examples/) - Comprehensive HF examples
@@ -431,7 +623,7 @@ print(f"Features: {backbone.num_features}, Params: {autotimm.count_parameters(ba
 
 **[Browse all examples →](https://theja-vanka.github.io/AutoTimm/examples/)**
 
-## 🏗️ Supported Architectures
+## Supported Architectures
 
 **Classification**
 - Models: Any timm backbone (1000+)
@@ -450,7 +642,7 @@ print(f"Features: {backbone.num_features}, Params: {autotimm.count_parameters(ba
 - Architecture: FCOS + Mask R-CNN style mask head
 - Losses: Detection losses + Binary mask loss
 
-## 🧪 Testing
+## Testing
 
 Comprehensive test suite with **200+ tests**:
 
@@ -461,12 +653,14 @@ pytest tests/ -v
 # Specific modules
 pytest tests/test_classification.py
 pytest tests/test_yolox.py
+pytest tests/test_interpretation.py
+pytest tests/test_interpretation_metrics.py
 
 # With coverage
 pytest tests/ --cov=autotimm --cov-report=html
 ```
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions!
 
@@ -479,7 +673,7 @@ pytest tests/ -v
 
 For major changes, please open an issue first.
 
-## 📄 Citation
+## Citation
 
 ```bibtex
 @software{autotimm2026,
@@ -487,34 +681,9 @@ For major changes, please open an issue first.
   title = {AutoTimm: Automatic PyTorch Image Models},
   url = {https://github.com/theja-vanka/AutoTimm},
   year = {2026},
-  version = {0.6.2}
+  version = {0.7.1}
 }
 ```
-
-## 🌟 Why AutoTimm?
-
-<table>
-<tr>
-<td width="33%">
-<h3 align="center">🚀 Fast</h3>
-<p align="center">
-From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-GPU out of the box.
-</p>
-</td>
-<td width="33%">
-<h3 align="center">🔧 Flexible</h3>
-<p align="center">
-1000+ backbones, 4 vision tasks, multiple transform backends. Use what works best.
-</p>
-</td>
-<td width="33%">
-<h3 align="center">🏭 Production Ready</h3>
-<p align="center">
-200+ tests, comprehensive logging, checkpoint management. Deploy with confidence.
-</p>
-</td>
-</tr>
-</table>
 
 ---
 
@@ -523,7 +692,7 @@ From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-G
 </p>
 
 <p align="center">
-  <a href="https://github.com/theja-vanka/AutoTimm">⭐ Star us on GitHub</a> •
-  <a href="https://github.com/theja-vanka/AutoTimm/issues">🐛 Report Issues</a> •
-  <a href="https://theja-vanka.github.io/AutoTimm/">📖 Read the Docs</a>
+  <a href="https://github.com/theja-vanka/AutoTimm">Star us on GitHub</a> •
+  <a href="https://github.com/theja-vanka/AutoTimm/issues">Report Issues</a> •
+  <a href="https://theja-vanka.github.io/AutoTimm/">Read the Docs</a>
 </p>
