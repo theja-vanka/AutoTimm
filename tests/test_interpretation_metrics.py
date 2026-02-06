@@ -113,7 +113,8 @@ class TestInsertionMetric:
         # Scores should increase over time
         assert len(result['scores']) == 11  # steps + 1
         assert result['scores'][0] == result['baseline_score']
-        assert result['scores'][-1] >= result['scores'][0]
+        # Allow small tolerance for floating-point precision
+        assert result['scores'][-1] >= result['scores'][0] - 1e-6
 
     def test_insertion_final_rise(self, metrics_instance, test_image):
         """Test that final rise is reasonable."""

@@ -368,6 +368,6 @@ jupyter notebook examples/comprehensive_interpretation_tutorial.ipynb
 ## See Also
 
 - [Interpretation User Guide](../../user-guide/interpretation/index.md) - Full interpretation documentation
-- [Metrics API](../../api/interpretation_metrics.md) - Interpretation metrics reference
-- [Visualization Guide](../../user-guide/visualization/index.md) - Visualization tools and techniques
+- [Interpretation Metrics Guide](../../user-guide/interpretation/metrics.md) - Interpretation metrics reference
+- [Interactive Visualizations Guide](../../user-guide/interpretation/interactive-visualizations.md) - Visualization tools and techniques
 
