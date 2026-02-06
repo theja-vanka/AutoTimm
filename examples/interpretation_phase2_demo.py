@@ -5,7 +5,6 @@ Demonstrates Integrated Gradients, SmoothGrad, Attention Visualization,
 and task-specific adapters for detection and segmentation.
 """
 
-import torch
 from PIL import Image
 import numpy as np
 
@@ -51,7 +50,7 @@ def example_1_integrated_gradients():
     ig = IntegratedGradients(model, baseline='black', steps=30)
     attribution = ig(image, target_class=5)
     ig.visualize_polarity(attribution, image, save_path="ig_polarity.png")
-    print(f"✓ Saved polarity visualization to: ig_polarity.png")
+    print("✓ Saved polarity visualization to: ig_polarity.png")
 
     # Check completeness
     completeness = ig.get_completeness_score(image, attribution, target_class=5)
@@ -111,7 +110,7 @@ def example_3_high_level_api_ig():
     print(f"✓ Explained class: {result['target_class']}")
     print(f"✓ Method: {result['method']}")
     print(f"✓ Heatmap shape: {result['heatmap'].shape}")
-    print(f"✓ Saved to: ig_explanation.png")
+    print("✓ Saved to: ig_explanation.png")
 
 
 def example_4_attention_visualization():

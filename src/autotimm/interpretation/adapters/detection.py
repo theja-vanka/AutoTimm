@@ -7,7 +7,6 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
-from autotimm.interpretation.gradcam import GradCAM
 
 
 def explain_detection(

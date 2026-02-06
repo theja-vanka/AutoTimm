@@ -6,7 +6,6 @@ import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
 
-from autotimm.interpretation.gradcam import GradCAM
 
 
 def explain_segmentation(

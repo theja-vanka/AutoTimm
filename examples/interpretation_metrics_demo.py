@@ -8,7 +8,6 @@ Demonstrates how to quantitatively evaluate explanation methods using:
 - Localization metrics (pointing game)
 """
 
-import torch
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
@@ -90,7 +89,7 @@ def example_1_deletion_insertion():
 
     plt.tight_layout()
     plt.savefig('metrics_faithfulness.png', dpi=150, bbox_inches='tight')
-    print(f"\n✓ Saved faithfulness curves to: metrics_faithfulness.png")
+    print("\n✓ Saved faithfulness curves to: metrics_faithfulness.png")
 
 
 def example_2_sensitivity():
@@ -126,7 +125,7 @@ def example_2_sensitivity():
     plt.legend()
     plt.grid(True, alpha=0.3)
     plt.savefig('metrics_sensitivity.png', dpi=150, bbox_inches='tight')
-    print(f"\n✓ Saved sensitivity distribution to: metrics_sensitivity.png")
+    print("\n✓ Saved sensitivity distribution to: metrics_sensitivity.png")
 
     # Interpretation
     if sensitivity_result['sensitivity'] < 0.05:
@@ -171,7 +170,7 @@ def example_3_sanity_checks():
     if not np.isnan(data_result['correlation']):
         print(f"✓ Correlation with random class: {data_result['correlation']:.3f}")
     else:
-        print(f"✓ Correlation with random class: N/A (constant heatmaps)")
+        print("✓ Correlation with random class: N/A (constant heatmaps)")
     print(f"  Mean change: {data_result['change']:.3f}")
     print(f"  Test passed: {data_result['passes']}")
 

@@ -7,12 +7,11 @@ This module provides metrics to evaluate the quality of explanation methods:
 - Sanity checks: Does the method behave reasonably?
 """
 
-from typing import Optional, Union, Dict, List, Callable
+from typing import Optional, Union, Dict, List
 import numpy as np
 import torch
 import torch.nn as nn
 from PIL import Image
-import warnings
 
 
 class ExplanationMetrics:

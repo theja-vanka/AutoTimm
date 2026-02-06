@@ -1,7 +1,7 @@
 """Base interpreter class for all interpretation methods."""
 
 from abc import ABC, abstractmethod
-from typing import Optional, Union, List, Tuple
+from typing import Optional, Union, Tuple
 import torch
 import torch.nn as nn
 import numpy as np

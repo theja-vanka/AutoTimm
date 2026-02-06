@@ -5,7 +5,6 @@ import torch
 import torch.nn as nn
 import numpy as np
 from PIL import Image
-import matplotlib.pyplot as plt
 
 from autotimm.interpretation.base import BaseInterpreter
 
@@ -79,7 +78,7 @@ class AttentionRollout(BaseInterpreter):
 
         # Register hooks on attention layers
         for name, module in self.model.named_modules():
-            if 'attn' in name.lower() and not 'attn_drop' in name.lower():
+            if 'attn' in name.lower() and 'attn_drop' not in name.lower():
                 if isinstance(module, nn.MultiheadAttention) or 'attention' in module.__class__.__name__.lower():
                     self._hooks.append(
                         module.register_forward_hook(attention_hook)
@@ -360,7 +359,7 @@ class AttentionFlow:
                 self.attention_matrices.append(attn.detach())
 
         for name, module in self.model.named_modules():
-            if 'attn' in name.lower() and not 'attn_drop' in name.lower():
+            if 'attn' in name.lower() and 'attn_drop' not in name.lower():
                 if isinstance(module, nn.MultiheadAttention) or 'attention' in module.__class__.__name__.lower():
                     self._hooks.append(
                         module.register_forward_hook(attention_hook)

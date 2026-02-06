@@ -8,7 +8,6 @@ interpretations using Plotly. Includes:
 - HTML report generation
 """
 
-import torch
 from PIL import Image
 import numpy as np
 

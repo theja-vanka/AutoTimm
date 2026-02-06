@@ -5,16 +5,14 @@ Demonstrates AutoTrainer integration, feature visualization, and
 production-ready interpretation workflows.
 """
 
-import torch
 from PIL import Image
 import numpy as np
 
-from autotimm import ImageClassifier, AutoTrainer, ImageDataModule
+from autotimm import ImageClassifier
 from autotimm.interpretation import (
     InterpretationCallback,
     FeatureMonitorCallback,
     FeatureVisualizer,
-    GradCAM,
 )
 
 
@@ -54,11 +52,11 @@ def example_1_autotrainer_integration():
         log_every_n_epochs=1,
     )
 
-    print(f"✓ Created InterpretationCallback")
-    print(f"  - Will log explanations every 5 epochs")
+    print("✓ Created InterpretationCallback")
+    print("  - Will log explanations every 5 epochs")
     print(f"  - Monitoring {len(sample_images)} sample images")
-    print(f"✓ Created FeatureMonitorCallback")
-    print(f"  - Monitoring 3 layers")
+    print("✓ Created FeatureMonitorCallback")
+    print("  - Monitoring 3 layers")
 
     # Example trainer setup (would use in actual training)
     """
@@ -96,11 +94,11 @@ def example_2_feature_visualization():
         sort_by="activation",
         save_path="feature_maps.png",
     )
-    print(f"✓ Saved feature maps to: feature_maps.png")
+    print("✓ Saved feature maps to: feature_maps.png")
 
     # Get feature statistics
     stats = viz.get_feature_statistics(image, layer_name="backbone.layer4")
-    print(f"\n✓ Layer 4 Statistics:")
+    print("\n✓ Layer 4 Statistics:")
     print(f"  - Mean activation: {stats['mean']:.3f}")
     print(f"  - Std deviation: {stats['std']:.3f}")
     print(f"  - Sparsity: {stats['sparsity']:.2%}")
@@ -110,7 +108,7 @@ def example_2_feature_visualization():
     top_features = viz.get_top_activating_features(
         image, "backbone.layer4", top_k=5
     )
-    print(f"\n✓ Top 5 Activating Channels:")
+    print("\n✓ Top 5 Activating Channels:")
     for channel, activation in top_features:
         print(f"  - Channel {channel}: {activation:.3f}")
 
@@ -144,7 +142,7 @@ def example_3_layer_comparison():
         print(f"    - Mean activation: {stats['mean']:.3f}")
         print(f"    - Sparsity: {stats['sparsity']:.2%}")
 
-    print(f"\n✓ Saved comparison plot to: layer_comparison.png")
+    print("\n✓ Saved comparison plot to: layer_comparison.png")
 
 
 def example_4_receptive_field():
@@ -169,7 +167,7 @@ def example_4_receptive_field():
     channel = top_features[0][0]
 
     print(f"✓ Selected channel {channel} (highest activation)")
-    print(f"  Computing receptive field approximation...")
+    print("  Computing receptive field approximation...")
 
     # Note: This can be slow, so we skip actual computation in demo
     # rf = viz.visualize_receptive_field(
@@ -179,7 +177,7 @@ def example_4_receptive_field():
     #     save_path="receptive_field.png"
     # )
 
-    print(f"✓ Receptive field visualization would be saved to: receptive_field.png")
+    print("✓ Receptive field visualization would be saved to: receptive_field.png")
 
 
 def example_5_production_workflow():

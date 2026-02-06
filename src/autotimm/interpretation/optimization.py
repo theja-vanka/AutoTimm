@@ -7,7 +7,7 @@ Provides:
 - Memory profiling tools
 """
 
-from typing import Optional, Union, List, Dict, Tuple, Callable
+from typing import Optional, Union, List, Dict
 import hashlib
 import pickle
 from pathlib import Path
@@ -16,7 +16,6 @@ import torch
 import torch.nn as nn
 import numpy as np
 from PIL import Image
-from functools import lru_cache
 import warnings
 
 
@@ -321,7 +320,6 @@ class BatchProcessor:
             List of heatmaps
         """
         from multiprocessing import Pool
-        import functools
 
         if target_classes is None:
             target_classes = [None] * len(images)

@@ -73,7 +73,7 @@ def example_1_caching():
 
     # Cache statistics
     stats = cache.stats()
-    print(f"\nCache statistics:")
+    print("\nCache statistics:")
     print(f"  Entries: {stats['num_entries']}")
     print(f"  Size: {stats['total_size_mb']:.2f} MB")
     print(f"  Utilization: {stats['utilization']:.1%}")

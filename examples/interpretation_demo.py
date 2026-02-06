@@ -5,14 +5,12 @@ This example shows how to use GradCAM and other interpretation methods
 to visualize what your model is looking at when making predictions.
 """
 
-import torch
 from PIL import Image
 import numpy as np
 
 from autotimm import ImageClassifier
 from autotimm.interpretation import (
     GradCAM,
-    GradCAMPlusPlus,
     explain_prediction,
     compare_methods,
     quick_explain,
@@ -52,7 +50,7 @@ def example_1_quick_explain():
     print(f"✓ Predicted class: {result['predicted_class']}")
     print(f"✓ Method used: {result['method']}")
     print(f"✓ Target layer: {result['target_layer']}")
-    print(f"✓ Saved to: quick_explanation.png")
+    print("✓ Saved to: quick_explanation.png")
 
 
 def example_2_gradcam_basic():
@@ -110,7 +108,7 @@ def example_3_compare_methods():
     print(f"✓ Compared {len(results)} methods")
     for method, result in results.items():
         print(f"  - {method.upper()}: class {result['predicted_class']}")
-    print(f"✓ Saved comparison to: method_comparison.png")
+    print("✓ Saved comparison to: method_comparison.png")
 
 
 def example_4_high_level_api():
@@ -147,7 +145,7 @@ def example_4_high_level_api():
     print(f"✓ Explained class: {result['target_class']}")
     print(f"✓ Method: {result['method']}")
     print(f"✓ Heatmap shape: {result['heatmap'].shape}")
-    print(f"✓ Saved to: detailed_explanation.png")
+    print("✓ Saved to: detailed_explanation.png")
 
 
 def example_5_custom_layer():

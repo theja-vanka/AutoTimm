@@ -2,7 +2,6 @@
 
 from typing import Optional, Union, Literal
 import torch
-import torch.nn.functional as F
 import numpy as np
 from PIL import Image
 import cv2

@@ -1,7 +1,6 @@
 """PyTorch Lightning callbacks for automatic interpretation during training."""
 
 from typing import Optional, List, Union, Literal
-from pathlib import Path
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import Callback
 import torch
@@ -226,7 +225,6 @@ class InterpretationCallback(Callback):
     def _log_to_tensorboard(self, logger, visualizations: List[np.ndarray], step: int):
         """Log to TensorBoard."""
         try:
-            from torch.utils.tensorboard import SummaryWriter
             writer = logger.experiment
 
             for idx, viz in enumerate(visualizations):
