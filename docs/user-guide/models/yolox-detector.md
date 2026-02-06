@@ -43,12 +43,14 @@ AutoTimm provides **two ways** to use YOLOX:
 ### When to Use Each
 
 **Use YOLOXDetector when:**
+
 - You want to reproduce official YOLOX results
 - You need production-ready performance
 - You want YOLOX paper benchmarks
 - You prefer the optimized YOLOX architecture
 
 **Use ObjectDetector (yolox) when:**
+
 - You want to experiment with different backbones
 - You need transfer learning from pretrained models
 - You want to compare different architectures

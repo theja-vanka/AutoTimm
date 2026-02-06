@@ -41,6 +41,7 @@ data/
 ```
 
 **Requirements:**
+
 - Images and masks must have matching filenames
 - Masks must be single-channel PNG with pixel values = class indices
 - Use 255 for unlabeled/ignored pixels
@@ -271,6 +272,7 @@ data = SegmentationDataModule(
 ```
 
 **Important Notes:**
+
 - Masks are automatically transformed with nearest-neighbor interpolation
 - No need to specify additional_targets for masks
 - Albumentations handles spatial consistency automatically
@@ -296,6 +298,7 @@ data = InstanceSegmentationDataModule(
 ```
 
 **Important Notes:**
+
 - Must specify `bbox_params` for detection + segmentation
 - Masks are automatically transformed alongside boxes
 - Format='coco' means [x, y, width, height]

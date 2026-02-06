@@ -73,6 +73,7 @@ model = SemanticSegmentor(
 ```
 
 **Features:**
+
 - ASPP module with multiple dilation rates (6, 12, 18)
 - Low-level feature fusion (C2 + ASPP output)
 - Decoder with 3x3 convolutions
@@ -92,6 +93,7 @@ model = SemanticSegmentor(
 ```
 
 **Features:**
+
 - Single high-level feature processing
 - Lightweight and fast
 - Good baseline for simple datasets

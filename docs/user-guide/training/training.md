@@ -276,6 +276,7 @@ print("Timm optimizers:", optimizers.get("timm", []))
 ```
 
 **Common optimizers:**
+
 - **AdamW** (recommended): `optimizer="adamw"`
 - **SGD**: `optimizer="sgd"`
 - **AdamP** (timm): `optimizer="adamp"`
@@ -293,6 +294,7 @@ print("Timm schedulers:", schedulers.get("timm", []))
 ```
 
 **Common schedulers:**
+
 - **CosineAnnealingLR**: `scheduler="cosineannealinglr"`
 - **CosineAnnealingWarmRestarts**: `scheduler="cosineannealingwarmrestarts"`
 - **MultiStepLR**: `scheduler="multisteplr"`
@@ -450,24 +452,29 @@ trainer = AutoTrainer(
 ### Detection Training Tips
 
 **Batch Size:**
+
 - CNNs: 16-32 (depends on GPU memory)
 - Transformers: 4-16 (higher memory requirements)
 - Use gradient accumulation if you need larger effective batch sizes
 
 **Learning Rate:**
+
 - CNN backbones: 1e-4 (standard)
 - Transformer backbones: 1e-5 (lower)
 - Frozen backbone (head-only): 1e-3 (higher)
 
 **Gradient Clipping:**
+
 - Always use `gradient_clip_val=1.0` for detection
 - Prevents gradient explosions, especially with transformers
 
 **Scheduler:**
+
 - MultiStep: Standard for COCO (drop at 8 and 11 epochs for 12-epoch training)
 - Cosine: Alternative that works well with transformers
 
 **Image Size:**
+
 - Standard: 640×640 for COCO
 - Smaller objects: Try 800×800 or 1024×1024
 - Faster training: 512×512

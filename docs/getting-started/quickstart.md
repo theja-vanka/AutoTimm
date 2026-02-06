@@ -246,6 +246,7 @@ optimizers = autotimm.list_optimizers(include_timm=False)
 ```
 
 **Available optimizers:**
+
 - **PyTorch**: `adamw`, `adam`, `sgd`, `rmsprop`, `adagrad`, `adadelta`, `adamax`, `asgd`
 - **Timm**: `adamp`, `sgdp`, `adabelief`, `radam`, `lamb`, `lars`, `madgrad`, `novograd`
 
@@ -259,6 +260,7 @@ print("Timm schedulers:", schedulers.get("timm", []))
 ```
 
 **Available schedulers:**
+
 - **PyTorch**: `cosineannealinglr`, `cosineannealingwarmrestarts`, `steplr`, `multisteplr`, `exponentiallr`, `onecyclelr`, `reducelronplateau`, and more (15 total)
 - **Timm**: `cosinelrscheduler`, `multisteplrscheduler`, `plateaulrscheduler`, `steplrscheduler`, and more (6 total)
 

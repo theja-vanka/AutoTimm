@@ -236,6 +236,7 @@ ObjectDetector
 ## FCOS Architecture
 
 **Feature Pyramid Network (FPN):**
+
 - Takes C3, C4, C5 features from backbone
 - Builds pyramid levels P3-P7 via top-down and lateral connections
 - Each pyramid level detects objects at different scales
@@ -252,11 +253,13 @@ Objects are assigned to FPN levels based on their size:
 | P7 | 128 | (512, ∞) | Very large |
 
 **Detection Head:**
+
 - Shared across all FPN levels
 - 3 branches: classification, bbox regression, centerness
 - Each branch has 4 conv layers (configurable via `head_num_convs`)
 
 **Loss Functions:**
+
 - **Focal Loss**: Handles class imbalance in one-stage detectors
 - **GIoU Loss**: IoU-based metric for bbox regression
 - **Centerness Loss**: Suppresses low-quality detections far from object centers
@@ -283,6 +286,7 @@ Objects are assigned to FPN levels based on their size:
 | `vit_base_patch16_224` | Slow | High | Research |
 
 **Notes:**
+
 - Swin Transformers work best for detection (hierarchical features)
 - Use smaller batch sizes (8-16) with transformers
 - Use lower learning rates (1e-5) with transformer backbones

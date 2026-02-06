@@ -114,15 +114,18 @@ DetectionHead (shared across all FPN levels)
 ### Output Format
 
 **Classification Scores:**
+
 - Shape: `(B, num_classes, H, W)` for each FPN level
 - Values: Raw logits (apply sigmoid for probabilities)
 
 **Bounding Box Predictions:**
+
 - Shape: `(B, 4, H, W)` for each FPN level
 - Format: `(left, top, right, bottom)` offsets from each location
 - Values: Raw predictions (apply exp() to get distances)
 
 **Centerness Scores:**
+
 - Shape: `(B, 1, H, W)` for each FPN level
 - Values: Raw logits (apply sigmoid for probabilities)
 - Purpose: Suppresses low-quality detections far from object centers
@@ -222,16 +225,19 @@ FPN
 ### Design Choices
 
 **Why out_channels=256?**
+
 - Standard choice in FPN literature (from original paper)
 - Good balance between capacity and efficiency
 - Can use 128 for faster inference or 512 for higher capacity
 
 **Why 5 pyramid levels?**
+
 - Covers object scales from very small to very large
 - P3-P7 handles objects from ~8px to >512px
 - More levels = better multi-scale detection but slower inference
 
 **Why top-down + lateral?**
+
 - Top-down: High-level semantic information flows to lower levels
 - Lateral: Preserves precise localization from lower levels
 - Combination: Semantically strong features at all scales
