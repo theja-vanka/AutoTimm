@@ -167,7 +167,7 @@ python examples/computer_vision/explore_yolox_models.py
 
 ## Troubleshooting
 
-For YOLOX-specific issues, see the [Troubleshooting Guide](troubleshooting.md#yolox-training-issues) including:
+Common YOLOX-specific issues include:
 
 - CUDA out of memory
 - Slow training

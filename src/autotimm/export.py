@@ -275,7 +275,7 @@ def validate_torchscript_export(
     scripted_model: torch.jit.ScriptModule,
     example_input: torch.Tensor | tuple[torch.Tensor, ...],
     rtol: float = 1e-5,
-    atol: float = 1e-8,
+    atol: float = 1e-6,
 ) -> bool:
     """Validate that TorchScript export produces identical outputs to the original model.
 

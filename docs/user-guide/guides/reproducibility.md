@@ -455,7 +455,7 @@ assert not torch.allclose(x3, x4)  # True!
 
 ## Common Issues
 
-For reproducibility issues, see the [Troubleshooting Guide](troubleshooting.md#reproducibility-issues) including:
+Common reproducibility issues include:
 
 - Results still vary slightly
 - Training is too slow with deterministic mode

@@ -33,6 +33,7 @@ def simple_classifier():
         num_classes=10,
         metrics=metrics,
         compile_model=False,  # Disable torch.compile for TorchScript compatibility
+        seed=None,  # Disable seeding for TorchScript compatibility
     )
     model.eval()
     return model
@@ -140,6 +141,7 @@ def test_model_to_torchscript_method(tmp_path):
         backbone="resnet18",
         num_classes=10,
         compile_model=False,
+        seed=None,  # Disable seeding for TorchScript compatibility
     )
     model.eval()
 
@@ -165,6 +167,7 @@ def test_model_to_torchscript_no_save():
         backbone="resnet18",
         num_classes=10,
         compile_model=False,
+        seed=None,  # Disable seeding for TorchScript compatibility
     )
     model.eval()
 
@@ -184,6 +187,7 @@ def test_export_trace_without_example_input():
         backbone="resnet18",
         num_classes=10,
         compile_model=False,
+        seed=None,  # Disable seeding for TorchScript compatibility
     )
 
     with tempfile.NamedTemporaryFile(suffix=".pt") as tmp:
@@ -202,6 +206,7 @@ def test_export_with_invalid_method():
         backbone="resnet18",
         num_classes=10,
         compile_model=False,
+        seed=None,  # Disable seeding for TorchScript compatibility
     )
 
     with tempfile.NamedTemporaryFile(suffix=".pt") as tmp:
@@ -220,6 +225,7 @@ def test_export_preserves_training_mode():
         backbone="resnet18",
         num_classes=10,
         compile_model=False,
+        seed=None,  # Disable seeding for TorchScript compatibility
     )
     model.train()  # Set to training mode
 
