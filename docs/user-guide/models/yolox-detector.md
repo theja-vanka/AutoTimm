@@ -359,6 +359,36 @@ metrics = [
 model = YOLOXDetector(model_name="yolox-s", metrics=metrics, ...)
 ```
 
+### torch.compile (PyTorch 2.0+)
+
+**Enabled by default** for faster training and inference:
+
+```python
+# Default: torch.compile enabled
+model = YOLOXDetector(
+    model_name="yolox-s",
+    num_classes=80,
+)
+
+# Disable if needed
+model = YOLOXDetector(
+    model_name="yolox-s",
+    num_classes=80,
+    compile_model=False,
+)
+
+# Custom compile options
+model = YOLOXDetector(
+    model_name="yolox-s",
+    num_classes=80,
+    compile_kwargs={"mode": "reduce-overhead"},
+)
+```
+
+**What gets compiled:** CSPDarknet Backbone + YOLOXPAFPN Neck + YOLOX Head
+
+See [ImageClassifier](image-classifier.md#performance-optimization) for compile mode details.
+
 ### Inference
 
 ```python

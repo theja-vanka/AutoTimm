@@ -44,6 +44,11 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
         freeze_backbone: If ``True``, backbone parameters are frozen
             (useful for linear probing).
         mixup_alpha: If > 0, apply Mixup augmentation with this alpha.
+        compile_model: If ``True`` (default), apply ``torch.compile()`` to the backbone and head
+            for faster inference and training. Requires PyTorch 2.0+.
+        compile_kwargs: Optional dict of kwargs to pass to ``torch.compile()``.
+            Common options: ``mode`` (``"default"``, ``"reduce-overhead"``, ``"max-autotune"``),
+            ``fullgraph`` (``True``/``False``), ``dynamic`` (``True``/``False``).
 
     Example:
         >>> # For training with metrics
@@ -97,6 +102,8 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
         label_smoothing: float = 0.0,
         freeze_backbone: bool = False,
         mixup_alpha: float = 0.0,
+        compile_model: bool = True,
+        compile_kwargs: dict[str, Any] | None = None,
     ):
         super().__init__()
         self.save_hyperparameters(
@@ -151,6 +158,21 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
         if freeze_backbone:
             for param in self.backbone.parameters():
                 param.requires_grad = False
+
+        # Apply torch.compile for optimization (PyTorch 2.0+)
+        if compile_model:
+            try:
+                compile_opts = compile_kwargs or {}
+                self.backbone = torch.compile(self.backbone, **compile_opts)
+                self.head = torch.compile(self.head, **compile_opts)
+            except Exception as e:
+                import warnings
+
+                warnings.warn(
+                    f"torch.compile failed: {e}. Continuing without compilation. "
+                    f"Ensure you have PyTorch 2.0+ for compile support.",
+                    stacklevel=2,
+                )
 
         # Setup transforms from config (PreprocessingMixin)
         self._setup_transforms(transform_config, task="classification")

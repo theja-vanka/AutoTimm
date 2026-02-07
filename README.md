@@ -58,8 +58,9 @@ From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-G
 </tr>
 </table>
 
-## What's New in v0.7.1
+## What's New in v0.7.2
 
+- **torch.compile by Default** - Automatic PyTorch 2.0+ optimization enabled out-of-the-box for faster training and inference
 - **Model Interpretation** - Complete explainability toolkit with 6 interpretation methods, 6 quality metrics, interactive Plotly visualizations, and up to 100x speedup with optimization
 - **Tutorial Notebook** - Comprehensive Jupyter notebook covering all interpretation features end-to-end
 - **YOLOX Models** - Official YOLOX implementation (nano to X) with CSPDarknet backbone
@@ -174,6 +175,10 @@ trainer.fit(model, datamodule=data)
 <tr>
 <td><strong>Multi-Logger Support</strong></td>
 <td>TensorBoard • MLflow • Weights & Biases • CSV—use simultaneously</td>
+</tr>
+<tr>
+<td><strong>torch.compile Support</strong></td>
+<td>Automatic PyTorch 2.0+ optimization • Enabled by default • Configurable modes</td>
 </tr>
 <tr>
 <td><strong>Production Ready</strong></td>
@@ -470,6 +475,38 @@ model = ImageClassifier(
 
 ## Smart Features
 
+### torch.compile Optimization
+
+**Enabled by default** for all tasks with PyTorch 2.0+:
+
+```python
+# Default: torch.compile enabled for faster training/inference
+model = ImageClassifier(backbone="resnet50", num_classes=10)
+
+# Disable if needed
+model = ImageClassifier(backbone="resnet50", num_classes=10, compile_model=False)
+
+# Custom compile options
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    compile_kwargs={"mode": "reduce-overhead", "fullgraph": True}
+)
+```
+
+**Compile modes:**
+- `"default"` - Balanced performance (default)
+- `"reduce-overhead"` - Lower latency, better for smaller batches
+- `"max-autotune"` - Maximum optimization, longer compile time
+
+**What gets compiled:**
+- Classification: backbone + head
+- Detection: backbone + FPN/neck + head
+- Segmentation: backbone + segmentation head
+- Instance Segmentation: backbone + FPN + detection head + mask head
+
+Gracefully falls back on PyTorch < 2.0 with a warning.
+
 ### Smart Backend Selection
 
 ```python
@@ -675,7 +712,7 @@ For major changes, please open an issue first.
   title = {AutoTimm: Automatic PyTorch Image Models},
   url = {https://github.com/theja-vanka/AutoTimm},
   year = {2026},
-  version = {0.7.1}
+  version = {0.7.2}
 }
 ```
 

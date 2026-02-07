@@ -188,6 +188,42 @@ model = ObjectDetector(
 )
 ```
 
+## Performance Optimization
+
+### torch.compile (PyTorch 2.0+)
+
+**Enabled by default** for automatic optimization:
+
+```python
+# Default: torch.compile enabled
+model = ObjectDetector(
+    backbone="resnet50",
+    num_classes=80,
+)
+```
+
+Disable or customize:
+
+```python
+# Disable compilation
+model = ObjectDetector(
+    backbone="resnet50",
+    num_classes=80,
+    compile_model=False,
+)
+
+# Custom compile options
+model = ObjectDetector(
+    backbone="resnet50",
+    num_classes=80,
+    compile_kwargs={"mode": "reduce-overhead"},
+)
+```
+
+**What gets compiled:** Backbone + FPN + Detection Head
+
+See [ImageClassifier Performance Optimization](image-classifier.md#performance-optimization) for compile mode details.
+
 ## Full Parameter Reference
 
 ```python
@@ -215,6 +251,8 @@ ObjectDetector(
     freeze_backbone=False,                  # Freeze backbone weights
     strides=(8, 16, 32, 64, 128),          # FPN strides
     regress_ranges=None,                    # Custom regression ranges
+    compile_model=True,                     # Enable torch.compile (PyTorch 2.0+)
+    compile_kwargs=None,                    # Custom torch.compile options
 )
 ```
 

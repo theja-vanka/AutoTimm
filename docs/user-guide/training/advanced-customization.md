@@ -868,6 +868,69 @@ trainer.fit(model, datamodule=data)
 
 ---
 
+## Performance Optimization
+
+### torch.compile (PyTorch 2.0+)
+
+**Enabled by default** in all AutoTimm tasks for automatic optimization:
+
+```python
+from autotimm import ImageClassifier, MetricConfig
+
+# Default: torch.compile enabled
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    metrics=metrics,
+)
+```
+
+Disable or customize:
+
+```python
+# Disable compilation
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    compile_model=False,  # Disable torch.compile
+)
+
+# Custom compile options
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    compile_kwargs={
+        "mode": "reduce-overhead",  # "default", "reduce-overhead", "max-autotune"
+        "fullgraph": True,           # Attempt full graph compilation
+        "dynamic": False,            # Static vs dynamic shapes
+    },
+)
+```
+
+**Compile Modes:**
+
+| Mode | Description | Use Case |
+|------|-------------|----------|
+| `default` | Balanced optimization | General purpose (recommended) |
+| `reduce-overhead` | Lower latency | Small batches, inference |
+| `max-autotune` | Maximum speed | Longer compile time, production |
+
+**What Gets Compiled:**
+
+- **ImageClassifier**: Backbone + Head
+- **ObjectDetector**: Backbone + FPN + Detection Head
+- **SemanticSegmentor**: Backbone + Segmentation Head
+- **InstanceSegmentor**: Backbone + FPN + Detection Head + Mask Head
+- **YOLOXDetector**: Backbone + Neck + Head
+
+**Notes:**
+
+- First run will be slower due to compilation
+- Falls back gracefully on PyTorch < 2.0
+- Compatible with all custom heads and modifications
+
+---
+
 ## Complete Example
 
 ```python

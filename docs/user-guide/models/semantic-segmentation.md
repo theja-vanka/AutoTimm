@@ -446,6 +446,37 @@ model = SemanticSegmentor(
 )
 ```
 
+### torch.compile (PyTorch 2.0+)
+
+**Enabled by default** for faster training and inference:
+
+```python
+# Default: torch.compile enabled
+model = SemanticSegmentor(
+    backbone="resnet50",
+    num_classes=19,
+    head_type="deeplabv3plus",
+)
+
+# Disable if needed
+model = SemanticSegmentor(
+    backbone="resnet50",
+    num_classes=19,
+    compile_model=False,
+)
+
+# Custom compile options
+model = SemanticSegmentor(
+    backbone="resnet50",
+    num_classes=19,
+    compile_kwargs={"mode": "reduce-overhead"},
+)
+```
+
+**What gets compiled:** Backbone + Segmentation Head
+
+See [ImageClassifier](image-classifier.md#performance-optimization) for compile mode details.
+
 ## Best Practices
 
 ### 1. Choose the Right Architecture

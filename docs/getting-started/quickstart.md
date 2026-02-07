@@ -69,6 +69,9 @@ model = ImageClassifier(
 )
 ```
 
+!!! tip "torch.compile Enabled by Default"
+    AutoTimm automatically applies `torch.compile()` (PyTorch 2.0+) to all models for faster training and inference. To disable: `compile_model=False`. For custom options: `compile_kwargs={"mode": "reduce-overhead"}`.
+
 ### 5. Train
 
 ```python
