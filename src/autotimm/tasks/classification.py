@@ -442,6 +442,50 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
         x = batch[0] if isinstance(batch, (tuple, list)) else batch
         return self(x).softmax(dim=-1)
 
+    def to_torchscript(
+        self,
+        save_path: str | None = None,
+        example_input: torch.Tensor | None = None,
+        method: str = "trace",
+        **kwargs: Any,
+    ) -> torch.jit.ScriptModule:
+        """Export model to TorchScript format.
+
+        Args:
+            save_path: Optional path to save the TorchScript model. If None, returns compiled model without saving.
+            example_input: Example input tensor for tracing. If None, uses default shape (1, 3, 224, 224).
+            method: Export method ("trace" or "script"). Default is "trace".
+            **kwargs: Additional arguments passed to export_to_torchscript.
+
+        Returns:
+            Compiled TorchScript module.
+
+        Example:
+            >>> model = ImageClassifier(backbone="resnet50", num_classes=10)
+            >>> scripted = model.to_torchscript("model.pt")
+        """
+        from autotimm.export import export_to_torchscript
+
+        if example_input is None:
+            example_input = torch.randn(1, 3, 224, 224)
+
+        if save_path is None:
+            # Return scripted model without saving
+            import tempfile
+
+            with tempfile.NamedTemporaryFile(suffix=".pt", delete=False) as tmp:
+                scripted = export_to_torchscript(
+                    self, tmp.name, example_input, method, **kwargs
+                )
+                import os
+
+                os.unlink(tmp.name)
+                return scripted
+        else:
+            return export_to_torchscript(
+                self, save_path, example_input, method, **kwargs
+            )
+
     def configure_optimizers(self) -> dict:
         """Configure optimizer and learning rate scheduler.
 

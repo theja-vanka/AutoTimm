@@ -26,6 +26,8 @@ theme:
   features:
     - navigation.instant
     - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.sections
     - navigation.top
     - search.suggest
@@ -112,6 +114,9 @@ nav:
           - HF Transformers Integration: user-guide/integration/huggingface-transformers-integration.md
       - Deployment:
           - Production Deployment: user-guide/deployment/deployment.md
+          - TorchScript Export: user-guide/deployment/torchscript-export.md
+          - C++ Deployment: user-guide/deployment/cpp-deployment.md
+          - Mobile Deployment: user-guide/deployment/mobile-deployment.md
       - Inference:
           - Overview: user-guide/inference/index.md
           - Classification Inference: user-guide/inference/classification-inference.md
@@ -142,6 +147,8 @@ nav:
       - Metrics & Logging:
           - Metrics: api/metrics.md
           - Loggers: api/loggers.md
+      - Export:
+          - Export API: api/export.md
       - Utilities: api/utils.md
   - Examples:
       - Overview: examples/index.md

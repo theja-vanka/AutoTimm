@@ -56,6 +56,7 @@ def test_object_detector_yolox():
         num_classes=80,
         detection_arch="yolox",
         metrics=None,
+        compile_model=False,  # Disable for isinstance check
     )
 
     # Check that YOLOXHead was created
@@ -133,6 +134,7 @@ def test_object_detector_fcos_vs_yolox():
         num_classes=80,
         detection_arch="fcos",
         metrics=None,
+        compile_model=False,  # Disable for consistent testing
     )
 
     # YOLOX model
@@ -141,6 +143,7 @@ def test_object_detector_fcos_vs_yolox():
         num_classes=80,
         detection_arch="yolox",
         metrics=None,
+        compile_model=False,  # Disable for consistent testing
     )
 
     images = torch.randn(1, 3, 640, 640)
