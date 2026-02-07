@@ -31,7 +31,7 @@ def create_sample_image():
     center = 112
     for i in range(224):
         for j in range(224):
-            dist = np.sqrt((i - center)**2 + (j - center)**2)
+            dist = np.sqrt((i - center) ** 2 + (j - center) ** 2)
             if dist < 50:
                 img[i, j, 2] = int(255 * (1 - dist / 50))
     return Image.fromarray(img)
@@ -39,9 +39,9 @@ def create_sample_image():
 
 def example_1_basic_visualization():
     """Example 1: Basic interactive visualization."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 1: Basic Interactive Visualization")
-    print("="*60)
+    print("=" * 60)
 
     # Create model and explainer
     model = ImageClassifier(backbone="resnet18", num_classes=10)
@@ -54,7 +54,7 @@ def example_1_basic_visualization():
     image = create_sample_image()
 
     print("\nGenerating interactive visualization...")
-    fig = viz.visualize_explanation(
+    viz.visualize_explanation(
         image,
         explainer,
         title="GradCAM Interactive Explanation",
@@ -72,25 +72,25 @@ def example_1_basic_visualization():
 
 def example_2_compare_methods():
     """Example 2: Compare multiple methods interactively."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 2: Interactive Method Comparison")
-    print("="*60)
+    print("=" * 60)
 
     model = ImageClassifier(backbone="resnet18", num_classes=10)
     model.eval()
 
     # Create multiple explainers
     explainers = {
-        'GradCAM': GradCAM(model),
-        'GradCAM++': GradCAMPlusPlus(model),
-        'IntegratedGradients': IntegratedGradients(model, baseline='black', steps=30),
+        "GradCAM": GradCAM(model),
+        "GradCAM++": GradCAMPlusPlus(model),
+        "IntegratedGradients": IntegratedGradients(model, baseline="black", steps=30),
     }
 
     viz = InteractiveVisualizer(model, use_cuda=False)
     image = create_sample_image()
 
     print("\nComparing 3 explanation methods...")
-    fig = viz.compare_methods(
+    viz.compare_methods(
         image,
         explainers,
         title="Method Comparison",
@@ -110,9 +110,9 @@ def example_2_compare_methods():
 
 def example_3_different_colorscales():
     """Example 3: Try different colorscales."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 3: Different Colorscales")
-    print("="*60)
+    print("=" * 60)
 
     model = ImageClassifier(backbone="resnet18", num_classes=10)
     model.eval()
@@ -122,15 +122,15 @@ def example_3_different_colorscales():
     image = create_sample_image()
 
     colorscales = {
-        'Viridis': 'viridis_example.html',
-        'Hot': 'hot_example.html',
-        'Jet': 'jet_example.html',
-        'Plasma': 'plasma_example.html',
+        "Viridis": "viridis_example.html",
+        "Hot": "hot_example.html",
+        "Jet": "jet_example.html",
+        "Plasma": "plasma_example.html",
     }
 
     print("\nGenerating visualizations with different colorscales...")
     for colorscale, filename in colorscales.items():
-        fig = viz.visualize_explanation(
+        viz.visualize_explanation(
             image,
             explainer,
             title=f"GradCAM with {colorscale} colorscale",
@@ -148,9 +148,9 @@ def example_3_different_colorscales():
 
 def example_4_html_report():
     """Example 4: Generate comprehensive HTML report."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 4: Comprehensive HTML Report")
-    print("="*60)
+    print("=" * 60)
 
     model = ImageClassifier(backbone="resnet18", num_classes=10)
     model.eval()
@@ -180,9 +180,9 @@ def example_4_html_report():
 
 def example_5_custom_opacity():
     """Example 5: Adjust opacity for better visibility."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 5: Custom Opacity Settings")
-    print("="*60)
+    print("=" * 60)
 
     model = ImageClassifier(backbone="resnet18", num_classes=10)
     model.eval()
@@ -196,7 +196,7 @@ def example_5_custom_opacity():
     print("\nGenerating visualizations with different opacities...")
     for opacity in opacities:
         filename = f"opacity_{int(opacity*10)}.html"
-        fig = viz.visualize_explanation(
+        viz.visualize_explanation(
             image,
             explainer,
             title=f"GradCAM with opacity {opacity}",
@@ -214,9 +214,9 @@ def example_5_custom_opacity():
 
 def example_6_production_workflow():
     """Example 6: Production deployment workflow."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 6: Production Workflow")
-    print("="*60)
+    print("=" * 60)
 
     print("\nProduction workflow for interactive explanations:")
     print()
@@ -258,9 +258,9 @@ def example_6_production_workflow():
 
 def main():
     """Run all interactive visualization examples."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Interactive Visualization Demo")
-    print("="*60)
+    print("=" * 60)
     print("\nThis demo requires plotly. Install with:")
     print("  pip install plotly")
     print("  or")
@@ -276,9 +276,9 @@ def main():
         example_5_custom_opacity()
         example_6_production_workflow()
 
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("✓ All examples completed!")
-        print("="*60)
+        print("=" * 60)
         print("\nGenerated files:")
         print("  - interactive_gradcam.html")
         print("  - interactive_comparison.html")

@@ -62,18 +62,18 @@ class ExplanationCache:
     def _load_metadata(self):
         """Load cache metadata."""
         if self._metadata_file.exists():
-            with open(self._metadata_file, 'rb') as f:
+            with open(self._metadata_file, "rb") as f:
                 self.metadata = pickle.load(f)
         else:
             self.metadata = {
-                'keys': [],  # LRU queue
-                'sizes': {},  # Key -> size in bytes
-                'total_size': 0,
+                "keys": [],  # LRU queue
+                "sizes": {},  # Key -> size in bytes
+                "total_size": 0,
             }
 
     def _save_metadata(self):
         """Save cache metadata."""
-        with open(self._metadata_file, 'wb') as f:
+        with open(self._metadata_file, "wb") as f:
             pickle.dump(self.metadata, f)
 
     def _compute_key(
@@ -81,7 +81,7 @@ class ExplanationCache:
         image: Union[Image.Image, np.ndarray, torch.Tensor],
         method: str,
         target_class: Optional[int],
-        **kwargs
+        **kwargs,
     ) -> str:
         """Compute cache key for an explanation."""
         # Create hashable representation
@@ -106,7 +106,7 @@ class ExplanationCache:
         image: Union[Image.Image, np.ndarray, torch.Tensor],
         method: str,
         target_class: Optional[int] = None,
-        **kwargs
+        **kwargs,
     ) -> Optional[np.ndarray]:
         """
         Retrieve explanation from cache.
@@ -121,9 +121,9 @@ class ExplanationCache:
 
         if cache_file.exists():
             # Update LRU order
-            if key in self.metadata['keys']:
-                self.metadata['keys'].remove(key)
-            self.metadata['keys'].append(key)
+            if key in self.metadata["keys"]:
+                self.metadata["keys"].remove(key)
+            self.metadata["keys"].append(key)
             self._save_metadata()
 
             # Load and return
@@ -137,7 +137,7 @@ class ExplanationCache:
         method: str,
         explanation: np.ndarray,
         target_class: Optional[int] = None,
-        **kwargs
+        **kwargs,
     ):
         """
         Store explanation in cache.
@@ -153,16 +153,16 @@ class ExplanationCache:
 
         # Update metadata
         file_size = cache_file.stat().st_size
-        self.metadata['sizes'][key] = file_size
-        self.metadata['total_size'] += file_size
+        self.metadata["sizes"][key] = file_size
+        self.metadata["total_size"] += file_size
 
-        if key in self.metadata['keys']:
-            self.metadata['keys'].remove(key)
-        self.metadata['keys'].append(key)
+        if key in self.metadata["keys"]:
+            self.metadata["keys"].remove(key)
+        self.metadata["keys"].append(key)
 
         # Evict if needed
-        while self.metadata['total_size'] > self.max_size_mb * 1024 * 1024:
-            if not self.metadata['keys']:
+        while self.metadata["total_size"] > self.max_size_mb * 1024 * 1024:
+            if not self.metadata["keys"]:
                 break
             self._evict_oldest()
 
@@ -170,17 +170,17 @@ class ExplanationCache:
 
     def _evict_oldest(self):
         """Evict oldest (LRU) entry from cache."""
-        if not self.metadata['keys']:
+        if not self.metadata["keys"]:
             return
 
-        oldest_key = self.metadata['keys'].pop(0)
+        oldest_key = self.metadata["keys"].pop(0)
         cache_file = self.cache_dir / f"{oldest_key}.npy"
 
         if cache_file.exists():
             cache_file.unlink()
 
-        size = self.metadata['sizes'].pop(oldest_key, 0)
-        self.metadata['total_size'] -= size
+        size = self.metadata["sizes"].pop(oldest_key, 0)
+        self.metadata["total_size"] -= size
 
     def clear(self):
         """Clear entire cache."""
@@ -191,23 +191,24 @@ class ExplanationCache:
             cache_file.unlink()
 
         self.metadata = {
-            'keys': [],
-            'sizes': {},
-            'total_size': 0,
+            "keys": [],
+            "sizes": {},
+            "total_size": 0,
         }
         self._save_metadata()
 
     def stats(self) -> Dict:
         """Get cache statistics."""
         if not self.enabled:
-            return {'enabled': False}
+            return {"enabled": False}
 
         return {
-            'enabled': True,
-            'num_entries': len(self.metadata['keys']),
-            'total_size_mb': self.metadata['total_size'] / (1024 * 1024),
-            'max_size_mb': self.max_size_mb,
-            'utilization': self.metadata['total_size'] / (self.max_size_mb * 1024 * 1024),
+            "enabled": True,
+            "num_entries": len(self.metadata["keys"]),
+            "total_size_mb": self.metadata["total_size"] / (1024 * 1024),
+            "max_size_mb": self.max_size_mb,
+            "utilization": self.metadata["total_size"]
+            / (self.max_size_mb * 1024 * 1024),
         }
 
 
@@ -258,7 +259,7 @@ class BatchProcessor:
         self,
         images: List[Union[Image.Image, np.ndarray, torch.Tensor]],
         target_classes: Optional[List[int]] = None,
-        **kwargs
+        **kwargs,
     ) -> List[np.ndarray]:
         """
         Process multiple images efficiently.
@@ -279,20 +280,20 @@ class BatchProcessor:
 
         # Process in batches
         for i in range(0, n_images, self.batch_size):
-            batch_images = images[i:i + self.batch_size]
-            batch_targets = target_classes[i:i + self.batch_size]
+            batch_images = images[i : i + self.batch_size]
+            batch_targets = target_classes[i : i + self.batch_size]
 
             if self.show_progress:
-                print(f"Processing batch {i // self.batch_size + 1}/{(n_images + self.batch_size - 1) // self.batch_size}...")
+                print(
+                    f"Processing batch {i // self.batch_size + 1}/{(n_images + self.batch_size - 1) // self.batch_size}..."
+                )
 
             # Process each image in the batch
             # Note: We don't actually batch at GPU level (explainer.explain handles one image)
             # but we group images to show progress and prepare for future GPU batching
             for img, target_class in zip(batch_images, batch_targets):
                 heatmap = self.explainer.explain(
-                    img,
-                    target_class=target_class,
-                    **kwargs
+                    img, target_class=target_class, **kwargs
                 )
                 heatmaps.append(heatmap)
 
@@ -303,7 +304,7 @@ class BatchProcessor:
         images: List[Union[Image.Image, np.ndarray, torch.Tensor]],
         target_classes: Optional[List[int]] = None,
         num_workers: int = 4,
-        **kwargs
+        **kwargs,
     ) -> List[np.ndarray]:
         """
         Process batch with parallel workers (CPU-based parallelism).
@@ -351,6 +352,7 @@ class BatchProcessor:
             image = Image.fromarray(image)
 
         import torchvision.transforms as T
+
         transform = T.Compose([T.ToTensor()])
         tensor = transform(image).unsqueeze(0)
         return tensor.to(self.device)
@@ -397,12 +399,12 @@ class PerformanceProfiler:
         stats = {}
         for name, times in self.timings.items():
             stats[name] = {
-                'count': len(times),
-                'total': sum(times),
-                'mean': np.mean(times),
-                'std': np.std(times),
-                'min': min(times),
-                'max': max(times),
+                "count": len(times),
+                "total": sum(times),
+                "mean": np.mean(times),
+                "std": np.std(times),
+                "min": min(times),
+                "max": max(times),
             }
         return stats
 
@@ -419,7 +421,9 @@ class PerformanceProfiler:
 
         stats = self.get_stats()
         for name, stat in stats.items():
-            print(f"{name:<30} {stat['count']:<8} {stat['mean']:<10.3f} {stat['total']:<10.3f}")
+            print(
+                f"{name:<30} {stat['count']:<8} {stat['mean']:<10.3f} {stat['total']:<10.3f}"
+            )
 
         print("-" * 60)
 
@@ -476,7 +480,7 @@ def optimize_for_inference(model: nn.Module, use_fp16: bool = False) -> nn.Modul
         model = model.half()
         warnings.warn(
             "Using FP16. Make sure to convert inputs to half precision as well.",
-            UserWarning
+            UserWarning,
         )
 
     # Enable cudnn benchmarking for faster convolutions
@@ -487,8 +491,8 @@ def optimize_for_inference(model: nn.Module, use_fp16: bool = False) -> nn.Modul
 
 
 __all__ = [
-    'ExplanationCache',
-    'BatchProcessor',
-    'PerformanceProfiler',
-    'optimize_for_inference',
+    "ExplanationCache",
+    "BatchProcessor",
+    "PerformanceProfiler",
+    "optimize_for_inference",
 ]

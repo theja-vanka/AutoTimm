@@ -28,9 +28,9 @@ def create_sample_image():
 
 def example_1_autotrainer_integration():
     """Example 1: AutoTrainer callback for automatic interpretation."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 1: AutoTrainer Integration")
-    print("="*60)
+    print("=" * 60)
     print("⚠ Note: This example shows callback setup.")
     print("        Full training demo requires a dataset.")
 
@@ -38,7 +38,7 @@ def example_1_autotrainer_integration():
     sample_images = [create_sample_image() for _ in range(4)]
 
     # Create interpretation callback
-    interp_callback = InterpretationCallback(
+    InterpretationCallback(
         sample_images=sample_images,
         method="gradcam",
         log_every_n_epochs=5,
@@ -47,7 +47,7 @@ def example_1_autotrainer_integration():
     )
 
     # Create feature monitoring callback
-    feature_callback = FeatureMonitorCallback(
+    FeatureMonitorCallback(
         layer_names=["backbone.layer2", "backbone.layer3", "backbone.layer4"],
         log_every_n_epochs=1,
     )
@@ -73,9 +73,9 @@ def example_1_autotrainer_integration():
 
 def example_2_feature_visualization():
     """Example 2: Feature map visualization and analysis."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 2: Feature Visualization")
-    print("="*60)
+    print("=" * 60)
 
     model = ImageClassifier(backbone="resnet18", num_classes=10)
     model.eval()
@@ -87,7 +87,7 @@ def example_2_feature_visualization():
 
     # Visualize feature maps
     print("Generating feature map visualizations...")
-    fig = viz.plot_feature_maps(
+    viz.plot_feature_maps(
         image,
         layer_name="backbone.layer3",
         num_features=16,
@@ -105,9 +105,7 @@ def example_2_feature_visualization():
     print(f"  - Active channels: {stats['active_channels']}/{stats['num_channels']}")
 
     # Get top activating features
-    top_features = viz.get_top_activating_features(
-        image, "backbone.layer4", top_k=5
-    )
+    top_features = viz.get_top_activating_features(image, "backbone.layer4", top_k=5)
     print("\n✓ Top 5 Activating Channels:")
     for channel, activation in top_features:
         print(f"  - Channel {channel}: {activation:.3f}")
@@ -115,9 +113,9 @@ def example_2_feature_visualization():
 
 def example_3_layer_comparison():
     """Example 3: Compare features across layers."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 3: Layer Comparison")
-    print("="*60)
+    print("=" * 60)
 
     model = ImageClassifier(backbone="resnet34", num_classes=10)
     model.eval()
@@ -127,12 +125,13 @@ def example_3_layer_comparison():
     viz = FeatureVisualizer(model)
 
     # Compare multiple layers
-    layers = ["backbone.layer1", "backbone.layer2", "backbone.layer3", "backbone.layer4"]
-    all_stats = viz.compare_layers(
-        image,
-        layers,
-        save_path="layer_comparison.png"
-    )
+    layers = [
+        "backbone.layer1",
+        "backbone.layer2",
+        "backbone.layer3",
+        "backbone.layer4",
+    ]
+    all_stats = viz.compare_layers(image, layers, save_path="layer_comparison.png")
 
     print("✓ Layer Statistics Comparison:")
     for layer, stats in all_stats.items():
@@ -147,9 +146,9 @@ def example_3_layer_comparison():
 
 def example_4_receptive_field():
     """Example 4: Receptive field visualization."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 4: Receptive Field Visualization")
-    print("="*60)
+    print("=" * 60)
     print("⚠ Note: This is computationally intensive.")
     print("        Using simplified version for demo.")
 
@@ -161,9 +160,7 @@ def example_4_receptive_field():
     viz = FeatureVisualizer(model)
 
     # Get top activating channel
-    top_features = viz.get_top_activating_features(
-        image, "backbone.layer3", top_k=1
-    )
+    top_features = viz.get_top_activating_features(image, "backbone.layer3", top_k=1)
     channel = top_features[0][0]
 
     print(f"✓ Selected channel {channel} (highest activation)")
@@ -182,9 +179,9 @@ def example_4_receptive_field():
 
 def example_5_production_workflow():
     """Example 5: Complete production workflow."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 5: Production Workflow")
-    print("="*60)
+    print("=" * 60)
 
     print("Complete workflow for production deployment:")
     print()
@@ -192,7 +189,7 @@ def example_5_production_workflow():
     print("   ```python")
     print("   callbacks = [")
     print("       InterpretationCallback(sample_images, log_every_n_epochs=5),")
-    print("       FeatureMonitorCallback([\"layer2\", \"layer3\", \"layer4\"]),")
+    print('       FeatureMonitorCallback(["layer2", "layer3", "layer4"]),')
     print("   ]")
     print("   trainer = AutoTrainer(callbacks=callbacks)")
     print("   trainer.fit(model, datamodule)")
@@ -201,13 +198,13 @@ def example_5_production_workflow():
     print("2. Feature analysis after training:")
     print("   ```python")
     print("   viz = FeatureVisualizer(model)")
-    print("   stats = viz.compare_layers(image, [\"layer2\", \"layer3\", \"layer4\"])")
+    print('   stats = viz.compare_layers(image, ["layer2", "layer3", "layer4"])')
     print("   ```")
     print()
     print("3. Inference-time interpretation:")
     print("   ```python")
     print("   from autotimm.interpretation import explain_prediction")
-    print("   result = explain_prediction(model, image, method=\"gradcam\")")
+    print('   result = explain_prediction(model, image, method="gradcam")')
     print("   ```")
     print()
     print("4. Monitoring in production:")
@@ -218,9 +215,9 @@ def example_5_production_workflow():
 
 def main():
     """Run all Phase 3 examples."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("AutoTimm Phase 3: Production Polish Demo")
-    print("="*60)
+    print("=" * 60)
 
     # Run examples
     example_1_autotrainer_integration()
@@ -229,9 +226,9 @@ def main():
     example_4_receptive_field()
     example_5_production_workflow()
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("✓ All Phase 3 examples completed!")
-    print("="*60)
+    print("=" * 60)
     print("\nGenerated files:")
     print("  - feature_maps.png")
     print("  - layer_comparison.png")

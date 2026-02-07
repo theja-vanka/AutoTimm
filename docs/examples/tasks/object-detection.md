@@ -459,7 +459,7 @@ pip install transformers
 
 ## Inference
 
-The [`detection_inference.py`](https://github.com/theja-vanka/AutoTimm/blob/main/examples/detection_inference.py) script provides a comprehensive toolkit for object detection inference.
+The [`detection_inference.py`](https://github.com/theja-vanka/AutoTimm/blob/main/examples/logging_inference/detection_inference.py) script provides a comprehensive toolkit for object detection inference.
 
 ### Features
 
@@ -548,7 +548,7 @@ For a complete inference workflow, see the [Detection Inference Guide](../../use
 ### Running the Demo
 
 ```bash
-python examples/detection_inference.py
+python examples/logging_inference/detection_inference.py
 ```
 
 Clone the repository and run examples:
@@ -559,17 +559,17 @@ cd AutoTimm
 pip install -e ".[all]"
 
 # Run object detection examples
-python examples/object_detection_coco.py
-python examples/object_detection_yolox.py
-python examples/object_detection_transformers.py
-python examples/object_detection_rtdetr.py
+python examples/computer_vision/object_detection_coco.py
+python examples/computer_vision/object_detection_yolox.py
+python examples/computer_vision/object_detection_transformers.py
+python examples/computer_vision/object_detection_rtdetr.py
 
 # Explore YOLOX models
-python examples/explore_yolox_models.py
-python examples/yolox_official.py
+python examples/computer_vision/explore_yolox_models.py
+python examples/computer_vision/yolox_official.py
 
 # Run inference
-python examples/detection_inference.py
+python examples/logging_inference/detection_inference.py
 ```
 
 ## See Also

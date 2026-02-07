@@ -336,12 +336,12 @@ report_path = viz.create_report(
 
 See the complete example script:
 ```
-examples/interactive_visualization_demo.py
+examples/interpretation/interactive_visualization_demo.py
 ```
 
 See the tutorial notebook:
 ```
-examples/comprehensive_interpretation_tutorial.ipynb
+examples/interpretation/comprehensive_interpretation_tutorial.ipynb
 ```
 
 ## Next Steps

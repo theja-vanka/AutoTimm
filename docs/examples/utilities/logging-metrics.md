@@ -155,9 +155,9 @@ model = ImageClassifier(
 ## Running Examples
 
 ```bash
-python examples/multiple_loggers.py
-python examples/mlflow_tracking.py
-python examples/detailed_evaluation.py
+python examples/logging_inference/multiple_loggers.py
+python examples/logging_inference/mlflow_tracking.py
+python examples/logging_inference/detailed_evaluation.py
 ```
 
 **See Also:**

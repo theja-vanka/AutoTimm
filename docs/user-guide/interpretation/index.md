@@ -430,10 +430,10 @@ heatmap = explainer.explain(small_image)
 
 See the complete examples:
 
-- `examples/interpretation_demo.py` - Basic interpretation methods
-- `examples/interpretation_phase2_demo.py` - Advanced methods and task-specific adapters
-- `examples/interpretation_phase3_demo.py` - Training integration and feature visualization
-- `examples/interpretation_metrics_demo.py` - Quantitative evaluation of explanation quality
+- `examples/interpretation/interpretation_demo.py` - Basic interpretation methods
+- `examples/interpretation/interpretation_phase2_demo.py` - Advanced methods and task-specific adapters
+- `examples/interpretation/interpretation_phase3_demo.py` - Training integration and feature visualization
+- `examples/interpretation/interpretation_metrics_demo.py` - Quantitative evaluation of explanation quality
 
 ## API Reference
 

@@ -38,14 +38,9 @@ callback = InterpretationCallback(
 
 **Parameters:**
 
-- `sample_images`: Images to explain during training
-  - Can be torch tensors, list of tensors, or list of file paths
-  - Will be sampled down to `num_samples` if more provided
+- `sample_images`: Images to explain during training. Can be torch tensors, list of tensors, or list of file paths. Will be sampled down to `num_samples` if more provided
 - `sample_labels` (Optional[List[int]]): Ground truth labels for sample images
-- `method` (str): Interpretation method to use
-  - `'gradcam'` (default): Fast, good for most cases
-  - `'gradcam++'`: Better for multiple objects
-  - `'integrated_gradients'`: Pixel-level attributions
+- `method` (str): Interpretation method to use. Options: `'gradcam'` (default, fast), `'gradcam++'` (better for multiple objects), `'integrated_gradients'` (pixel-level attributions)
 - `target_layer` (Optional): Layer to use for interpretation (None = auto-detect)
 - `log_every_n_epochs` (int): Generate explanations every N epochs (default: 5)
 - `log_every_n_steps` (Optional[int]): Alternative: log every N steps (overrides epochs)

@@ -30,9 +30,9 @@ def create_sample_image():
 
 def example_1_quick_explain():
     """Example 1: Quickest way to explain a prediction."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 1: Quick Explanation")
-    print("="*60)
+    print("=" * 60)
 
     # Create a model (using random weights for demo)
     model = ImageClassifier(
@@ -55,9 +55,9 @@ def example_1_quick_explain():
 
 def example_2_gradcam_basic():
     """Example 2: Basic GradCAM usage."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 2: Basic GradCAM")
-    print("="*60)
+    print("=" * 60)
 
     # Create a model
     model = ImageClassifier(
@@ -82,9 +82,9 @@ def example_2_gradcam_basic():
 
 def example_3_compare_methods():
     """Example 3: Compare GradCAM and GradCAM++."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 3: Compare Interpretation Methods")
-    print("="*60)
+    print("=" * 60)
 
     # Create a model
     model = ImageClassifier(
@@ -113,9 +113,9 @@ def example_3_compare_methods():
 
 def example_4_high_level_api():
     """Example 4: High-level API with all features."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 4: High-Level API")
-    print("="*60)
+    print("=" * 60)
 
     # Create a model
     model = ImageClassifier(
@@ -150,9 +150,9 @@ def example_4_high_level_api():
 
 def example_5_custom_layer():
     """Example 5: Visualize different layers."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 5: Compare Different Layers")
-    print("="*60)
+    print("=" * 60)
 
     # Create a model
     model = ImageClassifier(
@@ -175,9 +175,9 @@ def example_5_custom_layer():
 
 def example_6_batch_processing():
     """Example 6: Batch processing multiple images."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 6: Batch Processing")
-    print("="*60)
+    print("=" * 60)
 
     # Create a model
     model = ImageClassifier(
@@ -199,9 +199,9 @@ def example_6_batch_processing():
 
 def main():
     """Run all examples."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("AutoTimm Model Interpretation Demo")
-    print("="*60)
+    print("=" * 60)
 
     # Run examples
     example_1_quick_explain()
@@ -211,9 +211,9 @@ def main():
     example_5_custom_layer()
     example_6_batch_processing()
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("✓ All examples completed successfully!")
-    print("="*60)
+    print("=" * 60)
     print("\nGenerated files:")
     print("  - quick_explanation.png")
     print("  - method_comparison.png")

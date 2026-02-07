@@ -454,10 +454,15 @@ cache = ExplanationCache(
 ```
 
 **Methods**:
-- `get(image, method, target_class=None, **kwargs)` - Retrieve from cache
-- `put(image, method, explanation, target_class=None, **kwargs)` - Store in cache
-- `stats()` - Get cache statistics
-- `clear()` - Clear entire cache
+
+- `get(image, method, target_class=None, **kwargs)` 
+  Retrieve from cache
+- `put(image, method, explanation, target_class=None, **kwargs)` 
+  Store in cache
+- `stats()` 
+  Get cache statistics
+- `clear()` 
+  Clear entire cache
 
 ### BatchProcessor
 
@@ -472,8 +477,11 @@ processor = BatchProcessor(
 ```
 
 **Methods**:
-- `process_batch(images, target_classes=None, **kwargs)` - Process batch
-- `process_batch_parallel(images, target_classes=None, num_workers=4, **kwargs)` - Parallel processing
+
+- `process_batch(images, target_classes=None, **kwargs)` 
+  Process batch
+- `process_batch_parallel(images, target_classes=None, num_workers=4, **kwargs)` 
+  Parallel processing
 
 ### PerformanceProfiler
 
@@ -482,10 +490,15 @@ profiler = PerformanceProfiler(enabled=True)
 ```
 
 **Methods**:
-- `profile(name)` - Context manager for profiling
-- `get_stats()` - Get profiling statistics
-- `print_stats()` - Print formatted statistics
-- `reset()` - Reset profiling data
+
+- `profile(name)` 
+  Context manager for profiling
+- `get_stats()` 
+  Get profiling statistics
+- `print_stats()` 
+  Print formatted statistics
+- `reset()` 
+  Reset profiling data
 
 ### optimize_for_inference()
 
@@ -500,12 +513,12 @@ model = optimize_for_inference(
 
 See the complete example script:
 ```
-examples/performance_optimization_demo.py
+examples/data_training/performance_optimization_demo.py
 ```
 
 See the tutorial notebook:
 ```
-examples/comprehensive_interpretation_tutorial.ipynb
+examples/interpretation/comprehensive_interpretation_tutorial.ipynb
 ```
 
 ## Next Steps

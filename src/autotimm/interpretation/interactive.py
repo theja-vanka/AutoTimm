@@ -15,8 +15,8 @@ import torch.nn as nn
 
 try:
     import plotly.graph_objects as go
-    import plotly.express as px
     from plotly.subplots import make_subplots
+
     PLOTLY_AVAILABLE = True
 except ImportError:
     PLOTLY_AVAILABLE = False
@@ -112,7 +112,9 @@ class InteractiveVisualizer:
         with torch.no_grad():
             output = self.model(input_tensor)
             if isinstance(output, dict):
-                output = output.get('logits', output.get('output', list(output.values())[0]))
+                output = output.get(
+                    "logits", output.get("output", list(output.values())[0])
+                )
             pred_class = output.argmax(dim=1).item()
             pred_score = torch.softmax(output, dim=1)[0, pred_class].item()
 
@@ -139,26 +141,22 @@ class InteractiveVisualizer:
         # Resize heatmap if needed
         if heatmap.shape != image_np.shape[:2]:
             import cv2
+
             heatmap = cv2.resize(heatmap, (image_np.shape[1], image_np.shape[0]))
 
         # Create figure with subplots
         fig = make_subplots(
-            rows=1, cols=2,
+            rows=1,
+            cols=2,
             subplot_titles=("Original Image", "Explanation Overlay"),
             horizontal_spacing=0.05,
         )
 
         # Original image
-        fig.add_trace(
-            go.Image(z=image_np),
-            row=1, col=1
-        )
+        fig.add_trace(go.Image(z=image_np), row=1, col=1)
 
         # Overlay
-        fig.add_trace(
-            go.Image(z=image_np),
-            row=1, col=2
-        )
+        fig.add_trace(go.Image(z=image_np), row=1, col=2)
 
         # Add heatmap overlay
         fig.add_trace(
@@ -167,13 +165,18 @@ class InteractiveVisualizer:
                 colorscale=colorscale,
                 opacity=opacity,
                 showscale=show_colorbar,
-                hovertemplate='X: %{x}<br>Y: %{y}<br>Importance: %{z:.3f}<extra></extra>',
-                colorbar=dict(
-                    title="Importance",
-                    x=1.15,
-                ) if show_colorbar else None,
+                hovertemplate="X: %{x}<br>Y: %{y}<br>Importance: %{z:.3f}<extra></extra>",
+                colorbar=(
+                    dict(
+                        title="Importance",
+                        x=1.15,
+                    )
+                    if show_colorbar
+                    else None
+                ),
             ),
-            row=1, col=2
+            row=1,
+            col=2,
         )
 
         # Update layout
@@ -181,12 +184,12 @@ class InteractiveVisualizer:
             title=dict(
                 text=f"{title}<br><sub>Predicted: Class {pred_class} (confidence: {pred_score:.3f})</sub>",
                 x=0.5,
-                xanchor='center',
+                xanchor="center",
             ),
             width=width,
             height=height,
             showlegend=False,
-            hovermode='closest',
+            hovermode="closest",
         )
 
         # Remove axes
@@ -245,7 +248,9 @@ class InteractiveVisualizer:
         with torch.no_grad():
             output = self.model(input_tensor)
             if isinstance(output, dict):
-                output = output.get('logits', output.get('output', list(output.values())[0]))
+                output = output.get(
+                    "logits", output.get("output", list(output.values())[0])
+                )
             pred_class = output.argmax(dim=1).item()
             pred_score = torch.softmax(output, dim=1)[0, pred_class].item()
 
@@ -268,16 +273,14 @@ class InteractiveVisualizer:
         # Create subplots
         n_methods = len(explainers)
         fig = make_subplots(
-            rows=1, cols=n_methods + 1,
+            rows=1,
+            cols=n_methods + 1,
             subplot_titles=["Original"] + list(explainers.keys()),
             horizontal_spacing=0.02,
         )
 
         # Original image
-        fig.add_trace(
-            go.Image(z=image_np),
-            row=1, col=1
-        )
+        fig.add_trace(go.Image(z=image_np), row=1, col=1)
 
         # Add each method
         for idx, (method_name, explainer) in enumerate(explainers.items(), start=2):
@@ -287,13 +290,11 @@ class InteractiveVisualizer:
             # Resize if needed
             if heatmap.shape != image_np.shape[:2]:
                 import cv2
+
                 heatmap = cv2.resize(heatmap, (image_np.shape[1], image_np.shape[0]))
 
             # Add base image
-            fig.add_trace(
-                go.Image(z=image_np),
-                row=1, col=idx
-            )
+            fig.add_trace(go.Image(z=image_np), row=1, col=idx)
 
             # Add heatmap overlay
             fig.add_trace(
@@ -302,13 +303,18 @@ class InteractiveVisualizer:
                     colorscale=colorscale,
                     opacity=opacity,
                     showscale=(idx == n_methods + 1),  # Only show colorbar for last
-                    hovertemplate=f'{method_name}<br>X: %{{x}}<br>Y: %{{y}}<br>Importance: %{{z:.3f}}<extra></extra>',
-                    colorbar=dict(
-                        title="Importance",
-                        x=1.02,
-                    ) if idx == n_methods + 1 else None,
+                    hovertemplate=f"{method_name}<br>X: %{{x}}<br>Y: %{{y}}<br>Importance: %{{z:.3f}}<extra></extra>",
+                    colorbar=(
+                        dict(
+                            title="Importance",
+                            x=1.02,
+                        )
+                        if idx == n_methods + 1
+                        else None
+                    ),
                 ),
-                row=1, col=idx
+                row=1,
+                col=idx,
             )
 
         # Update layout
@@ -316,12 +322,12 @@ class InteractiveVisualizer:
             title=dict(
                 text=f"{title}<br><sub>Predicted: Class {pred_class} (confidence: {pred_score:.3f})</sub>",
                 x=0.5,
-                xanchor='center',
+                xanchor="center",
             ),
             width=width,
             height=height,
             showlegend=False,
-            hovermode='closest',
+            hovermode="closest",
         )
 
         # Remove axes
@@ -373,7 +379,9 @@ class InteractiveVisualizer:
         with torch.no_grad():
             output = self.model(input_tensor)
             if isinstance(output, dict):
-                output = output.get('logits', output.get('output', list(output.values())[0]))
+                output = output.get(
+                    "logits", output.get("output", list(output.values())[0])
+                )
             pred_class = output.argmax(dim=1).item()
             pred_score = torch.softmax(output, dim=1)[0, pred_class].item()
             top5_scores, top5_classes = torch.topk(torch.softmax(output, dim=1)[0], k=5)
@@ -399,6 +407,7 @@ class InteractiveVisualizer:
         # Resize heatmap
         if heatmap.shape != image_np.shape[:2]:
             import cv2
+
             heatmap = cv2.resize(heatmap, (image_np.shape[1], image_np.shape[0]))
 
         # Create HTML report
@@ -479,19 +488,25 @@ class InteractiveVisualizer:
         # Top-5 predictions
         html_parts.append("<h2>Top-5 Predictions</h2>")
         html_parts.append("<table style='width:100%; border-collapse: collapse;'>")
-        html_parts.append("<tr style='background-color:#f0f0f0;'><th style='padding:10px; text-align:left;'>Rank</th><th style='padding:10px; text-align:left;'>Class</th><th style='padding:10px; text-align:left;'>Confidence</th></tr>")
-        for rank, (cls, score) in enumerate(zip(top5_classes.tolist(), top5_scores.tolist()), 1):
-            html_parts.append(f"<tr><td style='padding:8px;'>{rank}</td><td style='padding:8px;'>Class {cls}</td><td style='padding:8px;'>{score:.2%}</td></tr>")
+        html_parts.append(
+            "<tr style='background-color:#f0f0f0;'><th style='padding:10px; text-align:left;'>Rank</th><th style='padding:10px; text-align:left;'>Class</th><th style='padding:10px; text-align:left;'>Confidence</th></tr>"
+        )
+        for rank, (cls, score) in enumerate(
+            zip(top5_classes.tolist(), top5_scores.tolist()), 1
+        ):
+            html_parts.append(
+                f"<tr><td style='padding:8px;'>{rank}</td><td style='padding:8px;'>Class {cls}</td><td style='padding:8px;'>{score:.2%}</td></tr>"
+            )
         html_parts.append("</table>")
 
         # Statistics
         if include_statistics:
             stats = {
-                'Mean': float(heatmap.mean()),
-                'Std': float(heatmap.std()),
-                'Min': float(heatmap.min()),
-                'Max': float(heatmap.max()),
-                'Sparsity': float((heatmap == 0).mean()),
+                "Mean": float(heatmap.mean()),
+                "Std": float(heatmap.std()),
+                "Min": float(heatmap.min()),
+                "Max": float(heatmap.max()),
+                "Sparsity": float((heatmap == 0).mean()),
             }
 
             html_parts.append("<h2>Heatmap Statistics</h2>")
@@ -508,20 +523,21 @@ class InteractiveVisualizer:
         # Main visualization
         html_parts.append("<h2>Explanation Visualization</h2>")
         fig1 = self.visualize_explanation(
-            image, explainer, target_class=target_class,
-            title="", show_colorbar=True
+            image, explainer, target_class=target_class, title="", show_colorbar=True
         )
         html_parts.append(fig1.to_html(full_html=False, include_plotlyjs=False))
 
         # Distribution
         html_parts.append("<h2>Importance Distribution</h2>")
         fig2 = go.Figure()
-        fig2.add_trace(go.Histogram(
-            x=heatmap.flatten(),
-            nbinsx=50,
-            name='Importance',
-            marker_color='#4CAF50',
-        ))
+        fig2.add_trace(
+            go.Histogram(
+                x=heatmap.flatten(),
+                nbinsx=50,
+                name="Importance",
+                marker_color="#4CAF50",
+            )
+        )
         fig2.update_layout(
             xaxis_title="Importance Value",
             yaxis_title="Frequency",
@@ -538,8 +554,8 @@ class InteractiveVisualizer:
         """)
 
         # Write file
-        with open(save_path, 'w') as f:
-            f.write('\n'.join(html_parts))
+        with open(save_path, "w") as f:
+            f.write("\n".join(html_parts))
 
         return save_path
 
@@ -560,11 +576,12 @@ class InteractiveVisualizer:
 
         # Convert PIL to tensor
         import torchvision.transforms as T
+
         transform = T.Compose([T.ToTensor()])
         tensor = transform(image).unsqueeze(0)
         return tensor.to(self.device)
 
 
 __all__ = [
-    'InteractiveVisualizer',
+    "InteractiveVisualizer",
 ]

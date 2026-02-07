@@ -372,6 +372,6 @@ config.attention_probs_dropout_prob = 0.0
 
 ## Resources
 
-- [Example: HF Direct Models with Lightning](https://github.com/theja-vanka/AutoTimm/blob/main/examples/hf_direct_models_lightning.py)
+- [Example: HF Direct Models with Lightning](https://github.com/theja-vanka/AutoTimm/blob/main/examples/huggingface/hf_direct_models_lightning.py)
 - [HuggingFace Transformers Docs](https://huggingface.co/docs/transformers)
 - [PyTorch Lightning Docs](https://lightning.ai/docs/pytorch)

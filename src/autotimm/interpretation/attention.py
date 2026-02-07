@@ -40,7 +40,7 @@ class AttentionRollout(BaseInterpreter):
     def __init__(
         self,
         model: nn.Module,
-        head_fusion: Literal['mean', 'max', 'min'] = 'mean',
+        head_fusion: Literal["mean", "max", "min"] = "mean",
         discard_ratio: float = 0.9,
         use_cuda: bool = True,
     ):
@@ -70,7 +70,7 @@ class AttentionRollout(BaseInterpreter):
         def attention_hook(module, input, output):
             # Capture attention weights
             # Different ViT implementations have different formats
-            if hasattr(module, 'attn_drop'):
+            if hasattr(module, "attn_drop"):
                 # timm ViT format - attention is in the forward output
                 if isinstance(output, tuple) and len(output) > 1:
                     attn = output[1]  # (B, H, N, N)
@@ -78,11 +78,12 @@ class AttentionRollout(BaseInterpreter):
 
         # Register hooks on attention layers
         for name, module in self.model.named_modules():
-            if 'attn' in name.lower() and 'attn_drop' not in name.lower():
-                if isinstance(module, nn.MultiheadAttention) or 'attention' in module.__class__.__name__.lower():
-                    self._hooks.append(
-                        module.register_forward_hook(attention_hook)
-                    )
+            if "attn" in name.lower() and "attn_drop" not in name.lower():
+                if (
+                    isinstance(module, nn.MultiheadAttention)
+                    or "attention" in module.__class__.__name__.lower()
+                ):
+                    self._hooks.append(module.register_forward_hook(attention_hook))
 
     def explain(
         self,
@@ -107,7 +108,7 @@ class AttentionRollout(BaseInterpreter):
 
         # Forward pass
         with torch.no_grad():
-            output = self.model(input_tensor)
+            _ = self.model(input_tensor)
 
         # Remove hooks
         self._remove_hooks()
@@ -140,11 +141,11 @@ class AttentionRollout(BaseInterpreter):
         for attn_matrix in self.attention_matrices:
             # attn_matrix shape: (B, H, N, N)
             # Fuse heads
-            if self.head_fusion == 'mean':
+            if self.head_fusion == "mean":
                 attn_matrix = attn_matrix.mean(dim=1)  # (B, N, N)
-            elif self.head_fusion == 'max':
+            elif self.head_fusion == "max":
                 attn_matrix = attn_matrix.max(dim=1)[0]
-            elif self.head_fusion == 'min':
+            elif self.head_fusion == "min":
                 attn_matrix = attn_matrix.min(dim=1)[0]
 
             attn_matrix = attn_matrix.squeeze(0)  # (N, N)
@@ -155,9 +156,7 @@ class AttentionRollout(BaseInterpreter):
                 threshold_index = int(flat.shape[0] * self.discard_ratio)
                 threshold = torch.sort(flat)[0][threshold_index]
                 attn_matrix = torch.where(
-                    attn_matrix < threshold,
-                    torch.zeros_like(attn_matrix),
-                    attn_matrix
+                    attn_matrix < threshold, torch.zeros_like(attn_matrix), attn_matrix
                 )
 
             # Add residual connection (identity)
@@ -185,7 +184,7 @@ class AttentionRollout(BaseInterpreter):
         image: Union[Image.Image, np.ndarray],
         save_path: Optional[str] = None,
         alpha: float = 0.5,
-        colormap: str = 'viridis',
+        colormap: str = "viridis",
     ) -> np.ndarray:
         """
         Visualize attention map overlaid on image.
@@ -298,6 +297,7 @@ class AttentionFlow:
         if isinstance(image, (Image.Image, np.ndarray)):
             # Convert to tensor
             import torchvision.transforms as T
+
             if isinstance(image, Image.Image):
                 transform = T.Compose([T.ToTensor()])
                 input_tensor = transform(image).unsqueeze(0).to(self.device)
@@ -317,7 +317,7 @@ class AttentionFlow:
 
         # Forward pass
         with torch.no_grad():
-            output = self.model(input_tensor)
+            _ = self.model(input_tensor)
 
         # Remove hooks
         for hook in self._hooks:
@@ -359,11 +359,12 @@ class AttentionFlow:
                 self.attention_matrices.append(attn.detach())
 
         for name, module in self.model.named_modules():
-            if 'attn' in name.lower() and 'attn_drop' not in name.lower():
-                if isinstance(module, nn.MultiheadAttention) or 'attention' in module.__class__.__name__.lower():
-                    self._hooks.append(
-                        module.register_forward_hook(attention_hook)
-                    )
+            if "attn" in name.lower() and "attn_drop" not in name.lower():
+                if (
+                    isinstance(module, nn.MultiheadAttention)
+                    or "attention" in module.__class__.__name__.lower()
+                ):
+                    self._hooks.append(module.register_forward_hook(attention_hook))
 
 
 __all__ = [

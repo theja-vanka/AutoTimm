@@ -55,7 +55,7 @@ class ExplanationMetrics:
         image: Union[Image.Image, np.ndarray, torch.Tensor],
         target_class: Optional[int] = None,
         steps: int = 50,
-        baseline: str = 'blur',
+        baseline: str = "blur",
     ) -> Dict[str, float]:
         """
         Deletion metric: progressively delete most important pixels.
@@ -107,7 +107,7 @@ class ExplanationMetrics:
 
         for step in range(1, steps + 1):
             # Delete pixels
-            pixels_to_delete = pixel_order[:step * pixels_per_step]
+            pixels_to_delete = pixel_order[: step * pixels_per_step]
 
             # Convert flat indices to 2D
             rows = pixels_to_delete // heatmap.shape[1]
@@ -121,7 +121,9 @@ class ExplanationMetrics:
             with torch.no_grad():
                 output = self.model(modified)
                 if isinstance(output, dict):
-                    output = output.get('logits', output.get('output', list(output.values())[0]))
+                    output = output.get(
+                        "logits", output.get("output", list(output.values())[0])
+                    )
                 probs = torch.softmax(output, dim=1)
                 score = probs[0, target_class].item()
 
@@ -129,17 +131,17 @@ class ExplanationMetrics:
 
         # Compute metrics
         try:
-            auc = np.trapezoid(scores, dx=1.0/steps) / original_score
+            auc = np.trapezoid(scores, dx=1.0 / steps) / original_score
         except AttributeError:
             # Fallback for older numpy versions
-            auc = np.trapz(scores, dx=1.0/steps) / original_score
+            auc = np.trapz(scores, dx=1.0 / steps) / original_score
         final_drop = (original_score - scores[-1]) / original_score
 
         return {
-            'auc': auc,
-            'final_drop': final_drop,
-            'scores': scores,
-            'original_score': original_score,
+            "auc": auc,
+            "final_drop": final_drop,
+            "scores": scores,
+            "original_score": original_score,
         }
 
     def insertion(
@@ -147,7 +149,7 @@ class ExplanationMetrics:
         image: Union[Image.Image, np.ndarray, torch.Tensor],
         target_class: Optional[int] = None,
         steps: int = 50,
-        baseline: str = 'blur',
+        baseline: str = "blur",
     ) -> Dict[str, float]:
         """
         Insertion metric: progressively insert most important pixels.
@@ -192,7 +194,9 @@ class ExplanationMetrics:
         with torch.no_grad():
             output = self.model(baseline_tensor)
             if isinstance(output, dict):
-                output = output.get('logits', output.get('output', list(output.values())[0]))
+                output = output.get(
+                    "logits", output.get("output", list(output.values())[0])
+                )
             probs = torch.softmax(output, dim=1)
             baseline_score = probs[0, target_class].item()
 
@@ -207,7 +211,7 @@ class ExplanationMetrics:
 
         for step in range(1, steps + 1):
             # Insert pixels
-            pixels_to_insert = pixel_order[:step * pixels_per_step]
+            pixels_to_insert = pixel_order[: step * pixels_per_step]
 
             # Convert flat indices to 2D
             rows = pixels_to_insert // heatmap.shape[1]
@@ -221,7 +225,9 @@ class ExplanationMetrics:
             with torch.no_grad():
                 output = self.model(modified)
                 if isinstance(output, dict):
-                    output = output.get('logits', output.get('output', list(output.values())[0]))
+                    output = output.get(
+                        "logits", output.get("output", list(output.values())[0])
+                    )
                 probs = torch.softmax(output, dim=1)
                 score = probs[0, target_class].item()
 
@@ -229,18 +235,26 @@ class ExplanationMetrics:
 
         # Compute metrics
         try:
-            auc = np.trapezoid(scores, dx=1.0/steps) / original_score
+            auc = np.trapezoid(scores, dx=1.0 / steps) / original_score
         except AttributeError:
             # Fallback for older numpy versions
-            auc = np.trapz(scores, dx=1.0/steps) / original_score
-        final_rise = (scores[-1] - baseline_score) / (original_score - baseline_score + 1e-8)
+            auc = np.trapz(scores, dx=1.0 / steps) / original_score
+
+        # Compute final rise - handle edge case where baseline >= original
+        denominator = original_score - baseline_score
+        if abs(denominator) < 1e-6:
+            # Baseline and original are essentially the same
+            final_rise = 0.0
+        else:
+            # Use absolute value to avoid negative denominators
+            final_rise = (scores[-1] - baseline_score) / abs(denominator)
 
         return {
-            'auc': auc,
-            'final_rise': final_rise,
-            'scores': scores,
-            'original_score': original_score,
-            'baseline_score': baseline_score,
+            "auc": auc,
+            "final_rise": final_rise,
+            "scores": scores,
+            "original_score": original_score,
+            "baseline_score": baseline_score,
         }
 
     def sensitivity_n(
@@ -287,17 +301,19 @@ class ExplanationMetrics:
             noisy_input = torch.clamp(noisy_input, 0, 1)
 
             # Get explanation for noisy input
-            noisy_heatmap = self.explainer.explain(noisy_input, target_class=target_class)
+            noisy_heatmap = self.explainer.explain(
+                noisy_input, target_class=target_class
+            )
 
             # Compute change
             change = np.abs(noisy_heatmap - original_heatmap).mean()
             changes.append(change)
 
         return {
-            'sensitivity': np.mean(changes),
-            'std': np.std(changes),
-            'max_change': np.max(changes),
-            'changes': changes,
+            "sensitivity": np.mean(changes),
+            "std": np.std(changes),
+            "max_change": np.max(changes),
+            "changes": changes,
         }
 
     def model_parameter_randomization_test(
@@ -355,8 +371,7 @@ class ExplanationMetrics:
 
         # Compute correlation
         correlation = np.corrcoef(
-            original_heatmap.flatten(),
-            randomized_heatmap.flatten()
+            original_heatmap.flatten(), randomized_heatmap.flatten()
         )[0, 1]
 
         # Compute mean absolute change
@@ -366,9 +381,9 @@ class ExplanationMetrics:
         passes = correlation < 0.5
 
         return {
-            'correlation': correlation,
-            'change': change,
-            'passes': passes,
+            "correlation": correlation,
+            "change": change,
+            "passes": passes,
         }
 
     def data_randomization_test(
@@ -414,10 +429,9 @@ class ExplanationMetrics:
             random_heatmap = original_heatmap
 
         # Compute correlation
-        correlation = np.corrcoef(
-            original_heatmap.flatten(),
-            random_heatmap.flatten()
-        )[0, 1]
+        correlation = np.corrcoef(original_heatmap.flatten(), random_heatmap.flatten())[
+            0, 1
+        ]
 
         # Compute change
         change = np.abs(random_heatmap - original_heatmap).mean()
@@ -426,9 +440,9 @@ class ExplanationMetrics:
         passes = correlation < 0.5
 
         return {
-            'correlation': correlation,
-            'change': change,
-            'passes': passes,
+            "correlation": correlation,
+            "change": change,
+            "passes": passes,
         }
 
     def pointing_game(
@@ -481,9 +495,9 @@ class ExplanationMetrics:
         hit = (x1 <= max_x <= x2) and (y1 <= max_y <= y2)
 
         return {
-            'hit': hit,
-            'max_location': (max_y, max_x),
-            'bbox': bbox,
+            "hit": hit,
+            "max_location": (max_y, max_x),
+            "bbox": bbox,
         }
 
     def evaluate_all(
@@ -513,29 +527,29 @@ class ExplanationMetrics:
 
         # Faithfulness metrics
         print("Computing deletion metric...")
-        results['deletion'] = self.deletion(image, target_class=target_class)
+        results["deletion"] = self.deletion(image, target_class=target_class)
 
         print("Computing insertion metric...")
-        results['insertion'] = self.insertion(image, target_class=target_class)
+        results["insertion"] = self.insertion(image, target_class=target_class)
 
         # Sensitivity
         print("Computing sensitivity...")
-        results['sensitivity'] = self.sensitivity_n(image, target_class=target_class)
+        results["sensitivity"] = self.sensitivity_n(image, target_class=target_class)
 
         # Sanity checks
         print("Running model parameter randomization test...")
-        results['param_randomization'] = self.model_parameter_randomization_test(
+        results["param_randomization"] = self.model_parameter_randomization_test(
             image, target_class=target_class
         )
 
         print("Running data randomization test...")
-        results['data_randomization'] = self.data_randomization_test(
+        results["data_randomization"] = self.data_randomization_test(
             image, target_class=target_class
         )
 
         # Pointing game (if bbox provided)
         if bbox is not None:
-            results['pointing_game'] = self.pointing_game(
+            results["pointing_game"] = self.pointing_game(
                 image, bbox, target_class=target_class
             )
 
@@ -560,6 +574,7 @@ class ExplanationMetrics:
 
         # Convert PIL to tensor
         import torchvision.transforms as T
+
         transform = T.Compose([T.ToTensor()])
         tensor = transform(image).unsqueeze(0)
         return tensor.to(self.device)
@@ -571,7 +586,9 @@ class ExplanationMetrics:
         with torch.no_grad():
             output = self.model(input_tensor)
             if isinstance(output, dict):
-                output = output.get('logits', output.get('output', list(output.values())[0]))
+                output = output.get(
+                    "logits", output.get("output", list(output.values())[0])
+                )
             probs = torch.softmax(output, dim=1)
 
             if target_class is None:
@@ -586,13 +603,14 @@ class ExplanationMetrics:
         self, input_tensor: torch.Tensor, baseline: str
     ) -> torch.Tensor:
         """Create baseline tensor."""
-        if baseline == 'black':
+        if baseline == "black":
             return torch.zeros_like(input_tensor)
-        elif baseline == 'mean':
+        elif baseline == "mean":
             mean = input_tensor.mean()
             return torch.full_like(input_tensor, mean)
-        elif baseline == 'blur':
+        elif baseline == "blur":
             import torchvision.transforms.functional as TF
+
             # Apply Gaussian blur
             blurred = TF.gaussian_blur(input_tensor, kernel_size=51, sigma=20.0)
             return blurred
@@ -602,6 +620,7 @@ class ExplanationMetrics:
     def _resize_heatmap(self, heatmap: np.ndarray, target_size: tuple) -> np.ndarray:
         """Resize heatmap to target size."""
         import cv2
+
         return cv2.resize(heatmap, (target_size[1], target_size[0]))
 
     def _get_num_classes(self) -> int:
@@ -612,13 +631,15 @@ class ExplanationMetrics:
             with torch.no_grad():
                 output = self.model(dummy_input)
                 if isinstance(output, dict):
-                    output = output.get('logits', output.get('output', list(output.values())[0]))
+                    output = output.get(
+                        "logits", output.get("output", list(output.values())[0])
+                    )
                 return output.shape[1]
-        except:
+        except Exception:
             # Default to 1000 (ImageNet)
             return 1000
 
 
 __all__ = [
-    'ExplanationMetrics',
+    "ExplanationMetrics",
 ]

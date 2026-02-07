@@ -200,5 +200,5 @@ model = autotimm.ImageClassifier(
 ## Running Examples
 
 ```bash
-python examples/backbone_discovery.py
+python examples/logging_inference/backbone_discovery.py
 ```

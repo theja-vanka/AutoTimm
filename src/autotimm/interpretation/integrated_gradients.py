@@ -44,7 +44,9 @@ class IntegratedGradients(BaseInterpreter):
     def __init__(
         self,
         model: torch.nn.Module,
-        baseline: Union[Literal['black', 'white', 'blur', 'random'], torch.Tensor] = 'black',
+        baseline: Union[
+            Literal["black", "white", "blur", "random"], torch.Tensor
+        ] = "black",
         steps: int = 50,
         use_cuda: bool = True,
     ):
@@ -56,7 +58,7 @@ class IntegratedGradients(BaseInterpreter):
         )
         self.model.to(self.device)
 
-        self.baseline_type = baseline if isinstance(baseline, str) else 'custom'
+        self.baseline_type = baseline if isinstance(baseline, str) else "custom"
         self.custom_baseline = baseline if isinstance(baseline, torch.Tensor) else None
         self.steps = steps
 
@@ -66,9 +68,7 @@ class IntegratedGradients(BaseInterpreter):
         self.gradients = None
         self._hooks = []
 
-    def _generate_baseline(
-        self, input_tensor: torch.Tensor
-    ) -> torch.Tensor:
+    def _generate_baseline(self, input_tensor: torch.Tensor) -> torch.Tensor:
         """
         Generate baseline based on type.
 
@@ -87,11 +87,11 @@ class IntegratedGradients(BaseInterpreter):
                 )
             return baseline
 
-        if self.baseline_type == 'black':
+        if self.baseline_type == "black":
             return torch.zeros_like(input_tensor)
-        elif self.baseline_type == 'white':
+        elif self.baseline_type == "white":
             return torch.ones_like(input_tensor)
-        elif self.baseline_type == 'blur':
+        elif self.baseline_type == "blur":
             # Apply Gaussian blur as baseline
             img_np = input_tensor.detach().squeeze(0).cpu().numpy().transpose(1, 2, 0)
             if img_np.max() <= 1.0:
@@ -101,7 +101,7 @@ class IntegratedGradients(BaseInterpreter):
                 blurred = blurred.astype(np.float32) / 255.0
             blurred = torch.from_numpy(blurred.transpose(2, 0, 1)).unsqueeze(0)
             return blurred.float().to(self.device)
-        elif self.baseline_type == 'random':
+        elif self.baseline_type == "random":
             return torch.rand_like(input_tensor)
         else:
             raise ValueError(f"Unknown baseline type: {self.baseline_type}")
@@ -236,18 +236,18 @@ class IntegratedGradients(BaseInterpreter):
 
         # Original
         axes[0].imshow(image)
-        axes[0].set_title("Original", fontsize=12, fontweight='bold')
-        axes[0].axis('off')
+        axes[0].set_title("Original", fontsize=12, fontweight="bold")
+        axes[0].axis("off")
 
         # Positive attribution
-        axes[1].imshow(pos_attr, cmap='Reds')
-        axes[1].set_title("Positive Attribution", fontsize=12, fontweight='bold')
-        axes[1].axis('off')
+        axes[1].imshow(pos_attr, cmap="Reds")
+        axes[1].set_title("Positive Attribution", fontsize=12, fontweight="bold")
+        axes[1].axis("off")
 
         # Negative attribution
-        axes[2].imshow(neg_attr, cmap='Blues')
-        axes[2].set_title("Negative Attribution", fontsize=12, fontweight='bold')
-        axes[2].axis('off')
+        axes[2].imshow(neg_attr, cmap="Blues")
+        axes[2].set_title("Negative Attribution", fontsize=12, fontweight="bold")
+        axes[2].axis("off")
 
         # Combined
         # Create RGB visualization: R=positive, B=negative, G=0
@@ -255,13 +255,13 @@ class IntegratedGradients(BaseInterpreter):
         combined[:, :, 0] = pos_attr  # Red channel
         combined[:, :, 2] = neg_attr  # Blue channel
         axes[3].imshow(combined)
-        axes[3].set_title("Combined (R=Pos, B=Neg)", fontsize=12, fontweight='bold')
-        axes[3].axis('off')
+        axes[3].set_title("Combined (R=Pos, B=Neg)", fontsize=12, fontweight="bold")
+        axes[3].axis("off")
 
         plt.tight_layout()
 
         if save_path:
-            fig.savefig(save_path, dpi=150, bbox_inches='tight')
+            fig.savefig(save_path, dpi=150, bbox_inches="tight")
 
         plt.close(fig)
 
@@ -293,12 +293,16 @@ class IntegratedGradients(BaseInterpreter):
             # Score at input
             output_input = self.model(input_tensor)
             if isinstance(output_input, dict):
-                output_input = output_input.get("logits", output_input.get("output", output_input))
+                output_input = output_input.get(
+                    "logits", output_input.get("output", output_input)
+                )
 
             # Score at baseline
             output_baseline = self.model(baseline)
             if isinstance(output_baseline, dict):
-                output_baseline = output_baseline.get("logits", output_baseline.get("output", output_baseline))
+                output_baseline = output_baseline.get(
+                    "logits", output_baseline.get("output", output_baseline)
+                )
 
             if target_class is None:
                 target_class = output_input.argmax(dim=1).item()
@@ -358,7 +362,7 @@ class SmoothGrad:
         self,
         image: Union[Image.Image, np.ndarray, torch.Tensor],
         target_class: Optional[int] = None,
-        **kwargs
+        **kwargs,
     ) -> np.ndarray:
         """
         Generate smoothed attribution.
@@ -377,7 +381,7 @@ class SmoothGrad:
         self,
         image: Union[Image.Image, np.ndarray, torch.Tensor],
         target_class: Optional[int] = None,
-        **kwargs
+        **kwargs,
     ) -> np.ndarray:
         """
         Generate smoothed attribution by averaging over noisy samples.

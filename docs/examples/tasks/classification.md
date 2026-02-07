@@ -188,9 +188,9 @@ cd AutoTimm
 pip install -e ".[all]"
 
 # Run examples
-python examples/classify_cifar10.py
-python examples/classify_custom_folder.py
-python examples/vit_finetuning.py
+python examples/getting_started/classify_cifar10.py
+python examples/getting_started/classify_custom_folder.py
+python examples/getting_started/vit_finetuning.py
 ```
 
 ## See Also

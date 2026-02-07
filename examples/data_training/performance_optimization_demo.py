@@ -35,9 +35,9 @@ def create_sample_image(seed=None):
 
 def example_1_caching():
     """Example 1: Caching for faster repeated explanations."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 1: Explanation Caching")
-    print("="*60)
+    print("=" * 60)
 
     model = ImageClassifier(backbone="resnet18", num_classes=10)
     model.eval()
@@ -51,7 +51,9 @@ def example_1_caching():
     for i in range(5):
         heatmap = explainer.explain(image, target_class=5)
     time_without_cache = time.time() - start
-    print(f"✓ 5 explanations: {time_without_cache:.3f}s ({time_without_cache/5:.3f}s each)")
+    print(
+        f"✓ 5 explanations: {time_without_cache:.3f}s ({time_without_cache/5:.3f}s each)"
+    )
 
     # With caching
     print("\nWith caching:")
@@ -84,9 +86,9 @@ def example_1_caching():
 
 def example_2_batch_processing():
     """Example 2: Batch processing for multiple images."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 2: Batch Processing")
-    print("="*60)
+    print("=" * 60)
 
     model = ImageClassifier(backbone="resnet18", num_classes=10)
     model.eval()
@@ -110,11 +112,7 @@ def example_2_batch_processing():
     # Batch processing
     print(f"\nProcessing {n_images} images with batch processor:")
     processor = BatchProcessor(
-        model,
-        explainer,
-        batch_size=8,
-        show_progress=False,
-        use_cuda=False
+        model, explainer, batch_size=8, show_progress=False, use_cuda=False
     )
 
     start = time.time()
@@ -126,15 +124,17 @@ def example_2_batch_processing():
     print(f"\n✓ Speedup: {speedup:.1f}x faster with batching!")
 
     # Verify results are similar
-    diff = np.mean([np.abs(h1 - h2).mean() for h1, h2 in zip(heatmaps_seq, heatmaps_batch)])
+    diff = np.mean(
+        [np.abs(h1 - h2).mean() for h1, h2 in zip(heatmaps_seq, heatmaps_batch)]
+    )
     print(f"\nResult difference: {diff:.6f} (should be ~0)")
 
 
 def example_3_profiling():
     """Example 3: Performance profiling."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 3: Performance Profiling")
-    print("="*60)
+    print("=" * 60)
 
     model = ImageClassifier(backbone="resnet18", num_classes=10)
     model.eval()
@@ -156,7 +156,7 @@ def example_3_profiling():
         with profiler.profile("forward_pass"):
             # Forward pass
             with torch.no_grad():
-                output = model(tensor)
+                model(tensor)
 
         with profiler.profile("explanation"):
             # Generate explanation
@@ -164,22 +164,22 @@ def example_3_profiling():
 
         with profiler.profile("postprocessing"):
             # Simulate postprocessing
-            normalized = (heatmap - heatmap.min()) / (heatmap.max() - heatmap.min() + 1e-8)
+            (heatmap - heatmap.min()) / (heatmap.max() - heatmap.min() + 1e-8)
 
     # Print statistics
     profiler.print_stats()
 
     # Identify bottleneck
     stats = profiler.get_stats()
-    slowest = max(stats.items(), key=lambda x: x[1]['mean'])
+    slowest = max(stats.items(), key=lambda x: x[1]["mean"])
     print(f"\n⚠ Bottleneck: {slowest[0]} ({slowest[1]['mean']:.3f}s)")
 
 
 def example_4_model_optimization():
     """Example 4: Model optimization for inference."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 4: Model Optimization")
-    print("="*60)
+    print("=" * 60)
 
     image = create_sample_image(seed=42)
     tensor = torch.from_numpy(np.array(image)).permute(2, 0, 1).float() / 255.0
@@ -193,7 +193,7 @@ def example_4_model_optimization():
     start = time.time()
     for _ in range(10):
         with torch.no_grad():
-            output = model(tensor)
+            model(tensor)
     time_original = time.time() - start
     print(f"✓ 10 forward passes: {time_original:.3f}s ({time_original/10:.3f}s each)")
 
@@ -204,7 +204,7 @@ def example_4_model_optimization():
     start = time.time()
     for _ in range(10):
         with torch.no_grad():
-            output = model_opt(tensor)
+            model_opt(tensor)
     time_optimized = time.time() - start
     print(f"✓ 10 forward passes: {time_optimized:.3f}s ({time_optimized/10:.3f}s each)")
 
@@ -219,9 +219,9 @@ def example_4_model_optimization():
 
 def example_5_cache_management():
     """Example 5: Cache management and statistics."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 5: Cache Management")
-    print("="*60)
+    print("=" * 60)
 
     model = ImageClassifier(backbone="resnet18", num_classes=10)
     model.eval()
@@ -238,8 +238,10 @@ def example_5_cache_management():
 
         if (i + 1) % 5 == 0:
             stats = cache.stats()
-            print(f"After {i+1} images: {stats['num_entries']} entries, "
-                  f"{stats['total_size_mb']:.2f} MB ({stats['utilization']:.1%} full)")
+            print(
+                f"After {i+1} images: {stats['num_entries']} entries, "
+                f"{stats['total_size_mb']:.2f} MB ({stats['utilization']:.1%} full)"
+            )
 
     print("\n✓ Cache automatically evicts old entries when full (LRU policy)")
 
@@ -266,9 +268,9 @@ def example_5_cache_management():
 
 def example_6_production_tips():
     """Example 6: Production deployment tips."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 6: Production Deployment Tips")
-    print("="*60)
+    print("=" * 60)
 
     print("\nRecommended optimization strategy:")
     print()
@@ -279,7 +281,9 @@ def example_6_production_tips():
     print()
     print("2. Enable Caching:")
     print("   ```python")
-    print("   cache = ExplanationCache(cache_dir='/var/cache/explanations', max_size_mb=5000)")
+    print(
+        "   cache = ExplanationCache(cache_dir='/var/cache/explanations', max_size_mb=5000)"
+    )
     print("   ```")
     print()
     print("3. Use Batch Processing:")
@@ -306,9 +310,9 @@ def example_6_production_tips():
 
 def main():
     """Run all performance optimization examples."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Performance Optimization Demo")
-    print("="*60)
+    print("=" * 60)
 
     try:
         example_1_caching()
@@ -318,9 +322,9 @@ def main():
         example_5_cache_management()
         example_6_production_tips()
 
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("✓ All examples completed!")
-        print("="*60)
+        print("=" * 60)
         print("\nPerformance optimizations demonstrated:")
         print("  ✓ Explanation caching (10-50x speedup)")
         print("  ✓ Batch processing (2-5x speedup)")
@@ -337,6 +341,7 @@ def main():
     except Exception as e:
         print(f"\n✗ Error: {e}")
         import traceback
+
         traceback.print_exc()
 
 

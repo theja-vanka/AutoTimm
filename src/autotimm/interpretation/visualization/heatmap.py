@@ -85,7 +85,11 @@ def overlay_heatmap(
 
     # Ensure image is uint8
     if image.dtype != np.uint8:
-        image = (image * 255).astype(np.uint8) if image.max() <= 1 else image.astype(np.uint8)
+        image = (
+            (image * 255).astype(np.uint8)
+            if image.max() <= 1
+            else image.astype(np.uint8)
+        )
 
     # Handle grayscale images
     if image.ndim == 2 or (image.ndim == 3 and image.shape[2] == 1):
@@ -180,21 +184,19 @@ def create_comparison_figure(
 
     # Plot original image
     axes[0].imshow(image)
-    axes[0].set_title("Original", fontsize=12, fontweight='bold')
-    axes[0].axis('off')
+    axes[0].set_title("Original", fontsize=12, fontweight="bold")
+    axes[0].axis("off")
 
     # Plot heatmaps
     for idx, (heatmap, title) in enumerate(zip(heatmaps, titles), 1):
-        overlayed = overlay_heatmap(
-            image, heatmap, alpha=alpha, colormap=colormap
-        )
+        overlayed = overlay_heatmap(image, heatmap, alpha=alpha, colormap=colormap)
         axes[idx].imshow(overlayed)
-        axes[idx].set_title(title, fontsize=12, fontweight='bold')
-        axes[idx].axis('off')
+        axes[idx].set_title(title, fontsize=12, fontweight="bold")
+        axes[idx].axis("off")
 
     # Hide unused axes
     for idx in range(num_panels, len(axes)):
-        axes[idx].axis('off')
+        axes[idx].axis("off")
 
     plt.tight_layout()
 
@@ -247,7 +249,7 @@ def save_heatmap(
             alpha=alpha,
             dpi=dpi,
         )
-        fig.savefig(save_path, dpi=dpi, bbox_inches='tight')
+        fig.savefig(save_path, dpi=dpi, bbox_inches="tight")
         plt.close(fig)
     else:
         # Save only overlay
@@ -281,11 +283,11 @@ def create_heatmap_legend(
     cmap = cm.get_cmap(colormap)
     norm = plt.Normalize(vmin=0, vmax=1)
 
-    cb = fig.colorbar(
+    fig.colorbar(
         cm.ScalarMappable(norm=norm, cmap=cmap),
         cax=ax,
-        orientation='horizontal',
-        label=label
+        orientation="horizontal",
+        label=label,
     )
 
     return fig

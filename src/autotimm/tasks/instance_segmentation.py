@@ -368,7 +368,9 @@ class InstanceSegmentor(PreprocessingMixin, pl.LightningModule):
             size=(self.mask_size, self.mask_size),
             mode="bilinear",
             align_corners=False,
-        ).squeeze(1)  # [total_N, mask_size, mask_size]
+        ).squeeze(
+            1
+        )  # [total_N, mask_size, mask_size]
 
         # Compute mask loss
         loss = self.mask_loss_fn(mask_logits, target_masks_resized)

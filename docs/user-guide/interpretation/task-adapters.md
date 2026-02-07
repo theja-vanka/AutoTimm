@@ -188,9 +188,7 @@ results = explain_segmentation(
 - `method` (str): Interpretation method
 - `target_layer` (Optional): Layer for interpretation
 - `show_uncertainty` (bool): Whether to visualize prediction uncertainty
-- `uncertainty_method` (str): Uncertainty quantification method
-  - `'entropy'`: Shannon entropy of class probabilities
-  - `'margin'`: Difference between top-2 probabilities
+- `uncertainty_method` (str): Uncertainty quantification method. Options: `'entropy'` (Shannon entropy of class probabilities), `'margin'` (difference between top-2 probabilities)
 - `colormap` (str): Colormap for heatmaps
 - `alpha` (float): Overlay transparency
 - `save_path` (Optional[str]): Path to save visualization

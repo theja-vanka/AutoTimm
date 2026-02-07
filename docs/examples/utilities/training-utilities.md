@@ -210,10 +210,10 @@ if __name__ == "__main__":
 ## Running Examples
 
 ```bash
-python examples/auto_tuning.py
-python examples/multi_gpu_training.py
-python examples/preset_manager.py
-python examples/performance_optimization_demo.py
+python examples/data_training/auto_tuning.py
+python examples/data_training/multi_gpu_training.py
+python examples/data_training/preset_manager.py
+python examples/data_training/performance_optimization_demo.py
 ```
 
 **See Also:**

@@ -149,9 +149,7 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
         if isinstance(backbone, str):
             from autotimm.backbone import FeatureBackboneConfig
 
-            backbone = FeatureBackboneConfig(
-                model_name=backbone, out_indices=(2, 3, 4)
-            )
+            backbone = FeatureBackboneConfig(model_name=backbone, out_indices=(2, 3, 4))
         elif not hasattr(backbone, "out_indices"):
             # If it's a FeatureBackboneConfig without out_indices set, use (2, 3, 4)
             if hasattr(backbone, "model_name"):
@@ -187,9 +185,9 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
             self.head = YOLOXHead(
                 in_channels=fpn_channels,
                 num_classes=num_classes,
-                num_convs=head_num_convs
-                if head_num_convs <= 2
-                else 2,  # YOLOX typically uses 2 convs
+                num_convs=(
+                    head_num_convs if head_num_convs <= 2 else 2
+                ),  # YOLOX typically uses 2 convs
                 prior_prob=0.01,
                 activation="silu",
             )

@@ -57,7 +57,7 @@ class InterpretationCallback(Callback):
         self,
         sample_images: Union[torch.Tensor, List[torch.Tensor], List[str]],
         sample_labels: Optional[List[int]] = None,
-        method: Literal['gradcam', 'gradcam++', 'integrated_gradients'] = 'gradcam',
+        method: Literal["gradcam", "gradcam++", "integrated_gradients"] = "gradcam",
         target_layer: Optional[Union[str, torch.nn.Module]] = None,
         log_every_n_epochs: int = 5,
         log_every_n_steps: Optional[int] = None,
@@ -89,6 +89,7 @@ class InterpretationCallback(Callback):
         if isinstance(images, list) and len(images) > 0 and isinstance(images[0], str):
             from PIL import Image
             import torchvision.transforms as T
+
             transform = T.Compose([T.ToTensor()])
             images = [transform(Image.open(img).convert("RGB")) for img in images]
 
@@ -109,13 +110,18 @@ class InterpretationCallback(Callback):
     def on_train_start(self, trainer: pl.Trainer, pl_module: pl.LightningModule):
         """Initialize explainer when training starts."""
         # Create explainer
-        if self.method == 'gradcam':
-            self.explainer = GradCAM(pl_module, target_layer=self.target_layer, use_cuda=True)
-        elif self.method == 'gradcam++':
+        if self.method == "gradcam":
+            self.explainer = GradCAM(
+                pl_module, target_layer=self.target_layer, use_cuda=True
+            )
+        elif self.method == "gradcam++":
             from autotimm.interpretation import GradCAMPlusPlus
-            self.explainer = GradCAMPlusPlus(pl_module, target_layer=self.target_layer, use_cuda=True)
-        elif self.method == 'integrated_gradients':
-            self.explainer = IntegratedGradients(pl_module, baseline='black', steps=30)
+
+            self.explainer = GradCAMPlusPlus(
+                pl_module, target_layer=self.target_layer, use_cuda=True
+            )
+        elif self.method == "integrated_gradients":
+            self.explainer = IntegratedGradients(pl_module, baseline="black", steps=30)
 
     def on_train_epoch_end(self, trainer: pl.Trainer, pl_module: pl.LightningModule):
         """Generate and log interpretations at epoch end."""
@@ -215,11 +221,11 @@ class InterpretationCallback(Callback):
         for logger in trainer.loggers:
             logger_name = logger.__class__.__name__.lower()
 
-            if 'tensorboard' in logger_name:
+            if "tensorboard" in logger_name:
                 self._log_to_tensorboard(logger, visualizations, step)
-            elif 'wandb' in logger_name:
+            elif "wandb" in logger_name:
                 self._log_to_wandb(logger, visualizations, epoch, step)
-            elif 'mlflow' in logger_name:
+            elif "mlflow" in logger_name:
                 self._log_to_mlflow(logger, visualizations, epoch, step)
 
     def _log_to_tensorboard(self, logger, visualizations: List[np.ndarray], step: int):
@@ -238,11 +244,17 @@ class InterpretationCallback(Callback):
         except Exception as e:
             print(f"Warning: Failed to log to TensorBoard: {e}")
 
-    def _log_to_wandb(self, logger, visualizations: List[np.ndarray], epoch: int, step: int):
+    def _log_to_wandb(
+        self, logger, visualizations: List[np.ndarray], epoch: int, step: int
+    ):
         """Log to Weights & Biases."""
         try:
             import wandb
-            images = [wandb.Image(viz, caption=f"Sample {idx}") for idx, viz in enumerate(visualizations)]
+
+            images = [
+                wandb.Image(viz, caption=f"Sample {idx}")
+                for idx, viz in enumerate(visualizations)
+            ]
             logger.experiment.log(
                 {f"{self.prefix}": images},
                 step=step,
@@ -250,7 +262,9 @@ class InterpretationCallback(Callback):
         except Exception as e:
             print(f"Warning: Failed to log to W&B: {e}")
 
-    def _log_to_mlflow(self, logger, visualizations: List[np.ndarray], epoch: int, step: int):
+    def _log_to_mlflow(
+        self, logger, visualizations: List[np.ndarray], epoch: int, step: int
+    ):
         """Log to MLflow."""
         try:
             from PIL import Image
@@ -258,11 +272,10 @@ class InterpretationCallback(Callback):
             import mlflow
 
             for idx, viz in enumerate(visualizations):
-                with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
+                with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
                     Image.fromarray(viz).save(tmp.name)
                     mlflow.log_artifact(
-                        tmp.name,
-                        artifact_path=f"{self.prefix}/epoch_{epoch}"
+                        tmp.name, artifact_path=f"{self.prefix}/epoch_{epoch}"
                     )
         except Exception as e:
             print(f"Warning: Failed to log to MLflow: {e}")
@@ -331,9 +344,9 @@ class FeatureMonitorCallback(Callback):
             layer = self._get_layer_by_name(pl_module, name)
             if layer is not None:
                 hook = layer.register_forward_hook(
-                    lambda module, input, output, name=name: self.activations[name].append(
-                        output.detach().cpu()
-                    )
+                    lambda module, input, output, name=name: self.activations[
+                        name
+                    ].append(output.detach().cpu())
                 )
                 self.hooks.append(hook)
 

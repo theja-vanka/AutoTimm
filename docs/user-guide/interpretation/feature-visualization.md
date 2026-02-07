@@ -62,10 +62,7 @@ fig = viz.plot_feature_maps(
 - `image`: Input image
 - `layer_name` (str): Name of layer to visualize (e.g., "backbone.layer3")
 - `num_features` (int): Number of feature maps to display (default: 16)
-- `sort_by` (str): How to select features:
-  - `"activation"` (default): Highest mean activation
-  - `"variance"`: Highest variance
-  - `"random"`: Random selection
+- `sort_by` (str): How to select features. Options: `"activation"` (default, highest mean activation), `"variance"` (highest variance), `"random"` (random selection)
 - `save_path` (Optional[str]): Path to save figure
 - `figsize` (Optional[Tuple[int, int]]): Figure size (width, height)
 
@@ -144,15 +141,7 @@ stats = viz.get_feature_statistics(
 - `layer_name` (str): Name of layer
 
 **Returns:**
-- `Dict[str, float]`: Dictionary containing:
-  - `mean`: Mean activation across all features
-  - `std`: Standard deviation
-  - `sparsity`: Fraction of zero activations (0.0-1.0)
-  - `max`: Maximum activation
-  - `min`: Minimum activation
-  - `active_channels`: Number of channels with mean > 0.01
-  - `num_channels`: Total number of channels
-  - `spatial_size`: Tuple of (height, width)
+- `Dict[str, float]`: Dictionary containing `mean` (mean activation), `std` (standard deviation), `sparsity` (fraction of zero activations, 0.0-1.0), `max` (maximum activation), `min` (minimum activation), `active_channels` (number of channels with mean > 0.01), `num_channels` (total number of channels), `spatial_size` (tuple of height, width)
 
 **Example:**
 

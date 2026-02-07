@@ -251,8 +251,7 @@ def main():
     print("\n" + "=" * 60)
     print("RT-DETR vs FCOS Architecture Comparison")
     print("=" * 60)
-    print(
-        """
+    print("""
 ┌─────────────────────┬──────────────────────┬──────────────────────┐
 │ Feature             │ RT-DETR              │ FCOS (AutoTimm)      │
 ├─────────────────────┼──────────────────────┼──────────────────────┤
@@ -286,8 +285,7 @@ Both architectures:
 - Support any image size
 - Work with COCO format datasets
 - Can use pretrained backbones
-"""
-    )
+""")
 
     # ========================================================================
     # Available RT-DETR Models
@@ -295,8 +293,7 @@ Both architectures:
     print("\n" + "=" * 60)
     print("Available RT-DETR Pretrained Models")
     print("=" * 60)
-    print(
-        """
+    print("""
 From Hugging Face (PekingU):
 - PekingU/rtdetr_r18vd  - Smallest, fastest (20M params)
 - PekingU/rtdetr_r34vd  - Good balance (31M params)
@@ -310,8 +307,7 @@ Usage:
         model_name="PekingU/rtdetr_r50vd",
         num_classes=80,  # or your custom number of classes
     )
-"""
-    )
+""")
 
 
 if __name__ == "__main__":

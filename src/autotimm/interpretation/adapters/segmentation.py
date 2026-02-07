@@ -7,7 +7,6 @@ from PIL import Image
 import matplotlib.pyplot as plt
 
 
-
 def explain_segmentation(
     model: torch.nn.Module,
     image: Union[str, Image.Image, np.ndarray, torch.Tensor],
@@ -77,15 +76,19 @@ def explain_segmentation(
         image_tensor = image
         if image_tensor.ndim == 4:
             image_tensor = image_tensor.squeeze(0)
-        image_np = (image_tensor.cpu().numpy().transpose(1, 2, 0) * 255).astype(np.uint8)
+        image_np = (image_tensor.cpu().numpy().transpose(1, 2, 0) * 255).astype(
+            np.uint8
+        )
         image_pil = Image.fromarray(image_np)
 
     # Create explainer
     if method.lower() == "gradcam":
         from autotimm.interpretation import GradCAM
+
         explainer = GradCAM(model, target_layer=target_layer)
     elif method.lower() in ["gradcam++", "gradcampp"]:
         from autotimm.interpretation import GradCAMPlusPlus
+
         explainer = GradCAMPlusPlus(model, target_layer=target_layer)
     else:
         raise ValueError(f"Unknown method: {method}")
@@ -98,7 +101,7 @@ def explain_segmentation(
 
     # Parse segmentation output
     if isinstance(seg_output, dict):
-        logits = seg_output.get('logits', seg_output.get('output', seg_output))
+        logits = seg_output.get("logits", seg_output.get("output", seg_output))
     else:
         logits = seg_output
 
@@ -125,15 +128,15 @@ def explain_segmentation(
 
     # Prepare results
     results = {
-        'heatmap': heatmap,
-        'prediction': prediction,
-        'target_class': target_class,
+        "heatmap": heatmap,
+        "prediction": prediction,
+        "target_class": target_class,
     }
 
     # Compute uncertainty if requested
     if show_uncertainty:
         uncertainty = _compute_uncertainty(probs, method=uncertainty_method)
-        results['uncertainty'] = uncertainty
+        results["uncertainty"] = uncertainty
 
     # Create visualization if save path provided
     if save_path:
@@ -142,13 +145,13 @@ def explain_segmentation(
             heatmap,
             prediction,
             target_class,
-            uncertainty=results.get('uncertainty', None),
+            uncertainty=results.get("uncertainty", None),
             show_mask=show_mask_overlay,
             colormap=colormap,
             alpha=alpha,
         )
         Image.fromarray(viz).save(save_path)
-        results['visualization'] = viz
+        results["visualization"] = viz
 
     return results
 
@@ -183,7 +186,9 @@ def _compute_uncertainty(
         raise ValueError(f"Unknown uncertainty method: {method}")
 
     # Normalize to [0, 1]
-    uncertainty = (uncertainty - uncertainty.min()) / (uncertainty.max() - uncertainty.min() + 1e-8)
+    uncertainty = (uncertainty - uncertainty.min()) / (
+        uncertainty.max() - uncertainty.min() + 1e-8
+    )
 
     return uncertainty
 
@@ -217,19 +222,17 @@ def _visualize_segmentation_explanation(
 
     # Original image
     axes[panel_idx].imshow(image)
-    axes[panel_idx].set_title("Original", fontsize=12, fontweight='bold')
-    axes[panel_idx].axis('off')
+    axes[panel_idx].set_title("Original", fontsize=12, fontweight="bold")
+    axes[panel_idx].axis("off")
     panel_idx += 1
 
     # Heatmap overlay
     overlayed = overlay_heatmap(image, heatmap, alpha=alpha, colormap=colormap)
     axes[panel_idx].imshow(overlayed)
     axes[panel_idx].set_title(
-        f"Explanation (Class {target_class})",
-        fontsize=12,
-        fontweight='bold'
+        f"Explanation (Class {target_class})", fontsize=12, fontweight="bold"
     )
-    axes[panel_idx].axis('off')
+    axes[panel_idx].axis("off")
     panel_idx += 1
 
     # Predicted mask
@@ -240,25 +243,27 @@ def _visualize_segmentation_explanation(
             prediction_resized = cv2.resize(
                 prediction.astype(np.uint8),
                 (image.shape[1], image.shape[0]),
-                interpolation=cv2.INTER_NEAREST
+                interpolation=cv2.INTER_NEAREST,
             )
         else:
             prediction_resized = prediction
 
         # Highlight target class
         mask_vis = np.zeros_like(image)
-        mask_vis[prediction_resized == target_class] = [255, 0, 0]  # Red for target class
+        mask_vis[prediction_resized == target_class] = [
+            255,
+            0,
+            0,
+        ]  # Red for target class
 
         # Blend with original
         mask_overlay = cv2.addWeighted(image, 0.6, mask_vis, 0.4, 0)
 
         axes[panel_idx].imshow(mask_overlay)
         axes[panel_idx].set_title(
-            f"Predicted Mask (Class {target_class})",
-            fontsize=12,
-            fontweight='bold'
+            f"Predicted Mask (Class {target_class})", fontsize=12, fontweight="bold"
         )
-        axes[panel_idx].axis('off')
+        axes[panel_idx].axis("off")
         panel_idx += 1
 
     # Uncertainty
@@ -266,15 +271,14 @@ def _visualize_segmentation_explanation(
         # Resize if needed
         if uncertainty.shape != image.shape[:2]:
             uncertainty_resized = cv2.resize(
-                uncertainty,
-                (image.shape[1], image.shape[0])
+                uncertainty, (image.shape[1], image.shape[0])
             )
         else:
             uncertainty_resized = uncertainty
 
-        im = axes[panel_idx].imshow(uncertainty_resized, cmap='hot', vmin=0, vmax=1)
-        axes[panel_idx].set_title("Uncertainty", fontsize=12, fontweight='bold')
-        axes[panel_idx].axis('off')
+        im = axes[panel_idx].imshow(uncertainty_resized, cmap="hot", vmin=0, vmax=1)
+        axes[panel_idx].set_title("Uncertainty", fontsize=12, fontweight="bold")
+        axes[panel_idx].axis("off")
         plt.colorbar(im, ax=axes[panel_idx], fraction=0.046)
 
     plt.tight_layout()

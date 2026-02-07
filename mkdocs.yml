@@ -145,16 +145,25 @@ nav:
       - Utilities: api/utils.md
   - Examples:
       - Overview: examples/index.md
-      - Tasks:
+      - Getting Started:
           - Classification: examples/tasks/classification.md
+      - Computer Vision Tasks:
           - Object Detection: examples/tasks/object-detection.md
           - Semantic Segmentation: examples/tasks/semantic-segmentation.md
           - Instance Segmentation: examples/tasks/instance-segmentation.md
-      - Integration:
-          - Hugging Face Hub: examples/integration/huggingface-hub.md
-      - Utilities:
+      - HuggingFace Hub:
+          - Basic Integration: examples/integration/huggingface-hub.md
+          - Model Interpretation: examples/integration/hf_interpretation.md
+          - Transfer Learning: examples/integration/hf_transfer_learning.md
+          - Ensemble & Distillation: examples/integration/hf_ensemble.md
+          - Deployment: examples/integration/hf_deployment.md
+      - Data & Training:
           - Data Handling: examples/utilities/data-handling.md
+          - Custom Data & Augmentation: examples/utilities/hf_custom_data.md
           - Training Utilities: examples/utilities/training-utilities.md
+          - Hyperparameter Tuning: examples/utilities/hf_hyperparameter_tuning.md
+      - Understanding & Deployment:
+          - Model Interpretation: examples/utilities/interpretation.md
           - Logging & Metrics: examples/utilities/logging-metrics.md
           - Backbone Utilities: examples/utilities/backbone-utilities.md
 
