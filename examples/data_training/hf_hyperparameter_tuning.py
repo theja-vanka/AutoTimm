@@ -203,7 +203,7 @@ def example_2_multi_objective_optimization():
 
         # Measure inference time
         dummy_input = torch.randn(1, 3, 224, 224)
-        with torch.no_grad():
+        with torch.inference_mode():
             # Warmup
             for _ in range(10):
                 _ = model(dummy_input)

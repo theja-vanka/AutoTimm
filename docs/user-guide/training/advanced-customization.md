@@ -292,7 +292,7 @@ class LabelSmoothingCrossEntropy(nn.Module):
         n_classes = logits.size(-1)
 
         # Create smoothed targets
-        with torch.no_grad():
+        with torch.inference_mode():
             smooth_targets = torch.zeros_like(logits)
             smooth_targets.fill_(self.smoothing / (n_classes - 1))
             smooth_targets.scatter_(1, targets.unsqueeze(1), 1 - self.smoothing)
@@ -828,7 +828,7 @@ class ModelEMA(pl.Callback):
 
     def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
         # Update EMA weights
-        with torch.no_grad():
+        with torch.inference_mode():
             for ema_param, param in zip(
                 self.ema_model.parameters(), pl_module.parameters()
             ):

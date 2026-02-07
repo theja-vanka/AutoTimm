@@ -60,6 +60,7 @@ From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-G
 
 ## What's New in v0.7.2
 
+- **torch.inference_mode** - Faster inference across all tasks, export, and interpretation using `torch.inference_mode()` instead of `torch.no_grad()`
 - **Reproducibility by Default** - Automatic seeding with `seed=42` and deterministic mode enabled out-of-the-box for fully reproducible training and inference
 - **torch.compile by Default** - Automatic PyTorch 2.0+ optimization enabled out-of-the-box for faster training and inference
 - **TorchScript Export** - Export trained models to TorchScript (.pt) for production deployment without Python dependencies
@@ -576,8 +577,9 @@ output = scripted_model(image)
 **Benefits:**
 - No Python dependencies required
 - Deploy to C++, mobile, or edge devices
-- Faster inference with optimizations
+- Faster inference with `torch.inference_mode()` and JIT optimizations
 - Single-file deployment
+- Graceful fallback if JIT optimization fails on your platform
 
 ### Smart Backend Selection
 

@@ -366,7 +366,7 @@ transform = transforms.Compose([
 image_tensor = transform(image).unsqueeze(0)
 
 # Predict
-with torch.no_grad():
+with torch.inference_mode():
     predictions = model.predict(image_tensor)
 
 # predictions shape: [1, H, W] with class indices
@@ -377,7 +377,7 @@ with torch.no_grad():
 ```python
 images = torch.randn(4, 3, 512, 512)  # Batch of 4 images
 
-with torch.no_grad():
+with torch.inference_mode():
     predictions = model.predict(images)
     # Shape: [4, H, W]
 ```
@@ -385,7 +385,7 @@ with torch.no_grad():
 ### Get Probabilities
 
 ```python
-with torch.no_grad():
+with torch.inference_mode():
     logits = model.predict(images, return_logits=True)
     probs = torch.softmax(logits, dim=1)
     # Shape: [B, num_classes, H, W]

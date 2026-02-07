@@ -593,7 +593,7 @@ tensor = model.preprocess(image)  # Uses model's pretrained normalization
 
 # Run inference
 model.eval()
-with torch.no_grad():
+with torch.inference_mode():
     predictions = model(tensor).softmax(dim=1)
     predicted_class = predictions.argmax(dim=1).item()
     print(f"Predicted class: {predicted_class}")

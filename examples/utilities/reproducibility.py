@@ -170,7 +170,7 @@ def example_6_reproducible_inference():
     # Test with same input
     x = torch.randn(1, 3, 224, 224)
 
-    with torch.no_grad():
+    with torch.inference_mode():
         out1 = model1(x)
         out2 = model2(x)
 

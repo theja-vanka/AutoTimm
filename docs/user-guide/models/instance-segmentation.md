@@ -238,7 +238,7 @@ transform = T.Compose([
 image_tensor = transform(image).unsqueeze(0)
 
 # Predict
-with torch.no_grad():
+with torch.inference_mode():
     predictions = model.predict(image_tensor)
 
 # predictions is a list of dicts, one per image:
@@ -302,7 +302,7 @@ def visualize_instance_segmentation(image, prediction, threshold=0.5):
     plt.show()
 
 # Use it
-with torch.no_grad():
+with torch.inference_mode():
     predictions = model.predict(image_tensor)
 visualize_instance_segmentation(image, predictions[0])
 ```

@@ -31,7 +31,7 @@ def test_reproducibility():
     model2.eval()
 
     x = torch.randn(1, 3, 224, 224)
-    with torch.no_grad():
+    with torch.inference_mode():
         out1 = model1(x)
         out2 = model2(x)
 
@@ -74,7 +74,7 @@ def test_different_seeds():
     model2.eval()
 
     x = torch.randn(1, 3, 224, 224)
-    with torch.no_grad():
+    with torch.inference_mode():
         out1 = model1(x)
         out2 = model2(x)
 
@@ -154,7 +154,7 @@ def test_deterministic_mode():
     # Run inference
     model.eval()
     x = torch.randn(1, 3, 224, 224)
-    with torch.no_grad():
+    with torch.inference_mode():
         out = model(x)
 
     print(f"Output shape: {out.shape}")

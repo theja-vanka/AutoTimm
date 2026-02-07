@@ -159,7 +159,7 @@ class FeatureVisualizer:
         handle = layer.register_forward_hook(hook)
 
         # Forward pass
-        with torch.no_grad():
+        with torch.inference_mode():
             input_tensor = self._preprocess_image(image)
             self.model(input_tensor)
 

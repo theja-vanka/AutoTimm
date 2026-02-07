@@ -191,7 +191,7 @@ def predict_single_image(
     input_tensor = input_tensor.to(device)
 
     # Get detections
-    with torch.no_grad():
+    with torch.inference_mode():
         detections = model.predict(input_tensor)
 
     # Process results for first (only) image
@@ -257,7 +257,7 @@ def predict_batch(
         input_tensor = model.preprocess(batch_images).to(device)
 
         # Get detections
-        with torch.no_grad():
+        with torch.inference_mode():
             detections = model.predict(input_tensor)
 
         # Process each image's detections

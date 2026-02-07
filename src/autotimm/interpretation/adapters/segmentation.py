@@ -95,7 +95,7 @@ def explain_segmentation(
 
     # Get prediction
     model.eval()
-    with torch.no_grad():
+    with torch.inference_mode():
         input_tensor = explainer._preprocess_image(image_pil)
         seg_output = model(input_tensor)
 

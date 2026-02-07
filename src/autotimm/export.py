@@ -42,7 +42,7 @@ def _lightning_export_mode(model: nn.Module):
 
 class _ForwardWrapper(nn.Module):
     """Wrapper to export only the forward method, avoiding Lightning module issues.
-    
+
     This wrapper creates a clean module containing only the essential components
     needed for inference (backbone and head), avoiding problematic attributes like
     metrics, logging configs, and other Lightning-specific state.
@@ -50,22 +50,12 @@ class _ForwardWrapper(nn.Module):
 
     def __init__(self, model: nn.Module):
         super().__init__()
-        # For classification models, extract backbone and head
-        if hasattr(model, 'backbone') and hasattr(model, 'head'):
-            self.backbone = model.backbone
-            self.head = model.head
-            self._has_components = True
-        else:
-            # Fallback: just store the model
-            self.model = model
-            self._has_components = False
+        self.backbone = model.backbone
+        self.head = model.head
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        if self._has_components:
-            features = self.backbone(x)
-            return self.head(features)
-        else:
-            return self.model(x)
+        features = self.backbone(x)
+        return self.head(features)
 
 
 def export_to_torchscript(
@@ -153,7 +143,7 @@ def export_to_torchscript(
                         "Provide a sample input tensor with the expected shape."
                     )
 
-                with torch.no_grad():
+                with torch.inference_mode():
                     scripted_model = torch.jit.trace(model_to_export, example_input)
 
             elif method == "script":
@@ -165,7 +155,15 @@ def export_to_torchscript(
 
         # Optimize for inference
         if optimize:
-            scripted_model = torch.jit.optimize_for_inference(scripted_model)
+            try:
+                scripted_model = torch.jit.optimize_for_inference(scripted_model)
+            except RuntimeError as e:
+                warnings.warn(
+                    f"torch.jit.optimize_for_inference failed: {e}. "
+                    "Falling back to non-optimized model. "
+                    "Set optimize=False to suppress this warning.",
+                    stacklevel=2,
+                )
 
         # Save the model
         save_path.parent.mkdir(parents=True, exist_ok=True)
@@ -303,7 +301,7 @@ def validate_torchscript_export(
     original_model.eval()
     scripted_model.eval()
 
-    with torch.no_grad():
+    with torch.inference_mode():
         original_output = original_model(example_input)
         scripted_output = scripted_model(example_input)
 

@@ -139,14 +139,14 @@ def benchmark_inference_speed():
 
             # Warmup
             dummy_input = torch.randn(1, 3, 224, 224)
-            with torch.no_grad():
+            with torch.inference_mode():
                 for _ in range(5):
                     _ = backbone(dummy_input)
 
             # Benchmark
             num_runs = 20
             start = time.time()
-            with torch.no_grad():
+            with torch.inference_mode():
                 for _ in range(num_runs):
                     _ = backbone(dummy_input)
             avg_time = (time.time() - start) / num_runs * 1000  # ms

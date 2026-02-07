@@ -109,7 +109,7 @@ class InteractiveVisualizer:
         """
         # Get prediction
         input_tensor = self._preprocess_image(image)
-        with torch.no_grad():
+        with torch.inference_mode():
             output = self.model(input_tensor)
             if isinstance(output, dict):
                 output = output.get(
@@ -245,7 +245,7 @@ class InteractiveVisualizer:
         """
         # Get prediction
         input_tensor = self._preprocess_image(image)
-        with torch.no_grad():
+        with torch.inference_mode():
             output = self.model(input_tensor)
             if isinstance(output, dict):
                 output = output.get(
@@ -376,7 +376,7 @@ class InteractiveVisualizer:
         """
         # Get prediction and explanation
         input_tensor = self._preprocess_image(image)
-        with torch.no_grad():
+        with torch.inference_mode():
             output = self.model(input_tensor)
             if isinstance(output, dict):
                 output = output.get(

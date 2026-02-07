@@ -46,7 +46,7 @@ def example_basic_export():
 
     # Load and test
     loaded_model = load_torchscript("resnet18_classifier.pt")
-    with torch.no_grad():
+    with torch.inference_mode():
         output = loaded_model(example_input)
     print(f"✓ Loaded model output shape: {output.shape}")
     print()
@@ -155,7 +155,7 @@ model.eval()
 image = torch.randn(1, 3, 224, 224)
 
 # Run inference
-with torch.no_grad():
+with torch.inference_mode():
     output = model(image)
     probabilities = torch.softmax(output, dim=1)
     predicted_class = torch.argmax(probabilities, dim=1)
@@ -218,7 +218,7 @@ def example_batch_inference():
     loaded_model = torch.jit.load("batch_model.pt")
     test_batch = torch.randn(16, 3, 224, 224)
 
-    with torch.no_grad():
+    with torch.inference_mode():
         output = loaded_model(test_batch)
 
     print(f"✓ Exported model with batch size: {batch_size}")

@@ -134,7 +134,7 @@ student = ImageClassifier(backbone="hf-hub:timm/mobilenetv3_small_100.lamb_in1k"
 distill_loss = DistillationLoss(alpha=0.7, temperature=3.0)
 
 for images, labels in train_loader:
-    with torch.no_grad():
+    with torch.inference_mode():
         teacher_logits = teacher(images)
 
     student_logits = student(images)

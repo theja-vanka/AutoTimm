@@ -561,7 +561,7 @@ class InstanceSegmentor(PreprocessingMixin, pl.LightningModule):
             List of dicts with 'boxes', 'labels', 'scores', 'masks' for each image
         """
         self.eval()
-        with torch.no_grad():
+        with torch.inference_mode():
             # Get features
             features = self.backbone(images)
             _ = self.fpn(features)

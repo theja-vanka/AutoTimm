@@ -416,7 +416,7 @@ class SemanticSegmentor(PreprocessingMixin, pl.LightningModule):
             Predicted class indices [B, H, W] or logits [B, C, H, W]
         """
         self.eval()
-        with torch.no_grad():
+        with torch.inference_mode():
             logits = self(images)
             if return_logits:
                 return logits

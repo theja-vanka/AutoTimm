@@ -176,7 +176,7 @@ tensor = model.preprocess(images)  # Returns (4, 3, 384, 384)
 
 # Forward pass
 model.eval()
-with torch.no_grad():
+with torch.inference_mode():
     predictions = model(tensor).softmax(dim=1)
 ```
 

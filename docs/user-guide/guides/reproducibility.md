@@ -361,7 +361,7 @@ model2.eval()
 x = torch.randn(1, 3, 224, 224)
 
 # Same predictions
-with torch.no_grad():
+with torch.inference_mode():
     pred1 = model(x)
     pred2 = model2(x)
 

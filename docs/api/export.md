@@ -74,7 +74,7 @@ scripted = export_to_torchscript(
 )
 
 # Use exported model
-with torch.no_grad():
+with torch.inference_mode():
     output = scripted(example_input)
 ```
 
@@ -127,7 +127,7 @@ model = load_torchscript("model.pt", device="cuda")
 
 # Run inference
 model.eval()
-with torch.no_grad():
+with torch.inference_mode():
     output = model(input_tensor)
 ```
 
@@ -453,7 +453,7 @@ export_to_torchscript(model, "model.pt", example_input)
 model.eval()
 
 # Check for dropout/batch_norm issues
-with torch.no_grad():
+with torch.inference_mode():
     export_to_torchscript(model, "model.pt", example_input)
 ```
 
@@ -475,7 +475,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = model.to(device)
 
 # Run inference
-with torch.no_grad():
+with torch.inference_mode():
     output = model(input_tensor.to(device))
 ```
 

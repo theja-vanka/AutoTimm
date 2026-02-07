@@ -403,7 +403,7 @@ model.eval()
 images = torch.randn(1, 3, 640, 640)
 
 # Run inference
-with torch.no_grad():
+with torch.inference_mode():
     predictions = model.predict(images)
 
 # Process results

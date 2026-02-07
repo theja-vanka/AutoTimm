@@ -79,7 +79,7 @@ def multi_objective(trial: Trial) -> tuple[float, float]:
     dummy_input = torch.randn(1, 3, 224, 224)
     start = time.time()
     for _ in range(50):
-        with torch.no_grad():
+        with torch.inference_mode():
             _ = model(dummy_input)
     inference_time = (time.time() - start) / 50 * 1000  # ms
 

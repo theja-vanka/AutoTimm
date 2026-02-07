@@ -205,7 +205,7 @@ def predict_single_image(
     input_tensor = input_tensor.to(device)
 
     # Get segmentation predictions
-    with torch.no_grad():
+    with torch.inference_mode():
         logits = model.predict(input_tensor)
 
     # Get probabilities and predicted classes
@@ -251,7 +251,7 @@ def predict_batch(
         input_tensor = model.preprocess(batch_images).to(device)
 
         # Get predictions
-        with torch.no_grad():
+        with torch.inference_mode():
             logits = model.predict(input_tensor)
 
         # Process each image's prediction

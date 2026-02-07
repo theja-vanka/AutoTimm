@@ -48,7 +48,7 @@ import torch
 model = torch.jit.load("model.pt")
 model.eval()
 
-with torch.no_grad():
+with torch.inference_mode():
     output = model(image)
 ```
 
@@ -226,7 +226,7 @@ is_valid = validate_torchscript_export(
     scripted_model=scripted,
     example_input=example_input,
     rtol=1e-5,
-    atol=1e-8
+    atol=1e-6
 )
 
 if is_valid:
@@ -302,7 +302,7 @@ model.eval()
 model = model.to("cuda")  # or "cpu"
 
 # Run inference
-with torch.no_grad():
+with torch.inference_mode():
     output = model(image)
 ```
 
@@ -328,15 +328,16 @@ See [Mobile Deployment Guide](mobile-deployment.md) for iOS and Android examples
 
 ## Optimization Tips
 
-### 1. Disable torch.compile
+### 1. Disable torch.compile and Seeding
 
-For TorchScript export, disable torch.compile to avoid double optimization:
+For TorchScript export, disable torch.compile and seeding to avoid compatibility issues:
 
 ```python
 model = ImageClassifier(
     backbone="resnet50",
     num_classes=10,
-    compile_model=False  # Disable for TorchScript export
+    compile_model=False,  # Disable for TorchScript export
+    seed=None,            # Disable seeding for TorchScript compatibility
 )
 ```
 
@@ -363,14 +364,14 @@ example_input = torch.randn(8, 3, 224, 224)
 
 ### 4. Optimize After Export
 
-TorchScript optimizations are applied by default:
+TorchScript optimizations are applied by default. If optimization fails on your platform, AutoTimm falls back gracefully with a warning:
 
 ```python
 export_to_torchscript(
     model,
     "model.pt",
     example_input=example_input,
-    optimize=True  # Default
+    optimize=True  # Default; set False to skip optimization
 )
 ```
 

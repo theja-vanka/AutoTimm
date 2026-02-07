@@ -40,7 +40,7 @@ class SimpleEnsemble(nn.Module):
         # Get predictions from each model
         predictions = []
         for model in self.models:
-            with torch.no_grad():
+            with torch.inference_mode():
                 pred = model(x)
                 if isinstance(pred, dict):
                     pred = pred.get(
@@ -67,7 +67,7 @@ class WeightedEnsemble(nn.Module):
         # Get predictions from each model
         predictions = []
         for model in self.models:
-            with torch.no_grad():
+            with torch.inference_mode():
                 pred = model(x)
                 if isinstance(pred, dict):
                     pred = pred.get(
@@ -158,7 +158,7 @@ def example_1_simple_ensemble():
 
     # Test ensemble
     images, labels = create_sample_data(batch_size=4)
-    with torch.no_grad():
+    with torch.inference_mode():
         ensemble_pred = ensemble(images)
 
     print(f"✓ Ensemble prediction shape: {ensemble_pred.shape}")
@@ -167,7 +167,7 @@ def example_1_simple_ensemble():
     # Compare individual vs ensemble predictions
     print("\nPrediction comparison (first sample):")
     for i, (name, model) in enumerate(zip([n for n, _ in model_configs], models)):
-        with torch.no_grad():
+        with torch.inference_mode():
             pred = model(images[0:1])
             if isinstance(pred, dict):
                 pred = pred.get("logits", pred.get("output", list(pred.values())[0]))
@@ -216,7 +216,7 @@ def example_2_weighted_ensemble():
     print("(Simulated - in practice, train on validation data)")
 
     # Manually set example weights (in practice, these would be learned)
-    with torch.no_grad():
+    with torch.inference_mode():
         # Assume ResNet-34 performs better, give it more weight
         weighted_ensemble.weights.data = torch.tensor([0.4, 0.6])
 
@@ -225,7 +225,7 @@ def example_2_weighted_ensemble():
 
     # Test weighted ensemble
     images, _ = create_sample_data(batch_size=4)
-    with torch.no_grad():
+    with torch.inference_mode():
         weighted_pred = weighted_ensemble(images)
 
     print(f"✓ Weighted ensemble prediction shape: {weighted_pred.shape}")
@@ -276,7 +276,7 @@ def example_3_knowledge_distillation():
     images, labels = create_sample_data(batch_size=8)
 
     # Get teacher predictions (soft targets)
-    with torch.no_grad():
+    with torch.inference_mode():
         teacher_logits = teacher(images)
         if isinstance(teacher_logits, dict):
             teacher_logits = teacher_logits.get(

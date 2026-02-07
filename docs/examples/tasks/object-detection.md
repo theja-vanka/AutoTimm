@@ -208,7 +208,7 @@ def main():
         
         # Test inference
         dummy_input = torch.randn(1, 3, 640, 640)
-        with torch.no_grad():
+        with torch.inference_mode():
             output = model(dummy_input)
         print(f"  Output shape: {output.shape}")
 

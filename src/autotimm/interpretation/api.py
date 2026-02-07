@@ -87,7 +87,7 @@ def explain_prediction(
 
     # Get predicted class if not specified
     model.eval()
-    with torch.no_grad():
+    with torch.inference_mode():
         input_tensor = explainer._preprocess_image(image)
         output = model(input_tensor)
 

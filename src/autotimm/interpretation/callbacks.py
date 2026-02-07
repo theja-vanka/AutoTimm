@@ -162,7 +162,7 @@ class InterpretationCallback(Callback):
                 image_tensor = image.unsqueeze(0).to(pl_module.device)
 
                 # Get prediction
-                with torch.no_grad():
+                with torch.inference_mode():
                     output = pl_module(image_tensor)
                     if isinstance(output, dict):
                         output = output.get("logits", output.get("output", output))

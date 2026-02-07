@@ -77,7 +77,7 @@ import torch
 model = torch.jit.load("model.pt")
 model.eval()
 
-with torch.no_grad():
+with torch.inference_mode():
     output = model(input_tensor)
 ```
 
@@ -256,7 +256,7 @@ def quantize_static(model, calibration_loader, num_calibration_batches=100):
     model_prepared = prepare(model)
 
     # Calibrate with representative data
-    with torch.no_grad():
+    with torch.inference_mode():
         for i, (images, _) in enumerate(calibration_loader):
             if i >= num_calibration_batches:
                 break
@@ -467,7 +467,7 @@ async def predict(file: UploadFile = File(...)):
         input_tensor = input_tensor.cuda()
 
     # Predict
-    with torch.no_grad():
+    with torch.inference_mode():
         output = model(input_tensor)
         probabilities = torch.softmax(output, dim=1)
 
@@ -497,7 +497,7 @@ async def predict_batch(files: List[UploadFile] = File(...)):
         if torch.cuda.is_available():
             input_tensor = input_tensor.cuda()
 
-        with torch.no_grad():
+        with torch.inference_mode():
             output = model(input_tensor)
             probabilities = torch.softmax(output, dim=1)
 
@@ -630,7 +630,7 @@ class ClassificationHandler(BaseHandler):
         return torch.stack(images)
 
     def inference(self, data):
-        with torch.no_grad():
+        with torch.inference_mode():
             return self.model(data)
 
     def postprocess(self, inference_output):
@@ -813,7 +813,7 @@ def deploy_model(
 
     # 1. Export TorchScript
     print("Exporting TorchScript...")
-    with torch.no_grad():
+    with torch.inference_mode():
         traced = torch.jit.trace(model, example_input)
         traced = torch.jit.optimize_for_inference(traced)
     traced.save(os.path.join(output_dir, "model_traced.pt"))

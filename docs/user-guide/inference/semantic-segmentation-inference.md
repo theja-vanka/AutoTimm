@@ -461,7 +461,7 @@ image = Image.open("test.jpg").convert("RGB")
 input_tensor = model.preprocess(image)  # Returns (1, 3, H, W) tensor
 
 # Predict
-with torch.no_grad():
+with torch.inference_mode():
     logits = model.predict(input_tensor)  # Returns (1, num_classes, H, W)
 
 # Get class predictions
@@ -495,7 +495,7 @@ transformed = transform(image=image_np)
 input_tensor = transformed["image"].unsqueeze(0)  # Add batch dimension
 
 # Predict
-with torch.no_grad():
+with torch.inference_mode():
     logits = model(input_tensor)
     mask = logits.argmax(dim=1)[0].cpu().numpy()
 ```

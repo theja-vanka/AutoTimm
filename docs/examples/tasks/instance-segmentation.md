@@ -402,7 +402,7 @@ def main():
     image_tensor = transform(image).unsqueeze(0)
 
     # Predict
-    with torch.no_grad():
+    with torch.inference_mode():
         predictions = model.predict(image_tensor)
 
     # predictions is a list of dicts:
@@ -616,7 +616,7 @@ def batch_predict(model, image_paths, batch_size=4):
         batch_tensor = torch.stack(batch_images)
 
         # Predict
-        with torch.no_grad():
+        with torch.inference_mode():
             predictions = model.predict(batch_tensor)
 
         results.extend(predictions)

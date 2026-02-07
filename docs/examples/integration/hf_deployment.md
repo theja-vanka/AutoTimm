@@ -90,7 +90,7 @@ quantized_model = quantization.quantize_dynamic(
 ```python
 # 1. Disable gradients (2x faster)
 model.eval()
-with torch.no_grad():
+with torch.inference_mode():
     output = model(image)
 
 # 2. torch.compile (1.5-2x faster, PyTorch 2.0+)
@@ -126,7 +126,7 @@ async def predict(file: UploadFile = File(...)):
     tensor = transform(image).unsqueeze(0)
 
     # Predict
-    with torch.no_grad():
+    with torch.inference_mode():
         output = model(tensor)
         probs = torch.softmax(output, dim=1)
         top5_prob, top5_idx = torch.topk(probs, 5)
@@ -182,7 +182,7 @@ python examples/huggingface/hf_deployment.py
 - [ ] Profile and identify bottlenecks
 
 ### Inference Optimization
-- [ ] Always use `torch.no_grad()` or `model.eval()`
+- [ ] Always use `torch.inference_mode()` or `model.eval()`
 - [ ] Use `torch.compile()` if PyTorch 2.0+
 - [ ] Implement request batching
 - [ ] Test on target hardware

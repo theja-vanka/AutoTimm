@@ -44,7 +44,7 @@ loaded_model = torch.jit.load("model_scripted.pt")
 loaded_model.eval()
 
 # Use for inference
-with torch.no_grad():
+with torch.inference_mode():
     input_tensor = torch.randn(1, 3, 224, 224)
     output = loaded_model(input_tensor)
     probabilities = torch.softmax(output, dim=1)
@@ -316,7 +316,7 @@ model.qconfig = get_default_qconfig('fbgemm')
 model_prepared = prepare(model)
 
 # Calibrate with representative data
-with torch.no_grad():
+with torch.inference_mode():
     for data in calibration_dataloader:
         model_prepared(data)
 

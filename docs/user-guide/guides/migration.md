@@ -101,7 +101,7 @@ def train_pure_pytorch():
         val_correct = 0
         val_total = 0
 
-        with torch.no_grad():
+        with torch.inference_mode():
             for images, labels in val_loader:
                 images, labels = images.to(device), labels.to(device)
                 outputs = model(images)
@@ -439,7 +439,7 @@ def train_timm():
         model.eval()
         correct = 0
         total = 0
-        with torch.no_grad():
+        with torch.inference_mode():
             for images, labels in val_loader:
                 images, labels = images.to(device), labels.to(device)
                 outputs = model(images)
@@ -707,7 +707,7 @@ trainer.fit(model, datamodule=data)
 ```python
 # Pure PyTorch
 model.eval()
-with torch.no_grad():
+with torch.inference_mode():
     output = model(image)
     prediction = output.argmax(dim=1)
 

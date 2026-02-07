@@ -210,7 +210,7 @@ def main():
     all_preds = []
     all_targets = []
 
-    with torch.no_grad():
+    with torch.inference_mode():
         for batch in data.test_dataloader():
             x, y = batch
             x = x.to(device)

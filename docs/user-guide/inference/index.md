@@ -66,7 +66,7 @@ model = ImageClassifier.load_from_checkpoint(
 model.eval()
 
 image = Image.open("test.jpg").convert("RGB")
-with torch.no_grad():
+with torch.inference_mode():
     logits = model(model.preprocess(image))
     predicted_class = logits.argmax(dim=1).item()
 ```
@@ -84,7 +84,7 @@ model = ObjectDetector.load_from_checkpoint(
 )
 model.eval()
 
-with torch.no_grad():
+with torch.inference_mode():
     detections = model.predict_step(model.preprocess(image), batch_idx=0)
 ```
 
@@ -114,7 +114,7 @@ torch.onnx.export(model, torch.randn(1, 3, 224, 224), "model.onnx")
 **Checklist:**
 
 - Use `model.eval()` before inference
-- Wrap predictions in `torch.no_grad()`
+- Wrap predictions in `torch.inference_mode()`
 - Process multiple images in batches
 - Use GPU when available
 

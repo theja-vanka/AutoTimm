@@ -57,7 +57,7 @@ model = model.half()
 input_tensor = input_tensor.half()
 
 # 3. Disable gradient computation
-with torch.no_grad():
+with torch.inference_mode():
     with torch.cuda.amp.autocast():  # Automatic mixed precision
         outputs = model(inputs)
 ```

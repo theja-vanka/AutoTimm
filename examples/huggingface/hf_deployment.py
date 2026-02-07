@@ -117,7 +117,7 @@ def example_1_onnx_export():
     print(f"  Inference time: {onnx_time * 1000:.2f} ms")
 
     # Compare with PyTorch
-    with torch.no_grad():
+    with torch.inference_mode():
         start = time.time()
         torch_output = model(dummy_input)
         torch_time = time.time() - start
@@ -187,7 +187,7 @@ def example_2_dynamic_quantization():
 
     # Warmup
     for _ in range(10):
-        with torch.no_grad():
+        with torch.inference_mode():
             _ = model(dummy_input)
             _ = quantized_model(dummy_input)
 
@@ -195,14 +195,14 @@ def example_2_dynamic_quantization():
     num_runs = 50
     start = time.time()
     for _ in range(num_runs):
-        with torch.no_grad():
+        with torch.inference_mode():
             _ = model(dummy_input)
     original_time = (time.time() - start) / num_runs
 
     # Benchmark quantized model
     start = time.time()
     for _ in range(num_runs):
-        with torch.no_grad():
+        with torch.inference_mode():
             _ = quantized_model(dummy_input)
     quantized_time = (time.time() - start) / num_runs
 
@@ -247,7 +247,7 @@ def example_3_torchscript_export():
         print(f"  Size: {traced_path.stat().st_size / 1024 / 1024:.2f} MB")
 
         # Test traced model
-        with torch.no_grad():
+        with torch.inference_mode():
             traced_model(dummy_input)
             original_output = model(dummy_input)
 
@@ -328,13 +328,13 @@ def example_4_inference_optimization():
 
             # Warmup compiled model
             for _ in range(5):
-                with torch.no_grad():
+                with torch.inference_mode():
                     _ = compiled_model(dummy_input)
 
             # Benchmark
             start = time.time()
             for _ in range(20):
-                with torch.no_grad():
+                with torch.inference_mode():
                     _ = compiled_model(dummy_input)
             time_compiled = time.time() - start
 
@@ -358,7 +358,7 @@ def example_4_inference_optimization():
 
         start = time.time()
         for _ in range(10):
-            with torch.no_grad():
+            with torch.inference_mode():
                 _ = model(batch_input)
         total_time = time.time() - start
 
@@ -507,7 +507,7 @@ async def predict(file: UploadFile = File(...)):
     tensor = transform(image).unsqueeze(0)
 
     # Predict
-    with torch.no_grad():
+    with torch.inference_mode():
         output = model(tensor)
         if isinstance(output, dict):
             output = output.get("logits", output.get("output", list(output.values())[0]))
