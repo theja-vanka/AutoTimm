@@ -1,18 +1,19 @@
 /**
  * Mermaid Diagram Zoom and Pan Functionality
- * Adds interactive zoom, pan, and fullscreen capabilities to mermaid diagrams
+ * Adds interactive zoom, pan, and fullscreen capabilities to mermaid diagrams.
+ * Works with MkDocs Material's built-in mermaid rendering.
  */
-
-// Wait for mermaid diagrams to be rendered
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize after a short delay to ensure mermaid has rendered
-    setTimeout(initializeMermaidZoom, 500);
-});
 
 function initializeMermaidZoom() {
     const mermaidDiagrams = document.querySelectorAll('.mermaid');
 
-    mermaidDiagrams.forEach(function(diagram, index) {
+    mermaidDiagrams.forEach(function(diagram) {
+        // Skip if already wrapped
+        if (diagram.closest('.mermaid-zoom-wrapper')) return;
+
+        const svg = diagram.querySelector('svg');
+        if (!svg) return;
+
         // Wrap diagram in a container for zoom controls
         const wrapper = document.createElement('div');
         wrapper.className = 'mermaid-zoom-wrapper';
@@ -47,10 +48,6 @@ function initializeMermaidZoom() {
         `;
         wrapper.insertBefore(controls, diagram);
 
-        // Get the SVG element
-        const svg = diagram.querySelector('svg');
-        if (!svg) return;
-
         // Make SVG responsive and zoomable
         svg.style.maxWidth = '100%';
         svg.style.height = 'auto';
@@ -64,36 +61,35 @@ function initializeMermaidZoom() {
         let startX = 0;
         let startY = 0;
 
-        // Apply transform
         function applyTransform() {
-            svg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+            svg.style.transform = 'translate(' + translateX + 'px, ' + translateY + 'px) scale(' + scale + ')';
             svg.style.transformOrigin = '0 0';
         }
 
-        // Zoom in
-        controls.querySelector('.zoom-in').addEventListener('click', function() {
+        controls.querySelector('.zoom-in').addEventListener('click', function(e) {
+            e.stopPropagation();
             scale = Math.min(scale * 1.2, 5);
             applyTransform();
         });
 
-        // Zoom out
-        controls.querySelector('.zoom-out').addEventListener('click', function() {
+        controls.querySelector('.zoom-out').addEventListener('click', function(e) {
+            e.stopPropagation();
             scale = Math.max(scale / 1.2, 0.5);
             applyTransform();
         });
 
-        // Reset zoom
-        controls.querySelector('.zoom-reset').addEventListener('click', function() {
+        controls.querySelector('.zoom-reset').addEventListener('click', function(e) {
+            e.stopPropagation();
             scale = 1;
             translateX = 0;
             translateY = 0;
             applyTransform();
         });
 
-        // Fullscreen toggle
-        controls.querySelector('.zoom-fullscreen').addEventListener('click', function() {
+        controls.querySelector('.zoom-fullscreen').addEventListener('click', function(e) {
+            e.stopPropagation();
             if (!document.fullscreenElement) {
-                wrapper.requestFullscreen().catch(err => {
+                wrapper.requestFullscreen().catch(function(err) {
                     console.log('Fullscreen error:', err);
                 });
                 wrapper.classList.add('fullscreen-active');
@@ -103,15 +99,13 @@ function initializeMermaidZoom() {
             }
         });
 
-        // Mouse wheel zoom
         diagram.addEventListener('wheel', function(e) {
             e.preventDefault();
-            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            var delta = e.deltaY > 0 ? 0.9 : 1.1;
             scale = Math.min(Math.max(scale * delta, 0.5), 5);
             applyTransform();
         });
 
-        // Pan with mouse drag
         svg.addEventListener('mousedown', function(e) {
             if (e.button === 0) {
                 isDragging = true;
@@ -136,19 +130,19 @@ function initializeMermaidZoom() {
             }
         });
 
-        // Touch support for mobile
-        let touchStartX = 0;
-        let touchStartY = 0;
-        let initialDistance = 0;
-        let initialScale = 1;
+        // Touch support
+        var touchStartX = 0;
+        var touchStartY = 0;
+        var initialDistance = 0;
+        var initialScale = 1;
 
         svg.addEventListener('touchstart', function(e) {
             if (e.touches.length === 1) {
                 touchStartX = e.touches[0].clientX - translateX;
                 touchStartY = e.touches[0].clientY - translateY;
             } else if (e.touches.length === 2) {
-                const dx = e.touches[0].clientX - e.touches[1].clientX;
-                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                var dx = e.touches[0].clientX - e.touches[1].clientX;
+                var dy = e.touches[0].clientY - e.touches[1].clientY;
                 initialDistance = Math.sqrt(dx * dx + dy * dy);
                 initialScale = scale;
             }
@@ -161,9 +155,9 @@ function initializeMermaidZoom() {
                 translateY = e.touches[0].clientY - touchStartY;
                 applyTransform();
             } else if (e.touches.length === 2) {
-                const dx = e.touches[0].clientX - e.touches[1].clientX;
-                const dy = e.touches[0].clientY - e.touches[1].clientY;
-                const distance = Math.sqrt(dx * dx + dy * dy);
+                var dx = e.touches[0].clientX - e.touches[1].clientX;
+                var dy = e.touches[0].clientY - e.touches[1].clientY;
+                var distance = Math.sqrt(dx * dx + dy * dy);
                 scale = Math.min(Math.max(initialScale * (distance / initialDistance), 0.5), 5);
                 applyTransform();
             }
@@ -171,9 +165,45 @@ function initializeMermaidZoom() {
     });
 }
 
-// Re-initialize when navigating in Material theme (instant loading)
+// Use MutationObserver to detect when Material finishes rendering mermaid SVGs
+function observeMermaidRendering() {
+    var observer = new MutationObserver(function(mutations) {
+        var hasMermaidSvg = false;
+        mutations.forEach(function(mutation) {
+            mutation.addedNodes.forEach(function(node) {
+                if (node.nodeName === 'svg' || (node.querySelector && node.querySelector('svg'))) {
+                    var parent = node.closest ? node.closest('.mermaid') : null;
+                    if (!parent && node.parentElement) {
+                        parent = node.parentElement.closest('.mermaid');
+                    }
+                    if (parent) hasMermaidSvg = true;
+                }
+            });
+        });
+        if (hasMermaidSvg) {
+            initializeMermaidZoom();
+        }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+    return observer;
+}
+
+// Initial setup
+var mermaidObserver = observeMermaidRendering();
+
+// Also run on initial load in case SVGs are already rendered
+document.addEventListener('DOMContentLoaded', function() {
+    initializeMermaidZoom();
+});
+
+// Re-initialize on Material instant navigation
 if (typeof document$ !== 'undefined') {
     document$.subscribe(function() {
-        setTimeout(initializeMermaidZoom, 500);
+        // Disconnect old observer and start a new one for the new page
+        if (mermaidObserver) mermaidObserver.disconnect();
+        mermaidObserver = observeMermaidRendering();
+        // Also try immediately in case SVGs are already present
+        initializeMermaidZoom();
     });
 }

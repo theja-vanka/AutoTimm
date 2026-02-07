@@ -246,7 +246,6 @@ extra:
       Model Deployment, TorchScript
 
 extra_javascript:
-  - https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js
   - javascripts/mermaid-zoom.js
 
 extra_css:
