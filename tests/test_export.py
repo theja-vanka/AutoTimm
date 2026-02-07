@@ -16,6 +16,21 @@ from autotimm.export import (
 from autotimm.metrics import MetricConfig
 
 
+@pytest.fixture(autouse=True)
+def reset_deterministic_mode():
+    """Reset deterministic mode before each test.
+
+    This is necessary because torch.use_deterministic_algorithms() is a global
+    setting that persists across tests. Other tests may enable it via seed_everything(),
+    which can cause TorchScript serialization to fail.
+    """
+    # Disable deterministic algorithms for TorchScript compatibility
+    torch.use_deterministic_algorithms(False)
+    yield
+    # Reset to default state after test
+    torch.use_deterministic_algorithms(False)
+
+
 @pytest.fixture
 def simple_classifier():
     """Create a simple classifier for testing."""
