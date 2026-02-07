@@ -60,6 +60,7 @@ From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-G
 
 ## What's New in v0.7.2
 
+- **Reproducibility by Default** - Automatic seeding with `seed=42` and deterministic mode enabled out-of-the-box for fully reproducible training and inference
 - **torch.compile by Default** - Automatic PyTorch 2.0+ optimization enabled out-of-the-box for faster training and inference
 - **TorchScript Export** - Export trained models to TorchScript (.pt) for production deployment without Python dependencies
 - **Model Interpretation** - Complete explainability toolkit with 6 interpretation methods, 6 quality metrics, interactive Plotly visualizations, and up to 100x speedup with optimization
@@ -507,6 +508,42 @@ model = ImageClassifier(
 - Instance Segmentation: backbone + FPN + detection head + mask head
 
 Gracefully falls back on PyTorch < 2.0 with a warning.
+
+### Reproducibility by Default
+
+**Automatic seeding** for reproducible experiments:
+
+```python
+# Default: seed=42, deterministic=True for full reproducibility
+model = ImageClassifier(backbone="resnet50", num_classes=10)
+trainer = AutoTrainer(max_epochs=10)
+
+# Custom seed
+model = ImageClassifier(backbone="resnet50", num_classes=10, seed=123)
+trainer = AutoTrainer(max_epochs=10, seed=123)
+
+# Faster training (disable deterministic mode)
+model = ImageClassifier(backbone="resnet50", num_classes=10, deterministic=False)
+trainer = AutoTrainer(max_epochs=10, deterministic=False)
+
+# Manual seeding
+from autotimm import seed_everything
+seed_everything(42, deterministic=True)
+```
+
+**What's seeded:**
+- Python's `random` module
+- NumPy's random number generator
+- PyTorch (CPU & CUDA)
+- Environment variables for reproducibility
+- cuDNN deterministic algorithms (when `deterministic=True`)
+
+**Seeding options:**
+- **Model-level:** Seeds when model is created
+- **Trainer-level:** Seeds before training starts (uses Lightning's seeding by default)
+- **Manual:** Use `seed_everything()` for custom control
+
+Perfect for research papers, debugging, and ensuring consistent results across runs!
 
 ### TorchScript Export
 

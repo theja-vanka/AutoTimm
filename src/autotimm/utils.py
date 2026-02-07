@@ -2,7 +2,70 @@
 
 from __future__ import annotations
 
+import os
+import random
+
+import numpy as np
+import torch
 import torch.nn as nn
+
+
+def seed_everything(seed: int = 42, deterministic: bool = False) -> int:
+    """Set random seeds for reproducibility across all libraries.
+
+    Seeds Python's random, NumPy, PyTorch (CPU and CUDA), and sets environment
+    variables for deterministic behavior.
+
+    Parameters:
+        seed: Random seed value. Default is 42.
+        deterministic: If ``True``, enables deterministic algorithms in PyTorch.
+            This may impact performance but ensures fully reproducible results.
+            Default is ``False``.
+
+    Returns:
+        The seed value that was set.
+
+    Example:
+        >>> seed_everything(42)
+        42
+        >>> # For fully deterministic training (slower but reproducible)
+        >>> seed_everything(42, deterministic=True)
+        42
+
+    Note:
+        Setting ``deterministic=True`` may reduce performance. Use it only when
+        full reproducibility is required (e.g., for research or debugging).
+    """
+    # Python random
+    random.seed(seed)
+
+    # NumPy
+    np.random.seed(seed)
+
+    # PyTorch
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)  # For multi-GPU
+
+    # Environment variables for additional reproducibility
+    os.environ["PYTHONHASHSEED"] = str(seed)
+
+    # PyTorch backends
+    if deterministic:
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+        # Enable deterministic algorithms (PyTorch 1.8+)
+        try:
+            torch.use_deterministic_algorithms(True)
+        except AttributeError:
+            # Fallback for older PyTorch versions
+            torch.set_deterministic(True)
+    else:
+        # Enable cuDNN benchmark for faster training (default)
+        torch.backends.cudnn.benchmark = True
+        torch.backends.cudnn.deterministic = False
+
+    return seed
 
 
 def count_parameters(model: nn.Module, trainable_only: bool = True) -> int:

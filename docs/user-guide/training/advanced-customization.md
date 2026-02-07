@@ -931,6 +931,116 @@ model = ImageClassifier(
 
 ---
 
+### Reproducibility
+
+**Automatic seeding enabled by default** for reproducible experiments:
+
+```python
+from autotimm import ImageClassifier, AutoTrainer, seed_everything
+
+# Default: seed=42, deterministic=True
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    # seed=42 (default)
+    # deterministic=True (default)
+)
+
+trainer = AutoTrainer(
+    max_epochs=10,
+    # seed=42 (default)
+    # deterministic=True (default)
+)
+```
+
+**Custom seeding:**
+
+```python
+# Use a different seed
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    seed=123,
+    deterministic=True,
+)
+
+trainer = AutoTrainer(max_epochs=10, seed=123)
+```
+
+**Faster training (disable deterministic mode):**
+
+```python
+# Disable deterministic for speed
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    seed=42,
+    deterministic=False,  # Enables cuDNN benchmark
+)
+
+trainer = AutoTrainer(
+    max_epochs=10,
+    deterministic=False,  # Faster but not fully deterministic
+)
+```
+
+**Manual seeding:**
+
+```python
+# Seed everything manually
+seed_everything(42, deterministic=True)
+
+# Now create models without automatic seeding
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    seed=None,  # Don't seed again
+)
+```
+
+**Trainer seeding options:**
+
+```python
+# Use PyTorch Lightning's seeding (default)
+trainer = AutoTrainer(
+    max_epochs=10,
+    seed=42,
+    use_autotimm_seeding=False,  # Default
+)
+
+# Use AutoTimm's custom seeding
+trainer = AutoTrainer(
+    max_epochs=10,
+    seed=42,
+    use_autotimm_seeding=True,
+)
+```
+
+**What's seeded:**
+
+- Python's `random` module
+- NumPy's random number generator
+- PyTorch (CPU & CUDA)
+- Environment variables (`PYTHONHASHSEED`)
+- cuDNN deterministic algorithms (when `deterministic=True`)
+
+**Trade-offs:**
+
+| Setting | Speed | Reproducibility | Use Case |
+|---------|-------|-----------------|----------|
+| `deterministic=True` | Slower | Full | Research, debugging |
+| `deterministic=False` | Faster | Partial | Production training |
+| `seed=None` | Fastest | None | Exploring variance |
+
+**Best practices:**
+
+- **Research papers**: Use `seed=42, deterministic=True`
+- **Production training**: Use `seed=42, deterministic=False`
+- **Debugging**: Use `seed=42, deterministic=True`
+- **Exploration**: Use `seed=None`
+
+---
+
 ## Complete Example
 
 ```python

@@ -21,6 +21,7 @@ from autotimm.losses import FocalLoss, GIoULoss
 from autotimm.losses.segmentation import MaskLoss
 from autotimm.metrics import LoggingConfig, MetricConfig, MetricManager
 from autotimm.tasks.preprocessing_mixin import PreprocessingMixin
+from autotimm.utils import seed_everything
 
 
 class InstanceSegmentor(PreprocessingMixin, pl.LightningModule):
@@ -65,6 +66,10 @@ class InstanceSegmentor(PreprocessingMixin, pl.LightningModule):
         compile_kwargs: Optional dict of kwargs to pass to ``torch.compile()``.
             Common options: ``mode`` (``"default"``, ``"reduce-overhead"``, ``"max-autotune"``),
             ``fullgraph`` (``True``/``False``), ``dynamic`` (``True``/``False``).
+        seed: Random seed for reproducibility. If ``None``, no seeding is performed.
+            Default is ``42`` for reproducible results.
+        deterministic: If ``True`` (default), enables deterministic algorithms in PyTorch for full
+            reproducibility (may impact performance). Set to ``False`` for faster training.
 
     Example:
         >>> model = InstanceSegmentor(
@@ -114,7 +119,13 @@ class InstanceSegmentor(PreprocessingMixin, pl.LightningModule):
         mask_threshold: float = 0.5,
         compile_model: bool = True,
         compile_kwargs: dict[str, Any] | None = None,
+        seed: int | None = 42,
+        deterministic: bool = True,
     ):
+        # Seed for reproducibility
+        if seed is not None:
+            seed_everything(seed, deterministic=deterministic)
+
         super().__init__()
         self.save_hyperparameters(
             ignore=["metrics", "logging_config", "transform_config"]

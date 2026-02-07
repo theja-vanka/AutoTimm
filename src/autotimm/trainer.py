@@ -9,6 +9,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.tuner import Tuner
 
 from autotimm.loggers import LoggerConfig, LoggerManager
+from autotimm.utils import seed_everything
 
 # Module-level flag to ensure watermark is printed only once per session
 _WATERMARK_PRINTED = False
@@ -161,6 +162,13 @@ class AutoTrainer(pl.Trainer):
         fast_dev_run: Runs a single batch through train, val, and test to
             find bugs quickly. Can be ``True`` (1 batch), ``False`` (disabled),
             or an integer (number of batches). Useful for debugging.
+        seed: Random seed for reproducibility. If ``None``, no seeding is performed.
+            Default is ``42`` for reproducible results.
+        deterministic: If ``True`` (default), enables deterministic algorithms in PyTorch
+            for full reproducibility (may impact performance). Set to ``False`` for faster training.
+        use_autotimm_seeding: If ``True``, uses AutoTimm's custom ``seed_everything()``
+            function which provides comprehensive seeding with deterministic mode support.
+            If ``False`` (default), uses PyTorch Lightning's built-in seeding.
         **trainer_kwargs: Any other ``pl.Trainer`` argument.
 
     Example:
@@ -186,6 +194,18 @@ class AutoTrainer(pl.Trainer):
         >>> # Quick debugging with fast_dev_run (auto-tuning disabled automatically)
         >>> trainer = AutoTrainer(fast_dev_run=True)
         >>> trainer.fit(model, datamodule=data)  # Runs 1 batch only
+
+        >>> # Custom seeding for reproducibility
+        >>> trainer = AutoTrainer(max_epochs=10, seed=123, deterministic=True)
+        >>> trainer.fit(model, datamodule=data)
+
+        >>> # Use Lightning's built-in seeding instead of AutoTimm's
+        >>> trainer = AutoTrainer(max_epochs=10, seed=42, use_autotimm_seeding=False)
+        >>> trainer.fit(model, datamodule=data)
+
+        >>> # Disable seeding completely
+        >>> trainer = AutoTrainer(max_epochs=10, seed=None)
+        >>> trainer.fit(model, datamodule=data)
     """
 
     def __init__(
@@ -211,10 +231,30 @@ class AutoTrainer(pl.Trainer):
         val_check_interval: float | int = 1.0,
         enable_checkpointing: bool = True,
         fast_dev_run: bool | int = False,
+        seed: int | None = 42,
+        deterministic: bool = True,
+        use_autotimm_seeding: bool = False,
         **trainer_kwargs: Any,
     ) -> None:
         # Print environment watermark on first AutoTrainer instantiation
         _print_watermark()
+
+        # Handle seeding
+        if seed is not None and use_autotimm_seeding:
+            # Use AutoTimm's custom seed_everything with deterministic support
+            seed_everything(seed, deterministic=deterministic)
+        elif seed is not None and not use_autotimm_seeding:
+            # Use PyTorch Lightning's built-in seeding (if not already in trainer_kwargs)
+            if "seed_everything" not in trainer_kwargs:
+                # Pass seed to Lightning's Trainer
+                import pytorch_lightning as pl_seed
+                pl_seed.seed_everything(seed, workers=True)
+                # Note: Lightning doesn't have built-in deterministic parameter,
+                # so we still apply our deterministic settings
+                if deterministic:
+                    import torch
+                    torch.backends.cudnn.deterministic = True
+                    torch.backends.cudnn.benchmark = False
 
         if isinstance(logger, LoggerManager):
             resolved_logger = logger.loggers

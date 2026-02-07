@@ -124,6 +124,7 @@ nav:
           - Segmentation Inference: user-guide/inference/semantic-segmentation-inference.md
           - Model Export: user-guide/inference/model-export.md
       - Guides:
+          - Reproducibility: user-guide/guides/reproducibility.md
           - Logging: user-guide/guides/logging.md
           - Troubleshooting: user-guide/guides/troubleshooting.md
           - Migration Guide: user-guide/guides/migration.md

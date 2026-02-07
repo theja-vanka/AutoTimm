@@ -73,7 +73,7 @@ from autotimm.tasks.object_detection import ObjectDetector
 from autotimm.tasks.semantic_segmentation import SemanticSegmentor
 from autotimm.tasks.yolox_detector import YOLOXDetector
 from autotimm.trainer import AutoTrainer, TunerConfig
-from autotimm.utils import count_parameters, list_optimizers, list_schedulers
+from autotimm.utils import count_parameters, list_optimizers, list_schedulers, seed_everything
 from autotimm.export import (
     export_to_torchscript,
     load_torchscript,
@@ -189,6 +189,7 @@ __all__ = [
     "count_parameters",
     "list_optimizers",
     "list_schedulers",
+    "seed_everything",
     # Export
     "export_to_torchscript",
     "load_torchscript",
