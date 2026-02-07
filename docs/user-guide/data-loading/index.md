@@ -7,6 +7,34 @@ AutoTimm provides specialized data modules for different computer vision tasks:
 - **[SegmentationDataModule](segmentation-data.md)**: Semantic segmentation datasets
 - **[Transforms](transforms.md)**: Image transforms and augmentation system
 
+## Data Loading Pipeline
+
+```mermaid
+graph LR
+    A[Raw Data] --> B{Data Module}
+    B -->|ImageDataModule| C1[Classification]
+    B -->|DetectionDataModule| C2[Detection]
+    B -->|SegmentationDataModule| C3[Segmentation]
+    
+    C1 --> D1[Transforms]
+    C2 --> D2[Transforms + BBox]
+    C3 --> D3[Transforms + Masks]
+    
+    D1 --> E[DataLoader]
+    D2 --> E
+    D3 --> E
+    
+    E --> F[Training Batches]
+    
+    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style B fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C1 fill:#2196F3,stroke:#1976D2,color:#fff
+    style C2 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C3 fill:#2196F3,stroke:#1976D2,color:#fff
+    style E fill:#42A5F5,stroke:#1976D2,color:#fff
+    style F fill:#2196F3,stroke:#1976D2,color:#fff
+```
+
 ## Quick Start
 
 ### Image Classification

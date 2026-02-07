@@ -770,25 +770,11 @@ Typical inference times on mobile devices:
 
 ## Troubleshooting
 
-### iOS: "Module file doesn't exist"
+For mobile deployment issues, see the [Troubleshooting - Production Deployment](../../troubleshooting/deployment/production.md) including:
 
-**Solution:** Ensure model is in app bundle:
-- Check "Copy items if needed" when adding to Xcode
-- Verify target membership
-
-### Android: "Native method not found"
-
-**Solution:** Update PyTorch Android version:
-```gradle
-implementation 'org.pytorch:pytorch_android:1.13.1'
-```
-
-### Slow Inference
-
-**Solution:** Profile and optimize:
-- Use smaller input size
-- Switch to lightweight backbone
-- Enable quantization
+- iOS: Module file doesn't exist
+- Android: Native method not found
+- Slow inference on mobile devices
 
 ## Examples
 

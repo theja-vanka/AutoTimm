@@ -2,6 +2,52 @@
 
 Combine multiple models and distill knowledge into compact students for production deployment.
 
+## Ensemble & Distillation Architecture
+
+```mermaid
+graph TB
+    subgraph "Ensemble Methods"
+        A1[Model 1: ResNet] --> E1[Predictions]
+        A2[Model 2: MobileNet] --> E2[Predictions]
+        A3[Model 3: EfficientNet] --> E3[Predictions]
+        
+        E1 --> F{Combination}
+        E2 --> F
+        E3 --> F
+        
+        F -->|Simple| G1[Average]
+        F -->|Weighted| G2[Learned Weights]
+        
+        G1 --> H[Final Prediction]
+        G2 --> H
+    end
+    
+    subgraph "Knowledge Distillation"
+        I[Teacher Model] --> J[Soft Targets]
+        K[Student Model] --> L[Predictions]
+        
+        J --> M[KL Divergence]
+        L --> M
+        L --> N[Hard Loss CE]
+        
+        M --> O[Distillation Loss]
+        N --> O
+        
+        O --> P[Compact Model]
+    end
+    
+    H -.Teacher.-> I
+    
+    style A1 fill:#2196F3,stroke:#1976D2,color:#fff
+    style A2 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style A3 fill:#2196F3,stroke:#1976D2,color:#fff
+    style H fill:#42A5F5,stroke:#1976D2,color:#fff
+    style I fill:#2196F3,stroke:#1976D2,color:#fff
+    style K fill:#42A5F5,stroke:#1976D2,color:#fff
+    style O fill:#2196F3,stroke:#1976D2,color:#fff
+    style P fill:#42A5F5,stroke:#1976D2,color:#fff
+```
+
 ## Overview
 
 Learn how to create model ensembles for improved accuracy and use knowledge distillation to compress large models into efficient students while retaining performance.

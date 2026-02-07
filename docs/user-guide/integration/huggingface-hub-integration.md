@@ -2,6 +2,44 @@
 
 AutoTimm seamlessly integrates with Hugging Face Hub, giving you access to thousands of timm-compatible pretrained models with version control, model cards, and community contributions.
 
+## HF Hub Integration Flow
+
+```mermaid
+graph LR
+    A[HF Hub] --> B[Search Models]
+    
+    B --> C[list_hf_hub_backbones]
+    
+    C --> D{Filter}
+    D -->|By Name| E1[model_name='resnet']
+    D -->|By Author| E2[author='timm']
+    D -->|By Tag| E3[tag='image-classification']
+    
+    E1 --> F[Model List]
+    E2 --> F
+    E3 --> F
+    
+    F --> G[Select Model]
+    
+    G --> H[hf-hub:timm/model]
+    
+    H --> I{Task}
+    
+    I -->|Classification| J1[ImageClassifier]
+    I -->|Detection| J2[ObjectDetector]
+    I -->|Segmentation| J3[SemanticSegmentor]
+    
+    J1 --> K[Training]
+    J2 --> K
+    J3 --> K
+    
+    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style C fill:#42A5F5,stroke:#1976D2,color:#fff
+    style F fill:#2196F3,stroke:#1976D2,color:#fff
+    style H fill:#42A5F5,stroke:#1976D2,color:#fff
+    style K fill:#2196F3,stroke:#1976D2,color:#fff
+```
+
 ## Overview
 
 Load models directly from Hugging Face Hub using the `hf-hub:` prefix. This provides:
@@ -242,28 +280,12 @@ The only difference is the initial model download from Hugging Face Hub (cached 
 
 ## Troubleshooting
 
-### Model download is slow
+For HuggingFace Hub integration issues, see the [Troubleshooting - HuggingFace](../../troubleshooting/integration/huggingface.md) including:
 
-Models are cached after first download. Subsequent runs are fast.
-
-### Checkpoint loading fails
-
-Make sure to pass the same `backbone` argument when loading:
-
-```python
-loaded = ImageClassifier.load_from_checkpoint(
-    path,
-    backbone="hf-hub:timm/resnet50.a1_in1k",  # Must match original
-    metrics=metrics,
-)
-```
-
-### RuntimeError about Trainer attachment
-
-This happens when calling `configure_optimizers()` without a trainer. Either:
-
-- Attach model to trainer first, or
-- Use `scheduler=None` to avoid scheduler configuration
+- Model download is slow
+- Checkpoint loading fails
+- RuntimeError about Trainer attachment
+- Model not found errors
 
 ## Resources
 

@@ -2,6 +2,42 @@
 
 AutoTimm can work alongside HuggingFace Transformers vision models (ViT, DeiT, BEiT, Swin, etc.) with PyTorch Lightning. This guide shows you how to use these models directly without Auto classes for full control and compatibility.
 
+## Direct Model Integration
+
+```mermaid
+graph TB
+    A[HF Transformers] --> B{Model Type}
+    
+    B -->|ViT| C1[ViTModel + ViTConfig]
+    B -->|DeiT| C2[DeiTModel + DeiTConfig]
+    B -->|BEiT| C3[BeitModel + BeitConfig]
+    B -->|Swin| C4[SwinModel + SwinConfig]
+    
+    C1 --> D[Custom LightningModule]
+    C2 --> D
+    C3 --> D
+    C4 --> D
+    
+    D --> E[Add Task Head]
+    E --> F[Configure Optimizers]
+    F --> G[Training Steps]
+    
+    G --> H[PyTorch Lightning]
+    
+    H --> I1[DDP]
+    H --> I2[Mixed Precision]
+    H --> I3[Callbacks]
+    H --> I4[Checkpointing]
+    
+    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C2 fill:#2196F3,stroke:#1976D2,color:#fff
+    style C3 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C4 fill:#2196F3,stroke:#1976D2,color:#fff
+    style D fill:#42A5F5,stroke:#1976D2,color:#fff
+    style H fill:#2196F3,stroke:#1976D2,color:#fff
+```
+
 ## Overview
 
 **Key Finding: You don't need Auto classes!** All HuggingFace vision models can be used directly with specific model classes for better control and type safety.
@@ -302,43 +338,11 @@ model3 = ViTModel.from_pretrained("google/vit-base-patch16-224")
 
 ## Troubleshooting
 
-### Model expects 'pixel_values' keyword argument
+For HuggingFace Transformers integration issues, see the [Troubleshooting - HuggingFace](../../troubleshooting/integration/huggingface.md) including:
 
-HF models expect `pixel_values` as a keyword argument:
-
-```python
-# ✗ Wrong
-output = model(x)
-
-# ✓ Correct
-output = model(pixel_values=x)
-```
-
-### Model is slow
-
-Ensure you're using the right dtype and device:
-
-```python
-model = model.half()  # FP16
-model = model.to("cuda")
-
-# Or use Lightning's precision
-trainer = pl.Trainer(precision="16-mixed")
-```
-
-### Checkpoint loading fails
-
-Ensure Lightning can find the class:
-
-```python
-# Save
-model = ViTClassifier()
-trainer.fit(model)
-
-# Load - class must be in scope
-from my_module import ViTClassifier
-loaded = ViTClassifier.load_from_checkpoint(path)
-```
+- Model expects 'pixel_values' keyword argument
+- Model is slow
+- Checkpoint loading fails
 
 ## Performance Considerations
 

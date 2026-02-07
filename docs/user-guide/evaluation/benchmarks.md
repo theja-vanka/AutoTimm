@@ -363,4 +363,4 @@ for backbone in backbones:
 
 - [Training Guide](../training/training.md) - Training configuration options
 - [Model Export](../inference/model-export.md) - Exporting models for deployment
-- [Troubleshooting](../guides/troubleshooting.md) - Memory and performance issues
+- [Troubleshooting](../../troubleshooting/performance/oom-errors.md) - Memory and performance issues

@@ -2,6 +2,40 @@
 
 This section provides detailed API documentation for all AutoTimm classes and functions.
 
+## API Organization
+
+```mermaid
+graph TB
+    A[AutoTimm API] --> B[Models]
+    A --> C[Data]
+    A --> D[Training]
+    A --> E[Config]
+    
+    B --> B1[ImageClassifier]
+    B --> B2[ObjectDetector]
+    B --> B3[SemanticSegmentor]
+    B --> B4[InstanceSegmentor]
+    B --> B5[YOLOXDetector]
+    
+    C --> C1[ImageDataModule]
+    C --> C2[DetectionDataModule]
+    C --> C3[SegmentationDataModule]
+    
+    D --> D1[AutoTrainer]
+    D --> D2[TunerConfig]
+    
+    E --> E1[MetricConfig/Manager]
+    E --> E2[LoggerConfig/Manager]
+    E --> E3[TransformConfig]
+    E --> E4[BackboneConfig]
+    
+    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style B fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C fill:#2196F3,stroke:#1976D2,color:#fff
+    style D fill:#42A5F5,stroke:#1976D2,color:#fff
+    style E fill:#2196F3,stroke:#1976D2,color:#fff
+```
+
 ## Core Classes
 
 | Class | Description |

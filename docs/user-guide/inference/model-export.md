@@ -458,45 +458,12 @@ outputs = session.run(None, {"image": batch})
 
 ## Common Issues
 
-### ONNX Export Fails
+For model export issues, see the [Troubleshooting - Export & Inference](../../troubleshooting/deployment/export-inference.md) including:
 
-**Problem:** Export fails with unsupported operation
-
-**Solutions:**
-```python
-# 1. Use a lower opset version
-torch.onnx.export(..., opset_version=11)
-
-# 2. Simplify the model (remove custom ops)
-
-# 3. Use TorchScript instead
-traced_model = torch.jit.trace(model, example_input)
-```
-
-### Model Size Too Large
-
-**Problem:** Exported model is too big
-
-**Solutions:**
-```python
-# 1. Use quantization
-quantize_dynamic("model.onnx", "model_quant.onnx")
-
-# 2. Use FP16
-# During ONNX export, convert to FP16
-
-# 3. Use a smaller backbone
-model = ImageClassifier(backbone="resnet34")  # Instead of resnet50
-```
-
-### Inference Speed Not Improved
-
-**Problem:** Exported model isn't faster
-
-**Solutions:**
-```python
-# 1. Use appropriate execution provider
-providers = ['CUDAExecutionProvider']
+- ONNX export fails
+- Model size too large
+- Inference speed not improved
+- Format compatibility issues
 
 # 2. Enable optimizations
 sess_options = ort.SessionOptions()

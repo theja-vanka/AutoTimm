@@ -2,6 +2,39 @@
 
 AutoTimm provides `AutoTrainer`, a configured PyTorch Lightning Trainer with sensible defaults and built-in support for auto-tuning, logging, and checkpointing.
 
+## Training Workflow
+
+```mermaid
+graph TB
+    A[Initialize Model & Data] --> B{Auto-Tuning?}
+    B -->|Yes| C[Find LR & Batch Size]
+    B -->|No| D[Start Training]
+    C --> D
+    D --> E[Training Loop]
+    E --> F[Forward Pass]
+    F --> G[Compute Loss]
+    G --> H[Backward Pass]
+    H --> I[Update Weights]
+    I --> J{Validation?}
+    J -->|Every N epochs| K[Validation Loop]
+    K --> L[Compute Metrics]
+    L --> M{Save Checkpoint?}
+    M -->|Best metric| N[Save Model]
+    M -->|No| O{Continue?}
+    J -->|No| O
+    N --> O
+    O -->|More epochs| E
+    O -->|Done| P[Test Model]
+    P --> Q[Final Metrics]
+    
+    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style C fill:#42A5F5,stroke:#1976D2,color:#fff
+    style E fill:#2196F3,stroke:#1976D2,color:#fff
+    style K fill:#42A5F5,stroke:#1976D2,color:#fff
+    style N fill:#2196F3,stroke:#1976D2,color:#fff
+    style P fill:#42A5F5,stroke:#1976D2,color:#fff
+```
+
 ## AutoTrainer
 
 ### Basic Training

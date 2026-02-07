@@ -41,14 +41,31 @@ def _lightning_export_mode(model: nn.Module):
 
 
 class _ForwardWrapper(nn.Module):
-    """Wrapper to export only the forward method, avoiding Lightning module issues."""
+    """Wrapper to export only the forward method, avoiding Lightning module issues.
+    
+    This wrapper creates a clean module containing only the essential components
+    needed for inference (backbone and head), avoiding problematic attributes like
+    metrics, logging configs, and other Lightning-specific state.
+    """
 
     def __init__(self, model: nn.Module):
         super().__init__()
-        self.model = model
+        # For classification models, extract backbone and head
+        if hasattr(model, 'backbone') and hasattr(model, 'head'):
+            self.backbone = model.backbone
+            self.head = model.head
+            self._has_components = True
+        else:
+            # Fallback: just store the model
+            self.model = model
+            self._has_components = False
 
-    def forward(self, *args, **kwargs):
-        return self.model(*args, **kwargs)
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        if self._has_components:
+            features = self.backbone(x)
+            return self.head(features)
+        else:
+            return self.model(x)
 
 
 def export_to_torchscript(
@@ -122,7 +139,12 @@ def export_to_torchscript(
     try:
         # Use context manager to make Lightning modules TorchScript-compatible
         with _lightning_export_mode(model):
-            model_to_export = model
+            # Wrap the model if requested (default for Lightning modules)
+            is_lightning = any("LightningModule" in cls.__name__ for cls in type(model).__mro__)
+            if wrap_model and is_lightning:
+                model_to_export = _ForwardWrapper(model)
+            else:
+                model_to_export = model
 
             if method == "trace":
                 if example_input is None:

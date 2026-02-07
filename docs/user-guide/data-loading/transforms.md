@@ -2,6 +2,43 @@
 
 AutoTimm provides a flexible transform system for image preprocessing and augmentation, supporting both torchvision and albumentations backends with model-specific normalization.
 
+## Transform Pipeline
+
+```mermaid
+graph LR
+    A[Raw Image] --> B{TransformConfig}
+    
+    B -->|Backend| C1[torchvision]
+    B -->|Backend| C2[albumentations]
+    
+    C1 --> D1[Preset Transforms]
+    C2 --> D2[Preset Transforms]
+    
+    D1 --> E[Resize]
+    D2 --> E
+    
+    E --> F[Augmentation]
+    
+    F -->|Training| G1[RandAugment/Strong]
+    F -->|Evaluation| G2[CenterCrop]
+    
+    G1 --> H[Normalization]
+    G2 --> H
+    
+    H -->|timm config| I1[Model-specific]
+    H -->|custom| I2[User-defined]
+    
+    I1 --> J[Tensor]
+    I2 --> J
+    
+    style B fill:#2196F3,stroke:#1976D2,color:#fff
+    style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C2 fill:#2196F3,stroke:#1976D2,color:#fff
+    style F fill:#42A5F5,stroke:#1976D2,color:#fff
+    style H fill:#2196F3,stroke:#1976D2,color:#fff
+    style J fill:#42A5F5,stroke:#1976D2,color:#fff
+```
+
 ## Overview
 
 The transform system consists of three main components:
@@ -541,48 +578,12 @@ config = TransformConfig(image_size=384)
 
 ## Troubleshooting
 
-### Wrong Predictions After Training
+For transform-related issues, see the [Troubleshooting - Augmentation](../../troubleshooting/data/augmentation.md) including:
 
-**Problem:** Model predictions don't match training performance
-
-**Solution:** Ensure inference uses the same normalization:
-
-```python
-# Correct: Use model's preprocess method
-tensor = model.preprocess(image)
-
-# Or manually match normalization
-config = model.get_data_config()
-transform = transforms.Compose([
-    transforms.Resize(256),
-    transforms.CenterCrop(224),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=config['mean'], std=config['std']),
-])
-```
-
-### Albumentations Import Error
-
-**Problem:** `ImportError: Albumentations is required`
-
-**Solution:** Albumentations is included by default in AutoTimm. If you see this error:
-
-1. Reinstall AutoTimm: `pip install --upgrade autotimm`
-2. Verify installation: `python -c "import albumentations; print(albumentations.__version__)"`
-
-### Bounding Boxes Not Preserved
-
-**Problem:** Detection bboxes become invalid after augmentation
-
-**Solution:** Use albumentations with proper bbox params:
-
-```python
-config = TransformConfig(
-    backend="albumentations",
-    bbox_format="coco",
-    min_visibility=0.3,  # Filter bboxes with <30% visibility
-)
-```
+- Wrong predictions after training
+- Bounding boxes not preserved
+- Albumentations transform errors
+- Normalization mismatches
 
 ---
 

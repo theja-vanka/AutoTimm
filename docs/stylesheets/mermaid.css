@@ -1,0 +1,31 @@
+/* Mermaid diagram styling to match AutoTimm theme */
+.mermaid {
+  text-align: center;
+  margin: 2em 0;
+}
+
+/* Light mode colors */
+[data-md-color-scheme="default"] .mermaid {
+  --mermaid-primary-color: #2196F3;
+  --mermaid-primary-text-color: #fff;
+  --mermaid-primary-border-color: #1976D2;
+  --mermaid-line-color: #1976D2;
+  --mermaid-secondary-color: #E3F2FD;
+  --mermaid-tertiary-color: #BBDEFB;
+  --mermaid-note-bg-color: #E3F2FD;
+  --mermaid-note-border-color: #2196F3;
+  --mermaid-text-color: #212121;
+}
+
+/* Dark mode colors */
+[data-md-color-scheme="slate"] .mermaid {
+  --mermaid-primary-color: #42A5F5;
+  --mermaid-primary-text-color: #000;
+  --mermaid-primary-border-color: #90CAF9;
+  --mermaid-line-color: #90CAF9;
+  --mermaid-secondary-color: #1E3A5F;
+  --mermaid-tertiary-color: #2C5282;
+  --mermaid-note-bg-color: #1E3A5F;
+  --mermaid-note-border-color: #42A5F5;
+  --mermaid-text-color: #E0E0E0;
+}

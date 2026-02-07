@@ -2,6 +2,37 @@
 
 This guide helps you migrate existing deep learning projects to AutoTimm from other frameworks and libraries.
 
+## Migration Workflow Comparison
+
+```mermaid
+graph TB
+    subgraph "Pure PyTorch"
+        P1[Manual Data Loading] --> P2[Manual Model Setup]
+        P2 --> P3[Manual Training Loop]
+        P3 --> P4[Manual Logging]
+        P4 --> P5[Manual Checkpointing]
+        P5 --> P6[Manual Validation]
+    end
+    
+    subgraph "AutoTimm"
+        A1[ImageDataModule] --> A2[ImageClassifier]
+        A2 --> A3[AutoTrainer]
+        A3 --> A4[Automatic Everything]
+        A4 --> A5[Results]
+    end
+    
+    P6 -.Migration.-> A1
+    
+    style P1 fill:#757575,stroke:#424242,color:#fff
+    style P3 fill:#757575,stroke:#424242,color:#fff
+    style P5 fill:#757575,stroke:#424242,color:#fff
+    style A1 fill:#2196F3,stroke:#1976D2,color:#fff
+    style A2 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style A3 fill:#2196F3,stroke:#1976D2,color:#fff
+    style A4 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style A5 fill:#2196F3,stroke:#1976D2,color:#fff
+```
+
 ## From Pure PyTorch
 
 ### Before: Pure PyTorch

@@ -1,91 +1,45 @@
 # Logging and Metrics Examples
 
-This page demonstrates logging configurations, MLflow tracking, and detailed evaluation metrics.
+Quick examples for logging and evaluation. For comprehensive documentation, see the [Logging Guide](../../user-guide/guides/logging.md) and [Metrics Guide](../../user-guide/evaluation/metrics.md).
 
 ## Multiple Loggers
-
-Log to TensorBoard and CSV simultaneously.
 
 ```python
 from autotimm import AutoTrainer, LoggerConfig
 
-
-def main():
-    trainer = AutoTrainer(
-        max_epochs=10,
-        logger=[
-            LoggerConfig(backend="tensorboard", params={"save_dir": "logs/tb"}),
-            LoggerConfig(backend="csv", params={"save_dir": "logs/csv"}),
-        ],
-    )
-
-    trainer.fit(model, datamodule=data)
-
-
-if __name__ == "__main__":
-    main()
+trainer = AutoTrainer(
+    max_epochs=10,
+    logger=[
+        LoggerConfig(backend="tensorboard", params={"save_dir": "logs/tb"}),
+        LoggerConfig(backend="csv", params={"save_dir": "logs/csv"}),
+    ],
+)
+trainer.fit(model, datamodule=data)
 ```
 
-**Available Loggers:**
-
-| Logger | Backend | Key Parameters |
-|--------|---------|----------------|
-| TensorBoard | `tensorboard` | `save_dir`, `name`, `version` |
-| Weights & Biases | `wandb` | `project`, `name`, `entity` |
-| MLflow | `mlflow` | `experiment_name`, `tracking_uri` |
-| CSV | `csv` | `save_dir`, `name`, `version` |
+📖 **[Full Logging Documentation](../../user-guide/guides/logging.md)** - All logger backends, configurations, and features.
 
 ---
 
 ## MLflow Tracking
 
-Track experiments with MLflow.
-
 ```python
 from autotimm import AutoTrainer, LoggerConfig
 
-
-def main():
-    trainer = AutoTrainer(
-        max_epochs=10,
-        logger=[
-            LoggerConfig(
-                backend="mlflow",
-                params={
-                    "experiment_name": "cifar10-experiments",
-                    "tracking_uri": "http://localhost:5000",
-                    "tags": {"model": "resnet50", "dataset": "cifar10"},
-                },
-            ),
-        ],
-    )
-
-    trainer.fit(model, datamodule=data)
-
-
-if __name__ == "__main__":
-    main()
+trainer = AutoTrainer(
+    max_epochs=10,
+    logger=[
+        LoggerConfig(
+            backend="mlflow",
+            params={
+                "experiment_name": "cifar10-experiments",
+                "tracking_uri": "http://localhost:5000",
+            },
+        ),
+    ],
+)
+trainer.fit(model, datamodule=data)
 ```
-
-**MLflow Setup:**
-
-```bash
-# Install MLflow
-pip install mlflow
-
-# Start MLflow UI
-mlflow ui --port 5000
-
-# Access at http://localhost:5000
-```
-
-**MLflow Features:**
-
-- Experiment tracking and comparison
-- Model versioning and registry
-- Hyperparameter logging
-- Artifact storage (models, plots, etc.)
-- Remote tracking server support
 
 ---
 

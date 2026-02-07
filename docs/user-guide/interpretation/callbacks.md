@@ -502,62 +502,12 @@ feature_callback = FeatureMonitorCallback(
 
 ## Troubleshooting
 
-### Interpretations Not Logged
+For interpretation callback issues, see the [Troubleshooting - Interpretation](../../troubleshooting/task-specific/interpretation.md) including:
 
-**Problem:** No images appear in TensorBoard/W&B
-
-**Solutions:**
-1. Check that logger is configured correctly
-2. Verify `log_every_n_epochs` settings
-3. Ensure training runs for enough epochs
-4. Check logger output directory
-
-```python
-# Debug: Print when logging occurs
-interp_callback.log_every_n_epochs = 1  # Log every epoch
-```
-
-### Feature Monitoring Not Working
-
-**Problem:** No feature statistics in logs
-
-**Solutions:**
-1. Verify layer names are correct:
-   ```python
-   for name, _ in model.named_modules():
-       print(name)
-   ```
-2. Check that epochs meet logging criteria
-3. Ensure model is actually training (not just validating)
-
-### High Memory Usage
-
-**Problem:** Training runs out of memory
-
-**Solutions:**
-```python
-# Reduce number of samples
-interp_callback = InterpretationCallback(
-    sample_images=sample_images[:4],  # Fewer samples
-    num_samples=4,
-)
-
-# Reduce monitored batches
-feature_callback = FeatureMonitorCallback(
-    layer_names=["backbone.layer4"],
-    num_batches=5,  # Fewer batches
-)
-```
-
-### Slow Training
-
-**Problem:** Training significantly slower with callbacks
-
-**Solutions:**
-```python
-# Log less frequently
-interp_callback = InterpretationCallback(
-    sample_images=sample_images,
+- Interpretations not logged
+- Feature monitoring not working
+- High memory usage
+- Slow training with callbacks
     log_every_n_epochs=10,  # Less frequent
 )
 

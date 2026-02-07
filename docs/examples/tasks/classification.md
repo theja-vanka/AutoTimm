@@ -2,6 +2,32 @@
 
 This page demonstrates image classification tasks using AutoTimm.
 
+## Classification Workflow
+
+```mermaid
+graph LR
+    A[Dataset] --> B[ImageDataModule]
+    
+    C[Backbone] --> D[ImageClassifier]
+    E[MetricConfig] --> F[MetricManager]
+    F --> D
+    
+    B --> G[AutoTrainer]
+    D --> G
+    H[LoggerConfig] --> G
+    
+    G --> I[Training]
+    I --> J[Validation]
+    J --> K[Testing]
+    K --> L[Results]
+    
+    style B fill:#2196F3,stroke:#1976D2,color:#fff
+    style D fill:#42A5F5,stroke:#1976D2,color:#fff
+    style F fill:#2196F3,stroke:#1976D2,color:#fff
+    style G fill:#42A5F5,stroke:#1976D2,color:#fff
+    style L fill:#2196F3,stroke:#1976D2,color:#fff
+```
+
 ## CIFAR-10 Classification
 
 Basic training with ResNet-18 on CIFAR-10 using MetricManager.

@@ -538,46 +538,12 @@ save_annotated_image("input.jpg", results, "output.jpg", class_names=COCO_CLASSE
 
 ## Common Issues
 
-### No Detections
+For object detection inference issues, see the [Troubleshooting - Export & Inference](../../troubleshooting/deployment/export-inference.md) including:
 
-**Problem:** Model returns empty results
-
-**Solutions:**
-```python
-# 1. Lower the score threshold
-pipeline = DetectionPipeline(score_threshold=0.1)
-
-# 2. Check image preprocessing
-# Ensure image is RGB
-image = Image.open("img.jpg").convert("RGB")
-
-# 3. Verify model is loaded correctly
-print(f"Model num_classes: {model.num_classes}")
-
-# 4. Check if objects are in the training classes
-```
-
-### Too Many Duplicate Detections
-
-**Problem:** Same object detected multiple times
-
-**Solutions:**
-```python
-# 1. Lower NMS threshold (stricter)
-model = ObjectDetector(nms_thresh=0.3)
-
-# 2. Increase score threshold
-pipeline = DetectionPipeline(score_threshold=0.5)
-```
-
-### Missing Small Objects
-
-**Problem:** Small objects not detected
-
-**Solutions:**
-```python
-# 1. Use larger image size
-pipeline = DetectionPipeline(image_size=800)
+- No detections
+- Too many duplicate detections
+- Missing small objects
+- Score threshold tuning
 
 # 2. Lower score threshold
 pipeline = DetectionPipeline(score_threshold=0.1)

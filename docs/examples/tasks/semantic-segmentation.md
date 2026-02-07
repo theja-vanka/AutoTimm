@@ -2,6 +2,46 @@
 
 Complete examples for training semantic segmentation models with AutoTimm.
 
+## Semantic Segmentation Architecture
+
+```mermaid
+graph TB
+    A[Input Image] --> B[Backbone]
+    
+    B --> C{Head Type}
+    
+    C -->|DeepLabV3+| D1[ASPP Module]
+    C -->|FCN| D2[FCN Head]
+    C -->|UPerNet| D3[UPerNet Head]
+    
+    D1 --> E1[Decoder]
+    E1 --> F[Segmentation Map]
+    
+    D2 --> F
+    D3 --> F
+    
+    F --> G{Loss}
+    
+    G --> H1[Cross-Entropy]
+    G --> H2[Dice Loss]
+    
+    H1 --> I[Combined Loss]
+    H2 --> I
+    
+    I --> J[Backprop]
+    
+    F --> K{Metrics}
+    K --> L1[mIoU]
+    K --> L2[Pixel Accuracy]
+    K --> L3[Dice Score]
+    
+    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style B fill:#42A5F5,stroke:#1976D2,color:#fff
+    style D1 fill:#2196F3,stroke:#1976D2,color:#fff
+    style F fill:#42A5F5,stroke:#1976D2,color:#fff
+    style I fill:#2196F3,stroke:#1976D2,color:#fff
+```
+
 ## Basic Example: Cityscapes
 
 Train DeepLabV3+ on Cityscapes dataset for urban scene segmentation.

@@ -167,20 +167,12 @@ python examples/computer_vision/explore_yolox_models.py
 
 ## Troubleshooting
 
-### CUDA Out of Memory
-- Reduce batch size
-- Use gradient accumulation
-- Use smaller model
+For YOLOX-specific issues, see the [Troubleshooting Guide](troubleshooting.md#yolox-training-issues) including:
 
-### Slow Training
-- Use mixed precision (`precision="16-mixed"`)
-- Reduce image size
-- Use fewer workers
-
-### Poor Performance
-- Use official settings
-- Train for full 300 epochs
-- Use batch size 64 (scale LR accordingly)
+- CUDA out of memory
+- Slow training
+- Poor performance
+- Batch size and settings optimization
 
 ## Quick Comparison
 

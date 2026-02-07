@@ -2,6 +2,48 @@
 
 AutoTimm is designed with reproducibility as a first-class feature. This guide covers everything you need to know about achieving consistent, reproducible results in your experiments.
 
+## Reproducibility Workflow
+
+```mermaid
+graph TB
+    A[Experiment] --> B{Seed Sources}
+    
+    B --> C1[Model seed=42]
+    B --> C2[Trainer seed=42]
+    B --> C3[Manual seed_everything]
+    
+    C1 --> D[seed_everything]
+    C2 --> D
+    C3 --> D
+    
+    D --> E1[Python Random]
+    D --> E2[NumPy Random]
+    D --> E3[PyTorch Random]
+    D --> E4[CUDA Random]
+    
+    E1 --> F[Deterministic Mode]
+    E2 --> F
+    E3 --> F
+    E4 --> F
+    
+    F --> G1[cuDNN Deterministic]
+    F --> G2[cuDNN Benchmark OFF]
+    F --> G3[Dataloader Workers]
+    
+    G1 --> H[Reproducible Results]
+    G2 --> H
+    G3 --> H
+    
+    H --> I{Verification}
+    I --> J1[Same Seed → Same Results]
+    I --> J2[Different Seed → Different Results]
+    
+    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style D fill:#42A5F5,stroke:#1976D2,color:#fff
+    style F fill:#2196F3,stroke:#1976D2,color:#fff
+    style H fill:#42A5F5,stroke:#1976D2,color:#fff
+```
+
 ## Why Reproducibility Matters
 
 - **Research**: Essential for publishing papers and validating results
@@ -413,59 +455,11 @@ assert not torch.allclose(x3, x4)  # True!
 
 ## Common Issues
 
-### Issue: Results still vary slightly
+For reproducibility issues, see the [Troubleshooting Guide](troubleshooting.md#reproducibility-issues) including:
 
-**Possible causes:**
-
-1. Deterministic mode disabled
-2. Different hardware/drivers
-3. Non-deterministic operations
-
-**Solution:**
-
-
-```python
-# Enable strict deterministic mode
-model = ImageClassifier(
-    backbone="resnet50",
-    num_classes=10,
-    seed=42,
-    deterministic=True,  # Make sure this is True
-)
-
-# Disable torch.compile if needed
-model = ImageClassifier(
-    backbone="resnet50",
-    num_classes=10,
-    seed=42,
-    deterministic=True,
-    compile_model=False,  # Disable compilation
-)
-```
-
-### Issue: Training is too slow
-
-**Solution:**
-
-```python
-# Use deterministic=False for faster training
-model = ImageClassifier(
-    backbone="resnet50",
-    num_classes=10,
-    seed=42,
-    deterministic=False,  # Faster but less reproducible
-)
-```
-
-### Issue: Different results on different GPUs
-
-**Cause:** Some operations are hardware-dependent
-
-**Solution:**
-
-- Use same GPU type for reproducibility
-- Document hardware in experiments
-- Accept small numerical differences
+- Results still vary slightly
+- Training is too slow with deterministic mode
+- Different results on different GPUs
 
 ## Performance Impact
 
@@ -502,10 +496,10 @@ Expected training time impact:
 
 ## Examples
 
-See complete working examples:
+See complete working examples in the repository:
 
-- [examples/utilities/reproducibility.py](../../../examples/utilities/reproducibility.py) - Comprehensive examples
-- [examples/utilities/test_seeding.py](../../../examples/utilities/test_seeding.py) - Seeding tests
+- `examples/utilities/reproducibility.py` - Comprehensive examples (9 patterns)
+- `examples/utilities/test_seeding.py` - Seeding verification tests
 
 ## API Reference
 

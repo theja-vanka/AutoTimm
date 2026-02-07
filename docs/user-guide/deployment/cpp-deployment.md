@@ -609,37 +609,11 @@ docker run -v $(pwd)/model.pt:/app/model.pt autotimm-inference
 
 ## Troubleshooting
 
-### Issue: "undefined symbol" errors
+For C++ deployment issues, see the [Troubleshooting - Production Deployment](../../troubleshooting/deployment/production.md) including:
 
-**Solution:** Ensure you're using the correct LibTorch ABI:
-
-```bash
-# Check your compiler's ABI
-g++ --version
-
-# Use cxx11-abi version for modern compilers
-wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-latest.zip
-```
-
-### Issue: "CUDA error: no kernel image available"
-
-**Solution:** Match LibTorch CUDA version with your system:
-
-```bash
-# Check CUDA version
-nvidia-smi
-
-# Download matching LibTorch (e.g., CUDA 11.8)
-wget https://download.pytorch.org/libtorch/cu118/libtorch-cxx11-abi-shared-with-deps-latest.zip
-```
-
-### Issue: Slow CPU inference
-
-**Solution:** Enable optimizations:
-
-```cmake
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native")
-```
+- Undefined symbol errors
+- CUDA error: no kernel image available
+- Slow CPU inference
 
 ## Examples
 

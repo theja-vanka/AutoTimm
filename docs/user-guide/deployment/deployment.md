@@ -2,6 +2,40 @@
 
 This guide covers deploying AutoTimm models to production environments, including model export, optimization, containerization, and serving.
 
+## Deployment Options
+
+```mermaid
+graph TB
+    A[Trained Model] --> B{Deployment Target}
+    
+    B -->|Python/PyTorch| C[TorchScript]
+    B -->|Cross-Platform| D[ONNX]
+    B -->|NVIDIA GPU| E[TensorRT]
+    B -->|Mobile| F[Mobile Export]
+    B -->|Edge Devices| G[Quantized Models]
+    
+    C --> H1[LibTorch C++]
+    C --> H2[PyTorch Mobile]
+    
+    D --> I1[ONNX Runtime]
+    D --> I2[OpenVINO]
+    D --> I3[TensorRT]
+    
+    E --> J[Optimized NVIDIA]
+    
+    F --> K1[iOS]
+    F --> K2[Android]
+    
+    G --> L[INT8/FP16]
+    
+    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style C fill:#42A5F5,stroke:#1976D2,color:#fff
+    style D fill:#2196F3,stroke:#1976D2,color:#fff
+    style E fill:#42A5F5,stroke:#1976D2,color:#fff
+    style F fill:#2196F3,stroke:#1976D2,color:#fff
+    style G fill:#42A5F5,stroke:#1976D2,color:#fff
+```
+
 ## Model Export Overview
 
 | Format | Use Case | Pros | Cons |
@@ -16,96 +50,38 @@ This guide covers deploying AutoTimm models to production environments, includin
 
 TorchScript serializes PyTorch models for deployment without Python dependencies.
 
-### Trace Mode (Recommended)
-
-Trace mode captures the execution graph by running the model with example input.
+### Quick Example
 
 ```python
+from autotimm import ImageClassifier, export_to_torchscript
 import torch
-from autotimm import ImageClassifier, MetricConfig
 
+# Load trained model
+model = ImageClassifier.load_from_checkpoint("model.ckpt")
 
-def export_torchscript_trace(checkpoint_path, output_path, backbone, num_classes, image_size=224):
-    """Export model using TorchScript trace mode."""
-    # Load model
-    metrics = [
-        MetricConfig(
-            name="accuracy",
-            backend="torchmetrics",
-            metric_class="Accuracy",
-            params={"task": "multiclass"},
-            stages=["val"],
-        )
-    ]
-
-    model = ImageClassifier.load_from_checkpoint(
-        checkpoint_path,
-        backbone=backbone,
-        num_classes=num_classes,
-        metrics=metrics,
-    )
-    model.eval()
-
-    # Create example input
-    example_input = torch.randn(1, 3, image_size, image_size)
-
-    # Trace the model
-    with torch.no_grad():
-        traced_model = torch.jit.trace(model, example_input)
-
-    # Optimize for inference
-    traced_model = torch.jit.optimize_for_inference(traced_model)
-
-    # Save
-    traced_model.save(output_path)
-    print(f"Saved TorchScript model to {output_path}")
-
-    return traced_model
-
-
-# Usage
-model = export_torchscript_trace(
-    checkpoint_path="checkpoints/best.ckpt",
-    output_path="model_traced.pt",
-    backbone="resnet50",
-    num_classes=10,
+# Export to TorchScript
+example_input = torch.randn(1, 3, 224, 224)
+export_to_torchscript(
+    model,
+    "model.pt",
+    example_input=example_input
 )
 ```
 
-### Script Mode
-
-Script mode preserves control flow (if/else, loops). Use when your model has dynamic behavior.
+### Loading and Inference
 
 ```python
 import torch
 
-
-def export_torchscript_script(model, output_path):
-    """Export model using TorchScript script mode."""
-    model.eval()
-
-    # Script the model
-    scripted_model = torch.jit.script(model)
-
-    # Save
-    scripted_model.save(output_path)
-
-    return scripted_model
-```
-
-### Loading TorchScript Models
-
-```python
-import torch
-
-# Load model (no need for original model definition)
-model = torch.jit.load("model_traced.pt")
+# Load model (no AutoTimm dependency needed)
+model = torch.jit.load("model.pt")
 model.eval()
 
-# Inference
 with torch.no_grad():
     output = model(input_tensor)
 ```
+
+📖 **[Complete TorchScript Export Guide](torchscript-export.md)** - Detailed documentation including trace vs script modes, optimization, and troubleshooting.
 
 ---
 
@@ -885,4 +861,4 @@ if __name__ == "__main__":
 
 - [Model Export](../inference/model-export.md) - Detailed export documentation
 - [Benchmarks](../evaluation/benchmarks.md) - Model performance comparison
-- [Troubleshooting](../guides/troubleshooting.md) - Common deployment issues
+- [Troubleshooting](../../troubleshooting/deployment/production.md) - Common deployment issues

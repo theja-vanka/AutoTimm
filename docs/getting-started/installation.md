@@ -97,25 +97,9 @@ If CUDA is not available, install PyTorch with CUDA support from [pytorch.org](h
 
 ## Troubleshooting
 
-### ImportError: No module named 'timm'
+For common installation issues, see the [Troubleshooting - Installation](../troubleshooting/environment/installation.md) which covers:
 
-```bash
-pip install timm>=1.0
-```
-
-### CUDA out of memory
-
-Reduce batch size or use gradient accumulation:
-
-```python
-trainer = AutoTrainer(
-    max_epochs=10,
-    accumulate_grad_batches=4,  # Simulate larger batch
-)
-```
-
-### Albumentations not found
-
-```bash
-pip install autotimm[albumentations]
-```
+- ImportError: No module named 'timm'
+- CUDA out of memory
+- Albumentations not found
+- And more installation-related issues

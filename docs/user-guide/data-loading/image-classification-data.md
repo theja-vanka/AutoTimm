@@ -2,6 +2,46 @@
 
 The `ImageDataModule` handles image classification datasets including built-in datasets (CIFAR, MNIST) and custom folder-structured datasets.
 
+## Data Loading Flow
+
+```mermaid
+graph LR
+    A[Data Source] --> B{Dataset Type}
+    
+    B -->|Built-in| C1[CIFAR/MNIST]
+    B -->|Custom| C2[ImageFolder]
+    
+    C1 --> D[Auto Download]
+    C2 --> E[Scan Directories]
+    
+    D --> F[ImageDataModule]
+    E --> F
+    
+    F --> G{Split Strategy}
+    
+    G -->|Has val/| H1[Use val/ folder]
+    G -->|No val/| H2[Auto split val_split=0.1]
+    
+    H1 --> I[Train/Val/Test Splits]
+    H2 --> I
+    
+    I --> J[TransformConfig]
+    
+    J -->|Train| K1[Augmentation]
+    J -->|Val/Test| K2[Resize + Normalize]
+    
+    K1 --> L[DataLoader]
+    K2 --> L
+    
+    L --> M[Batches]
+    
+    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style F fill:#42A5F5,stroke:#1976D2,color:#fff
+    style J fill:#2196F3,stroke:#1976D2,color:#fff
+    style L fill:#42A5F5,stroke:#1976D2,color:#fff
+    style M fill:#2196F3,stroke:#1976D2,color:#fff
+```
+
 ## Built-in Datasets
 
 Load standard datasets automatically:

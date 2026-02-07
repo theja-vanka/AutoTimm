@@ -388,34 +388,12 @@ assert torch.allclose(original_out, scripted_out, rtol=1e-5)
 
 ## Troubleshooting
 
-### Issue: "RuntimeError: Couldn't export module"
+For TorchScript export issues, see the [Troubleshooting - Export & Inference](../../troubleshooting/deployment/export-inference.md) including:
 
-**Solution:** Use `method="trace"` instead of `"script"`:
-
-```python
-export_to_torchscript(model, "model.pt", example_input, method="trace")
-```
-
-### Issue: "Model outputs don't match"
-
-**Solution:** Ensure model is in eval mode and dropout/batch_norm behave correctly:
-
-```python
-model.eval()  # Set to evaluation mode
-with torch.no_grad():
-    export_to_torchscript(model, "model.pt", example_input)
-```
-
-### Issue: "Dynamic control flow not captured"
-
-**Solution:** This is a limitation of tracing. Either:
-1. Use `method="script"` (if compatible)
-2. Restructure model to avoid dynamic control flow
-3. Use multiple exported models for different code paths
-
-### Issue: "Module has __getattr__ method"
-
-**Solution:** PyTorch Lightning modules are automatically handled. Ensure you're using the latest AutoTimm version.
+- RuntimeError: Couldn't export module
+- Model outputs don't match
+- Dynamic control flow not captured
+- Module has __getattr__ method
 
 ## Limitations
 

@@ -472,46 +472,9 @@ See the `examples/` directory for complete working examples:
 
 ## Troubleshooting
 
-### CUDA Out of Memory
+For YOLOX detector issues, see the [Troubleshooting - YOLOX](../../troubleshooting/task-specific/yolox.md) including:
 
-```python
-# Reduce batch size
-data = DetectionDataModule(batch_size=8, ...)  # Instead of 64
-
-# Use gradient accumulation
-trainer = AutoTrainer(accumulate_grad_batches=8, ...)  # Effective batch size: 8×8=64
-
-# Use smaller model
-model = YOLOXDetector(model_name="yolox-s", ...)  # Instead of yolox-l
-```
-
-### Slow Training
-
-```python
-# Use mixed precision
-trainer = AutoTrainer(precision="16-mixed", ...)
-
-# Reduce image size
-data = DetectionDataModule(image_size=416, ...)  # Instead of 640
-
-# Use fewer workers
-data = DetectionDataModule(num_workers=2, ...)
-```
-
-### Poor Performance
-
-```python
-# Use official YOLOX settings
-model = YOLOXDetector(
-    model_name="yolox-s",
-    lr=0.01,              # Official LR
-    optimizer="sgd",      # SGD, not AdamW
-    scheduler="yolox",    # YOLOX scheduler
-    total_epochs=300,     # Full training
-)
-
-# Ensure proper batch size
-data = DetectionDataModule(batch_size=64, ...)
-
-# Use data augmentation (when implemented)
-```
+- CUDA out of memory
+- Slow training
+- Poor performance
+- Proper settings configuration

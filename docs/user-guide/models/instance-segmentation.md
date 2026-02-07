@@ -487,37 +487,12 @@ trainer.test(model, datamodule=data)
 
 ## Troubleshooting
 
-### Out of Memory
+For instance segmentation issues, see the [Troubleshooting Overview](../../troubleshooting/index.md) including:
 
-Reduce batch size or image size:
-
-```python
-data = InstanceSegmentationDataModule(
-    data_dir="./coco",
-    image_size=512,  # Smaller
-    batch_size=2,    # Smaller
-)
-```
-
-### Slow Training
-
-- Use smaller backbone (ResNet-18, EfficientNet-B0)
-- Reduce image size
-- Enable mixed precision training
-- Reduce mask_size
-
-### Poor Mask Quality
-
-- Increase mask_loss_weight
-- Use larger image_size
-- Increase mask_size (e.g., 56 instead of 28)
-- Train longer
-
-### NaN Loss
-
-- Enable gradient clipping
-- Reduce learning rate
-- Check dataset annotations are valid
+- Out of memory
+- Slow training
+- Poor mask quality
+- NaN loss issues
 
 ## API Reference
 

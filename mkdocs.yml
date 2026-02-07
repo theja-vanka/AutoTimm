@@ -55,7 +55,11 @@ plugins:
 markdown_extensions:
   - admonition
   - pymdownx.details
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
@@ -126,9 +130,42 @@ nav:
       - Guides:
           - Reproducibility: user-guide/guides/reproducibility.md
           - Logging: user-guide/guides/logging.md
-          - Troubleshooting: user-guide/guides/troubleshooting.md
           - Migration Guide: user-guide/guides/migration.md
           - YOLOX Quick Reference: user-guide/guides/yolox-quick-reference.md
+  - Troubleshooting:
+      - Overview: troubleshooting/index.md
+      - Training Issues:
+          - NaN Losses: troubleshooting/training/nan-losses.md
+          - Convergence Problems: troubleshooting/training/convergence.md
+          - Gradient Issues: troubleshooting/training/gradient-issues.md
+          - LR Tuning Failures: troubleshooting/training/lr-tuning.md
+      - Performance Issues:
+          - OOM Errors: troubleshooting/performance/oom-errors.md
+          - Slow Training: troubleshooting/performance/slow-training.md
+          - Performance Profiling: troubleshooting/performance/profiling.md
+      - Data Issues:
+          - Data Loading: troubleshooting/data/data-loading.md
+          - Augmentation: troubleshooting/data/augmentation.md
+      - Model Issues:
+          - Model Loading: troubleshooting/models/model-loading.md
+          - Metrics: troubleshooting/models/metrics.md
+      - Deployment Issues:
+          - Export & Inference: troubleshooting/deployment/export-inference.md
+          - Production Deployment: troubleshooting/deployment/production.md
+      - Environment Issues:
+          - Device Errors: troubleshooting/environment/device-errors.md
+          - Installation: troubleshooting/environment/installation.md
+          - Distributed Training: troubleshooting/environment/distributed.md
+      - Integration Issues:
+          - Loggers: troubleshooting/integration/loggers.md
+          - HuggingFace: troubleshooting/integration/huggingface.md
+          - Reproducibility: troubleshooting/integration/reproducibility.md
+      - Task-Specific Issues:
+          - YOLOX: troubleshooting/task-specific/yolox.md
+          - Interpretation: troubleshooting/task-specific/interpretation.md
+      - Quick Reference:
+          - Error Reference: troubleshooting/reference/error-reference.md
+          - Warnings: troubleshooting/reference/warnings.md
   - API Reference:
       - Overview: api/index.md
       - Tasks:
@@ -177,6 +214,12 @@ nav:
 
 extra:
   generator: false
+
+extra_javascript:
+  - https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js
+
+extra_css:
+  - stylesheets/mermaid.css
 
 copyright: |
   Copyright &copy; 2026 <a href="https://github.com/theja-vanka" target="_blank">Krishnatheja Vanka</a>.
