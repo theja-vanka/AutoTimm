@@ -1,5 +1,6 @@
 """Tests for model export functionality."""
 
+import os
 import tempfile
 from pathlib import Path
 
@@ -16,7 +17,7 @@ from autotimm.export import (
 from autotimm.metrics import MetricConfig
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(autouse=True, scope="function")
 def reset_deterministic_mode():
     """Reset deterministic mode before each test.
 
@@ -28,18 +29,53 @@ def reset_deterministic_mode():
     original_deterministic = torch.are_deterministic_algorithms_enabled()
     original_cudnn_deterministic = torch.backends.cudnn.deterministic
     original_cudnn_benchmark = torch.backends.cudnn.benchmark
+    original_cublas_allow_tf32 = None
+    original_cudnn_allow_tf32 = None
 
-    # Disable deterministic algorithms for TorchScript compatibility
-    torch.use_deterministic_algorithms(False)
+    # Save TF32 settings if available (PyTorch >= 1.7)
+    try:
+        original_cublas_allow_tf32 = torch.backends.cuda.matmul.allow_tf32
+        original_cudnn_allow_tf32 = torch.backends.cudnn.allow_tf32
+    except AttributeError:
+        pass
+
+    # Disable all deterministic algorithms aggressively
+    try:
+        torch.use_deterministic_algorithms(False, warn_only=False)
+    except TypeError:
+        # PyTorch < 1.11 doesn't have warn_only parameter
+        torch.use_deterministic_algorithms(False)
+
     torch.backends.cudnn.deterministic = False
     torch.backends.cudnn.benchmark = True
+
+    # Enable TF32 if available (helps with performance and compatibility)
+    try:
+        torch.backends.cuda.matmul.allow_tf32 = True
+        torch.backends.cudnn.allow_tf32 = True
+    except AttributeError:
+        pass
+
+    # Clear any CUBLAS workspace configuration that might interfere
+    if "CUBLAS_WORKSPACE_CONFIG" in os.environ:
+        del os.environ["CUBLAS_WORKSPACE_CONFIG"]
 
     yield
 
     # Restore original state after test
-    torch.use_deterministic_algorithms(original_deterministic)
+    try:
+        torch.use_deterministic_algorithms(original_deterministic, warn_only=False)
+    except TypeError:
+        torch.use_deterministic_algorithms(original_deterministic)
+
     torch.backends.cudnn.deterministic = original_cudnn_deterministic
     torch.backends.cudnn.benchmark = original_cudnn_benchmark
+
+    # Restore TF32 settings if available
+    if original_cublas_allow_tf32 is not None:
+        torch.backends.cuda.matmul.allow_tf32 = original_cublas_allow_tf32
+    if original_cudnn_allow_tf32 is not None:
+        torch.backends.cudnn.allow_tf32 = original_cudnn_allow_tf32
 
 
 @pytest.fixture
