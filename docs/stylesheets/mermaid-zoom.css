@@ -1,0 +1,154 @@
+/**
+ * Mermaid Diagram Zoom Controls Styling
+ */
+
+.mermaid-zoom-wrapper {
+    position: relative;
+    margin: 1em 0;
+    border: 1px solid var(--md-default-fg-color--lightest);
+    border-radius: 0.2rem;
+    padding: 0.5rem;
+    background: var(--md-code-bg-color);
+    overflow: hidden;
+}
+
+.mermaid-zoom-wrapper .mermaid {
+    overflow: visible;
+    transition: transform 0.2s ease-out;
+}
+
+.mermaid-zoom-controls {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    display: flex;
+    gap: 0.25rem;
+    z-index: 10;
+    background: var(--md-default-bg-color);
+    border-radius: 0.2rem;
+    padding: 0.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.zoom-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0.25rem;
+    background: var(--md-default-bg-color);
+    border: 1px solid var(--md-default-fg-color--lightest);
+    border-radius: 0.2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--md-default-fg-color);
+}
+
+.zoom-btn:hover {
+    background: var(--md-accent-fg-color);
+    color: var(--md-accent-bg-color);
+    border-color: var(--md-accent-fg-color);
+    transform: scale(1.05);
+}
+
+.zoom-btn:active {
+    transform: scale(0.95);
+}
+
+.zoom-btn svg {
+    width: 20px;
+    height: 20px;
+    display: block;
+}
+
+/* Fullscreen mode styling */
+.mermaid-zoom-wrapper.fullscreen-active {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    margin: 0;
+    border-radius: 0;
+    background: var(--md-default-bg-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-zoom-wrapper.fullscreen-active .mermaid {
+    max-width: 90vw;
+    max-height: 90vh;
+}
+
+.mermaid-zoom-wrapper.fullscreen-active .mermaid-zoom-controls {
+    top: 1rem;
+    right: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .mermaid-zoom-controls {
+        top: 0.25rem;
+        right: 0.25rem;
+        padding: 0.125rem;
+        gap: 0.125rem;
+    }
+
+    .zoom-btn {
+        width: 28px;
+        height: 28px;
+    }
+
+    .zoom-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+/* Dark mode adjustments */
+[data-md-color-scheme="slate"] .mermaid-zoom-wrapper {
+    border-color: var(--md-default-fg-color--lighter);
+}
+
+[data-md-color-scheme="slate"] .zoom-btn {
+    border-color: var(--md-default-fg-color--lighter);
+}
+
+[data-md-color-scheme="slate"] .zoom-btn:hover {
+    background: var(--md-accent-fg-color);
+    color: var(--md-default-bg-color);
+}
+
+/* Smooth transitions */
+.mermaid-zoom-wrapper svg {
+    transition: transform 0.2s ease-out;
+}
+
+/* User select prevention during drag */
+.mermaid-zoom-wrapper .mermaid svg {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+
+/* Accessibility improvements */
+.zoom-btn:focus {
+    outline: 2px solid var(--md-accent-fg-color);
+    outline-offset: 2px;
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .zoom-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .zoom-btn svg {
+        width: 22px;
+        height: 22px;
+    }
+}

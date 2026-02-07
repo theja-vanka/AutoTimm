@@ -1,5 +1,6 @@
 site_name: AutoTimm
-site_description: Automatic PyTorch Image Models
+site_description: AutoTimm - Automatic PyTorch Image Models for Computer Vision. Build, train, and deploy state-of-the-art models for image classification, object detection, and segmentation with minimal code.
+site_author: Krishnatheja Vanka
 site_url: https://theja-vanka.github.io/AutoTimm
 repo_name: theja-vanka/AutoTimm
 repo_url: https://github.com/theja-vanka/AutoTimm
@@ -38,7 +39,19 @@ theme:
     repo: fontawesome/brands/github
 
 plugins:
-  - search
+  - search:
+      lang: en
+      separator: '[\s\-\.]+'
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: date
+  - minify:
+      minify_html: true
+      minify_js: true
+      minify_css: true
+      htmlmin_opts:
+        remove_comments: true
+      cache_safe: true
   - mkdocstrings:
       handlers:
         python:
@@ -214,12 +227,31 @@ nav:
 
 extra:
   generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/theja-vanka/AutoTimm
+      name: AutoTimm on GitHub
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/autotimm/
+      name: AutoTimm on PyPI
+  analytics:
+    provider: google
+    property: !ENV GOOGLE_ANALYTICS_KEY
+  meta:
+    keywords: >-
+      PyTorch, Computer Vision, Deep Learning, Image Classification,
+      Object Detection, Semantic Segmentation, Instance Segmentation,
+      Transfer Learning, timm, YOLOX, AutoML, Machine Learning,
+      Neural Networks, CNN, Vision Transformer, Model Training,
+      Model Deployment, TorchScript
 
 extra_javascript:
   - https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js
+  - javascripts/mermaid-zoom.js
 
 extra_css:
   - stylesheets/mermaid.css
+  - stylesheets/mermaid-zoom.css
 
 copyright: |
   Copyright &copy; 2026 <a href="https://github.com/theja-vanka" target="_blank">Krishnatheja Vanka</a>.
