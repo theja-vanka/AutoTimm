@@ -130,7 +130,9 @@ def export_to_torchscript(
         # Use context manager to make Lightning modules TorchScript-compatible
         with _lightning_export_mode(model):
             # Wrap the model if requested (default for Lightning modules)
-            is_lightning = any("LightningModule" in cls.__name__ for cls in type(model).__mro__)
+            is_lightning = any(
+                "LightningModule" in cls.__name__ for cls in type(model).__mro__
+            )
             if wrap_model and is_lightning:
                 model_to_export = _ForwardWrapper(model)
             else:
@@ -153,7 +155,12 @@ def export_to_torchscript(
             else:
                 raise ValueError(f"Unknown method: {method}. Use 'trace' or 'script'.")
 
-        # Optimize for inference
+        # Save the model before optimization (optimize_for_inference can produce
+        # frozen modules that fail to deserialize with torch.jit.load)
+        save_path.parent.mkdir(parents=True, exist_ok=True)
+        torch.jit.save(scripted_model, str(save_path))
+
+        # Optimize for inference (in-memory only)
         if optimize:
             try:
                 scripted_model = torch.jit.optimize_for_inference(scripted_model)
@@ -164,10 +171,6 @@ def export_to_torchscript(
                     "Set optimize=False to suppress this warning.",
                     stacklevel=2,
                 )
-
-        # Save the model
-        save_path.parent.mkdir(parents=True, exist_ok=True)
-        torch.jit.save(scripted_model, str(save_path))
 
         print(f"✓ Model exported to TorchScript: {save_path}")
         return scripted_model

@@ -248,11 +248,13 @@ class AutoTrainer(pl.Trainer):
             if "seed_everything" not in trainer_kwargs:
                 # Pass seed to Lightning's Trainer
                 import pytorch_lightning as pl_seed
+
                 pl_seed.seed_everything(seed, workers=True)
                 # Note: Lightning doesn't have built-in deterministic parameter,
                 # so we still apply our deterministic settings
                 if deterministic:
                     import torch
+
                     torch.backends.cudnn.deterministic = True
                     torch.backends.cudnn.benchmark = False
 

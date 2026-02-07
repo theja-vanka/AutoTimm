@@ -2,14 +2,12 @@
 
 import os
 import tempfile
-from pathlib import Path
 
 import pytest
 import torch
 
 from autotimm import ImageClassifier
 from autotimm.export import (
-    export_checkpoint_to_torchscript,
     export_to_torchscript,
     load_torchscript,
     validate_torchscript_export,
@@ -106,7 +104,7 @@ def test_export_to_torchscript_trace(simple_classifier, tmp_path):
     save_path = tmp_path / "model.pt"
     example_input = torch.randn(1, 3, 224, 224)
 
-    scripted_model = export_to_torchscript(
+    export_to_torchscript(
         simple_classifier,
         save_path,
         example_input=example_input,
@@ -136,7 +134,7 @@ def test_export_to_torchscript_script(simple_classifier, tmp_path):
     save_path = tmp_path / "model.pt"
 
     # Script method doesn't require example input
-    scripted_model = export_to_torchscript(
+    export_to_torchscript(
         simple_classifier,
         save_path,
         method="script",
@@ -208,7 +206,7 @@ def test_model_to_torchscript_method(tmp_path):
     model.eval()
 
     save_path = tmp_path / "model.pt"
-    scripted = model.to_torchscript(str(save_path))
+    model.to_torchscript(str(save_path))
 
     # Check file was created
     assert save_path.exists()

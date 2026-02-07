@@ -52,7 +52,7 @@ From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-G
 <td width="33%">
 <h3 align="center">Production Ready</h3>
 <p align="center">
-200+ tests, comprehensive logging, checkpoint management. Deploy with confidence.
+365+ tests, comprehensive logging, checkpoint management. Deploy with confidence.
 </p>
 </td>
 </tr>
@@ -185,7 +185,7 @@ trainer.fit(model, datamodule=data)
 </tr>
 <tr>
 <td><strong>Production Ready</strong></td>
-<td>Mixed precision • Multi-GPU • Gradient accumulation • 200+ tests</td>
+<td>Mixed precision • Multi-GPU • Gradient accumulation • 365+ tests</td>
 </tr>
 </table>
 
@@ -751,7 +751,7 @@ Comprehensive documentation with **interactive diagrams**, search optimization, 
 
 ## Testing
 
-Comprehensive test suite with **200+ tests**:
+Comprehensive test suite with **365+ tests**:
 
 ```bash
 # Run all tests
