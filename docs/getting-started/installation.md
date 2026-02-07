@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- Python 3.10+
+- Python 3.10-3.14
 - PyTorch 2.0+
 - CUDA (optional, for GPU training)
 
@@ -24,10 +24,12 @@ This installs the core package with **all** vision task dependencies:
 - `pytorch-lightning>=2.0`
 - `torchmetrics>=1.0`
 - `numpy>=1.23`
-- `albumentations>=1.3` *(now included by default)*
-- `opencv-python-headless>=4.8` *(now included by default)*
-- `pycocotools>=2.0` *(now included by default)*
+- `albumentations>=1.3` *(included by default)*
+- `opencv-python-headless>=4.8` *(included by default)*
+- `pycocotools>=2.0` *(included by default)*
 - `huggingface_hub>=0.20`
+- `transformers>=4.30` *(included by default)*
+- `matplotlib>=3.7` *(included by default)*
 - `watermark>=2.3`
 - `rich>=13.0`
 
@@ -49,13 +51,24 @@ pip install autotimm[wandb]
 pip install autotimm[mlflow]
 ```
 
+#### Interactive Visualizations
+
+For interactive Plotly visualizations in model interpretation:
+
+```bash
+pip install autotimm[interactive]
+```
+
+This includes:
+- `plotly>=5.0` - Interactive plots with zoom/pan/hover
+
 #### Everything
 
 ```bash
 pip install autotimm[all]
 ```
 
-Includes all optional logger dependencies: tensorboard, mlflow, and wandb.
+Includes all optional dependencies: tensorboard, mlflow, wandb, and plotly.
 
 ## Development Installation
 

@@ -24,11 +24,22 @@ def reset_deterministic_mode():
     setting that persists across tests. Other tests may enable it via seed_everything(),
     which can cause TorchScript serialization to fail.
     """
+    # Save original state
+    original_deterministic = torch.are_deterministic_algorithms_enabled()
+    original_cudnn_deterministic = torch.backends.cudnn.deterministic
+    original_cudnn_benchmark = torch.backends.cudnn.benchmark
+
     # Disable deterministic algorithms for TorchScript compatibility
     torch.use_deterministic_algorithms(False)
+    torch.backends.cudnn.deterministic = False
+    torch.backends.cudnn.benchmark = True
+
     yield
-    # Reset to default state after test
-    torch.use_deterministic_algorithms(False)
+
+    # Restore original state after test
+    torch.use_deterministic_algorithms(original_deterministic)
+    torch.backends.cudnn.deterministic = original_cudnn_deterministic
+    torch.backends.cudnn.benchmark = original_cudnn_benchmark
 
 
 @pytest.fixture
