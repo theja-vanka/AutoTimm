@@ -690,6 +690,8 @@ print(f"Features: {backbone.num_features}, Params: {autotimm.count_parameters(ba
 
 ### Documentation
 
+Comprehensive documentation with **interactive diagrams**, search optimization, and fast navigation:
+
 | Section | Description |
 |---------|-------------|
 | [Quick Start](https://theja-vanka.github.io/AutoTimm/getting-started/quickstart/) | Get up and running in 5 minutes |
