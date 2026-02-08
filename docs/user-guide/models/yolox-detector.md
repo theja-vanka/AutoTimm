@@ -359,6 +359,36 @@ metrics = [
 model = YOLOXDetector(model_name="yolox-s", metrics=metrics, ...)
 ```
 
+### torch.compile (PyTorch 2.0+)
+
+**Enabled by default** for faster training and inference:
+
+```python
+# Default: torch.compile enabled
+model = YOLOXDetector(
+    model_name="yolox-s",
+    num_classes=80,
+)
+
+# Disable if needed
+model = YOLOXDetector(
+    model_name="yolox-s",
+    num_classes=80,
+    compile_model=False,
+)
+
+# Custom compile options
+model = YOLOXDetector(
+    model_name="yolox-s",
+    num_classes=80,
+    compile_kwargs={"mode": "reduce-overhead"},
+)
+```
+
+**What gets compiled:** CSPDarknet Backbone + YOLOXPAFPN Neck + YOLOX Head
+
+See [ImageClassifier](image-classifier.md#performance-optimization) for compile mode details.
+
 ### Inference
 
 ```python
@@ -373,7 +403,7 @@ model.eval()
 images = torch.randn(1, 3, 640, 640)
 
 # Run inference
-with torch.no_grad():
+with torch.inference_mode():
     predictions = model.predict(images)
 
 # Process results
@@ -442,46 +472,9 @@ See the `examples/` directory for complete working examples:
 
 ## Troubleshooting
 
-### CUDA Out of Memory
+For YOLOX detector issues, see the [Troubleshooting - YOLOX](../../troubleshooting/task-specific/yolox.md) including:
 
-```python
-# Reduce batch size
-data = DetectionDataModule(batch_size=8, ...)  # Instead of 64
-
-# Use gradient accumulation
-trainer = AutoTrainer(accumulate_grad_batches=8, ...)  # Effective batch size: 8×8=64
-
-# Use smaller model
-model = YOLOXDetector(model_name="yolox-s", ...)  # Instead of yolox-l
-```
-
-### Slow Training
-
-```python
-# Use mixed precision
-trainer = AutoTrainer(precision="16-mixed", ...)
-
-# Reduce image size
-data = DetectionDataModule(image_size=416, ...)  # Instead of 640
-
-# Use fewer workers
-data = DetectionDataModule(num_workers=2, ...)
-```
-
-### Poor Performance
-
-```python
-# Use official YOLOX settings
-model = YOLOXDetector(
-    model_name="yolox-s",
-    lr=0.01,              # Official LR
-    optimizer="sgd",      # SGD, not AdamW
-    scheduler="yolox",    # YOLOX scheduler
-    total_epochs=300,     # Full training
-)
-
-# Ensure proper batch size
-data = DetectionDataModule(batch_size=64, ...)
-
-# Use data augmentation (when implemented)
-```
+- CUDA out of memory
+- Slow training
+- Poor performance
+- Proper settings configuration

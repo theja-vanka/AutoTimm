@@ -2,6 +2,36 @@
 
 This guide compares the different approaches for using HuggingFace models with AutoTimm, PyTorch Lightning, and AutoTrainer.
 
+## Integration Approaches
+
+```mermaid
+graph TB
+    A[HuggingFace Models] --> B{Integration Type}
+    
+    B -->|Option 1| C[HF Hub timm]
+    B -->|Option 2| D[HF Transformers Direct]
+    B -->|Option 3| E[HF Auto Classes]
+    
+    C --> F1[timm + hf_hub]
+    C --> G1[ImageClassifier]
+    G1 --> H1[AutoTrainer ✓]
+    
+    D --> F2[transformers]
+    D --> G2[Custom LightningModule]
+    G2 --> H2[AutoTrainer ✓]
+    
+    E --> F3[transformers]
+    E --> G3[Custom LightningModule]
+    G3 --> H3[AutoTrainer ✓]
+    
+    style C fill:#2196F3,stroke:#1976D2,color:#fff
+    style D fill:#42A5F5,stroke:#1976D2,color:#fff
+    style E fill:#2196F3,stroke:#1976D2,color:#fff
+    style H1 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style H2 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style H3 fill:#42A5F5,stroke:#1976D2,color:#fff
+```
+
 ## Quick Reference
 
 AutoTimm provides three distinct ways to work with HuggingFace models:

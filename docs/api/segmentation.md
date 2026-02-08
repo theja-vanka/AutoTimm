@@ -469,7 +469,7 @@ tensor = model.preprocess(image)  # Returns preprocessed tensor
 
 # Run inference
 model.eval()
-with torch.no_grad():
+with torch.inference_mode():
     predictions = model(tensor)
 ```
 

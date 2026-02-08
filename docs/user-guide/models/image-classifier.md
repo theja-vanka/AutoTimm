@@ -267,6 +267,60 @@ trainer = AutoTrainer(max_epochs=20, gradient_clip_val=1.0)
 trainer.fit(model, datamodule=data)
 ```
 
+## Performance Optimization
+
+### torch.compile (PyTorch 2.0+)
+
+**Enabled by default** for automatic optimization:
+
+```python
+# Default: torch.compile enabled
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    metrics=metrics,
+)
+```
+
+Disable if needed:
+
+```python
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    metrics=metrics,
+    compile_model=False,
+)
+```
+
+Custom compile options:
+
+```python
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    metrics=metrics,
+    compile_kwargs={
+        "mode": "reduce-overhead",  # "default", "reduce-overhead", "max-autotune"
+        "fullgraph": True,           # Try to compile entire graph
+        "dynamic": False,            # Dynamic shapes
+    },
+)
+```
+
+**Compile Modes:**
+
+- `"default"` - Balanced performance (recommended)
+- `"reduce-overhead"` - Lower latency, better for smaller batches or inference
+- `"max-autotune"` - Maximum optimization with longer compile time
+
+**What gets compiled:**
+
+- Backbone network
+- Classification head
+
+**Note:** First training/inference run will be slower due to compilation overhead. Subsequent runs benefit from optimization. Falls back gracefully on PyTorch < 2.0.
+
 ## Full Parameter Reference
 
 ```python
@@ -285,6 +339,8 @@ ImageClassifier(
     label_smoothing=0.0,           # Label smoothing factor
     freeze_backbone=False,         # Freeze backbone weights
     mixup_alpha=0.0,               # Mixup augmentation alpha
+    compile_model=True,            # Enable torch.compile (PyTorch 2.0+)
+    compile_kwargs=None,           # Custom torch.compile options
 )
 ```
 

@@ -142,7 +142,7 @@ def inspect_backbone(model_name):
     print(f"  Output features: {backbone.num_features}")
     
     dummy_input = torch.randn(1, 3, 224, 224)
-    with torch.no_grad():
+    with torch.inference_mode():
         output = backbone(dummy_input)
     print(f"  Output shape: {output.shape}\n")
 

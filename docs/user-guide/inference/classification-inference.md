@@ -46,7 +46,7 @@ image = Image.open("image.jpg")
 input_tensor = model.preprocess(image)  # Returns (1, 3, 224, 224)
 
 # Predict
-with torch.no_grad():
+with torch.inference_mode():
     logits = model(input_tensor)
     probabilities = torch.softmax(logits, dim=1)
     predicted_class = probabilities.argmax(dim=1).item()
@@ -79,7 +79,7 @@ image = Image.open("image.jpg").convert("RGB")
 input_tensor = transform(image).unsqueeze(0)  # Add batch dimension
 
 # Predict
-with torch.no_grad():
+with torch.inference_mode():
     logits = model(input_tensor)
     probabilities = torch.softmax(logits, dim=1)
     predicted_class = probabilities.argmax(dim=1).item()
@@ -115,7 +115,7 @@ input_tensor = model.preprocess(images)  # Returns (4, 3, 224, 224)
 
 # Predict
 model.eval()
-with torch.no_grad():
+with torch.inference_mode():
     logits = model(input_tensor)
     probs = torch.softmax(logits, dim=1)
     preds = probs.argmax(dim=1)
@@ -146,7 +146,7 @@ model.eval()
 all_predictions = []
 all_probabilities = []
 
-with torch.no_grad():
+with torch.inference_mode():
     for images, _ in dataloader:
         logits = model(images)
         probs = torch.softmax(logits, dim=1)
@@ -185,7 +185,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = model.to(device)
 model.eval()
 
-with torch.no_grad():
+with torch.inference_mode():
     input_tensor = input_tensor.to(device)
     logits = model(input_tensor)
     probabilities = torch.softmax(logits, dim=1)
@@ -207,7 +207,7 @@ Get the top K most likely classes:
 def get_topk_predictions(model, image_tensor, k=5, class_names=None):
     """Get top-k predictions with class names and probabilities."""
     model.eval()
-    with torch.no_grad():
+    with torch.inference_mode():
         logits = model(image_tensor)
         probs = torch.softmax(logits, dim=1)
         topk_probs, topk_indices = probs.topk(k, dim=1)
@@ -293,7 +293,7 @@ class InferencePipeline:
         input_tensor = self.model.preprocess(image).to(self.device)
 
         # Predict
-        with torch.no_grad():
+        with torch.inference_mode():
             logits = self.model(input_tensor)
             probs = torch.softmax(logits, dim=1)
 
@@ -326,7 +326,7 @@ class InferencePipeline:
         image = Image.open(image_path).convert("RGB")
         input_tensor = self.transform(image).unsqueeze(0).to(self.device)
 
-        with torch.no_grad():
+        with torch.inference_mode():
             logits = self.model(input_tensor)
             probs = torch.softmax(logits, dim=1)
 
@@ -384,7 +384,7 @@ def predict_batch_efficient(model, image_paths, transform, device, batch_size=32
         batch_tensor = torch.stack(images).to(device)
 
         # Predict
-        with torch.no_grad():
+        with torch.inference_mode():
             logits = model(batch_tensor)
             probs = torch.softmax(logits, dim=1)
             preds = probs.argmax(dim=1)
@@ -405,7 +405,7 @@ model = model.half()
 # Convert input to half precision
 input_tensor = input_tensor.half()
 
-with torch.no_grad():
+with torch.inference_mode():
     logits = model(input_tensor)
 ```
 
@@ -426,21 +426,21 @@ model = torch.compile(model, mode="reduce-overhead")
 
 # First run is slower (compilation)
 # Subsequent runs are faster
-with torch.no_grad():
+with torch.inference_mode():
     output = model(input_tensor)
 ```
 
 ### 4. Disable Gradient Tracking
 
-Always use `torch.no_grad()` for inference:
+Always use `torch.inference_mode()` for inference:
 
 ```python
 # Good - saves memory
-with torch.no_grad():
+with torch.inference_mode():
     output = model(input_tensor)
 
 # Also good
-@torch.no_grad()
+@torch.inference_mode()
 def predict(model, input_tensor):
     return model(input_tensor)
 
@@ -452,52 +452,12 @@ output = model(input_tensor)  # Don't do this for inference!
 
 ## Common Issues
 
-### Out of Memory
+For classification inference issues, see the [Troubleshooting - Export & Inference](../../troubleshooting/deployment/export-inference.md) including:
 
-**Problem:** CUDA out of memory error
-
-**Solutions:**
-```python
-# 1. Reduce batch size
-batch_size = 16  # Instead of 32
-
-# 2. Use smaller image size
-transform = transforms.Resize(224)  # Instead of 384
-
-# 3. Clear cache between batches
-torch.cuda.empty_cache()
-
-# 4. Use CPU for very large images
-device = torch.device("cpu")
-```
-
-### Slow Inference
-
-**Problem:** Predictions are too slow
-
-**Solutions:**
-```python
-# 1. Use GPU
-device = torch.device("cuda")
-
-# 2. Increase batch size
-batch_size = 64
-
-# 3. Use half precision
-model = model.half()
-
-# 4. Pre-load model
-# Keep model in memory between predictions
-# Don't reload for each image
-```
-
-### Wrong Predictions
-
-**Problem:** Model predictions don't match training performance
-
-**Solutions:**
-```python
-# 1. Check transforms match training
+- Out of memory
+- Slow inference
+- Wrong predictions
+- Batch processing issues
 # Use exact same normalization as training
 
 # 2. Ensure model is in eval mode

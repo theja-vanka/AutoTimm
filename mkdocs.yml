@@ -1,5 +1,6 @@
 site_name: AutoTimm
-site_description: Automatic PyTorch Image Models
+site_description: AutoTimm - Automatic PyTorch Image Models for Computer Vision. Build, train, and deploy state-of-the-art models for image classification, object detection, and segmentation with minimal code.
+site_author: Krishnatheja Vanka
 site_url: https://theja-vanka.github.io/AutoTimm
 repo_name: theja-vanka/AutoTimm
 repo_url: https://github.com/theja-vanka/AutoTimm
@@ -26,6 +27,8 @@ theme:
   features:
     - navigation.instant
     - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.sections
     - navigation.top
     - search.suggest
@@ -36,7 +39,19 @@ theme:
     repo: fontawesome/brands/github
 
 plugins:
-  - search
+  - search:
+      lang: en
+      separator: '[\s\-\.]+'
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: date
+  - minify:
+      minify_html: true
+      minify_js: true
+      minify_css: true
+      htmlmin_opts:
+        remove_comments: true
+      cache_safe: true
   - mkdocstrings:
       handlers:
         python:
@@ -53,7 +68,11 @@ plugins:
 markdown_extensions:
   - admonition
   - pymdownx.details
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
@@ -112,6 +131,9 @@ nav:
           - HF Transformers Integration: user-guide/integration/huggingface-transformers-integration.md
       - Deployment:
           - Production Deployment: user-guide/deployment/deployment.md
+          - TorchScript Export: user-guide/deployment/torchscript-export.md
+          - C++ Deployment: user-guide/deployment/cpp-deployment.md
+          - Mobile Deployment: user-guide/deployment/mobile-deployment.md
       - Inference:
           - Overview: user-guide/inference/index.md
           - Classification Inference: user-guide/inference/classification-inference.md
@@ -119,10 +141,44 @@ nav:
           - Segmentation Inference: user-guide/inference/semantic-segmentation-inference.md
           - Model Export: user-guide/inference/model-export.md
       - Guides:
+          - Reproducibility: user-guide/guides/reproducibility.md
           - Logging: user-guide/guides/logging.md
-          - Troubleshooting: user-guide/guides/troubleshooting.md
           - Migration Guide: user-guide/guides/migration.md
           - YOLOX Quick Reference: user-guide/guides/yolox-quick-reference.md
+  - Troubleshooting:
+      - Overview: troubleshooting/index.md
+      - Training Issues:
+          - NaN Losses: troubleshooting/training/nan-losses.md
+          - Convergence Problems: troubleshooting/training/convergence.md
+          - Gradient Issues: troubleshooting/training/gradient-issues.md
+          - LR Tuning Failures: troubleshooting/training/lr-tuning.md
+      - Performance Issues:
+          - OOM Errors: troubleshooting/performance/oom-errors.md
+          - Slow Training: troubleshooting/performance/slow-training.md
+          - Performance Profiling: troubleshooting/performance/profiling.md
+      - Data Issues:
+          - Data Loading: troubleshooting/data/data-loading.md
+          - Augmentation: troubleshooting/data/augmentation.md
+      - Model Issues:
+          - Model Loading: troubleshooting/models/model-loading.md
+          - Metrics: troubleshooting/models/metrics.md
+      - Deployment Issues:
+          - Export & Inference: troubleshooting/deployment/export-inference.md
+          - Production Deployment: troubleshooting/deployment/production.md
+      - Environment Issues:
+          - Device Errors: troubleshooting/environment/device-errors.md
+          - Installation: troubleshooting/environment/installation.md
+          - Distributed Training: troubleshooting/environment/distributed.md
+      - Integration Issues:
+          - Loggers: troubleshooting/integration/loggers.md
+          - HuggingFace: troubleshooting/integration/huggingface.md
+          - Reproducibility: troubleshooting/integration/reproducibility.md
+      - Task-Specific Issues:
+          - YOLOX: troubleshooting/task-specific/yolox.md
+          - Interpretation: troubleshooting/task-specific/interpretation.md
+      - Quick Reference:
+          - Error Reference: troubleshooting/reference/error-reference.md
+          - Warnings: troubleshooting/reference/warnings.md
   - API Reference:
       - Overview: api/index.md
       - Tasks:
@@ -142,6 +198,8 @@ nav:
       - Metrics & Logging:
           - Metrics: api/metrics.md
           - Loggers: api/loggers.md
+      - Export:
+          - Export API: api/export.md
       - Utilities: api/utils.md
   - Examples:
       - Overview: examples/index.md
@@ -169,6 +227,30 @@ nav:
 
 extra:
   generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/theja-vanka/AutoTimm
+      name: AutoTimm on GitHub
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/autotimm/
+      name: AutoTimm on PyPI
+  analytics:
+    provider: google
+    property: !ENV GOOGLE_ANALYTICS_KEY
+  meta:
+    keywords: >-
+      PyTorch, Computer Vision, Deep Learning, Image Classification,
+      Object Detection, Semantic Segmentation, Instance Segmentation,
+      Transfer Learning, timm, YOLOX, AutoML, Machine Learning,
+      Neural Networks, CNN, Vision Transformer, Model Training,
+      Model Deployment, TorchScript
+
+extra_javascript:
+  - javascripts/mermaid-zoom.js
+
+extra_css:
+  - stylesheets/mermaid.css
+  - stylesheets/mermaid-zoom.css
 
 copyright: |
   Copyright &copy; 2026 <a href="https://github.com/theja-vanka" target="_blank">Krishnatheja Vanka</a>.

@@ -1,6 +1,46 @@
 # Models
 
-AutoTimm provides two main model architectures for computer vision tasks. Choose the model that best fits your use case.
+AutoTimm provides specialized model architectures for different computer vision tasks. Choose the model that best fits your use case.
+
+## Model Architecture Overview
+
+```mermaid
+graph TB
+    subgraph Classification
+        A[ImageClassifier] --> A1[Backbone<br/>1000+ timm models]
+        A1 --> A2[Classification Head]
+        A2 --> A3[Class Predictions]
+    end
+    
+    subgraph Detection
+        B[ObjectDetector] --> B1[Backbone<br/>1000+ timm models]
+        B1 --> B2[FPN]
+        B2 --> B3[Detection Head<br/>FCOS/YOLOX]
+        B3 --> B4[Boxes + Classes]
+        
+        C[YOLOXDetector] --> C1[CSPDarknet]
+        C1 --> C2[PAFPN]
+        C2 --> C3[YOLOX Head]
+        C3 --> C4[Boxes + Classes]
+    end
+    
+    subgraph Segmentation
+        D[SemanticSegmentor] --> D1[Backbone<br/>1000+ timm models]
+        D1 --> D2[DeepLabV3+/FCN]
+        D2 --> D3[Pixel Masks]
+        
+        E[InstanceSegmentor] --> E1[Backbone<br/>1000+ timm models]
+        E1 --> E2[FPN]
+        E2 --> E3[Mask Head]
+        E3 --> E4[Instance Masks]
+    end
+    
+    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style B fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C fill:#2196F3,stroke:#1976D2,color:#fff
+    style D fill:#42A5F5,stroke:#1976D2,color:#fff
+    style E fill:#2196F3,stroke:#1976D2,color:#fff
+```
 
 ## Available Models
 

@@ -52,14 +52,18 @@ From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-G
 <td width="33%">
 <h3 align="center">Production Ready</h3>
 <p align="center">
-200+ tests, comprehensive logging, checkpoint management. Deploy with confidence.
+365+ tests, comprehensive logging, checkpoint management. Deploy with confidence.
 </p>
 </td>
 </tr>
 </table>
 
-## What's New in v0.7.1
+## What's New in v0.7.2
 
+- **torch.inference_mode** - Faster inference across all tasks, export, and interpretation using `torch.inference_mode()` instead of `torch.no_grad()`
+- **Reproducibility by Default** - Automatic seeding with `seed=42` and deterministic mode enabled out-of-the-box for fully reproducible training and inference
+- **torch.compile by Default** - Automatic PyTorch 2.0+ optimization enabled out-of-the-box for faster training and inference
+- **TorchScript Export** - Export trained models to TorchScript (.pt) for production deployment without Python dependencies
 - **Model Interpretation** - Complete explainability toolkit with 6 interpretation methods, 6 quality metrics, interactive Plotly visualizations, and up to 100x speedup with optimization
 - **Tutorial Notebook** - Comprehensive Jupyter notebook covering all interpretation features end-to-end
 - **YOLOX Models** - Official YOLOX implementation (nano to X) with CSPDarknet backbone
@@ -176,8 +180,12 @@ trainer.fit(model, datamodule=data)
 <td>TensorBoard • MLflow • Weights & Biases • CSV—use simultaneously</td>
 </tr>
 <tr>
+<td><strong>torch.compile Support</strong></td>
+<td>Automatic PyTorch 2.0+ optimization • Enabled by default • Configurable modes</td>
+</tr>
+<tr>
 <td><strong>Production Ready</strong></td>
-<td>Mixed precision • Multi-GPU • Gradient accumulation • 200+ tests</td>
+<td>Mixed precision • Multi-GPU • Gradient accumulation • 365+ tests</td>
 </tr>
 </table>
 
@@ -470,6 +478,109 @@ model = ImageClassifier(
 
 ## Smart Features
 
+### torch.compile Optimization
+
+**Enabled by default** for all tasks with PyTorch 2.0+:
+
+```python
+# Default: torch.compile enabled for faster training/inference
+model = ImageClassifier(backbone="resnet50", num_classes=10)
+
+# Disable if needed
+model = ImageClassifier(backbone="resnet50", num_classes=10, compile_model=False)
+
+# Custom compile options
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    compile_kwargs={"mode": "reduce-overhead", "fullgraph": True}
+)
+```
+
+**Compile modes:**
+- `"default"` - Balanced performance (default)
+- `"reduce-overhead"` - Lower latency, better for smaller batches
+- `"max-autotune"` - Maximum optimization, longer compile time
+
+**What gets compiled:**
+- Classification: backbone + head
+- Detection: backbone + FPN/neck + head
+- Segmentation: backbone + segmentation head
+- Instance Segmentation: backbone + FPN + detection head + mask head
+
+Gracefully falls back on PyTorch < 2.0 with a warning.
+
+### Reproducibility by Default
+
+**Automatic seeding** for reproducible experiments:
+
+```python
+# Default: seed=42, deterministic=True for full reproducibility
+model = ImageClassifier(backbone="resnet50", num_classes=10)
+trainer = AutoTrainer(max_epochs=10)
+
+# Custom seed
+model = ImageClassifier(backbone="resnet50", num_classes=10, seed=123)
+trainer = AutoTrainer(max_epochs=10, seed=123)
+
+# Faster training (disable deterministic mode)
+model = ImageClassifier(backbone="resnet50", num_classes=10, deterministic=False)
+trainer = AutoTrainer(max_epochs=10, deterministic=False)
+
+# Manual seeding
+from autotimm import seed_everything
+seed_everything(42, deterministic=True)
+```
+
+**What's seeded:**
+- Python's `random` module
+- NumPy's random number generator
+- PyTorch (CPU & CUDA)
+- Environment variables for reproducibility
+- cuDNN deterministic algorithms (when `deterministic=True`)
+
+**Seeding options:**
+- **Model-level:** Seeds when model is created
+- **Trainer-level:** Seeds before training starts (uses Lightning's seeding by default)
+- **Manual:** Use `seed_everything()` for custom control
+
+Perfect for research papers, debugging, and ensuring consistent results across runs!
+
+### TorchScript Export
+
+Export trained models for production deployment:
+
+```python
+from autotimm import ImageClassifier, export_to_torchscript
+import torch
+
+# Load trained model
+model = ImageClassifier.load_from_checkpoint("model.ckpt")
+
+# Export to TorchScript
+example_input = torch.randn(1, 3, 224, 224)
+export_to_torchscript(
+    model,
+    "model.pt",
+    example_input=example_input,
+    method="trace"  # Recommended
+)
+
+# Or use the convenience method
+model.to_torchscript("model.pt")
+
+# Load and use in production
+scripted_model = torch.jit.load("model.pt")
+output = scripted_model(image)
+```
+
+**Benefits:**
+- No Python dependencies required
+- Deploy to C++, mobile, or edge devices
+- Faster inference with `torch.inference_mode()` and JIT optimizations
+- Single-file deployment
+- Graceful fallback if JIT optimization fails on your platform
+
 ### Smart Backend Selection
 
 ```python
@@ -581,6 +692,8 @@ print(f"Features: {backbone.num_features}, Params: {autotimm.count_parameters(ba
 
 ### Documentation
 
+Comprehensive documentation with **interactive diagrams**, search optimization, and fast navigation:
+
 | Section | Description |
 |---------|-------------|
 | [Quick Start](https://theja-vanka.github.io/AutoTimm/getting-started/quickstart/) | Get up and running in 5 minutes |
@@ -638,7 +751,7 @@ print(f"Features: {backbone.num_features}, Params: {autotimm.count_parameters(ba
 
 ## Testing
 
-Comprehensive test suite with **200+ tests**:
+Comprehensive test suite with **365+ tests**:
 
 ```bash
 # Run all tests
@@ -675,7 +788,7 @@ For major changes, please open an issue first.
   title = {AutoTimm: Automatic PyTorch Image Models},
   url = {https://github.com/theja-vanka/AutoTimm},
   year = {2026},
-  version = {0.7.1}
+  version = {0.7.2}
 }
 ```
 

@@ -2,6 +2,44 @@
 
 AutoTimm supports multiple logging backends through `LoggerConfig` and `LoggerManager`. Log to TensorBoard, MLflow, Weights & Biases, and CSV simultaneously.
 
+## Logging System Architecture
+
+```mermaid
+graph TB
+    A[Training Events] --> B[LoggerManager]
+    
+    B --> C{Logger Backends}
+    
+    C -->|TensorBoard| D1[TensorBoard Logger]
+    C -->|W&B| D2[WandB Logger]
+    C -->|MLflow| D3[MLflow Logger]
+    C -->|CSV| D4[CSV Logger]
+    
+    D1 --> E1[logs/tensorboard/]
+    D2 --> E2[wandb.ai]
+    D3 --> E3[mlruns/]
+    D4 --> E4[logs/csv/]
+    
+    A --> F{Log Types}
+    
+    F --> G1[Metrics]
+    F --> G2[Hyperparams]
+    F --> G3[Artifacts]
+    F --> G4[System Info]
+    
+    G1 --> B
+    G2 --> B
+    G3 --> B
+    G4 --> B
+    
+    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style B fill:#42A5F5,stroke:#1976D2,color:#fff
+    style D1 fill:#2196F3,stroke:#1976D2,color:#fff
+    style D2 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style D3 fill:#2196F3,stroke:#1976D2,color:#fff
+    style D4 fill:#42A5F5,stroke:#1976D2,color:#fff
+```
+
 ## LoggerConfig
 
 ### Basic Configuration

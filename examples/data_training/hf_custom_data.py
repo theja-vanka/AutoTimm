@@ -389,7 +389,7 @@ for images, labels in train_loader:
     loss = criterion(outputs, labels)
 
 # Inference (threshold = 0.5)
-with torch.no_grad():
+with torch.inference_mode():
     outputs = model(images)
     predictions = (outputs > 0.5).float()
 '''

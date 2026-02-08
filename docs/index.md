@@ -5,6 +5,26 @@ Automated deep learning image tasks powered by [timm](https://github.com/hugging
 
 AutoTimm lets you train image classifiers, object detectors, and segmentation models with any of timm's 1000+ backbones in a few lines of Python.
 
+## AutoTimm Workflow
+
+```mermaid
+graph LR
+    A[Data] -->|ImageDataModule| B[Model]
+    B -->|ImageClassifier<br/>ObjectDetector<br/>SemanticSegmentor| C[Trainer]
+    C -->|AutoTrainer| D[Training]
+    D --> E{Evaluate}
+    E -->|Metrics| F[Deploy]
+    F -->|TorchScript<br/>ONNX| G[Production]
+    
+    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style B fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C fill:#2196F3,stroke:#1976D2,color:#fff
+    style D fill:#42A5F5,stroke:#1976D2,color:#fff
+    style E fill:#2196F3,stroke:#1976D2,color:#fff
+    style F fill:#42A5F5,stroke:#1976D2,color:#fff
+    style G fill:#2196F3,stroke:#1976D2,color:#fff
+```
+
 ## Features
 
 - **4 vision tasks** - Image classification, object detection, semantic segmentation, and instance segmentation

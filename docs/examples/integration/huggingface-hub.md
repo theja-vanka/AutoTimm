@@ -341,12 +341,13 @@ backbone = autotimm.create_backbone(config)
 
 ## Troubleshooting
 
-| Issue | Solution |
-|-------|----------|
-| Model not found | Verify model name with `list_hf_hub_backbones()` |
-| Out of memory | Reduce batch size, image size, or use smaller backbone |
-| Slow training | Enable mixed precision, reduce resolution, increase `num_workers` |
-| Poor accuracy | Use larger backbone, IN21k/22k pretrained models, or more epochs |
+For HuggingFace Hub issues, see the [Troubleshooting - HuggingFace](../../troubleshooting/integration/huggingface.md) which covers:
+
+- Model not found on Hub
+- Model download is slow
+- Checkpoint loading fails
+- Out of memory issues
+- And more HF Hub-related issues
 
 ## Benefits
 

@@ -2,6 +2,38 @@
 
 This page demonstrates object detection tasks using AutoTimm.
 
+## Detection Architectures
+
+```mermaid
+graph TB
+    subgraph "FCOS (Anchor-free)"
+        F1[Backbone + FPN] --> F2[Classification Head]
+        F1 --> F3[Regression Head]
+        F1 --> F4[Centerness Head]
+        F2 --> F5[Focal Loss]
+        F3 --> F6[GIoU Loss]
+    end
+    
+    subgraph "YOLOX (One-stage)"
+        Y1[CSPDarknet] --> Y2[PANet]
+        Y2 --> Y3[Decoupled Head]
+        Y3 --> Y4[SimOTA]
+    end
+    
+    subgraph "RT-DETR (Transformer)"
+        R1[Backbone] --> R2[Hybrid Encoder]
+        R2 --> R3[Transformer Decoder]
+        R3 --> R4[Set Prediction]
+    end
+    
+    style F1 fill:#2196F3,stroke:#1976D2,color:#fff
+    style F5 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style Y1 fill:#2196F3,stroke:#1976D2,color:#fff
+    style Y4 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style R1 fill:#2196F3,stroke:#1976D2,color:#fff
+    style R4 fill:#42A5F5,stroke:#1976D2,color:#fff
+```
+
 ## Object Detection on COCO
 
 FCOS-style anchor-free object detection with timm backbones and Feature Pyramid Networks.
@@ -176,7 +208,7 @@ def main():
         
         # Test inference
         dummy_input = torch.randn(1, 3, 640, 640)
-        with torch.no_grad():
+        with torch.inference_mode():
             output = model(dummy_input)
         print(f"  Output shape: {output.shape}")
 

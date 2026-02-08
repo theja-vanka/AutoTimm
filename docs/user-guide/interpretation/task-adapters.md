@@ -528,76 +528,12 @@ results = explain_segmentation(model, small_image)
 
 ## Troubleshooting
 
-### Detection: No Explanations Generated
+For task-specific interpretation issues, see the [Troubleshooting - Interpretation](../../troubleshooting/task-specific/interpretation.md) including:
 
-**Problem:** Empty detections list
-
-**Solutions:**
-- Lower `detection_threshold`
-- Verify model is trained
-- Check image preprocessing
-- Try different images
-
-```python
-# Debug: Check raw detections
-results = explain_detection(
-    model,
-    image,
-    detection_threshold=0.1,  # Very low threshold
-)
-print(f"Number of detections: {len(results['detections'])}")
-```
-
-### Detection: Poor Localization
-
-**Problem:** Heatmaps don't align with objects
-
-**Solutions:**
-- Try GradCAM++ instead of GradCAM
-- Specify a different target layer
-- Check bbox coordinates
-
-```python
-results = explain_detection(
-    model,
-    image,
-    method='gradcam++',          # Better for multiple objects
-    target_layer='backbone.layer3',  # Try different layer
-)
-```
-
-### Segmentation: Blank Heatmaps
-
-**Problem:** Heatmap is all zeros
-
-**Solutions:**
-- Verify target_class exists in prediction
-- Check that model is trained
-- Try different target layer
-
-```python
-# Check if class exists in prediction
-results = explain_segmentation(model, image)
-prediction = results['prediction']
-unique_classes = np.unique(prediction)
-print(f"Present classes: {unique_classes}")
-
-# Explain only present classes
-for class_id in unique_classes:
-    results = explain_segmentation(
-        model,
-        image,
-        target_class=int(class_id),
-        save_path=f'class_{class_id}_explanation.png'
-    )
-```
-
-### High Memory Usage
-
-**Problem:** Out of memory errors
-
-**Solutions:**
-- Reduce image resolution
+- Detection: No explanations generated
+- Detection: Poor localization
+- Segmentation: Blank heatmaps
+- High memory usage
 - Process fewer detections
 - Disable uncertainty calculation
 

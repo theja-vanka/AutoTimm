@@ -57,7 +57,7 @@ def main():
     print(f"\nPreprocessed image shape: {tensor.shape}")  # (1, 3, 224, 224)
 
     # Run inference
-    with torch.no_grad():
+    with torch.inference_mode():
         logits = model(tensor)
         probabilities = torch.softmax(logits, dim=-1)
 
@@ -74,7 +74,7 @@ def main():
     batch_size = 8
     batch = torch.randn(batch_size, 3, 224, 224)
 
-    with torch.no_grad():
+    with torch.inference_mode():
         predictions = model.predict_step(batch, batch_idx=0)
 
     print(f"\nBatch size: {batch_size}")

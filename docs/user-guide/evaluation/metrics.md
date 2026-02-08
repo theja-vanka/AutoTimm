@@ -2,6 +2,36 @@
 
 AutoTimm uses explicit metric configuration through `MetricConfig` and `MetricManager`. No default metrics are provided - you must specify exactly what you want to track.
 
+## Metric Lifecycle
+
+```mermaid
+graph LR
+    A[MetricConfig] --> B[MetricManager]
+    B --> C[Model Init]
+    
+    C --> D{Training Loop}
+    
+    D -->|Step| E1[Compute Metric]
+    D -->|Epoch End| E2[Aggregate]
+    
+    E1 --> F1[Log on Step]
+    E2 --> F2[Log on Epoch]
+    
+    F1 --> G[Logger Backend]
+    F2 --> G
+    
+    G -->|TensorBoard| H1[tensorboard/]
+    G -->|W&B| H2[wandb/]
+    G -->|MLflow| H3[mlflow/]
+    
+    E2 --> I[Progress Bar]
+    
+    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style B fill:#42A5F5,stroke:#1976D2,color:#fff
+    style D fill:#2196F3,stroke:#1976D2,color:#fff
+    style G fill:#42A5F5,stroke:#1976D2,color:#fff
+```
+
 ## MetricConfig
 
 ### Basic Configuration

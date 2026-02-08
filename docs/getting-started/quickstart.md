@@ -2,6 +2,26 @@
 
 This guide walks you through training your first image classifier with AutoTimm.
 
+## Training Workflow
+
+```mermaid
+graph LR
+    A[1. Import] --> B[2. Data]
+    B --> C[3. Metrics]
+    C --> D[4. Model]
+    D --> E[5. Trainer]
+    E --> F[6. Train]
+    F --> G[7. Evaluate]
+    
+    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style B fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C fill:#2196F3,stroke:#1976D2,color:#fff
+    style D fill:#42A5F5,stroke:#1976D2,color:#fff
+    style E fill:#2196F3,stroke:#1976D2,color:#fff
+    style F fill:#42A5F5,stroke:#1976D2,color:#fff
+    style G fill:#2196F3,stroke:#1976D2,color:#fff
+```
+
 ## Basic Training
 
 ### 1. Import Required Classes
@@ -68,6 +88,9 @@ model = ImageClassifier(
     lr=1e-3,
 )
 ```
+
+!!! tip "torch.compile Enabled by Default"
+    AutoTimm automatically applies `torch.compile()` (PyTorch 2.0+) to all models for faster training and inference. To disable: `compile_model=False`. For custom options: `compile_kwargs={"mode": "reduce-overhead"}`.
 
 ### 5. Train
 
@@ -570,7 +593,7 @@ tensor = model.preprocess(image)  # Uses model's pretrained normalization
 
 # Run inference
 model.eval()
-with torch.no_grad():
+with torch.inference_mode():
     predictions = model(tensor).softmax(dim=1)
     predicted_class = predictions.argmax(dim=1).item()
     print(f"Predicted class: {predicted_class}")

@@ -2,6 +2,44 @@
 
 Complete examples for training instance segmentation models with AutoTimm.
 
+## Instance Segmentation Architecture
+
+```mermaid
+graph TB
+    A[Input Image] --> B[Backbone + FPN]
+    
+    B --> C[Detection Head]
+    B --> D[Mask Head]
+    
+    C --> E[RoI Proposals]
+    E --> F[RoI Align]
+    
+    F --> D
+    
+    D --> G[Instance Masks]
+    C --> H[Bounding Boxes]
+    C --> I[Class Scores]
+    
+    H --> J{NMS}
+    I --> J
+    G --> J
+    
+    J --> K[Final Predictions]
+    
+    K --> L{Metrics}
+    L --> M1[Mask mAP]
+    L --> M2[Box mAP]
+    L --> M3[Instance IoU]
+    
+    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style B fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C fill:#2196F3,stroke:#1976D2,color:#fff
+    style D fill:#42A5F5,stroke:#1976D2,color:#fff
+    style F fill:#2196F3,stroke:#1976D2,color:#fff
+    style J fill:#42A5F5,stroke:#1976D2,color:#fff
+    style K fill:#2196F3,stroke:#1976D2,color:#fff
+```
+
 ## Basic Example: COCO
 
 Train Mask R-CNN style model on COCO dataset.
@@ -364,7 +402,7 @@ def main():
     image_tensor = transform(image).unsqueeze(0)
 
     # Predict
-    with torch.no_grad():
+    with torch.inference_mode():
         predictions = model.predict(image_tensor)
 
     # predictions is a list of dicts:
@@ -578,7 +616,7 @@ def batch_predict(model, image_paths, batch_size=4):
         batch_tensor = torch.stack(batch_images)
 
         # Predict
-        with torch.no_grad():
+        with torch.inference_mode():
             predictions = model.predict(batch_tensor)
 
         results.extend(predictions)

@@ -227,7 +227,7 @@ def main():
     inputs = processor(images=image, return_tensors="pt")
 
     # Inference (no NMS needed!)
-    with torch.no_grad():
+    with torch.inference_mode():
         outputs = model.model(**inputs)
 
     # Post-process results

@@ -107,7 +107,7 @@ class AttentionRollout(BaseInterpreter):
         input_tensor = self._preprocess_image(image)
 
         # Forward pass
-        with torch.no_grad():
+        with torch.inference_mode():
             _ = self.model(input_tensor)
 
         # Remove hooks
@@ -316,7 +316,7 @@ class AttentionFlow:
                 input_tensor = input_tensor.unsqueeze(0)
 
         # Forward pass
-        with torch.no_grad():
+        with torch.inference_mode():
             _ = self.model(input_tensor)
 
         # Remove hooks

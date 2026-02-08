@@ -316,7 +316,7 @@ def benchmark_model(backbone, num_classes=10, image_size=224, batch_size=32, war
     x = torch.randn(batch_size, 3, image_size, image_size).to(device)
 
     # Warmup
-    with torch.no_grad():
+    with torch.inference_mode():
         for _ in range(warmup):
             _ = model(x)
 
@@ -325,7 +325,7 @@ def benchmark_model(backbone, num_classes=10, image_size=224, batch_size=32, war
 
     # Benchmark
     start = time.perf_counter()
-    with torch.no_grad():
+    with torch.inference_mode():
         for _ in range(iterations):
             _ = model(x)
 
@@ -363,4 +363,4 @@ for backbone in backbones:
 
 - [Training Guide](../training/training.md) - Training configuration options
 - [Model Export](../inference/model-export.md) - Exporting models for deployment
-- [Troubleshooting](../guides/troubleshooting.md) - Memory and performance issues
+- [Troubleshooting](../../troubleshooting/performance/oom-errors.md) - Memory and performance issues

@@ -2,6 +2,42 @@
 
 The Preset Manager is an intelligent system that helps you choose the best transform backend (torchvision vs albumentations) based on your specific task and requirements.
 
+## Backend Selection Workflow
+
+```mermaid
+graph TB
+    A[Task Requirements] --> B{recommend_backend}
+    
+    B --> C{Has BBoxes/Masks?}
+    
+    C -->|Yes| D1[albumentations]
+    C -->|No| E{Advanced Aug?}
+    
+    E -->|Yes| D1
+    E -->|No| F{Prioritize Speed?}
+    
+    F -->|Yes| D2[torchvision]
+    F -->|No| D1
+    
+    D1 --> G1[Preset Selection]
+    D2 --> G2[Preset Selection]
+    
+    G1 -->|Detection/Seg| H1[default/strong]
+    G2 -->|Classification| H2[default/randaugment]
+    
+    H1 --> I[TransformConfig]
+    H2 --> I
+    
+    I --> J[DataModule]
+    
+    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style B fill:#42A5F5,stroke:#1976D2,color:#fff
+    style D1 fill:#2196F3,stroke:#1976D2,color:#fff
+    style D2 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style I fill:#2196F3,stroke:#1976D2,color:#fff
+    style J fill:#42A5F5,stroke:#1976D2,color:#fff
+```
+
 ## Quick Start
 
 ```python

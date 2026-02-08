@@ -535,34 +535,11 @@ features_l4 = viz.get_features(image, "backbone.layer4")
 
 ## Troubleshooting
 
-### ValueError: Layer not found
+For feature visualization issues, see the [Troubleshooting - Interpretation](../../troubleshooting/task-specific/interpretation.md) including:
 
-**Problem:** Layer name is incorrect
-
-**Solution:** Check available layer names:
-```python
-for name, module in model.named_modules():
-    if isinstance(module, nn.Conv2d):
-        print(name)
-```
-
-### Memory Error
-
-**Problem:** Image too large or too many features
-
-**Solution:**
-- Resize input image
-- Reduce `num_features` parameter
-- Process features in chunks
-
-### Blank Feature Maps
-
-**Problem:** Features are all zero or very small
-
-**Solution:**
-- Check that model is trained
-- Verify model is in eval mode
-- Try a different layer (earlier layers are usually more active)
+- ValueError: Layer not found
+- Memory error
+- Blank feature maps
 
 ---
 

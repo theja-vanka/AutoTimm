@@ -155,7 +155,7 @@ def example_3_profiling():
 
         with profiler.profile("forward_pass"):
             # Forward pass
-            with torch.no_grad():
+            with torch.inference_mode():
                 model(tensor)
 
         with profiler.profile("explanation"):
@@ -192,7 +192,7 @@ def example_4_model_optimization():
 
     start = time.time()
     for _ in range(10):
-        with torch.no_grad():
+        with torch.inference_mode():
             model(tensor)
     time_original = time.time() - start
     print(f"✓ 10 forward passes: {time_original:.3f}s ({time_original/10:.3f}s each)")
@@ -203,7 +203,7 @@ def example_4_model_optimization():
 
     start = time.time()
     for _ in range(10):
-        with torch.no_grad():
+        with torch.inference_mode():
             model_opt(tensor)
     time_optimized = time.time() - start
     print(f"✓ 10 forward passes: {time_optimized:.3f}s ({time_optimized/10:.3f}s each)")

@@ -461,7 +461,7 @@ image = Image.open("test.jpg").convert("RGB")
 input_tensor = model.preprocess(image)  # Returns (1, 3, H, W) tensor
 
 # Predict
-with torch.no_grad():
+with torch.inference_mode():
     logits = model.predict(input_tensor)  # Returns (1, num_classes, H, W)
 
 # Get class predictions
@@ -495,7 +495,7 @@ transformed = transform(image=image_np)
 input_tensor = transformed["image"].unsqueeze(0)  # Add batch dimension
 
 # Predict
-with torch.no_grad():
+with torch.inference_mode():
     logits = model(input_tensor)
     mask = logits.argmax(dim=1)[0].cpu().numpy()
 ```
@@ -563,50 +563,11 @@ model.eval()
 
 ## Troubleshooting
 
-### Mask Size Mismatch
+For semantic segmentation inference issues, see the [Troubleshooting - Export & Inference](../../troubleshooting/deployment/export-inference.md) including:
 
-The inference script automatically resizes masks back to the original image size:
-
-```python
-# In predict_single_image():
-# 1. Original image is resized to model's input size
-# 2. Model predicts on resized image
-# 3. Mask is resized back to original dimensions using NEAREST interpolation
-```
-
-### Out of Memory
-
-For large images or limited GPU memory:
-
-```python
-# Reduce batch size
-batch_results = predict_batch(
-    model=model,
-    image_paths=image_paths,
-    batch_size=1,  # Process one at a time
-)
-
-# Or use CPU
-model = model.cpu()
-```
-
-### Custom Ignore Index
-
-If your dataset uses a different ignore index:
-
-```python
-# When loading model
-model = load_model(
-    checkpoint_path="checkpoint.ckpt",
-    backbone="resnet50",
-    num_classes=19,
-    # Model should have been trained with same ignore_index
-)
-
-# Filter out ignore index from statistics
-mask_filtered = mask.copy()
-mask_filtered[mask_filtered == 255] = 0  # Replace ignore with background
-```
+- Mask size mismatch
+- Out of memory
+- Custom ignore index handling
 
 ---
 

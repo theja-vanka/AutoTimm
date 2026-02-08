@@ -2,6 +2,52 @@
 
 This guide covers data loading for semantic and instance segmentation tasks.
 
+## Segmentation Data Pipeline
+
+```mermaid
+graph TB
+    A[Dataset] --> B{Format}
+    
+    B -->|PNG| C1[Simple Pairs]
+    B -->|Cityscapes| C2[Urban Scenes]
+    B -->|Pascal VOC| C3[20 Classes]
+    B -->|COCO Stuff| C4[171 Classes]
+    
+    C1 --> D[Image + Mask Pairs]
+    C2 --> D
+    C3 --> D
+    C4 --> D
+    
+    D --> E[SegmentationDataModule]
+    
+    E --> F{Augmentation}
+    
+    F -->|Spatial| G1[Crop/Flip/Rotate]
+    F -->|Color| G2[Brightness/Contrast]
+    F -->|Both| G3[Synchronized]
+    
+    G1 --> H[Apply to Both]
+    G2 --> H
+    G3 --> H
+    
+    H --> I[Image Transform]
+    H --> J[Mask Transform]
+    
+    I --> K[Normalize Image]
+    J --> L[Keep Labels]
+    
+    K --> M[Collate Batch]
+    L --> M
+    
+    M --> N[Images + Masks]
+    
+    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style E fill:#42A5F5,stroke:#1976D2,color:#fff
+    style H fill:#2196F3,stroke:#1976D2,color:#fff
+    style M fill:#42A5F5,stroke:#1976D2,color:#fff
+    style N fill:#2196F3,stroke:#1976D2,color:#fff
+```
+
 ## Semantic Segmentation Data
 
 ### Supported Formats
@@ -496,33 +542,12 @@ data = SegmentationDataModule(
 
 ## Troubleshooting
 
-### Masks Not Loading
+For common segmentation data loading issues, see the [Troubleshooting - Data Loading](../../troubleshooting/data/data-loading.md), which includes:
 
-Check:
-- Masks are single-channel PNG (not RGB)
-- Pixel values are in range [0, num_classes-1] and 255
-- Filenames match between images and masks
-
-### Out of Memory
-
-Reduce:
-- image_size
-- batch_size
-- num_workers (frees CPU memory)
-
-### Slow Data Loading
-
-Increase:
-- num_workers (up to CPU cores)
-- Consider using smaller image_size
-- Use SSD storage instead of HDD
-
-### Transform Errors
-
-For albumentations:
-- Ensure you're using ToTensorV2() at the end
-- Normalize before ToTensorV2()
-- Don't use torchvision and albumentations together
+- Masks not loading (format, pixel values, filename issues)
+- Slow data loading (workers, image size, storage)
+- Transform errors (albumentations, backend mixing)
+- Out of memory errors
 
 ## Examples
 

@@ -59,7 +59,7 @@ def predict_single_image(
     input_tensor = input_tensor.to(device)
 
     # Get predictions
-    with torch.no_grad():
+    with torch.inference_mode():
         logits = model(input_tensor)
         probs = torch.softmax(logits, dim=-1)
 
@@ -88,7 +88,7 @@ def predict_batch(
     all_preds = []
     all_probs = []
 
-    with torch.no_grad():
+    with torch.inference_mode():
         for batch in dataloader:
             if isinstance(batch, (tuple, list)):
                 images = batch[0]

@@ -46,7 +46,7 @@ image = Image.open("image.jpg").convert("RGB")
 input_tensor = model.preprocess(image)  # Returns (1, 3, 640, 640)
 
 # Detect objects
-with torch.no_grad():
+with torch.inference_mode():
     detections = model.predict_step(input_tensor, batch_idx=0)
 ```
 
@@ -74,7 +74,7 @@ input_tensor = transform(image).unsqueeze(0)  # (1, 3, 640, 640)
 
 # Detect objects
 model.eval()
-with torch.no_grad():
+with torch.inference_mode():
     detections = model.predict_step(input_tensor, batch_idx=0)
 
 # detections is a dict with:
@@ -192,7 +192,7 @@ data.setup("test")
 model.eval()
 all_detections = []
 
-with torch.no_grad():
+with torch.inference_mode():
     for batch in data.test_dataloader():
         images = batch["image"]
         batch_detections = model.predict_step(images, batch_idx=0)
@@ -263,7 +263,7 @@ class DetectionPipeline:
         input_tensor = self.model.preprocess(image).to(self.device)
 
         # Detect
-        with torch.no_grad():
+        with torch.inference_mode():
             detections = self.model.predict_step(input_tensor, batch_idx=0)
 
         # Filter by threshold
@@ -426,7 +426,7 @@ def predict_batch_efficient(model, image_paths, transform, device, batch_size=8)
         batch_tensor = torch.stack(images).to(device)
 
         # Detect
-        with torch.no_grad():
+        with torch.inference_mode():
             detections = model.predict_step(batch_tensor, batch_idx=0)
 
         all_results.append(detections)
@@ -538,46 +538,12 @@ save_annotated_image("input.jpg", results, "output.jpg", class_names=COCO_CLASSE
 
 ## Common Issues
 
-### No Detections
+For object detection inference issues, see the [Troubleshooting - Export & Inference](../../troubleshooting/deployment/export-inference.md) including:
 
-**Problem:** Model returns empty results
-
-**Solutions:**
-```python
-# 1. Lower the score threshold
-pipeline = DetectionPipeline(score_threshold=0.1)
-
-# 2. Check image preprocessing
-# Ensure image is RGB
-image = Image.open("img.jpg").convert("RGB")
-
-# 3. Verify model is loaded correctly
-print(f"Model num_classes: {model.num_classes}")
-
-# 4. Check if objects are in the training classes
-```
-
-### Too Many Duplicate Detections
-
-**Problem:** Same object detected multiple times
-
-**Solutions:**
-```python
-# 1. Lower NMS threshold (stricter)
-model = ObjectDetector(nms_thresh=0.3)
-
-# 2. Increase score threshold
-pipeline = DetectionPipeline(score_threshold=0.5)
-```
-
-### Missing Small Objects
-
-**Problem:** Small objects not detected
-
-**Solutions:**
-```python
-# 1. Use larger image size
-pipeline = DetectionPipeline(image_size=800)
+- No detections
+- Too many duplicate detections
+- Missing small objects
+- Score threshold tuning
 
 # 2. Lower score threshold
 pipeline = DetectionPipeline(score_threshold=0.1)

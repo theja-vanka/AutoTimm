@@ -73,7 +73,18 @@ from autotimm.tasks.object_detection import ObjectDetector
 from autotimm.tasks.semantic_segmentation import SemanticSegmentor
 from autotimm.tasks.yolox_detector import YOLOXDetector
 from autotimm.trainer import AutoTrainer, TunerConfig
-from autotimm.utils import count_parameters, list_optimizers, list_schedulers
+from autotimm.utils import (
+    count_parameters,
+    list_optimizers,
+    list_schedulers,
+    seed_everything,
+)
+from autotimm.export import (
+    export_to_torchscript,
+    load_torchscript,
+    export_checkpoint_to_torchscript,
+    validate_torchscript_export,
+)
 
 # Interpretation
 from autotimm.interpretation import (
@@ -183,6 +194,12 @@ __all__ = [
     "count_parameters",
     "list_optimizers",
     "list_schedulers",
+    "seed_everything",
+    # Export
+    "export_to_torchscript",
+    "load_torchscript",
+    "export_checkpoint_to_torchscript",
+    "validate_torchscript_export",
     # YOLOX Utils
     "list_yolox_models",
     "list_yolox_backbones",

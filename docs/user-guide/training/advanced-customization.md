@@ -292,7 +292,7 @@ class LabelSmoothingCrossEntropy(nn.Module):
         n_classes = logits.size(-1)
 
         # Create smoothed targets
-        with torch.no_grad():
+        with torch.inference_mode():
             smooth_targets = torch.zeros_like(logits)
             smooth_targets.fill_(self.smoothing / (n_classes - 1))
             smooth_targets.scatter_(1, targets.unsqueeze(1), 1 - self.smoothing)
@@ -828,7 +828,7 @@ class ModelEMA(pl.Callback):
 
     def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
         # Update EMA weights
-        with torch.no_grad():
+        with torch.inference_mode():
             for ema_param, param in zip(
                 self.ema_model.parameters(), pl_module.parameters()
             ):
@@ -865,6 +865,179 @@ trainer = AutoTrainer(
 
 trainer.fit(model, datamodule=data)
 ```
+
+---
+
+## Performance Optimization
+
+### torch.compile (PyTorch 2.0+)
+
+**Enabled by default** in all AutoTimm tasks for automatic optimization:
+
+```python
+from autotimm import ImageClassifier, MetricConfig
+
+# Default: torch.compile enabled
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    metrics=metrics,
+)
+```
+
+Disable or customize:
+
+```python
+# Disable compilation
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    compile_model=False,  # Disable torch.compile
+)
+
+# Custom compile options
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    compile_kwargs={
+        "mode": "reduce-overhead",  # "default", "reduce-overhead", "max-autotune"
+        "fullgraph": True,           # Attempt full graph compilation
+        "dynamic": False,            # Static vs dynamic shapes
+    },
+)
+```
+
+**Compile Modes:**
+
+| Mode | Description | Use Case |
+|------|-------------|----------|
+| `default` | Balanced optimization | General purpose (recommended) |
+| `reduce-overhead` | Lower latency | Small batches, inference |
+| `max-autotune` | Maximum speed | Longer compile time, production |
+
+**What Gets Compiled:**
+
+- **ImageClassifier**: Backbone + Head
+- **ObjectDetector**: Backbone + FPN + Detection Head
+- **SemanticSegmentor**: Backbone + Segmentation Head
+- **InstanceSegmentor**: Backbone + FPN + Detection Head + Mask Head
+- **YOLOXDetector**: Backbone + Neck + Head
+
+**Notes:**
+
+- First run will be slower due to compilation
+- Falls back gracefully on PyTorch < 2.0
+- Compatible with all custom heads and modifications
+
+---
+
+### Reproducibility
+
+**Automatic seeding enabled by default** for reproducible experiments:
+
+```python
+from autotimm import ImageClassifier, AutoTrainer, seed_everything
+
+# Default: seed=42, deterministic=True
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    # seed=42 (default)
+    # deterministic=True (default)
+)
+
+trainer = AutoTrainer(
+    max_epochs=10,
+    # seed=42 (default)
+    # deterministic=True (default)
+)
+```
+
+**Custom seeding:**
+
+```python
+# Use a different seed
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    seed=123,
+    deterministic=True,
+)
+
+trainer = AutoTrainer(max_epochs=10, seed=123)
+```
+
+**Faster training (disable deterministic mode):**
+
+```python
+# Disable deterministic for speed
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    seed=42,
+    deterministic=False,  # Enables cuDNN benchmark
+)
+
+trainer = AutoTrainer(
+    max_epochs=10,
+    deterministic=False,  # Faster but not fully deterministic
+)
+```
+
+**Manual seeding:**
+
+```python
+# Seed everything manually
+seed_everything(42, deterministic=True)
+
+# Now create models without automatic seeding
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=10,
+    seed=None,  # Don't seed again
+)
+```
+
+**Trainer seeding options:**
+
+```python
+# Use PyTorch Lightning's seeding (default)
+trainer = AutoTrainer(
+    max_epochs=10,
+    seed=42,
+    use_autotimm_seeding=False,  # Default
+)
+
+# Use AutoTimm's custom seeding
+trainer = AutoTrainer(
+    max_epochs=10,
+    seed=42,
+    use_autotimm_seeding=True,
+)
+```
+
+**What's seeded:**
+
+- Python's `random` module
+- NumPy's random number generator
+- PyTorch (CPU & CUDA)
+- Environment variables (`PYTHONHASHSEED`)
+- cuDNN deterministic algorithms (when `deterministic=True`)
+
+**Trade-offs:**
+
+| Setting | Speed | Reproducibility | Use Case |
+|---------|-------|-----------------|----------|
+| `deterministic=True` | Slower | Full | Research, debugging |
+| `deterministic=False` | Faster | Partial | Production training |
+| `seed=None` | Fastest | None | Exploring variance |
+
+**Best practices:**
+
+- **Research papers**: Use `seed=42, deterministic=True`
+- **Production training**: Use `seed=42, deterministic=False`
+- **Debugging**: Use `seed=42, deterministic=True`
+- **Exploration**: Use `seed=None`
 
 ---
 

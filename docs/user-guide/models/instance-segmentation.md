@@ -238,7 +238,7 @@ transform = T.Compose([
 image_tensor = transform(image).unsqueeze(0)
 
 # Predict
-with torch.no_grad():
+with torch.inference_mode():
     predictions = model.predict(image_tensor)
 
 # predictions is a list of dicts, one per image:
@@ -302,7 +302,7 @@ def visualize_instance_segmentation(image, prediction, threshold=0.5):
     plt.show()
 
 # Use it
-with torch.no_grad():
+with torch.inference_mode():
     predictions = model.predict(image_tensor)
 visualize_instance_segmentation(image, predictions[0])
 ```
@@ -342,6 +342,36 @@ model = InstanceSegmentor(
     max_detections_per_image=100,  # Max instances per image
 )
 ```
+
+### torch.compile (PyTorch 2.0+)
+
+**Enabled by default** for faster training and inference:
+
+```python
+# Default: torch.compile enabled
+model = InstanceSegmentor(
+    backbone="resnet50",
+    num_classes=80,
+)
+
+# Disable if needed
+model = InstanceSegmentor(
+    backbone="resnet50",
+    num_classes=80,
+    compile_model=False,
+)
+
+# Custom compile options
+model = InstanceSegmentor(
+    backbone="resnet50",
+    num_classes=80,
+    compile_kwargs={"mode": "reduce-overhead"},
+)
+```
+
+**What gets compiled:** Backbone + FPN + Detection Head + Mask Head
+
+See [ImageClassifier](image-classifier.md#performance-optimization) for compile mode details.
 
 ## Best Practices
 
@@ -457,37 +487,12 @@ trainer.test(model, datamodule=data)
 
 ## Troubleshooting
 
-### Out of Memory
+For instance segmentation issues, see the [Troubleshooting Overview](../../troubleshooting/index.md) including:
 
-Reduce batch size or image size:
-
-```python
-data = InstanceSegmentationDataModule(
-    data_dir="./coco",
-    image_size=512,  # Smaller
-    batch_size=2,    # Smaller
-)
-```
-
-### Slow Training
-
-- Use smaller backbone (ResNet-18, EfficientNet-B0)
-- Reduce image size
-- Enable mixed precision training
-- Reduce mask_size
-
-### Poor Mask Quality
-
-- Increase mask_loss_weight
-- Use larger image_size
-- Increase mask_size (e.g., 56 instead of 28)
-- Train longer
-
-### NaN Loss
-
-- Enable gradient clipping
-- Reduce learning rate
-- Check dataset annotations are valid
+- Out of memory
+- Slow training
+- Poor mask quality
+- NaN loss issues
 
 ## API Reference
 

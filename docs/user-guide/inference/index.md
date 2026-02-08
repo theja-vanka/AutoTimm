@@ -2,6 +2,39 @@
 
 This guide covers how to use trained AutoTimm models for inference and prediction.
 
+## Inference Pipeline
+
+```mermaid
+graph LR
+    A[Trained Model] --> B[Load Checkpoint]
+    B --> C[Set Eval Mode]
+    C --> D[Preprocess Image]
+    D --> E{Inference}
+    
+    E -->|Classification| F1[Logits]
+    E -->|Detection| F2[Boxes + Classes]
+    E -->|Segmentation| F3[Pixel Masks]
+    
+    F1 --> G1[Softmax]
+    F2 --> G2[NMS]
+    F3 --> G3[Argmax]
+    
+    G1 --> H[Predictions]
+    G2 --> H
+    G3 --> H
+    
+    H --> I[Post-process]
+    I --> J[Results]
+    
+    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style B fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C fill:#2196F3,stroke:#1976D2,color:#fff
+    style D fill:#42A5F5,stroke:#1976D2,color:#fff
+    style E fill:#2196F3,stroke:#1976D2,color:#fff
+    style H fill:#42A5F5,stroke:#1976D2,color:#fff
+    style J fill:#2196F3,stroke:#1976D2,color:#fff
+```
+
 ## Quick Links
 
 - **[Classification Inference](classification-inference.md)** - Image classification model inference
@@ -33,7 +66,7 @@ model = ImageClassifier.load_from_checkpoint(
 model.eval()
 
 image = Image.open("test.jpg").convert("RGB")
-with torch.no_grad():
+with torch.inference_mode():
     logits = model(model.preprocess(image))
     predicted_class = logits.argmax(dim=1).item()
 ```
@@ -51,7 +84,7 @@ model = ObjectDetector.load_from_checkpoint(
 )
 model.eval()
 
-with torch.no_grad():
+with torch.inference_mode():
     detections = model.predict_step(model.preprocess(image), batch_idx=0)
 ```
 
@@ -81,7 +114,7 @@ torch.onnx.export(model, torch.randn(1, 3, 224, 224), "model.onnx")
 **Checklist:**
 
 - Use `model.eval()` before inference
-- Wrap predictions in `torch.no_grad()`
+- Wrap predictions in `torch.inference_mode()`
 - Process multiple images in batches
 - Use GPU when available
 

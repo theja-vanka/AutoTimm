@@ -404,45 +404,12 @@ print(f"Mean deletion AUC: {mean_deletion:.3f}")
 
 ## Troubleshooting
 
-### High Deletion AUC (>0.9)
+For interpretation metrics issues, see the [Troubleshooting - Interpretation](../../troubleshooting/task-specific/interpretation.md) including:
 
-**Problem**: Explanation doesn't affect prediction much
-
-**Solutions:**
-- Check that explanation method is working (visualize heatmap)
-- Try different target layer
-- Verify model is trained
-- Consider different baseline
-
-### Sensitivity NaN
-
-**Problem**: `sensitivity` is NaN
-
-**Cause**: Heatmaps are constant (no variation)
-
-**Solutions:**
-- Check that model produces varied predictions
-- Verify explanation method is working
-- Ensure input isn't constant
-
-### Sanity Checks Fail
-
-**Problem**: `passes=False` for sanity checks
-
-**Investigation:**
-- Visualize explanations for different classes
-- Check correlation value (how close to threshold)
-- Some simple models may legitimately have high correlation
-
-### Pointing Game Always Misses
-
-**Problem**: `hit=False` consistently
-
-**Solutions:**
-- Verify bbox coordinates are correct
-- Check heatmap size matches image size
-- Try different explanation method
-- Visualize max attention location
+- High deletion AUC (>0.9)
+- Sensitivity NaN
+- Sanity checks fail
+- Pointing game always misses
 
 ---
 

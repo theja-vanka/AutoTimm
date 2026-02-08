@@ -2,6 +2,42 @@
 
 This page demonstrates training optimization utilities including auto-tuning and multi-GPU training.
 
+## Training Optimization Strategies
+
+```mermaid
+graph TB
+    A[Training Config] --> B{Optimizations}
+    
+    B -->|Auto-tuning| C1[LR Finder]
+    B -->|Auto-tuning| C2[Batch Size Finder]
+    B -->|Multi-GPU| C3[DDP Strategy]
+    B -->|Precision| C4[Mixed Precision]
+    B -->|Memory| C5[Gradient Accumulation]
+    
+    C1 --> D[Optimal LR]
+    C2 --> E[Optimal Batch Size]
+    C3 --> F[Parallel Training]
+    C4 --> G[Faster Training]
+    C5 --> H[Larger Effective Batch]
+    
+    D --> I[Better Convergence]
+    E --> I
+    F --> J[Faster Training]
+    G --> J
+    H --> I
+    
+    I --> K[Final Model]
+    J --> K
+    
+    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C2 fill:#2196F3,stroke:#1976D2,color:#fff
+    style C3 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C4 fill:#2196F3,stroke:#1976D2,color:#fff
+    style C5 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style K fill:#2196F3,stroke:#1976D2,color:#fff
+```
+
 ## Auto-Tuning
 
 Automatically find optimal learning rate and batch size.

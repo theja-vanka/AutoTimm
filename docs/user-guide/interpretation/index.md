@@ -2,6 +2,44 @@
 
 AutoTimm provides comprehensive tools for interpreting and visualizing deep learning models. Understanding what your models learn and how they make decisions is crucial for debugging, building trust, and improving performance.
 
+## Interpretation Workflow
+
+```mermaid
+graph LR
+    A[Model + Image] --> B{Method}
+    
+    B -->|GradCAM| C1[Gradient-based]
+    B -->|Integrated Gradients| C2[Path-based]
+    B -->|Attention| C3[Attention-based]
+    B -->|SmoothGrad| C4[Noise-based]
+    
+    C1 --> D[Heatmap]
+    C2 --> D
+    C3 --> D
+    C4 --> D
+    
+    D --> E{Task Adapter}
+    
+    E -->|Classification| F1[Class Attribution]
+    E -->|Detection| F2[Box Attribution]
+    E -->|Segmentation| F3[Pixel Attribution]
+    
+    F1 --> G[Visualization]
+    F2 --> G
+    F3 --> G
+    
+    G --> H[Quality Metrics]
+    H --> I[Analysis]
+    
+    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C2 fill:#2196F3,stroke:#1976D2,color:#fff
+    style C3 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C4 fill:#2196F3,stroke:#1976D2,color:#fff
+    style G fill:#42A5F5,stroke:#1976D2,color:#fff
+    style I fill:#2196F3,stroke:#1976D2,color:#fff
+```
+
 ## Overview
 
 The interpretation module offers:
@@ -408,23 +446,12 @@ heatmap = explainer.explain(small_image)
 
 ## Troubleshooting
 
-### No Heatmap Visible
+For interpretation issues, see the [Troubleshooting - Interpretation](../../troubleshooting/task-specific/interpretation.md) including:
 
-- Check that the target layer is correct
-- Verify the model is in eval mode
-- Ensure gradients are enabled
-
-### Poor Localization
-
-- Try GradCAM++ instead of GradCAM
-- Use a different target layer (typically the last conv layer)
-- Apply SmoothGrad for cleaner results
-
-### Slow Performance
-
-- Enable GPU acceleration with `use_cuda=True`
-- Use batch processing for multiple images
-- Choose faster methods (GradCAM) for real-time needs
+- No heatmap visible
+- Poor localization
+- Slow performance
+- Method-specific issues
 
 ## Examples
 

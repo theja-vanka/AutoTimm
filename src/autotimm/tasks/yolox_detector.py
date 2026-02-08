@@ -19,6 +19,7 @@ from autotimm.metrics import LoggingConfig, MetricConfig, MetricManager
 from autotimm.models.csp_darknet import build_csp_darknet
 from autotimm.models.yolox_pafpn import build_yolox_pafpn
 from autotimm.tasks.preprocessing_mixin import PreprocessingMixin
+from autotimm.utils import seed_everything
 
 
 class YOLOXDetector(PreprocessingMixin, pl.LightningModule):
@@ -55,6 +56,15 @@ class YOLOXDetector(PreprocessingMixin, pl.LightningModule):
         score_thresh: Score threshold for inference
         nms_thresh: NMS IoU threshold
         max_detections_per_image: Max detections per image
+        compile_model: If ``True`` (default), apply ``torch.compile()`` to the backbone, neck, and head
+            for faster inference and training. Requires PyTorch 2.0+.
+        compile_kwargs: Optional dict of kwargs to pass to ``torch.compile()``.
+            Common options: ``mode`` (``"default"``, ``"reduce-overhead"``, ``"max-autotune"``),
+            ``fullgraph`` (``True``/``False``), ``dynamic`` (``True``/``False``).
+        seed: Random seed for reproducibility. If ``None``, no seeding is performed.
+            Default is ``42`` for reproducible results.
+        deterministic: If ``True`` (default), enables deterministic algorithms in PyTorch for full
+            reproducibility (may impact performance). Set to ``False`` for faster training.
 
     Example:
         >>> from autotimm import YOLOXDetector, DetectionDataModule, AutoTrainer
@@ -96,7 +106,15 @@ class YOLOXDetector(PreprocessingMixin, pl.LightningModule):
         score_thresh: float = 0.01,
         nms_thresh: float = 0.65,
         max_detections_per_image: int = 100,
+        compile_model: bool = True,
+        compile_kwargs: dict[str, Any] | None = None,
+        seed: int | None = 42,
+        deterministic: bool = True,
     ):
+        # Seed for reproducibility
+        if seed is not None:
+            seed_everything(seed, deterministic=deterministic)
+
         super().__init__()
         self.save_hyperparameters(
             ignore=["metrics", "logging_config", "transform_config"]
@@ -165,6 +183,22 @@ class YOLOXDetector(PreprocessingMixin, pl.LightningModule):
             log_learning_rate=False,
             log_gradient_norm=False,
         )
+
+        # Apply torch.compile for optimization (PyTorch 2.0+)
+        if compile_model:
+            try:
+                compile_opts = compile_kwargs or {}
+                self.backbone = torch.compile(self.backbone, **compile_opts)
+                self.neck = torch.compile(self.neck, **compile_opts)
+                self.head = torch.compile(self.head, **compile_opts)
+            except Exception as e:
+                import warnings
+
+                warnings.warn(
+                    f"torch.compile failed: {e}. Continuing without compilation. "
+                    f"Ensure you have PyTorch 2.0+ for compile support.",
+                    stacklevel=2,
+                )
 
         # Setup transforms
         self._setup_transforms(transform_config, task="detection")
