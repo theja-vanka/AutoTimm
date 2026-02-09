@@ -6,36 +6,71 @@ The Preset Manager is an intelligent system that helps you choose the best trans
 
 ```mermaid
 graph TD
-    A[Task Requirements] --> B{recommend_backend}
+    A[Task Requirements] --> A1[Define Task Type]
+    A1 --> A2[Identify Constraints]
+    A2 --> A3[List Data Types]
+    A3 --> B{recommend_backend}
     
-    B --> C{Has BBoxes/Masks?}
+    B --> B1[Analyze Requirements]
+    B1 --> B2[Check Data Types]
+    B2 --> C{Has BBoxes/Masks?}
     
-    C -->|Yes| D1[albumentations]
+    C -->|Yes - Need Spatial Transforms| D1[albumentations]
+    D1 --> D1a[Supports BBox/Mask]
+    D1a --> D1b[Synchronized Transforms]
+    
     C -->|No| E{Advanced Aug?}
+    E -->|Yes - Need Features| D1
+    E1[Complex Augmentations]
+    E1 --> E2[Morphological Ops]
+    E2 --> D1
     
-    E -->|Yes| D1
     E -->|No| F{Prioritize Speed?}
     
-    F -->|Yes| D2[torchvision]
-    F -->|No| D1
+    F -->|Yes - Need Performance| D2[torchvision]
+    D2 --> D2a[Native PyTorch]
+    D2a --> D2b[Optimized C++]
+    D2b --> D2c[Faster Execution]
     
-    D1 --> G1[Preset Selection]
-    D2 --> G2[Preset Selection]
+    F -->|No - Need Flexibility| D1
     
-    G1 -->|Detection/Seg| H1[default/strong]
-    G2 -->|Classification| H2[default/randaugment]
+    D1b --> G1[Preset Selection]
+    D2c --> G2[Preset Selection]
     
-    H1 --> I[TransformConfig]
-    H2 --> I
+    G1 --> G1a[Choose Preset]
+    G1a -->|Detection/Seg| H1[default/strong]
+    H1 --> H1a[BBox-aware Transforms]
+    H1a --> H1b[Mask-aware Transforms]
+    H1b --> H1c[Advanced Augmentation]
     
-    I --> J[DataModule]
+    G2 --> G2a[Choose Preset]
+    G2a -->|Classification| H2[default/randaugment]
+    H2 --> H2a[Simple Transforms]
+    H2a --> H2b[RandAugment Policy]
+    H2b --> H2c[Fast Execution]
     
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style D1 fill:#2196F3,stroke:#1976D2,color:#fff
-    style D2 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style I fill:#2196F3,stroke:#1976D2,color:#fff
-    style J fill:#42A5F5,stroke:#1976D2,color:#fff
+    H1c --> I[TransformConfig]
+    H2c --> I
+    
+    I --> I1[Create Config Object]
+    I1 --> I2[Set Backend]
+    I2 --> I3[Set Preset]
+    I3 --> I4[Configure Params]
+    I4 --> J[DataModule]
+    
+    J --> J1[Apply to DataModule]
+    J1 --> J2[Build Transform Pipeline]
+    J2 --> J3[Create DataLoaders]
+    J3 --> J4[Ready for Training]
+    
+    style A fill:#2196F3,stroke:#1976D2
+    style B fill:#1976D2,stroke:#1565C0
+    style D1 fill:#2196F3,stroke:#1976D2
+    style D2 fill:#1976D2,stroke:#1565C0
+    style H1 fill:#2196F3,stroke:#1976D2
+    style I fill:#1976D2,stroke:#1565C0
+    style J fill:#2196F3,stroke:#1976D2
+    style J4 fill:#1976D2,stroke:#1565C0
 ```
 
 ## Quick Start

@@ -8,21 +8,21 @@ AutoTimm lets you train image classifiers, object detectors, and segmentation mo
 ## AutoTimm Workflow
 
 ```mermaid
-graph TD
-    A[Data] -->|ImageDataModule| B[Model]
-    B -->|ImageClassifier<br/>ObjectDetector<br/>SemanticSegmentor| C[Trainer]
-    C -->|AutoTrainer| D[Training]
-    D --> E{Evaluate}
-    E -->|Metrics| F[Deploy]
-    F -->|TorchScript<br/>ONNX| G[Production]
-    
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C fill:#2196F3,stroke:#1976D2,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E fill:#2196F3,stroke:#1976D2,color:#fff
-    style F fill:#42A5F5,stroke:#1976D2,color:#fff
-    style G fill:#2196F3,stroke:#1976D2,color:#fff
+graph LR
+    A[Raw Data] -->|DataModule| B[Transforms &<br/>Augmentation]
+    B --> C[Select Backbone<br/>1000+ timm models]
+    C --> D[Build Model<br/>Classifier / Detector /<br/>Segmentor]
+    D -->|AutoTrainer| E[Train & Validate]
+    E --> F[Test & Export]
+    F --> G[Production]
+
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#1976D2,stroke:#1565C0
+    style D fill:#1565C0,stroke:#0D47A1
+    style E fill:#1976D2,stroke:#1565C0
+    style F fill:#1976D2,stroke:#1565C0
+    style G fill:#4CAF50,stroke:#388E3C
 ```
 
 ## Features

@@ -4,30 +4,40 @@ AutoTimm is designed with reproducibility as a first-class feature. This guide c
 
 ## Reproducibility Workflow
 
+### Seed Sources
+
 ```mermaid
-graph TD
-    A[Experiment] --> B{Seed Sources}
+graph LR
+    A{Seed Sources} --> B[Model<br/>seed=42]
+    A --> C[Trainer<br/>seed=42]
+    A --> D[Manual<br/>seed_everything]
+    B --> E[seed_everything<br/>Python, NumPy, PyTorch, CUDA]
+    C --> E
+    D --> E
 
-    B --> C1[Model seed=42]
-    B --> C2[Trainer seed=42]
-    B --> C3[Manual seed_everything]
+    style A fill:#FF9800,stroke:#F57C00
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#1976D2,stroke:#1565C0
+    style D fill:#1976D2,stroke:#1565C0
+    style E fill:#1565C0,stroke:#0D47A1
+```
 
-    C1 --> D[seed_everything<br/>Python, NumPy, PyTorch, CUDA]
-    C2 --> D
-    C3 --> D
+### Deterministic Pipeline
 
-    D --> F[Deterministic Mode<br/>cuDNN, Benchmark, Workers]
+```mermaid
+graph LR
+    A[Seed Everything] --> B[Deterministic Mode<br/>cuDNN + Benchmark + Workers]
+    B --> C[Reproducible Results<br/>Same init, data order,<br/>augmentations, gradients]
+    C --> D{Verify}
+    D --> E1[Same seed = same results]
+    D --> E2[Different seed = different results]
 
-    F --> H[Reproducible Results]
-
-    H --> I{Verification}
-    I --> J1[Same Seed = Same Results]
-    I --> J2[Different Seed = Different Results]
-
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style F fill:#2196F3,stroke:#1976D2,color:#fff
-    style H fill:#42A5F5,stroke:#1976D2,color:#fff
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#1976D2,stroke:#1565C0
+    style D fill:#FF9800,stroke:#F57C00
+    style E1 fill:#4CAF50,stroke:#388E3C
+    style E2 fill:#4CAF50,stroke:#388E3C
 ```
 
 ## Why Reproducibility Matters
@@ -489,7 +499,7 @@ See complete working examples in the repository:
 
 ## API Reference
 
-- [`seed_everything()`](../../api/utils.md#seed_everything) - Manual seeding function
+- [`seed_everything()`](../../api/utils.md) - Manual seeding function
 - [`ImageClassifier`](../models/image-classifier.md) - Model seeding parameters
 - [`AutoTrainer`](../../api/trainer.md) - Trainer seeding parameters
 

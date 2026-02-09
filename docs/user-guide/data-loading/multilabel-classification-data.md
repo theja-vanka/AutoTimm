@@ -6,34 +6,69 @@ The `MultiLabelImageDataModule` handles multi-label image classification dataset
 
 ```mermaid
 graph TD
-    A[CSV File] --> B[MultiLabelImageDataset]
-    C[Image Dir] --> B
+    A[CSV File] --> A1[Read CSV]
+    A1 --> A2[Parse Headers]
+    A2 --> A3[Load Paths & Labels]
+    A3 --> B[MultiLabelImageDataset]
+    
+    C[Image Dir] --> C1[Verify Directory]
+    C1 --> C2[List Image Files]
+    C2 --> B
 
-    B --> D[MultiLabelImageDataModule]
+    B --> B1[Create Dataset]
+    B1 --> B2[Validate Labels]
+    B2 --> B3[Multi-hot Encoding]
+    B3 --> D[MultiLabelImageDataModule]
 
-    D --> E{Split Strategy}
+    D --> D1[Initialize Module]
+    D1 --> D2[Configure Params]
+    D2 --> E{Split Strategy}
 
     E -->|val_csv provided| F1[Separate val set]
+    F1 --> F1a[Load val CSV]
+    F1a --> F1b[Create Val Dataset]
+    
     E -->|No val_csv| F2[Auto split val_split]
+    F2 --> F2a[Random Split]
+    F2a --> F2b[Create Val Subset]
 
-    F1 --> G[Train / Val / Test Splits]
-    F2 --> G
-
-    G --> H[Transforms]
+    F1b --> G[Train / Val / Test Splits]
+    F2b --> G
+    
+    G --> G1[Assign Indices]
+    G1 --> G2[Verify Splits]
+    G2 --> H[Transforms]
 
     H -->|Train| I1[Augmentation]
+    I1 --> I1a[RandomResizedCrop]
+    I1a --> I1b[RandomHorizontalFlip]
+    I1b --> I1c[ColorJitter]
+    I1c --> I1d[Normalize]
+    
     H -->|Val / Test| I2[Resize + Normalize]
+    I2 --> I2a[Resize]
+    I2a --> I2b[CenterCrop]
+    I2b --> I2c[Normalize]
 
-    I1 --> J[DataLoader]
-    I2 --> J
+    I1d --> J[DataLoader]
+    I2c --> J
+    
+    J --> J1[Create Loaders]
+    J1 --> J2[Set Batch Size]
+    J2 --> J3[Configure Workers]
+    J3 --> K[Batches: image, multi-hot labels]
+    
+    K --> K1[Stack Images]
+    K1 --> K2[Stack Labels]
+    K2 --> K3[Ready for Model]
 
-    J --> K[Batches: image, multi-hot labels]
-
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style H fill:#2196F3,stroke:#1976D2,color:#fff
-    style J fill:#42A5F5,stroke:#1976D2,color:#fff
-    style K fill:#2196F3,stroke:#1976D2,color:#fff
+    style A fill:#2196F3,stroke:#1976D2
+    style B fill:#1976D2,stroke:#1565C0
+    style D fill:#2196F3,stroke:#1976D2
+    style H fill:#1976D2,stroke:#1565C0
+    style J fill:#2196F3,stroke:#1976D2
+    style K fill:#1976D2,stroke:#1565C0
+    style K3 fill:#2196F3,stroke:#1976D2
 ```
 
 ## CSV Format
@@ -251,4 +286,4 @@ trainer.fit(model, datamodule=data)
 - [Image Classification Data](image-classification-data.md) - Single-label classification data loading
 - [Image Classifier Guide](../models/image-classifier.md#multi-label-classification) - Multi-label model configuration
 - [Multi-Label Example](../../examples/tasks/classification.md#multi-label-classification) - Runnable example
-- [API Reference](../../api/data.md#multilabelimagedatamodule) - Full API docs
+- [API Reference](../../api/multilabel_data.md) - Full API docs

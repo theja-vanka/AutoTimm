@@ -6,18 +6,18 @@ The [`examples/`](https://github.com/theja-vanka/AutoTimm/tree/main/examples) di
 
 ```mermaid
 graph LR
-    A[AutoTimm Examples] --> B[Getting Started]
-    A --> C[Computer Vision]
-    A --> D[HuggingFace Hub]
-    A --> E[Training & Optimization]
-    A --> F[Model Understanding]
+    A[<b>AutoTimm<br/>Examples</b>] --> B[<b>Getting Started</b><br/>Classification,<br/>data loading]
+    A --> C[<b>Computer Vision</b><br/>Detection,<br/>segmentation]
+    A --> D[<b>HuggingFace</b><br/>Hub integration,<br/>model sharing]
+    A --> E[<b>Training</b><br/>HPO, multi-GPU,<br/>auto-tuning]
+    A --> F[<b>Understanding</b><br/>GradCAM, attention,<br/>feature maps]
 
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C fill:#2196F3,stroke:#1976D2,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E fill:#2196F3,stroke:#1976D2,color:#fff
-    style F fill:#42A5F5,stroke:#1976D2,color:#fff
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#1565C0,stroke:#0D47A1
+    style D fill:#1976D2,stroke:#1565C0
+    style E fill:#1565C0,stroke:#0D47A1
+    style F fill:#1976D2,stroke:#1565C0
 ```
 
 ## Quick Reference
@@ -110,6 +110,10 @@ graph LR
 | [`data_training/albumentations_cifar10.py`](utilities/data-handling.md#albumentations-strong-augmentation) | Albumentations strong augmentation |
 | [`data_training/albumentations_custom_folder.py`](utilities/data-handling.md#custom-albumentations-pipeline) | Custom albumentations pipeline |
 | [`data_training/multilabel_classification.py`](tasks/classification.md#multi-label-classification) | Multi-label classification with CSV data |
+| [`data_training/csv_classification.py`](utilities/csv-data-loading.md#csv-classification) | Classification from CSV files |
+| [`data_training/csv_detection.py`](utilities/csv-data-loading.md#csv-object-detection) | Object detection from CSV annotations |
+| [`data_training/csv_segmentation.py`](utilities/csv-data-loading.md#csv-semantic-segmentation) | Semantic segmentation from CSV |
+| [`data_training/csv_instance_segmentation.py`](utilities/csv-data-loading.md#csv-instance-segmentation) | Instance segmentation from CSV |
 | [`data_training/hf_custom_data.py`](utilities/hf_custom_data.md) | Advanced augmentation, multi-label, validation |
 
 ### ⚙️ Training & Optimization
@@ -146,7 +150,7 @@ graph LR
 | Script | Description |
 |--------|-------------|
 | [`logging_inference/inference.py`](../user-guide/inference/classification-inference.md) | Model inference and batch prediction |
-| [`logging_inference/inference_without_metrics.py`](../user-guide/inference/classification-inference.md#inference-without-metrics) | Inference without metrics |
+| [`logging_inference/inference_without_metrics.py`](../user-guide/inference/classification-inference.md) | Inference without metrics |
 | [`logging_inference/multilabel_inference.py`](../user-guide/inference/classification-inference.md#multi-label-inference) | Multi-label inference and per-label probabilities |
 | [`logging_inference/detection_inference.py`](../user-guide/inference/object-detection-inference.md) | Object detection inference |
 | [`logging_inference/segmentation_inference.py`](../user-guide/inference/semantic-segmentation-inference.md) | Segmentation inference |
@@ -184,8 +188,8 @@ Start your journey with CIFAR-10 classification and custom datasets.
 - **Basic Integration** - 8 task-specific examples
 - **Advanced Techniques** - Interpretation, transfer learning, ensemble, deployment (4 examples)
 
-### 📊 Data & Training (10 examples)
-- **Data & Augmentation** - Balanced sampling, augmentation, multi-label (5 examples)
+### 📊 Data & Training (14 examples)
+- **Data & Augmentation** - Balanced sampling, augmentation, multi-label, CSV loading (9 examples)
 - **Training & Optimization** - Auto-tuning, multi-GPU, HPO (5 examples)
 
 ### 🔍 Understanding & Deployment (13 examples)
@@ -193,7 +197,7 @@ Start your journey with CIFAR-10 classification and custom datasets.
 - **Logging & Tracking** - TensorBoard, MLflow, evaluation (3 examples)
 - **Inference & Utilities** - Model inference, multi-label inference, and backbone discovery (4 examples)
 
-**Total: 46 runnable examples**
+**Total: 50 runnable examples**
 
 
 

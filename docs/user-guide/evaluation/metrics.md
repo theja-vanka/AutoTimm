@@ -4,32 +4,45 @@ AutoTimm uses explicit metric configuration through `MetricConfig` and `MetricMa
 
 ## Metric Lifecycle
 
+### Configure & Attach
+
+```mermaid
+graph LR
+    A[MetricConfig] --> B[MetricManager]
+    B --> C[Attach to Model]
+    C --> D{Training Loop}
+
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#1976D2,stroke:#1565C0
+    style D fill:#FF9800,stroke:#F57C00
+```
+
+### Compute & Log
+
 ```mermaid
 graph TD
-    A[MetricConfig] --> B[MetricManager]
-    B --> C[Model Init]
-    
-    C --> D{Training Loop}
-    
-    D -->|Step| E1[Compute Metric]
-    D -->|Epoch End| E2[Aggregate]
-    
-    E1 --> F1[Log on Step]
-    E2 --> F2[Log on Epoch]
-    
-    F1 --> G[Logger Backend]
-    F2 --> G
-    
-    G -->|TensorBoard| H1[tensorboard/]
-    G -->|W&B| H2[wandb/]
-    G -->|MLflow| H3[mlflow/]
-    
-    E2 --> I[Progress Bar]
-    
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style D fill:#2196F3,stroke:#1976D2,color:#fff
-    style G fill:#42A5F5,stroke:#1976D2,color:#fff
+    A{Training Loop} -->|Each Step| B[Update Metric State]
+    A -->|Epoch End| C[Aggregate & Reset]
+    B --> D[Log Step Metrics]
+    C --> E[Log Epoch Metrics]
+    D --> F{Logger Backend}
+    E --> F
+    F --> G1[TensorBoard]
+    F --> G2[Weights & Biases]
+    F --> G3[MLflow]
+    C --> H[Progress Bar]
+
+    style A fill:#FF9800,stroke:#F57C00
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#1976D2,stroke:#1565C0
+    style D fill:#1976D2,stroke:#1565C0
+    style E fill:#1976D2,stroke:#1565C0
+    style F fill:#FF9800,stroke:#F57C00
+    style G1 fill:#4CAF50,stroke:#388E3C
+    style G2 fill:#4CAF50,stroke:#388E3C
+    style G3 fill:#4CAF50,stroke:#388E3C
+    style H fill:#4CAF50,stroke:#388E3C
 ```
 
 ## MetricConfig

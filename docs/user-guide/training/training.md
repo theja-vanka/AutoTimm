@@ -8,31 +8,32 @@ AutoTimm provides `AutoTrainer`, a configured PyTorch Lightning Trainer with sen
 graph TD
     A[Initialize Model & Data] --> B{Auto-Tuning?}
     B -->|Yes| C[Find LR & Batch Size]
-    B -->|No| D[Start Training]
-    C --> D
-    D --> E[Training Loop]
-    E --> F[Forward Pass]
-    F --> G[Compute Loss]
-    G --> H[Backward Pass]
-    H --> I[Update Weights]
-    I --> J{Validation?}
-    J -->|Every N epochs| K[Validation Loop]
-    K --> L[Compute Metrics]
-    L --> M{Save Checkpoint?}
-    M -->|Best metric| N[Save Model]
-    M -->|No| O{Continue?}
-    J -->|No| O
-    N --> O
-    O -->|More epochs| E
-    O -->|Done| P[Test Model]
-    P --> Q[Final Metrics]
-    
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style C fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E fill:#2196F3,stroke:#1976D2,color:#fff
-    style K fill:#42A5F5,stroke:#1976D2,color:#fff
-    style N fill:#2196F3,stroke:#1976D2,color:#fff
-    style P fill:#42A5F5,stroke:#1976D2,color:#fff
+    C --> D[Training Loop]
+    B -->|No| D
+    D --> E[Forward Pass → Loss]
+    E --> F[Backward Pass → Update Weights]
+    F --> G{Validation?}
+    G -->|Yes| H[Compute Metrics → Log]
+    H --> I{Best Metric?}
+    I -->|Yes| J[Save Checkpoint]
+    J --> K{More Epochs?}
+    I -->|No| K
+    G -->|No| K
+    K -->|Yes| D
+    K -->|No| L[Load Best → Test → Final Metrics]
+
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#FF9800,stroke:#F57C00
+    style C fill:#1976D2,stroke:#1565C0
+    style D fill:#1976D2,stroke:#1565C0
+    style E fill:#1976D2,stroke:#1565C0
+    style F fill:#1976D2,stroke:#1565C0
+    style G fill:#FF9800,stroke:#F57C00
+    style H fill:#1976D2,stroke:#1565C0
+    style I fill:#FF9800,stroke:#F57C00
+    style J fill:#1976D2,stroke:#1565C0
+    style K fill:#FF9800,stroke:#F57C00
+    style L fill:#4CAF50,stroke:#388E3C
 ```
 
 ## AutoTrainer

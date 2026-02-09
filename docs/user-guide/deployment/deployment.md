@@ -7,33 +7,19 @@ This guide covers deploying AutoTimm models to production environments, includin
 ```mermaid
 graph TD
     A[Trained Model] --> B{Deployment Target}
-    
-    B -->|Python/PyTorch| C[TorchScript]
-    B -->|Cross-Platform| D[ONNX]
-    B -->|NVIDIA GPU| E[TensorRT]
-    B -->|Mobile| F[Mobile Export]
-    B -->|Edge Devices| G[Quantized Models]
-    
-    C --> H1[LibTorch C++]
-    C --> H2[PyTorch Mobile]
-    
-    D --> I1[ONNX Runtime]
-    D --> I2[OpenVINO]
-    D --> I3[TensorRT]
-    
-    E --> J[Optimized NVIDIA]
-    
-    F --> K1[iOS]
-    F --> K2[Android]
-    
-    G --> L[INT8/FP16]
-    
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style C fill:#42A5F5,stroke:#1976D2,color:#fff
-    style D fill:#2196F3,stroke:#1976D2,color:#fff
-    style E fill:#42A5F5,stroke:#1976D2,color:#fff
-    style F fill:#2196F3,stroke:#1976D2,color:#fff
-    style G fill:#42A5F5,stroke:#1976D2,color:#fff
+    B -->|Python / C++| C[<b>TorchScript</b><br/>LibTorch, PyTorch Mobile]
+    B -->|Cross-Platform| D[<b>ONNX</b><br/>ONNX Runtime, OpenVINO, TensorRT]
+    B -->|NVIDIA GPU| E[<b>TensorRT</b><br/>Maximum GPU performance]
+    B -->|Mobile| F[<b>Mobile Export</b><br/>iOS, Android]
+    B -->|Edge| G[<b>Quantized</b><br/>INT8 / FP16]
+
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#FF9800,stroke:#F57C00
+    style C fill:#1976D2,stroke:#1565C0
+    style D fill:#1976D2,stroke:#1565C0
+    style E fill:#1976D2,stroke:#1565C0
+    style F fill:#1976D2,stroke:#1565C0
+    style G fill:#1976D2,stroke:#1565C0
 ```
 
 ## Model Export Overview

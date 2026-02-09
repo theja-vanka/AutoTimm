@@ -4,40 +4,60 @@ AutoTimm provides comprehensive tools for interpreting and visualizing deep lear
 
 ## Interpretation Workflow
 
+### Choose a Method
+
 ```mermaid
-graph TD
+graph LR
     A[Model + Image] --> B{Method}
-    
-    B -->|GradCAM| C1[Gradient-based]
-    B -->|Integrated Gradients| C2[Path-based]
-    B -->|Attention| C3[Attention-based]
-    B -->|SmoothGrad| C4[Noise-based]
-    
-    C1 --> D[Heatmap]
+    B --> C1[<b>GradCAM</b><br/>Gradient-weighted<br/>activation maps]
+    B --> C2[<b>Integrated Gradients</b><br/>Path-based<br/>attribution]
+    B --> C3[<b>Attention Rollout</b><br/>ViT attention<br/>aggregation]
+    B --> C4[<b>SmoothGrad</b><br/>Noise-averaged<br/>gradients]
+
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#FF9800,stroke:#F57C00
+    style C1 fill:#1976D2,stroke:#1565C0
+    style C2 fill:#1976D2,stroke:#1565C0
+    style C3 fill:#1976D2,stroke:#1565C0
+    style C4 fill:#1976D2,stroke:#1565C0
+```
+
+### Generate & Visualize
+
+```mermaid
+graph LR
+    A[Heatmap] --> B{Task Adapter}
+    B --> C1[Classification<br/>Class attribution overlay]
+    B --> C2[Detection<br/>Per-box attribution]
+    B --> C3[Segmentation<br/>Per-class pixel maps]
+    C1 --> D[Visualization<br/>Plots + HTML Reports]
     C2 --> D
     C3 --> D
-    C4 --> D
-    
-    D --> E{Task Adapter}
-    
-    E -->|Classification| F1[Class Attribution]
-    E -->|Detection| F2[Box Attribution]
-    E -->|Segmentation| F3[Pixel Attribution]
-    
-    F1 --> G[Visualization]
-    F2 --> G
-    F3 --> G
-    
-    G --> H[Quality Metrics]
-    H --> I[Analysis]
-    
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C2 fill:#2196F3,stroke:#1976D2,color:#fff
-    style C3 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C4 fill:#2196F3,stroke:#1976D2,color:#fff
-    style G fill:#42A5F5,stroke:#1976D2,color:#fff
-    style I fill:#2196F3,stroke:#1976D2,color:#fff
+
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#FF9800,stroke:#F57C00
+    style C1 fill:#1976D2,stroke:#1565C0
+    style C2 fill:#1976D2,stroke:#1565C0
+    style C3 fill:#1976D2,stroke:#1565C0
+    style D fill:#4CAF50,stroke:#388E3C
+```
+
+### Evaluate Quality
+
+```mermaid
+graph LR
+    A[Explanation] --> B1[Faithfulness<br/>Perturbation test]
+    A --> B2[Sensitivity<br/>Input variation]
+    A --> B3[Localization<br/>Ground truth IoU]
+    B1 --> C[Metric Scores<br/>+ Comparison Report]
+    B2 --> C
+    B3 --> C
+
+    style A fill:#1565C0,stroke:#0D47A1
+    style B1 fill:#1976D2,stroke:#1565C0
+    style B2 fill:#1976D2,stroke:#1565C0
+    style B3 fill:#1976D2,stroke:#1565C0
+    style C fill:#4CAF50,stroke:#388E3C
 ```
 
 ## Overview

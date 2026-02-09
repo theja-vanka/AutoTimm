@@ -5,21 +5,21 @@ This guide walks you through training your first image classifier with AutoTimm.
 ## Training Workflow
 
 ```mermaid
-graph TD
-    A[1. Import] --> B[2. Data]
-    B --> C[3. Metrics]
-    C --> D[4. Model]
-    D --> E[5. Trainer]
-    E --> F[6. Train]
-    F --> G[7. Evaluate]
-    
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C fill:#2196F3,stroke:#1976D2,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E fill:#2196F3,stroke:#1976D2,color:#fff
-    style F fill:#42A5F5,stroke:#1976D2,color:#fff
-    style G fill:#2196F3,stroke:#1976D2,color:#fff
+graph LR
+    A[<b>1. Import</b>] --> B[<b>2. Data</b><br/>ImageDataModule]
+    B --> C[<b>3. Metrics</b><br/>MetricConfig]
+    C --> D[<b>4. Model</b><br/>Select backbone +<br/>num_classes]
+    D --> E[<b>5. Trainer</b><br/>AutoTrainer]
+    E --> F[<b>6. Train</b><br/>trainer.fit]
+    F --> G[<b>7. Evaluate</b><br/>trainer.test]
+
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#1565C0,stroke:#0D47A1
+    style D fill:#1976D2,stroke:#1565C0
+    style E fill:#1565C0,stroke:#0D47A1
+    style F fill:#1976D2,stroke:#1565C0
+    style G fill:#4CAF50,stroke:#388E3C
 ```
 
 ## Basic Training

@@ -2,41 +2,46 @@
 
 AutoTimm provides specialized data modules for different computer vision tasks:
 
-- **[ImageDataModule](image-classification-data.md)**: Image classification datasets (CIFAR, MNIST, custom folders)
+- **[ImageDataModule](image-classification-data.md)**: Image classification datasets (CIFAR, MNIST, custom folders, CSV)
 - **[MultiLabelImageDataModule](multilabel-classification-data.md)**: Multi-label classification from CSV files
-- **[DetectionDataModule](object-detection-data.md)**: Object detection datasets in COCO format
-- **[SegmentationDataModule](segmentation-data.md)**: Semantic segmentation datasets
+- **[DetectionDataModule](object-detection-data.md)**: Object detection datasets (COCO format or CSV)
+- **[SegmentationDataModule](segmentation-data.md)**: Semantic segmentation datasets (PNG, VOC, Cityscapes, COCO, CSV)
+- **[InstanceSegmentationDataModule](segmentation-data.md#instance-segmentation-data)**: Instance segmentation datasets (COCO format or CSV)
+- **[CSV Data Loading](csv-data.md)**: CSV-based data loading for all task types
 - **[Transforms](transforms.md)**: Image transforms and augmentation system
 
 ## Data Loading Pipeline
 
+### Data Modules
+
 ```mermaid
-graph TD
+graph LR
     A[Raw Data] --> B{Data Module}
-    B -->|ImageDataModule| C1[Classification]
-    B -->|MultiLabelImageDataModule| C4[Multi-Label]
-    B -->|DetectionDataModule| C2[Detection]
-    B -->|SegmentationDataModule| C3[Segmentation]
+    B --> C1[<b>ImageDataModule</b><br/>Folders / CSV / Built-in]
+    B --> C2[<b>MultiLabelImageDataModule</b><br/>CSV → Multi-hot labels]
+    B --> C3[<b>DetectionDataModule</b><br/>COCO JSON / CSV]
+    B --> C4[<b>SegmentationDataModule</b><br/>PNG / VOC / Cityscapes / CSV]
 
-    C1 --> D1[Transforms]
-    C4 --> D1
-    C2 --> D2[Transforms + BBox]
-    C3 --> D3[Transforms + Masks]
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#FF9800,stroke:#F57C00
+    style C1 fill:#1976D2,stroke:#1565C0
+    style C2 fill:#1976D2,stroke:#1565C0
+    style C3 fill:#1976D2,stroke:#1565C0
+    style C4 fill:#1976D2,stroke:#1565C0
+```
 
-    D1 --> E[DataLoader]
-    D2 --> E
-    D3 --> E
+### Transform & Batch
 
-    E --> F[Training Batches]
+```mermaid
+graph LR
+    A[Dataset] --> B[Transforms<br/>Resize + Augment + Normalize]
+    B --> C[DataLoader<br/>Workers / Batch Size / Shuffle]
+    C --> D[Training Batches]
 
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C1 fill:#2196F3,stroke:#1976D2,color:#fff
-    style C2 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C3 fill:#2196F3,stroke:#1976D2,color:#fff
-    style C4 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E fill:#42A5F5,stroke:#1976D2,color:#fff
-    style F fill:#2196F3,stroke:#1976D2,color:#fff
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#1976D2,stroke:#1565C0
+    style D fill:#4CAF50,stroke:#388E3C
 ```
 
 ## Quick Start

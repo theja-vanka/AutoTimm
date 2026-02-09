@@ -4,42 +4,86 @@ AutoTimm provides specialized model architectures for different computer vision 
 
 ## Model Architecture Overview
 
+### Classification
+
 ```mermaid
-graph TD
-    subgraph Classification
-        A[ImageClassifier] --> A1[Backbone<br/>1000+ timm models]
-        A1 --> A2[Classification Head]
-        A2 --> A3[Class Predictions]
-    end
-    
-    subgraph Detection
-        B[ObjectDetector] --> B1[Backbone<br/>1000+ timm models]
-        B1 --> B2[FPN]
-        B2 --> B3[Detection Head<br/>FCOS/YOLOX]
-        B3 --> B4[Boxes + Classes]
-        
-        C[YOLOXDetector] --> C1[CSPDarknet]
-        C1 --> C2[PAFPN]
-        C2 --> C3[YOLOX Head]
-        C3 --> C4[Boxes + Classes]
-    end
-    
-    subgraph Segmentation
-        D[SemanticSegmentor] --> D1[Backbone<br/>1000+ timm models]
-        D1 --> D2[DeepLabV3+/FCN]
-        D2 --> D3[Pixel Masks]
-        
-        E[InstanceSegmentor] --> E1[Backbone<br/>1000+ timm models]
-        E1 --> E2[FPN]
-        E2 --> E3[Mask Head]
-        E3 --> E4[Instance Masks]
-    end
-    
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C fill:#2196F3,stroke:#1976D2,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E fill:#2196F3,stroke:#1976D2,color:#fff
+graph LR
+    A[<b>ImageClassifier</b>] --> B[Backbone<br/>1000+ timm models]
+    B --> C[Global Pooling]
+    C --> D[Classification Head<br/>Linear + Dropout]
+    D --> E[Softmax / Sigmoid]
+
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#1976D2,stroke:#1565C0
+    style D fill:#1976D2,stroke:#1565C0
+    style E fill:#4CAF50,stroke:#388E3C
+```
+
+### Object Detection
+
+```mermaid
+graph LR
+    A[<b>ObjectDetector</b>] --> B[Backbone<br/>1000+ timm models]
+    B --> C[FPN]
+    C --> D[Detection Head<br/>FCOS / YOLOX]
+    D --> E1[Classification]
+    D --> E2[Regression]
+    D --> E3[Centerness]
+    E1 --> F[NMS → Boxes + Classes]
+    E2 --> F
+    E3 --> F
+
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#1976D2,stroke:#1565C0
+    style D fill:#1976D2,stroke:#1565C0
+    style F fill:#4CAF50,stroke:#388E3C
+```
+
+```mermaid
+graph LR
+    A[<b>YOLOXDetector</b>] --> B[CSPDarknet]
+    B --> C[PAFPN]
+    C --> D[Decoupled Head<br/>+ SimOTA]
+    D --> E[NMS → Boxes + Classes]
+
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#1976D2,stroke:#1565C0
+    style D fill:#1976D2,stroke:#1565C0
+    style E fill:#4CAF50,stroke:#388E3C
+```
+
+### Segmentation
+
+```mermaid
+graph LR
+    A[<b>SemanticSegmentor</b>] --> B[Backbone<br/>1000+ timm models]
+    B --> C[DeepLabV3+ / FCN<br/>ASPP + Decoder]
+    C --> D[Upsample → Argmax]
+    D --> E[Pixel Masks]
+
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#1976D2,stroke:#1565C0
+    style E fill:#4CAF50,stroke:#388E3C
+```
+
+```mermaid
+graph LR
+    A[<b>InstanceSegmentor</b>] --> B[Backbone<br/>1000+ timm models]
+    B --> C[FPN]
+    C --> D[Detection Head]
+    C --> E[Mask Head<br/>RoI Align + Conv]
+    D --> F[Instance Masks + Boxes]
+    E --> F
+
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#1976D2,stroke:#1565C0
+    style D fill:#1976D2,stroke:#1565C0
+    style E fill:#1976D2,stroke:#1565C0
+    style F fill:#4CAF50,stroke:#388E3C
 ```
 
 ## Available Models

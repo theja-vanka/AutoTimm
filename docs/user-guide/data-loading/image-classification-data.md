@@ -1,45 +1,37 @@
 # Image Classification Data
 
-The `ImageDataModule` handles image classification datasets including built-in datasets (CIFAR, MNIST) and custom folder-structured datasets.
+The `ImageDataModule` handles image classification datasets including built-in datasets (CIFAR, MNIST), custom folder-structured datasets, and [CSV files](csv-data.md#classification).
 
 ## Data Loading Flow
 
 ```mermaid
 graph TD
     A[Data Source] --> B{Dataset Type}
-    
-    B -->|Built-in| C1[CIFAR/MNIST]
-    B -->|Custom| C2[ImageFolder]
-    
-    C1 --> D[Auto Download]
-    C2 --> E[Scan Directories]
-    
-    D --> F[ImageDataModule]
-    E --> F
-    
-    F --> G{Split Strategy}
-    
-    G -->|Has val/| H1[Use val/ folder]
-    G -->|No val/| H2[Auto split val_split=0.1]
-    
-    H1 --> I[Train/Val/Test Splits]
+    B -->|Built-in| C1[CIFAR / MNIST<br/>Auto download]
+    B -->|Custom Folder| C2[ImageFolder<br/>class_1/, class_2/, ...]
+    B -->|CSV| C3[CSVImageDataset<br/>image_path, label]
+    C1 --> D[ImageDataModule]
+    C2 --> D
+    C3 --> D
+    D --> E{Split Strategy}
+    E -->|val/ exists| F1[Use val/ folder]
+    E -->|No val/| F2[Auto split<br/>val_split=0.1]
+    F1 --> G[Transforms]
+    F2 --> G
+    G -->|Train| H1[Augment + Normalize]
+    G -->|Val/Test| H2[Resize + Normalize]
+    H1 --> I[DataLoader → Batches]
     H2 --> I
-    
-    I --> J[TransformConfig]
-    
-    J -->|Train| K1[Augmentation]
-    J -->|Val/Test| K2[Resize + Normalize]
-    
-    K1 --> L[DataLoader]
-    K2 --> L
-    
-    L --> M[Batches]
-    
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style F fill:#42A5F5,stroke:#1976D2,color:#fff
-    style J fill:#2196F3,stroke:#1976D2,color:#fff
-    style L fill:#42A5F5,stroke:#1976D2,color:#fff
-    style M fill:#2196F3,stroke:#1976D2,color:#fff
+
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#FF9800,stroke:#F57C00
+    style C1 fill:#1976D2,stroke:#1565C0
+    style C2 fill:#1976D2,stroke:#1565C0
+    style C3 fill:#1976D2,stroke:#1565C0
+    style D fill:#1565C0,stroke:#0D47A1
+    style E fill:#FF9800,stroke:#F57C00
+    style G fill:#1976D2,stroke:#1565C0
+    style I fill:#4CAF50,stroke:#388E3C
 ```
 
 ## Built-in Datasets
@@ -521,6 +513,7 @@ MultiLabelImageDataModule(
 
 ## See Also
 
+- [CSV Data Loading](csv-data.md#classification) - Load classification data from CSV files
 - [Object Detection Data](object-detection-data.md) - For COCO format object detection datasets
 - [Data Handling Examples](../../examples/utilities/data-handling.md) - More examples and use cases
 - [Training Guide](../training/training.md) - How to train models with your data

@@ -6,18 +6,60 @@ Combine multiple models and distill knowledge into compact students for producti
 
 ```mermaid
 graph TD
-    A[Multiple Models] --> B{Combination}
-    B -->|Average / Weighted| C[Ensemble Prediction]
-    C -.Teacher.-> D[Teacher Model]
-    D --> E[Soft Targets + Hard Loss]
-    E --> F[Student Model]
-    F --> G[Compact Model]
+    A[Multiple Models] --> A1[Model 1]
+    A --> A2[Model 2]
+    A --> A3[Model N]
+    
+    A1 --> A1a[Forward Pass]
+    A2 --> A2a[Forward Pass]
+    A3 --> A3a[Forward Pass]
+    
+    A1a --> B{Combination}
+    A2a --> B
+    A3a --> B
+    
+    B -->|Average| C1[Simple Average]
+    C1 --> C1a[Sum Predictions]
+    C1a --> C1b[Divide by N]
+    
+    B -->|Weighted| C2[Weighted Average]
+    C2 --> C2a[Learn Weights]
+    C2a --> C2b[Weighted Sum]
+    
+    C1b --> C[Ensemble Prediction]
+    C2b --> C
+    
+    C --> C3[Aggregate Logits]
+    C3 --> C4[Final Prediction]
+    C4 -."Soft Targets".-> D[Teacher Model]
+    
+    D --> D1[Generate Soft Labels]
+    D1 --> D2[Temperature Scaling]
+    D2 --> D3[Soft Distributions]
+    D3 --> E[Soft Targets + Hard Loss]
+    
+    E --> E1[KL Divergence]
+    E1 --> E2[Cross Entropy]
+    E2 --> E3[Combined Loss]
+    E3 --> F[Student Model]
+    
+    F --> F1[Smaller Architecture]
+    F1 --> F2[Train with Teacher]
+    F2 --> F3[Match Distributions]
+    F3 --> F4[Optimize Loss]
+    F4 --> G[Compact Model]
+    
+    G --> G1[Reduced Parameters]
+    G1 --> G2[Faster Inference]
+    G2 --> G3[Production Ready]
+    G3 --> G4[Deploy]
 
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style C fill:#42A5F5,stroke:#1976D2,color:#fff
-    style D fill:#2196F3,stroke:#1976D2,color:#fff
-    style F fill:#42A5F5,stroke:#1976D2,color:#fff
-    style G fill:#2196F3,stroke:#1976D2,color:#fff
+    style A fill:#2196F3,stroke:#1976D2
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#2196F3,stroke:#1976D2
+    style D fill:#1976D2,stroke:#1565C0
+    style F fill:#2196F3,stroke:#1976D2
+    style G fill:#1976D2,stroke:#1565C0
 ```
 
 ## Overview

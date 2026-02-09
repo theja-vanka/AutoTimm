@@ -6,19 +6,57 @@ This section provides detailed API documentation for all AutoTimm classes and fu
 
 ```mermaid
 graph LR
-    A[AutoTimm API] --> B[Models]
-    A --> C[Data]
-    A --> D[Training]
-    A --> E[Config]
+    A[<b>AutoTimm API</b>] --> B[<b>Models</b>]
+    A --> C[<b>Data</b>]
+    A --> D[<b>Training</b>]
+    A --> E[<b>Config</b>]
 
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C fill:#2196F3,stroke:#1976D2,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E fill:#2196F3,stroke:#1976D2,color:#fff
+    B --> B1[ImageClassifier]
+    B --> B2[ObjectDetector]
+    B --> B3[SemanticSegmentor]
+    B --> B4[InstanceSegmentor]
+    B --> B5[YOLOXDetector]
+
+    C --> C1[ImageDataModule]
+    C --> C2[DetectionDataModule]
+    C --> C3[SegmentationDataModule]
+    C --> C4[InstanceSegDataModule]
+    C --> C5[MultiLabelDataModule]
+
+    D --> D1[AutoTrainer]
+    D --> D2[Callbacks]
+    D --> D3[TunerConfig]
+
+    E --> E1[TransformConfig]
+    E --> E2[MetricConfig]
+    E --> E3[LoggerConfig]
+
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#1565C0,stroke:#0D47A1
+    style D fill:#1976D2,stroke:#1565C0
+    style E fill:#1565C0,stroke:#0D47A1
+    style B1 fill:#1976D2,stroke:#1565C0
+    style B2 fill:#1976D2,stroke:#1565C0
+    style B3 fill:#1976D2,stroke:#1565C0
+    style B4 fill:#1976D2,stroke:#1565C0
+    style B5 fill:#1976D2,stroke:#1565C0
+    style C1 fill:#1976D2,stroke:#1565C0
+    style C2 fill:#1976D2,stroke:#1565C0
+    style C3 fill:#1976D2,stroke:#1565C0
+    style C4 fill:#1976D2,stroke:#1565C0
+    style C5 fill:#1976D2,stroke:#1565C0
+    style D1 fill:#1976D2,stroke:#1565C0
+    style D2 fill:#1976D2,stroke:#1565C0
+    style D3 fill:#1976D2,stroke:#1565C0
+    style E1 fill:#1976D2,stroke:#1565C0
+    style E2 fill:#1976D2,stroke:#1565C0
+    style E3 fill:#1976D2,stroke:#1565C0
 ```
 
 ## Core Classes
+
+### Task Models
 
 | Class | Description |
 |-------|-------------|
@@ -26,10 +64,32 @@ graph LR
 | [ObjectDetector](detection.md) | FCOS-style anchor-free object detector |
 | [SemanticSegmentor](segmentation.md#semanticsegmentor) | DeepLabV3+ / FCN semantic segmentation |
 | [InstanceSegmentor](segmentation.md#instancesegmentor) | Mask R-CNN style instance segmentation |
-| [ImageDataModule](data.md) | Data module for images (folder or built-in datasets) |
-| [DetectionDataModule](detection_data.md) | Data module for object detection (COCO format) |
-| [SegmentationDataModule](segmentation.md#segmentationdatamodule) | Data module for semantic segmentation |
-| [InstanceSegmentationDataModule](segmentation.md#instancesegmentationdatamodule) | Data module for instance segmentation |
+
+### Data Modules
+
+| Class | Description |
+|-------|-------------|
+| [ImageDataModule](data.md) | Image classification (folder/built-in/CSV) |
+| [MultiLabelImageDataModule](multilabel_data.md) | Multi-label classification from CSV |
+| [DetectionDataModule](detection_data.md) | Object detection (COCO/CSV) |
+| [SegmentationDataModule](segmentation.md#segmentationdatamodule) | Semantic segmentation |
+| [InstanceSegmentationDataModule](segmentation.md#instancesegmentationdatamodule) | Instance segmentation (COCO/CSV) |
+
+### CSV Datasets
+
+For direct CSV dataset usage without DataModules, see [CSV Data Loading API](csv_data.md):
+
+| Dataset | Task | Description |
+|---------|------|-------------|
+| [CSVImageDataset](csv_data.md#csvimagedataset) | Classification | Single-label from CSV |
+| [MultiLabelImageDataset](csv_data.md#multilabelimagedataset) | Multi-Label | Multi-label from CSV |
+| [CSVDetectionDataset](csv_data.md#csvdetectiondataset) | Detection | Bounding boxes from CSV |
+| [CSVInstanceDataset](csv_data.md#csvinstancedataset) | Instance Seg | Masks from CSV |
+
+### Training
+
+| Class | Description |
+|-------|-------------|
 | [AutoTrainer](trainer.md) | Configured PyTorch Lightning Trainer |
 
 ## Configuration Classes

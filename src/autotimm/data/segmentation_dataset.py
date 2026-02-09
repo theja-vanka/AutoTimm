@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import csv
 import json
 from pathlib import Path
 from typing import Any
@@ -20,15 +21,17 @@ class SemanticSegmentationDataset(Dataset):
     - COCO format: COCO stuff/panoptic annotations
     - Cityscapes format: images + labelIds masks
     - Pascal VOC format: JPEGImages + SegmentationClass
+    - CSV format: CSV file with image_path,mask_path columns
 
     Args:
         data_dir: Root directory of the dataset
         split: Dataset split ('train', 'val', 'test')
-        format: Dataset format ('png', 'coco', 'cityscapes', 'voc')
+        format: Dataset format ('png', 'coco', 'cityscapes', 'voc', 'csv')
         image_size: Target image size (resizes if provided)
         transforms: Albumentations transforms to apply
         class_mapping: Optional mapping from dataset class IDs to contiguous IDs
         ignore_index: Index to use for ignored pixels (default: 255)
+        csv_path: Path to CSV file (required when format='csv')
     """
 
     def __init__(
@@ -40,6 +43,7 @@ class SemanticSegmentationDataset(Dataset):
         transforms: Any = None,
         class_mapping: dict[int, int] | None = None,
         ignore_index: int = 255,
+        csv_path: str | Path | None = None,
     ):
         self.data_dir = Path(data_dir)
         self.split = split
@@ -48,6 +52,7 @@ class SemanticSegmentationDataset(Dataset):
         self.transforms = transforms
         self.class_mapping = class_mapping
         self.ignore_index = ignore_index
+        self.csv_path = Path(csv_path) if csv_path else None
 
         # Load dataset samples
         self.samples = self._load_samples()
@@ -62,6 +67,8 @@ class SemanticSegmentationDataset(Dataset):
             return self._load_cityscapes_format()
         elif self.format == "voc":
             return self._load_voc_format()
+        elif self.format == "csv":
+            return self._load_csv_format()
         else:
             raise ValueError(f"Unsupported format: {self.format}")
 
@@ -187,6 +194,37 @@ class SemanticSegmentationDataset(Dataset):
                         "image_path": str(image_path),
                         "mask_path": str(mask_path),
                         "image_id": image_id,
+                    }
+                )
+
+        return samples
+
+    def _load_csv_format(self) -> list[dict]:
+        """Load CSV format: image_path,mask_path columns."""
+        if self.csv_path is None:
+            raise ValueError("csv_path is required when format='csv'")
+
+        if not self.csv_path.exists():
+            raise FileNotFoundError(f"CSV file not found: {self.csv_path}")
+
+        samples = []
+        with open(self.csv_path, newline="") as f:
+            reader = csv.DictReader(f)
+            fieldnames = list(reader.fieldnames or [])
+
+            # Determine column names
+            img_col = "image_path" if "image_path" in fieldnames else fieldnames[0]
+            mask_col = "mask_path" if "mask_path" in fieldnames else fieldnames[1]
+
+            for row in reader:
+                image_path = self.data_dir / row[img_col]
+                mask_path = self.data_dir / row[mask_col]
+
+                samples.append(
+                    {
+                        "image_path": str(image_path),
+                        "mask_path": str(mask_path),
+                        "image_id": Path(row[img_col]).stem,
                     }
                 )
 

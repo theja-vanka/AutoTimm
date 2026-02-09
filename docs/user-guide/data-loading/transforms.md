@@ -6,37 +6,76 @@ AutoTimm provides a flexible transform system for image preprocessing and augmen
 
 ```mermaid
 graph TD
-    A[Raw Image] --> B{TransformConfig}
+    A[Raw Image] --> A1[Load from Disk]
+    A1 --> A2[Decode Format]
+    A2 --> B{TransformConfig}
     
     B -->|Backend| C1[torchvision]
+    C1 --> C1a[PIL Backend]
+    C1a --> C1b[Import Transforms]
+    
     B -->|Backend| C2[albumentations]
+    C2 --> C2a[OpenCV Backend]
+    C2a --> C2b[Import Transforms]
     
-    C1 --> D1[Preset Transforms]
-    C2 --> D2[Preset Transforms]
+    C1b --> D1[Preset Transforms]
+    C2b --> D2[Preset Transforms]
     
-    D1 --> E[Resize]
-    D2 --> E
+    D1 --> D1a[weak/medium/strong]
+    D1a --> D1b[auto_augment]
+    D1b --> D1c[rand_augment]
     
-    E --> F[Augmentation]
+    D2 --> D2a[weak/medium/strong]
+    D2a --> D2b[auto_augment]
+    D2b --> D2c[rand_augment]
+    
+    D1c --> E[Resize]
+    D2c --> E
+    
+    E --> E1[Determine Size]
+    E1 --> E2[Maintain Aspect]
+    E2 --> E3[Apply Interpolation]
+    E3 --> F[Augmentation]
     
     F -->|Training| G1[RandAugment/Strong]
-    F -->|Evaluation| G2[CenterCrop]
+    G1 --> G1a[Random Crop]
+    G1a --> G1b[Random Flip]
+    G1b --> G1c[Color Jitter]
+    G1c --> G1d[Rotation]
+    G1d --> G1e[Mixup/Cutmix]
     
-    G1 --> H[Normalization]
-    G2 --> H
+    F -->|Evaluation| G2[CenterCrop]
+    G2 --> G2a[Center Crop]
+    G2a --> G2b[Resize to Target]
+    
+    G1e --> H[Normalization]
+    G2b --> H
     
     H -->|timm config| I1[Model-specific]
+    I1 --> I1a[Load Pretrained Stats]
+    I1a --> I1b[Get Mean/Std]
+    I1b --> I1c[Apply Normalization]
+    
     H -->|custom| I2[User-defined]
+    I2 --> I2a[Custom Mean/Std]
+    I2a --> I2b[Apply Normalization]
     
-    I1 --> J[Tensor]
-    I2 --> J
+    I1c --> J[Tensor]
+    I2b --> J
     
-    style B fill:#2196F3,stroke:#1976D2,color:#fff
-    style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C2 fill:#2196F3,stroke:#1976D2,color:#fff
-    style F fill:#42A5F5,stroke:#1976D2,color:#fff
-    style H fill:#2196F3,stroke:#1976D2,color:#fff
-    style J fill:#42A5F5,stroke:#1976D2,color:#fff
+    J --> J1[Convert to Tensor]
+    J1 --> J2[Permute Dimensions]
+    J2 --> J3[Ensure Float32]
+    J3 --> J4[Ready for Model]
+    
+    style B fill:#2196F3,stroke:#1976D2
+    style C1 fill:#1976D2,stroke:#1565C0
+    style C2 fill:#2196F3,stroke:#1976D2
+    style E fill:#1976D2,stroke:#1565C0
+    style F fill:#2196F3,stroke:#1976D2
+    style H fill:#1976D2,stroke:#1565C0
+    style J fill:#2196F3,stroke:#1976D2
+    style J4 fill:#1976D2,stroke:#1565C0
 ```
 
 ## Overview

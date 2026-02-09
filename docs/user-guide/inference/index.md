@@ -4,38 +4,41 @@ This guide covers how to use trained AutoTimm models for inference and predictio
 
 ## Inference Pipeline
 
+### Load & Preprocess
+
 ```mermaid
-graph TD
+graph LR
     A[Trained Model] --> B[Load Checkpoint]
     B --> C[Set Eval Mode]
-    C --> D[Preprocess Image]
-    D --> E{Inference}
+    C --> D[Preprocess Image<br/>Resize + Normalize + Tensor]
+    D --> E{Task-Specific<br/>Inference}
 
-    E -->|Classification| F1[Logits]
-    E -->|Multi-Label| F4[Logits]
-    E -->|Detection| F2[Boxes + Classes]
-    E -->|Segmentation| F3[Pixel Masks]
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#1976D2,stroke:#1565C0
+    style D fill:#1976D2,stroke:#1565C0
+    style E fill:#FF9800,stroke:#F57C00
+```
 
-    F1 --> G1[Softmax]
-    F4 --> G4[Sigmoid + Threshold]
-    F2 --> G2[NMS]
-    F3 --> G3[Argmax]
+### Task-Specific Output
 
-    G1 --> H[Predictions]
-    G4 --> H
-    G2 --> H
-    G3 --> H
+```mermaid
+graph LR
+    A[Forward Pass] --> B1[Classification<br/>Softmax → Top-K]
+    A --> B2[Multi-Label<br/>Sigmoid → Threshold]
+    A --> B3[Detection<br/>Decode → NMS]
+    A --> B4[Segmentation<br/>Argmax → Mask]
+    B1 --> C[Results]
+    B2 --> C
+    B3 --> C
+    B4 --> C
 
-    H --> I[Post-process]
-    I --> J[Results]
-
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C fill:#2196F3,stroke:#1976D2,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E fill:#2196F3,stroke:#1976D2,color:#fff
-    style H fill:#42A5F5,stroke:#1976D2,color:#fff
-    style J fill:#2196F3,stroke:#1976D2,color:#fff
+    style A fill:#1565C0,stroke:#0D47A1
+    style B1 fill:#1976D2,stroke:#1565C0
+    style B2 fill:#1976D2,stroke:#1565C0
+    style B3 fill:#1976D2,stroke:#1565C0
+    style B4 fill:#1976D2,stroke:#1565C0
+    style C fill:#4CAF50,stroke:#388E3C
 ```
 
 ## Quick Links

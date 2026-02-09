@@ -6,24 +6,24 @@ Comprehensive troubleshooting guide for common issues when using AutoTimm.
 
 ```mermaid
 graph LR
-    A[Problem Category] --> B[Training]
-    A --> C[Performance]
-    A --> D[Data]
-    A --> E[Models]
-    A --> F[Deployment]
-    A --> G[Environment]
-    A --> H[Integration]
-    A --> I[Task-Specific]
+    A[Problem] --> B[<b>Training</b><br/>Loss, convergence,<br/>gradients, LR]
+    A --> C[<b>Performance</b><br/>Memory, speed,<br/>GPU, bottlenecks]
+    A --> D[<b>Data</b><br/>Loading, format,<br/>augmentation]
+    A --> E[<b>Models</b><br/>Architecture,<br/>pretrained, custom]
+    A --> F[<b>Deployment</b><br/>Export, serving,<br/>inference]
+    A --> G[<b>Environment</b><br/>Dependencies,<br/>CUDA, install]
+    A --> H[<b>Integration</b><br/>HuggingFace, timm,<br/>Lightning]
+    A --> I[<b>Task-Specific</b><br/>Classification,<br/>detection, segmentation]
 
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C fill:#2196F3,stroke:#1976D2,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E fill:#2196F3,stroke:#1976D2,color:#fff
-    style F fill:#42A5F5,stroke:#1976D2,color:#fff
-    style G fill:#2196F3,stroke:#1976D2,color:#fff
-    style H fill:#42A5F5,stroke:#1976D2,color:#fff
-    style I fill:#2196F3,stroke:#1976D2,color:#fff
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#1565C0,stroke:#0D47A1
+    style D fill:#1976D2,stroke:#1565C0
+    style E fill:#1565C0,stroke:#0D47A1
+    style F fill:#1976D2,stroke:#1565C0
+    style G fill:#1565C0,stroke:#0D47A1
+    style H fill:#1976D2,stroke:#1565C0
+    style I fill:#1565C0,stroke:#0D47A1
 ```
 
 ## Browse by Category

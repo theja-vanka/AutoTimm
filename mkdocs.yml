@@ -7,6 +7,7 @@ repo_url: https://github.com/theja-vanka/AutoTimm
 
 theme:
   name: material
+  custom_dir: docs/overrides
   favicon: assets/favicon.png
   logo: assets/logo.png
   palette:
@@ -99,6 +100,7 @@ nav:
           - Multi-Label Classification Data: user-guide/data-loading/multilabel-classification-data.md
           - Object Detection Data: user-guide/data-loading/object-detection-data.md
           - Segmentation Data: user-guide/data-loading/segmentation-data.md
+          - CSV Data Loading: user-guide/data-loading/csv-data.md
           - Transforms: user-guide/data-loading/transforms.md
           - Preset Manager: user-guide/data-loading/preset-manager.md
       - Models:
@@ -190,6 +192,7 @@ nav:
           - ImageDataModule: api/data.md
           - MultiLabelImageDataModule: api/multilabel_data.md
           - DetectionDataModule: api/detection_data.md
+          - CSV Data Loading: api/csv_data.md
           - TransformConfig: api/transforms.md
       - Training:
           - AutoTrainer: api/trainer.md
@@ -219,6 +222,7 @@ nav:
           - Deployment: examples/integration/hf_deployment.md
       - Data & Training:
           - Data Handling: examples/utilities/data-handling.md
+          - CSV Data Loading: examples/utilities/csv-data-loading.md
           - Custom Data & Augmentation: examples/utilities/hf_custom_data.md
           - Training Utilities: examples/utilities/training-utilities.md
           - Hyperparameter Tuning: examples/utilities/hf_hyperparameter_tuning.md
@@ -239,20 +243,9 @@ extra:
   analytics:
     provider: google
     property: !ENV GOOGLE_ANALYTICS_KEY
-  meta:
-    keywords: >-
-      PyTorch, Computer Vision, Deep Learning, Image Classification,
-      Object Detection, Semantic Segmentation, Instance Segmentation,
-      Transfer Learning, timm, YOLOX, AutoML, Machine Learning,
-      Neural Networks, CNN, Vision Transformer, Model Training,
-      Model Deployment, TorchScript
-
-extra_javascript:
-  - javascripts/mermaid-zoom.js
 
 extra_css:
   - stylesheets/mermaid.css
-  - stylesheets/mermaid-zoom.css
 
 copyright: |
   Copyright &copy; 2026 <a href="https://github.com/theja-vanka" target="_blank">Krishnatheja Vanka</a>.

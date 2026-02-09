@@ -1,49 +1,36 @@
 # Object Detection Data
 
-The `DetectionDataModule` handles object detection datasets in COCO format, including support for custom annotations, class filtering, and detection-specific augmentations.
+The `DetectionDataModule` handles object detection datasets in COCO format and [CSV format](csv-data.md#object-detection), including support for custom annotations, class filtering, and detection-specific augmentations.
 
 ## Detection Data Pipeline
 
 ```mermaid
 graph TD
-    A[COCO Dataset] --> B[Annotations JSON]
-    A --> C[Images]
-    
-    B --> D[Parse Annotations]
-    C --> D
-    
+    A[Data Source] --> B{Format}
+    B -->|COCO| C1[Annotations JSON<br/>+ Images]
+    B -->|CSV| C2[CSV with bbox columns<br/>+ Images]
+    C1 --> D[DetectionDataModule]
+    C2 --> D
     D --> E{Preprocessing}
-    
     E --> F1[Filter Classes]
     E --> F2[Min Bbox Area]
     E --> F3[Min Visibility]
-    
-    F1 --> G[DetectionDataModule]
+    F1 --> G{Augmentation}
     F2 --> G
     F3 --> G
-    
-    G --> H{Augmentation}
-    
-    H -->|Train| I1[Preset: strong]
-    H -->|Val/Test| I2[Resize + Normalize]
-    
-    I1 --> J[Bbox Transform]
-    I2 --> K[Collate]
-    
-    J --> L[Random Crop]
-    L --> M[Flip]
-    M --> N[Affine]
-    N --> K
-    
-    K --> O[Batch]
-    O --> P[Images + Boxes + Labels]
-    
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style G fill:#2196F3,stroke:#1976D2,color:#fff
-    style J fill:#42A5F5,stroke:#1976D2,color:#fff
-    style K fill:#2196F3,stroke:#1976D2,color:#fff
-    style P fill:#42A5F5,stroke:#1976D2,color:#fff
+    G -->|Train| H1[Flip + Crop + Color<br/>+ BBox Transform]
+    G -->|Val/Test| H2[Resize + Normalize]
+    H1 --> I[Collate → Batch<br/>Images + Boxes + Labels]
+    H2 --> I
+
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#FF9800,stroke:#F57C00
+    style C1 fill:#1976D2,stroke:#1565C0
+    style C2 fill:#1976D2,stroke:#1565C0
+    style D fill:#1565C0,stroke:#0D47A1
+    style E fill:#FF9800,stroke:#F57C00
+    style G fill:#FF9800,stroke:#F57C00
+    style I fill:#4CAF50,stroke:#388E3C
 ```
 
 ## COCO Dataset Format
@@ -414,6 +401,7 @@ To use your own COCO-format dataset:
 
 ## See Also
 
+- [CSV Data Loading](csv-data.md#object-detection) - Load detection data from CSV files
 - [Image Classification Data](image-classification-data.md) - For classification datasets
 - [Object Detection Examples](../../examples/tasks/object-detection.md) - More examples and use cases
 - [Training Guide](../training/training.md) - How to train detection models

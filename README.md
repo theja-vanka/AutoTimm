@@ -52,7 +52,7 @@ From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-G
 <td width="33%">
 <h3 align="center">Production Ready</h3>
 <p align="center">
-365+ tests, comprehensive logging, checkpoint management. Deploy with confidence.
+410+ tests, comprehensive logging, checkpoint management. Deploy with confidence.
 </p>
 </td>
 </tr>
@@ -60,6 +60,12 @@ From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-G
 
 ## What's New in v0.7.3
 
+- **CSV Data Loading** - Load data from CSV files for all task types: classification, object detection, semantic segmentation, and instance segmentation
+- **CSVImageDataset** - Single-label classification from CSV with auto class detection and both torchvision/albumentations backends
+- **CSVDetectionDataset** - Object detection from CSV with multi-row-per-image grouping and `xyxy` bbox format
+- **CSVInstanceDataset** - Instance segmentation from CSV with binary mask PNGs (no pycocotools required)
+- **CSV Segmentation** - Semantic segmentation from CSV via `format="csv"` in `SemanticSegmentationDataset`
+- **All DataModules Updated** - `ImageDataModule`, `DetectionDataModule`, `SegmentationDataModule`, and `InstanceSegmentationDataModule` all support `train_csv`/`val_csv`/`test_csv` parameters
 - **Multi-Label Classification** - Native multi-label support in `ImageClassifier` with `multi_label=True`, using `BCEWithLogitsLoss` and sigmoid predictions
 - **MultiLabelImageDataModule** - New data module for loading multi-label datasets from CSV files with auto-detected label columns, validation splits, and rich summary tables
 - **Multi-Label Metrics** - `MetricManager` now auto-injects `num_labels` and resolves `torchmetrics.classification` metrics (e.g., `MultilabelAccuracy`, `MultilabelF1Score`)
@@ -193,8 +199,12 @@ trainer.fit(model, datamodule=data)
 <td>Automatic PyTorch 2.0+ optimization • Enabled by default • Configurable modes</td>
 </tr>
 <tr>
+<td><strong>CSV Data Loading</strong></td>
+<td>Load any task from CSV files — classification, detection, segmentation, instance segmentation</td>
+</tr>
+<tr>
 <td><strong>Production Ready</strong></td>
-<td>Mixed precision • Multi-GPU • Gradient accumulation • 365+ tests</td>
+<td>Mixed precision • Multi-GPU • Gradient accumulation • 410+ tests</td>
 </tr>
 </table>
 
@@ -323,6 +333,43 @@ model = InstanceSegmentor(
 trainer = AutoTrainer(max_epochs=100)
 trainer.fit(model, datamodule=InstanceSegmentationDataModule(data_dir="./coco"))
 ```
+
+### CSV Data Loading
+
+Load data from CSV files instead of folder structures or COCO JSON:
+
+```python
+from autotimm import ImageClassifier, ImageDataModule, AutoTrainer
+
+# Classification from CSV (columns: image_path, label)
+data = ImageDataModule(
+    train_csv="train.csv",
+    val_csv="val.csv",
+    image_dir="./images",
+    image_size=224,
+    batch_size=32,
+)
+
+model = ImageClassifier(backbone="resnet50", num_classes=10)
+trainer = AutoTrainer(max_epochs=10)
+trainer.fit(model, datamodule=data)
+```
+
+```python
+from autotimm import ObjectDetector, DetectionDataModule
+
+# Detection from CSV (columns: image_path, x_min, y_min, x_max, y_max, label)
+data = DetectionDataModule(
+    train_csv="annotations.csv",
+    image_dir="./images",
+    image_size=640,
+    batch_size=8,
+)
+```
+
+CSV loading is supported for all tasks: classification, object detection, semantic segmentation, and instance segmentation.
+
+**[CSV Data Loading Guide](https://theja-vanka.github.io/AutoTimm/user-guide/data-loading/csv-data/)**
 
 ## Model Interpretation & Explainability
 
@@ -746,7 +793,7 @@ Comprehensive documentation with **interactive diagrams**, search optimization, 
 | [Interpretation Guide](https://theja-vanka.github.io/AutoTimm/user-guide/interpretation/) | Model explainability and visualization |
 | [YOLOX Guide](https://theja-vanka.github.io/AutoTimm/user-guide/models/yolox-detector/) | Complete YOLOX implementation guide |
 | [API Reference](https://theja-vanka.github.io/AutoTimm/api/) | Complete API documentation |
-| [Examples](https://theja-vanka.github.io/AutoTimm/examples/) | 45+ runnable code examples |
+| [Examples](https://theja-vanka.github.io/AutoTimm/examples/) | 50 runnable code examples |
 
 ### Ready-to-Run Examples
 
@@ -764,6 +811,7 @@ Comprehensive documentation with **interactive diagrams**, search optimization, 
 - Advanced: [hf_interpretation.py](examples/huggingface/hf_interpretation.py), [hf_transfer_learning.py](examples/huggingface/hf_transfer_learning.py), [hf_ensemble.py](examples/huggingface/hf_ensemble.py), [hf_deployment.py](examples/huggingface/hf_deployment.py)
 
 **📊 Data & Training**
+- CSV Data: [csv_classification.py](examples/data_training/csv_classification.py), [csv_detection.py](examples/data_training/csv_detection.py), [csv_segmentation.py](examples/data_training/csv_segmentation.py), [csv_instance_segmentation.py](examples/data_training/csv_instance_segmentation.py)
 - Data: [multilabel_classification.py](examples/data_training/multilabel_classification.py) - Multi-label from CSV, [hf_custom_data.py](examples/data_training/hf_custom_data.py) - Advanced augmentation
 - Training: [multi_gpu_training.py](examples/data_training/multi_gpu_training.py), [hf_hyperparameter_tuning.py](examples/data_training/hf_hyperparameter_tuning.py)
 - Optimization: [preset_manager.py](examples/data_training/preset_manager.py), [performance_optimization_demo.py](examples/data_training/performance_optimization_demo.py)
@@ -788,15 +836,16 @@ Comprehensive documentation with **interactive diagrams**, search optimization, 
 **Semantic Segmentation**
 - Architectures: DeepLabV3+, FCN
 - Losses: CrossEntropy, Dice, Focal, Combined, Tversky
-- Formats: PNG masks, COCO stuff, Cityscapes, Pascal VOC
+- Formats: PNG masks, COCO stuff, Cityscapes, Pascal VOC, CSV
 
 **Instance Segmentation**
 - Architecture: FCOS + Mask R-CNN style mask head
 - Losses: Detection losses + Binary mask loss
+- Formats: COCO JSON, CSV with binary mask PNGs
 
 ## Testing
 
-Comprehensive test suite with **365+ tests**:
+Comprehensive test suite with **410+ tests**:
 
 ```bash
 # Run all tests
@@ -806,7 +855,7 @@ pytest tests/ -v
 pytest tests/test_classification.py
 pytest tests/test_yolox.py
 pytest tests/test_interpretation.py
-pytest tests/test_interpretation_metrics.py
+pytest tests/test_csv_datamodules.py
 
 # With coverage
 pytest tests/ --cov=autotimm --cov-report=html

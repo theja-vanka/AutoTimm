@@ -175,3 +175,10 @@ print(data.summary())
 │ Val samples         │ 200                        │
 └─────────────────────┴────────────────────────────┘
 ```
+
+## See Also
+
+- [CSV Data Loading API](csv_data.md#multilabelimagedataset) - Direct dataset API for multi-label CSV data
+- [ImageDataModule](data.md) - Single-label classification data module
+- [CSV Data Loading Guide](../user-guide/data-loading/csv-data.md) - Complete guide with examples
+- [TransformConfig](transforms.md) - Unified transform configuration

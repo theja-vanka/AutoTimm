@@ -24,7 +24,7 @@ from autotimm.data.transforms import (
 class ImageDataModule(pl.LightningDataModule):
     """Lightning data module for image classification.
 
-    Supports two modes:
+    Supports three modes:
 
     1. **Folder mode** -- point ``data_dir`` at a directory with ``train/``,
        ``val/``, and optionally ``test/`` subdirectories, each containing one
@@ -32,10 +32,20 @@ class ImageDataModule(pl.LightningDataModule):
     2. **Built-in dataset mode** -- set ``dataset_name`` to a torchvision
        dataset (``"CIFAR10"``, ``"CIFAR100"``, ``"FashionMNIST"``, ``"MNIST"``)
        and ``data_dir`` to the download root.
+    3. **CSV mode** -- provide ``train_csv`` pointing to a CSV file with
+       ``image_path,label`` columns. Optionally provide ``val_csv`` and
+       ``test_csv`` for separate splits.
 
     Parameters:
         data_dir: Root directory for image data or download root.
         dataset_name: Optional name of a torchvision dataset class.
+        train_csv: Path to training CSV file (CSV mode).
+        val_csv: Path to validation CSV file (CSV mode).
+        test_csv: Path to test CSV file (CSV mode).
+        image_dir: Root directory for resolving image paths in CSV mode.
+            Defaults to the parent directory of ``train_csv``.
+        image_column: Name of the CSV column containing image paths.
+        label_column: Name of the CSV column containing class labels.
         image_size: Target image size (square).
         batch_size: Batch size for all dataloaders.
         num_workers: Number of data-loading workers.
@@ -79,6 +89,12 @@ class ImageDataModule(pl.LightningDataModule):
         self,
         data_dir: str | Path = "./data",
         dataset_name: str | None = None,
+        train_csv: str | Path | None = None,
+        val_csv: str | Path | None = None,
+        test_csv: str | Path | None = None,
+        image_dir: str | Path | None = None,
+        image_column: str | None = None,
+        label_column: str | None = None,
         image_size: int = 224,
         batch_size: int = 32,
         num_workers: int = 4,
@@ -98,6 +114,12 @@ class ImageDataModule(pl.LightningDataModule):
         self.save_hyperparameters()
         self.data_dir = Path(data_dir)
         self.dataset_name = dataset_name
+        self.train_csv = Path(train_csv) if train_csv else None
+        self.val_csv = Path(val_csv) if val_csv else None
+        self.test_csv = Path(test_csv) if test_csv else None
+        self.image_dir = Path(image_dir) if image_dir else None
+        self.image_column = image_column
+        self.label_column = label_column
         self.image_size = image_size
         self.batch_size = batch_size
         self.num_workers = num_workers
@@ -172,7 +194,9 @@ class ImageDataModule(pl.LightningDataModule):
             cls(str(self.data_dir), train=False, download=True)
 
     def setup(self, stage: str | None = None) -> None:
-        if self.dataset_name and self.dataset_name in self.BUILTIN_DATASETS:
+        if self.train_csv is not None:
+            self._setup_csv(stage)
+        elif self.dataset_name and self.dataset_name in self.BUILTIN_DATASETS:
             self._setup_builtin(stage)
         elif self.transform_backend == "albumentations":
             self._setup_folder_cv2(stage)
@@ -269,6 +293,52 @@ class ImageDataModule(pl.LightningDataModule):
         if stage in ("test", None) and test_dir.exists():
             self.test_dataset = ImageFolderCV2(
                 str(test_dir), transform=self.eval_transforms
+            )
+
+    def _setup_csv(self, stage: str | None) -> None:
+        from autotimm.data.dataset import CSVImageDataset
+
+        use_albu = self.transform_backend == "albumentations"
+        # Default image_dir to parent of train_csv
+        img_dir = self.image_dir or self.train_csv.parent
+
+        if stage in ("fit", None):
+            self.train_dataset = CSVImageDataset(
+                csv_path=self.train_csv,
+                image_dir=img_dir,
+                image_column=self.image_column,
+                label_column=self.label_column,
+                transform=self.train_transforms,
+                use_albumentations=use_albu,
+            )
+            self.num_classes = self.train_dataset.num_classes
+            self.class_names = list(self.train_dataset.classes)
+            self._train_targets = [s[1] for s in self.train_dataset.samples]
+
+            if self.val_csv is not None:
+                self.val_dataset = CSVImageDataset(
+                    csv_path=self.val_csv,
+                    image_dir=img_dir,
+                    image_column=self.image_column,
+                    label_column=self.label_column,
+                    transform=self.eval_transforms,
+                    use_albumentations=use_albu,
+                )
+            else:
+                n_val = int(len(self.train_dataset) * self.val_split)
+                n_train = len(self.train_dataset) - n_val
+                self.train_dataset, self.val_dataset = random_split(
+                    self.train_dataset, [n_train, n_val]
+                )
+
+        if stage in ("test", None) and self.test_csv is not None:
+            self.test_dataset = CSVImageDataset(
+                csv_path=self.test_csv,
+                image_dir=img_dir,
+                image_column=self.image_column,
+                label_column=self.label_column,
+                transform=self.eval_transforms,
+                use_albumentations=use_albu,
             )
 
     def _make_sampler(self) -> WeightedRandomSampler | None:

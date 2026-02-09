@@ -1,51 +1,38 @@
 # Segmentation Data Loading
 
-This guide covers data loading for semantic and instance segmentation tasks.
+This guide covers data loading for semantic and instance segmentation tasks. For CSV-based data loading, see [CSV Data Loading](csv-data.md#semantic-segmentation).
 
 ## Segmentation Data Pipeline
 
 ```mermaid
 graph TD
     A[Dataset] --> B{Format}
-    
-    B -->|PNG| C1[Simple Pairs]
-    B -->|Cityscapes| C2[Urban Scenes]
-    B -->|Pascal VOC| C3[20 Classes]
-    B -->|COCO Stuff| C4[171 Classes]
-    
-    C1 --> D[Image + Mask Pairs]
+    B -->|PNG| C1[image/ + mask/<br/>1:1 pairs]
+    B -->|Cityscapes| C2[leftImg8bit/ + gtFine/<br/>19 classes]
+    B -->|Pascal VOC| C3[JPEGImages/ +<br/>SegmentationClass/]
+    B -->|COCO Stuff| C4[images/ +<br/>annotations/]
+    B -->|CSV| C5[image_path,<br/>mask_path]
+    C1 --> D[SegmentationDataModule]
     C2 --> D
     C3 --> D
     C4 --> D
-    
-    D --> E[SegmentationDataModule]
-    
-    E --> F{Augmentation}
-    
-    F -->|Spatial| G1[Crop/Flip/Rotate]
-    F -->|Color| G2[Brightness/Contrast]
-    F -->|Both| G3[Synchronized]
-    
-    G1 --> H[Apply to Both]
-    G2 --> H
-    G3 --> H
-    
-    H --> I[Image Transform]
-    H --> J[Mask Transform]
-    
-    I --> K[Normalize Image]
-    J --> L[Keep Labels]
-    
-    K --> M[Collate Batch]
-    L --> M
-    
-    M --> N[Images + Masks]
-    
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style E fill:#42A5F5,stroke:#1976D2,color:#fff
-    style H fill:#2196F3,stroke:#1976D2,color:#fff
-    style M fill:#42A5F5,stroke:#1976D2,color:#fff
-    style N fill:#2196F3,stroke:#1976D2,color:#fff
+    C5 --> D
+    D --> E{Augmentation}
+    E -->|Train| F1[Spatial + Color<br/>applied to both<br/>image and mask]
+    E -->|Val/Test| F2[Resize + Normalize]
+    F1 --> G[Collate → Batch<br/>Images + Masks]
+    F2 --> G
+
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#FF9800,stroke:#F57C00
+    style C1 fill:#1976D2,stroke:#1565C0
+    style C2 fill:#1976D2,stroke:#1565C0
+    style C3 fill:#1976D2,stroke:#1565C0
+    style C4 fill:#1976D2,stroke:#1565C0
+    style C5 fill:#1976D2,stroke:#1565C0
+    style D fill:#1565C0,stroke:#0D47A1
+    style E fill:#FF9800,stroke:#F57C00
+    style G fill:#4CAF50,stroke:#388E3C
 ```
 
 ## Semantic Segmentation Data
@@ -554,3 +541,4 @@ For common segmentation data loading issues, see the [Troubleshooting - Data Loa
 See:
 - [Semantic Segmentation Example](../../examples/tasks/semantic-segmentation.md)
 - [Instance Segmentation Example](../../examples/tasks/instance-segmentation.md)
+- [CSV Data Loading](csv-data.md) - Load segmentation data from CSV files

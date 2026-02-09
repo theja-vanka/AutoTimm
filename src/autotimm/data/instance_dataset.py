@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import csv
 import json
+from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -239,6 +241,178 @@ class COCOInstanceDataset(Dataset):
             "labels": labels,
             "masks": masks,
             "image_id": img_id,
+            "orig_size": orig_size,
+        }
+
+
+class CSVInstanceDataset(Dataset):
+    """Dataset for instance segmentation from CSV.
+
+    CSV format (one row per instance)::
+
+        image_path,x_min,y_min,x_max,y_max,label,mask_path
+        img001.jpg,10,20,100,200,cat,masks/img001_0.png
+        img001.jpg,50,60,150,250,dog,masks/img001_1.png
+
+    Each ``mask_path`` is a binary mask PNG for that instance.
+    Does NOT require pycocotools.
+
+    Args:
+        csv_path: Path to CSV file.
+        image_dir: Directory containing images and masks.
+        image_column: Column name for image paths. Default ``"image_path"``.
+        bbox_columns: Column names for bbox coordinates.
+            Default ``["x_min", "y_min", "x_max", "y_max"]``.
+        label_column: Column name for class labels. Default ``"label"``.
+        mask_column: Column name for mask file paths. Default ``"mask_path"``.
+        transform: Albumentations transforms to apply.
+    """
+
+    def __init__(
+        self,
+        csv_path: str | Path,
+        image_dir: str | Path = ".",
+        image_column: str = "image_path",
+        bbox_columns: list[str] | None = None,
+        label_column: str = "label",
+        mask_column: str = "mask_path",
+        transform: Any = None,
+    ):
+        self.csv_path = Path(csv_path)
+        self.image_dir = Path(image_dir)
+        self.transform = transform
+        self._image_column = image_column
+        self._label_column = label_column
+        self._mask_column = mask_column
+
+        if bbox_columns is None:
+            bbox_columns = ["x_min", "y_min", "x_max", "y_max"]
+        self._bbox_columns = bbox_columns
+
+        # Parse CSV and group by image
+        image_anns: dict[str, list[dict]] = defaultdict(list)
+        with open(self.csv_path, newline="") as f:
+            reader = csv.DictReader(f)
+            fieldnames = list(reader.fieldnames or [])
+
+            for col in [image_column, label_column, mask_column] + bbox_columns:
+                if col not in fieldnames:
+                    raise ValueError(
+                        f"Column '{col}' not found in CSV. "
+                        f"Available columns: {fieldnames}"
+                    )
+
+            for row in reader:
+                img_path = row[image_column]
+                x1 = float(row[bbox_columns[0]])
+                y1 = float(row[bbox_columns[1]])
+                x2 = float(row[bbox_columns[2]])
+                y2 = float(row[bbox_columns[3]])
+
+                image_anns[img_path].append(
+                    {
+                        "bbox": [x1, y1, x2, y2],
+                        "label": row[label_column],
+                        "mask_path": row[mask_column],
+                    }
+                )
+
+        if not image_anns:
+            raise ValueError(
+                f"No images with annotations found in {self.csv_path}."
+            )
+
+        # Build class mapping
+        all_labels = sorted(
+            {ann["label"] for anns in image_anns.values() for ann in anns}
+        )
+        self.class_names: list[str] = all_labels
+        self._class_to_idx: dict[str, int] = {
+            name: idx for idx, name in enumerate(all_labels)
+        }
+        self.num_classes: int = len(all_labels)
+
+        self._image_paths: list[str] = sorted(image_anns.keys())
+        self._image_anns = image_anns
+
+    def __len__(self) -> int:
+        return len(self._image_paths)
+
+    def __getitem__(self, idx: int) -> dict[str, Any]:
+        img_rel = self._image_paths[idx]
+        img_path = self.image_dir / img_rel
+        anns = self._image_anns[img_rel]
+
+        image = cv2.imread(str(img_path))
+        if image is None:
+            raise RuntimeError(f"Failed to load image: {img_path}")
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        height, width = image.shape[:2]
+
+        boxes = []
+        labels = []
+        masks = []
+
+        for ann in anns:
+            boxes.append(ann["bbox"])
+            labels.append(self._class_to_idx[ann["label"]])
+            mask = cv2.imread(
+                str(self.image_dir / ann["mask_path"]), cv2.IMREAD_GRAYSCALE
+            )
+            if mask is None:
+                raise RuntimeError(
+                    f"Failed to load mask: {self.image_dir / ann['mask_path']}"
+                )
+            # Binarize
+            mask = (mask > 0).astype(np.uint8)
+            masks.append(mask)
+
+        orig_size = torch.tensor([height, width], dtype=torch.long)
+
+        if len(boxes) == 0:
+            boxes_arr = np.zeros((0, 4), dtype=np.float32)
+            labels_arr = np.zeros((0,), dtype=np.int64)
+            masks_arr = np.zeros((0, height, width), dtype=np.uint8)
+        else:
+            boxes_arr = np.array(boxes, dtype=np.float32)
+            labels_arr = np.array(labels, dtype=np.int64)
+            masks_arr = np.stack(masks, axis=0)
+
+        if self.transform:
+            mask_list = [masks_arr[i] for i in range(len(masks_arr))]
+            transformed = self.transform(
+                image=image,
+                masks=mask_list,
+                bboxes=boxes_arr.tolist(),
+                labels=labels_arr.tolist(),
+            )
+            image = transformed["image"]
+            bboxes_out = transformed["bboxes"]
+            labels_out = transformed["labels"]
+            masks_out = transformed["masks"]
+
+            if len(masks_out) > 0:
+                masks_arr = np.stack(masks_out, axis=0)
+            else:
+                masks_arr = np.zeros(
+                    (0, image.shape[1], image.shape[2]), dtype=np.uint8
+                )
+
+            boxes_t = torch.tensor(bboxes_out, dtype=torch.float32)
+            labels_t = torch.tensor(labels_out, dtype=torch.long)
+            masks_t = torch.from_numpy(masks_arr).float()
+        else:
+            image = torch.from_numpy(image).permute(2, 0, 1).float() / 255.0
+            boxes_t = torch.from_numpy(boxes_arr).float()
+            labels_t = torch.from_numpy(labels_arr).long()
+            masks_t = torch.from_numpy(masks_arr).float()
+
+        return {
+            "image": image,
+            "boxes": boxes_t,
+            "labels": labels_t,
+            "masks": masks_t,
+            "image_id": idx,
             "orig_size": orig_size,
         }
 

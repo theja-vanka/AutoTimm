@@ -7,7 +7,7 @@
 /* Light mode colors */
 [data-md-color-scheme="default"] .mermaid {
   --mermaid-primary-color: #2196F3;
-  --mermaid-primary-text-color: #fff;
+  --mermaid-primary-text-color: #212121;
   --mermaid-primary-border-color: #1976D2;
   --mermaid-line-color: #1976D2;
   --mermaid-secondary-color: #E3F2FD;
@@ -15,17 +15,63 @@
   --mermaid-note-bg-color: #E3F2FD;
   --mermaid-note-border-color: #2196F3;
   --mermaid-text-color: #212121;
+  --mermaid-label-color: #212121;
 }
 
-/* Dark mode colors */
+/* Dark mode colors - optimized for visibility */
 [data-md-color-scheme="slate"] .mermaid {
   --mermaid-primary-color: #42A5F5;
-  --mermaid-primary-text-color: #000;
+  --mermaid-primary-text-color: #FFFFFF;
   --mermaid-primary-border-color: #90CAF9;
   --mermaid-line-color: #90CAF9;
   --mermaid-secondary-color: #1E3A5F;
   --mermaid-tertiary-color: #2C5282;
   --mermaid-note-bg-color: #1E3A5F;
   --mermaid-note-border-color: #42A5F5;
-  --mermaid-text-color: #E0E0E0;
+  --mermaid-text-color: #FFFFFF;
+  --mermaid-label-color: #FFFFFF;
+}
+
+/* Light mode - override inline white text with dark text */
+[data-md-color-scheme="default"] .mermaid text,
+[data-md-color-scheme="default"] .mermaid .label,
+[data-md-color-scheme="default"] .mermaid .nodeLabel,
+[data-md-color-scheme="default"] .mermaid .edgeLabel,
+[data-md-color-scheme="default"] .mermaid .labelText,
+[data-md-color-scheme="default"] .mermaid tspan {
+  fill: #212121 !important;
+  color: #212121 !important;
+}
+
+/* Light mode - text on dark blue backgrounds should be white */
+[data-md-color-scheme="default"] .mermaid g[id*="flowchart"] > rect[style*="fill: rgb(21, 101, 192)"] ~ text,
+[data-md-color-scheme="default"] .mermaid g[id*="flowchart"] > rect[style*="fill: rgb(25, 118, 210)"] ~ text,
+[data-md-color-scheme="default"] .mermaid g[id*="flowchart"] > .nodeLabel[style*="fill: rgb(21, 101, 192)"],
+[data-md-color-scheme="default"] .mermaid g[id*="flowchart"] > .nodeLabel[style*="fill: rgb(25, 118, 210)"] {
+  fill: #FFFFFF !important;
+  color: #FFFFFF !important;
+}
+
+/* Light mode - handle nodes with dark backgrounds */
+[data-md-color-scheme="default"] .mermaid g.node rect[style*="fill: rgb(21, 101, 192)"] ~ g text,
+[data-md-color-scheme="default"] .mermaid g.node rect[style*="fill: rgb(66, 165, 245)"] ~ g text,
+[data-md-color-scheme="default"] .mermaid g.node rect[fill="#1565C0"] ~ g text,
+[data-md-color-scheme="default"] .mermaid g.node rect[fill="#42A5F5"] ~ g text {
+  fill: #FFFFFF !important;
+}
+
+/* Dark mode - ensure all text is white */
+[data-md-color-scheme="slate"] .mermaid text,
+[data-md-color-scheme="slate"] .mermaid .label,
+[data-md-color-scheme="slate"] .mermaid .nodeLabel,
+[data-md-color-scheme="slate"] .mermaid .edgeLabel,
+[data-md-color-scheme="slate"] .mermaid .labelText,
+[data-md-color-scheme="slate"] .mermaid tspan {
+  fill: #FFFFFF !important;
+  color: #FFFFFF !important;
+}
+
+/* Ensure good contrast for all nodes in both modes */
+.mermaid g.node {
+  transition: opacity 0.2s;
 }
