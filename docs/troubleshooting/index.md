@@ -5,67 +5,25 @@ Comprehensive troubleshooting guide for common issues when using AutoTimm.
 ## Quick Navigation
 
 ```mermaid
-graph TD
-    A[Problem Category] --> A1[Identify Issue]
-    A1 --> A2[Classify Type]
-    A2 --> B[Training]
-    A2 --> C[Performance]
-    A2 --> D[Data]
-    A2 --> E[Models]
-    A2 --> F[Deployment]
-    A2 --> G[Environment]
-    A2 --> H[Integration]
-    A2 --> I[Task-Specific]
-    
-    B --> B1[Loss Issues]
-    B --> B2[Convergence]
-    B --> B3[Gradients]
-    B --> B4[Learning Rate]
-    
-    C --> C1[Memory]
-    C --> C2[Speed]
-    C --> C3[GPU Utilization]
-    C --> C4[Bottlenecks]
-    
-    D --> D1[Loading Errors]
-    D --> D2[Format Issues]
-    D --> D3[Augmentation]
-    D --> D4[Validation]
-    
-    E --> E1[Architecture]
-    E --> E2[Pretrained]
-    E --> E3[Custom Models]
-    E --> E4[Compatibility]
-    
-    F --> F1[Export]
-    F --> F2[Optimization]
-    F --> F3[Serving]
-    F --> F4[Inference]
-    
-    G --> G1[Dependencies]
-    G --> G2[CUDA]
-    G --> G3[Installation]
-    G --> G4[Conflicts]
-    
-    H --> H1[HuggingFace]
-    H --> H2[timm]
-    H --> H3[PyTorch Lightning]
-    H --> H4[Custom]
-    
-    I --> I1[Classification]
-    I --> I2[Detection]
-    I --> I3[Segmentation]
-    I --> I4[Multi-task]
+graph LR
+    A[Problem] --> B[<b>Training</b><br/>Loss, convergence,<br/>gradients, LR]
+    A --> C[<b>Performance</b><br/>Memory, speed,<br/>GPU, bottlenecks]
+    A --> D[<b>Data</b><br/>Loading, format,<br/>augmentation]
+    A --> E[<b>Models</b><br/>Architecture,<br/>pretrained, custom]
+    A --> F[<b>Deployment</b><br/>Export, serving,<br/>inference]
+    A --> G[<b>Environment</b><br/>Dependencies,<br/>CUDA, install]
+    A --> H[<b>Integration</b><br/>HuggingFace, timm,<br/>Lightning]
+    A --> I[<b>Task-Specific</b><br/>Classification,<br/>detection, segmentation]
 
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style A fill:#1565C0,stroke:#0D47A1,color:#fff
     style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C fill:#2196F3,stroke:#1976D2,color:#fff
+    style C fill:#1565C0,stroke:#0D47A1,color:#fff
     style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E fill:#2196F3,stroke:#1976D2,color:#fff
+    style E fill:#1565C0,stroke:#0D47A1,color:#fff
     style F fill:#42A5F5,stroke:#1976D2,color:#fff
-    style G fill:#2196F3,stroke:#1976D2,color:#fff
+    style G fill:#1565C0,stroke:#0D47A1,color:#fff
     style H fill:#42A5F5,stroke:#1976D2,color:#fff
-    style I fill:#2196F3,stroke:#1976D2,color:#fff
+    style I fill:#1565C0,stroke:#0D47A1,color:#fff
 ```
 
 ## Browse by Category

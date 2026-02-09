@@ -6,78 +6,32 @@ AutoTimm supports CSV-based data loading for all task types, making it easy to w
 
 ```mermaid
 graph TD
-    A[CSV File] --> A1[Read CSV File]
-    A1 --> A2[Parse Columns]
-    A2 --> A3[Validate Format]
-    A3 --> B{Task Type}
-
-    B -->|Classification| C1[CSVImageDataset]
-    C1 --> C1a[image_path column]
-    C1a --> C1b[label column]
-    C1b --> C1c[Single label per image]
-    
-    B -->|Detection| C2[CSVDetectionDataset]
-    C2 --> C2a[image_path column]
-    C2a --> C2b[x1,y1,x2,y2 columns]
-    C2b --> C2c[class_id column]
-    C2c --> C2d[Group by image]
-    
-    B -->|Semantic Seg| C3[SemanticSegmentationDataset]
-    C3 --> C3a[image_path column]
-    C3a --> C3b[mask_path column]
-    C3b --> C3c[Optional class mapping]
-    
-    B -->|Instance Seg| C4[CSVInstanceDataset]
-    C4 --> C4a[image_path column]
-    C4a --> C4b[mask_path column]
-    C4b --> C4c[instance_id column]
-    C4c --> C4d[class_id column]
-
-    C1c --> D[DataModule]
-    C2d --> D
-    C3c --> D
-    C4d --> D
-
-    D --> D1[Create Dataset]
-    D1 --> D2[Load Metadata]
-    D2 --> D3[Validate Paths]
-    D3 --> E{Split Strategy}
-
-    E -->|val_csv provided| F1[Separate val set]
-    F1 --> F1a[Load val_csv]
-    F1a --> F1b[Create Val Dataset]
-    F1b --> F1c[Verify Non-overlap]
-    
+    A[CSV File] --> B{Task Type}
+    B -->|Classification| C1[<b>CSVImageDataset</b><br/>image_path, label]
+    B -->|Detection| C2[<b>CSVDetectionDataset</b><br/>image_path, x1, y1, x2, y2, label]
+    B -->|Semantic Seg| C3[<b>SemanticSegmentationDataset</b><br/>image_path, mask_path]
+    B -->|Instance Seg| C4[<b>CSVInstanceDataset</b><br/>image_path, mask_path, bbox, label]
+    C1 --> D[DataModule]
+    C2 --> D
+    C3 --> D
+    C4 --> D
+    D --> E{Split}
+    E -->|val_csv| F1[Separate val set]
     E -->|No val_csv| F2[Auto split]
-    F2 --> F2a[Shuffle Indices]
-    F2a --> F2b[val_split ratio]
-    F2b --> F2c[Create Subsets]
+    F1 --> G[Transforms → DataLoader]
+    F2 --> G
+    G --> H[Training Batches]
 
-    F1c --> G[Transforms]
-    F2c --> G
-    
-    G --> G1[Select Backend]
-    G1 --> G2[Apply Preset]
-    G2 --> G3[Task-specific Transforms]
-    G3 --> H[DataLoader]
-    
-    H --> H1[Set num_workers]
-    H1 --> H2[Configure batch_size]
-    H2 --> H3[Enable pin_memory]
-    H3 --> H4[Create Loaders]
-    H4 --> I[Training Batches]
-    
-    I --> I1[Collate Samples]
-    I1 --> I2[Stack Tensors]
-    I2 --> I3[Ready for Model]
-
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style D fill:#2196F3,stroke:#1976D2,color:#fff
+    style A fill:#1565C0,stroke:#0D47A1,color:#fff
+    style B fill:#FF9800,stroke:#F57C00,color:#fff
+    style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C2 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C3 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C4 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style D fill:#1565C0,stroke:#0D47A1,color:#fff
+    style E fill:#FF9800,stroke:#F57C00,color:#fff
     style G fill:#42A5F5,stroke:#1976D2,color:#fff
-    style H fill:#2196F3,stroke:#1976D2,color:#fff
-    style I fill:#42A5F5,stroke:#1976D2,color:#fff
-    style I3 fill:#2196F3,stroke:#1976D2,color:#fff
+    style H fill:#4CAF50,stroke:#388E3C,color:#fff
 ```
 
 ---

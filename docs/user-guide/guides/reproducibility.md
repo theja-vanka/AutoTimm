@@ -4,71 +4,40 @@ AutoTimm is designed with reproducibility as a first-class feature. This guide c
 
 ## Reproducibility Workflow
 
+### Seed Sources
+
 ```mermaid
-graph TD
-    A[Experiment] --> A1[Define Requirements]
-    A1 --> A2[Set Configuration]
-    A2 --> B{Seed Sources}
+graph LR
+    A{Seed Sources} --> B[Model<br/>seed=42]
+    A --> C[Trainer<br/>seed=42]
+    A --> D[Manual<br/>seed_everything]
+    B --> E[seed_everything<br/>Python, NumPy, PyTorch, CUDA]
+    C --> E
+    D --> E
 
-    B --> C1[Model seed=42]
-    C1 --> C1a[Pass to Constructor]
-    C1a --> C1b[Set in __init__]
-    
-    B --> C2[Trainer seed=42]
-    C2 --> C2a[Pass to AutoTrainer]
-    C2a --> C2b[Set in Trainer]
-    
-    B --> C3[Manual seed_everything]
-    C3 --> C3a[Import from Lightning]
-    C3a --> C3b[Call Explicitly]
-
-    C1b --> D[seed_everything<br/>Python, NumPy, PyTorch, CUDA]
-    C2b --> D
-    C3b --> D
-    
-    D --> D1[Set Python Seed]
-    D1 --> D2[Set NumPy Seed]
-    D2 --> D3[Set PyTorch Seed]
-    D3 --> D4[Set CUDA Seeds]
-    D4 --> D5[Set Random States]
-
-    D5 --> F[Deterministic Mode<br/>cuDNN, Benchmark, Workers]
-    F --> F1[torch.use_deterministic_algorithms]
-    F1 --> F2[torch.backends.cudnn.deterministic]
-    F2 --> F3[torch.backends.cudnn.benchmark]
-    F3 --> F4[worker_init_fn]
-    F4 --> F5[Dataloader Seeds]
-
-    F5 --> H[Reproducible Results]
-    H --> H1[Same Initialization]
-    H1 --> H2[Same Data Order]
-    H2 --> H3[Same Augmentations]
-    H3 --> H4[Same Gradients]
-    H4 --> H5[Same Updates]
-
-    H5 --> I{Verification}
-    I --> J1[Same Seed = Same Results]
-    J1 --> J1a[Train Multiple Times]
-    J1a --> J1b[Compare Metrics]
-    J1b --> J1c[Verify Equality]
-    
-    I --> J2[Different Seed = Different Results]
-    J2 --> J2a[Change Seed Value]
-    J2a --> J2b[Train Again]
-    J2b --> J2c[Verify Difference]
-    
-    J1c --> K[Validated Reproducibility]
-    J2c --> K
-    K --> K1[Document Setup]
-    K1 --> K2[Log Configuration]
-    K2 --> K3[Save Results]
-
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style A fill:#FF9800,stroke:#F57C00,color:#fff
+    style B fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C fill:#42A5F5,stroke:#1976D2,color:#fff
     style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style F fill:#2196F3,stroke:#1976D2,color:#fff
-    style H fill:#42A5F5,stroke:#1976D2,color:#fff
-    style I fill:#2196F3,stroke:#1976D2,color:#fff
-    style K fill:#42A5F5,stroke:#1976D2,color:#fff
+    style E fill:#1565C0,stroke:#0D47A1,color:#fff
+```
+
+### Deterministic Pipeline
+
+```mermaid
+graph LR
+    A[Seed Everything] --> B[Deterministic Mode<br/>cuDNN + Benchmark + Workers]
+    B --> C[Reproducible Results<br/>Same init, data order,<br/>augmentations, gradients]
+    C --> D{Verify}
+    D --> E1[Same seed = same results]
+    D --> E2[Different seed = different results]
+
+    style A fill:#1565C0,stroke:#0D47A1,color:#fff
+    style B fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C fill:#42A5F5,stroke:#1976D2,color:#fff
+    style D fill:#FF9800,stroke:#F57C00,color:#fff
+    style E1 fill:#4CAF50,stroke:#388E3C,color:#fff
+    style E2 fill:#4CAF50,stroke:#388E3C,color:#fff
 ```
 
 ## Why Reproducibility Matters

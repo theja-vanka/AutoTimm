@@ -6,106 +6,33 @@ This guide covers data loading for semantic and instance segmentation tasks. For
 
 ```mermaid
 graph TD
-    A[Dataset] --> A1[Identify Source]
-    A1 --> A2[Check Format]
-    A2 --> A3[Validate Structure]
-    A3 --> B{Format}
-    
-    B -->|PNG| C1[Simple Pairs]
-    C1 --> C1a[image/ folder]
-    C1a --> C1b[mask/ folder]
-    C1b --> C1c[1:1 Correspondence]
-    
-    B -->|Cityscapes| C2[Urban Scenes]
-    C2 --> C2a[leftImg8bit/]
-    C2a --> C2b[gtFine/]
-    C2b --> C2c[19 Classes]
-    
-    B -->|Pascal VOC| C3[20 Classes]
-    C3 --> C3a[JPEGImages/]
-    C3a --> C3b[SegmentationClass/]
-    C3b --> C3c[Object Categories]
-    
-    B -->|COCO Stuff| C4[171 Classes]
-    C4 --> C4a[images/]
-    C4a --> C4b[annotations/]
-    C4b --> C4c[Stuff + Things]
-    
-    C1c --> D[Image + Mask Pairs]
-    C2c --> D
-    C3c --> D
-    C4c --> D
-    
-    D --> D1[Verify Pairs]
-    D1 --> D2[Match Filenames]
-    D2 --> D3[Validate Masks]
-    D3 --> E[SegmentationDataModule]
-    
-    E --> E1[Initialize Module]
-    E1 --> E2[Create Dataset]
-    E2 --> E3[Setup Splits]
-    E3 --> F{Augmentation}
-    
-    F -->|Spatial| G1[Crop/Flip/Rotate]
-    G1 --> G1a[RandomCrop]
-    G1a --> G1b[HorizontalFlip]
-    G1b --> G1c[Rotate]
-    G1c --> G1d[Affine Transform]
-    
-    F -->|Color| G2[Brightness/Contrast]
-    G2 --> G2a[ColorJitter]
-    G2a --> G2b[Gamma Adjust]
-    G2b --> G2c[Normalize]
-    
-    F -->|Both| G3[Synchronized]
-    G3 --> G3a[Spatial + Color]
-    G3a --> G3b[Apply to Image]
-    G3b --> G3c[Apply to Mask]
-    G3c --> G3d[Maintain Alignment]
-    
-    G1d --> H[Apply to Both]
-    G2c --> H
-    G3d --> H
-    
-    H --> H1[Transform Image]
-    H --> H2[Transform Mask]
-    
-    H1 --> I[Image Transform]
-    I --> I1[Resize]
-    I1 --> I2[Augment]
-    I2 --> I3[To Tensor]
-    
-    H2 --> J[Mask Transform]
-    J --> J1[Resize (nearest)]
-    J1 --> J2[Same Augmentation]
-    J2 --> J3[To Tensor]
-    
-    I3 --> K[Normalize Image]
-    K --> K1[Apply Mean/Std]
-    K1 --> K2[Float Tensor]
-    
-    J3 --> L[Keep Labels]
-    L --> L1[Integer Tensor]
-    L1 --> L2[Preserve Classes]
-    
-    K2 --> M[Collate Batch]
-    L2 --> M
-    
-    M --> M1[Stack Images]
-    M1 --> M2[Stack Masks]
-    M2 --> N[Images + Masks]
-    
-    N --> N1[Create Batch Dict]
-    N1 --> N2[Ready for Training]
-    
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E fill:#2196F3,stroke:#1976D2,color:#fff
-    style F fill:#42A5F5,stroke:#1976D2,color:#fff
-    style H fill:#2196F3,stroke:#1976D2,color:#fff
-    style M fill:#42A5F5,stroke:#1976D2,color:#fff
-    style N fill:#2196F3,stroke:#1976D2,color:#fff
-    style N2 fill:#42A5F5,stroke:#1976D2,color:#fff
+    A[Dataset] --> B{Format}
+    B -->|PNG| C1[image/ + mask/<br/>1:1 pairs]
+    B -->|Cityscapes| C2[leftImg8bit/ + gtFine/<br/>19 classes]
+    B -->|Pascal VOC| C3[JPEGImages/ +<br/>SegmentationClass/]
+    B -->|COCO Stuff| C4[images/ +<br/>annotations/]
+    B -->|CSV| C5[image_path,<br/>mask_path]
+    C1 --> D[SegmentationDataModule]
+    C2 --> D
+    C3 --> D
+    C4 --> D
+    C5 --> D
+    D --> E{Augmentation}
+    E -->|Train| F1[Spatial + Color<br/>applied to both<br/>image and mask]
+    E -->|Val/Test| F2[Resize + Normalize]
+    F1 --> G[Collate → Batch<br/>Images + Masks]
+    F2 --> G
+
+    style A fill:#1565C0,stroke:#0D47A1,color:#fff
+    style B fill:#FF9800,stroke:#F57C00,color:#fff
+    style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C2 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C3 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C4 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C5 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style D fill:#1565C0,stroke:#0D47A1,color:#fff
+    style E fill:#FF9800,stroke:#F57C00,color:#fff
+    style G fill:#4CAF50,stroke:#388E3C,color:#fff
 ```
 
 ## Semantic Segmentation Data

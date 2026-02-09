@@ -5,49 +5,19 @@ The [`examples/`](https://github.com/theja-vanka/AutoTimm/tree/main/examples) di
 ## Examples Organization
 
 ```mermaid
-graph TD
-    A[AutoTimm Examples] --> B[Getting Started]
-    A --> C[Computer Vision]
-    A --> D[HuggingFace Hub]
-    A --> E[Training & Optimization]
-    A --> F[Model Understanding]
+graph LR
+    A[<b>AutoTimm<br/>Examples</b>] --> B[<b>Getting Started</b><br/>Classification,<br/>data loading]
+    A --> C[<b>Computer Vision</b><br/>Detection,<br/>segmentation]
+    A --> D[<b>HuggingFace</b><br/>Hub integration,<br/>model sharing]
+    A --> E[<b>Training</b><br/>HPO, multi-GPU,<br/>auto-tuning]
+    A --> F[<b>Understanding</b><br/>GradCAM, attention,<br/>feature maps]
 
-    B --> B1[Basic Classification]
-    B --> B2[Quick Start Guide]
-    B --> B3[Data Loading]
-    B --> B4[Model Selection]
-    
-    C --> C1[Image Classification]
-    C --> C2[Object Detection]
-    C --> C3[Segmentation]
-    C --> C4[Instance Segmentation]
-    C --> C5[Multi-task Learning]
-    
-    D --> D1[Model Loading]
-    D --> D2[Hub Integration]
-    D --> D3[Custom Models]
-    D --> D4[Model Sharing]
-    
-    E --> E1[Hyperparameter Tuning]
-    E --> E2[Auto-tuning]
-    E --> E3[Multi-GPU Training]
-    E --> E4[Mixed Precision]
-    E --> E5[Custom Callbacks]
-    
-    F --> F1[GradCAM]
-    F --> F2[Attention Visualization]
-    F --> F3[Feature Maps]
-    F --> F4[Model Profiling]
-    F --> F5[Error Analysis]
-
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style A fill:#1565C0,stroke:#0D47A1,color:#fff
     style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C fill:#2196F3,stroke:#1976D2,color:#fff
+    style C fill:#1565C0,stroke:#0D47A1,color:#fff
     style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E fill:#2196F3,stroke:#1976D2,color:#fff
+    style E fill:#1565C0,stroke:#0D47A1,color:#fff
     style F fill:#42A5F5,stroke:#1976D2,color:#fff
-    style B1 fill:#E3F2FD
-    style C1 fill:#E3F2FD
 ```
 
 ## Quick Reference

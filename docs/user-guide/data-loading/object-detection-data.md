@@ -6,94 +6,31 @@ The `DetectionDataModule` handles object detection datasets in COCO format and [
 
 ```mermaid
 graph TD
-    A[COCO Dataset] --> A1[Locate Directory]
-    A1 --> A2[Load Config]
-    A2 --> B[Annotations JSON]
-    A --> A3[Verify Structure]
-    A3 --> C[Images]
-    
-    B --> B1[Parse JSON]
-    B1 --> B2[Extract Metadata]
-    B2 --> B3[Load Annotations]
-    B3 --> D[Parse Annotations]
-    
-    C --> C1[List Images]
-    C1 --> C2[Verify Paths]
+    A[Data Source] --> B{Format}
+    B -->|COCO| C1[Annotations JSON<br/>+ Images]
+    B -->|CSV| C2[CSV with bbox columns<br/>+ Images]
+    C1 --> D[DetectionDataModule]
     C2 --> D
-    
-    D --> D1[Create Mappings]
-    D1 --> D2[Image ID to Annotations]
-    D2 --> D3[Category ID to Names]
-    D3 --> E{Preprocessing}
-    
+    D --> E{Preprocessing}
     E --> F1[Filter Classes]
-    F1 --> F1a[Select Categories]
-    F1a --> F1b[Remap IDs]
-    
     E --> F2[Min Bbox Area]
-    F2 --> F2a[Calculate Areas]
-    F2a --> F2b[Filter Small Boxes]
-    
     E --> F3[Min Visibility]
-    F3 --> F3a[Check Occlusion]
-    F3a --> F3b[Filter Occluded]
-    
-    F1b --> G[DetectionDataModule]
-    F2b --> G
-    F3b --> G
-    
-    G --> G1[Initialize Module]
-    G1 --> G2[Create Dataset]
-    G2 --> G3[Setup Splits]
-    G3 --> H{Augmentation}
-    
-    H -->|Train| I1[Preset: strong]
-    I1 --> I1a[HorizontalFlip]
-    I1a --> I1b[ShiftScaleRotate]
-    I1b --> I1c[RandomBrightnessContrast]
-    
-    H -->|Val/Test| I2[Resize + Normalize]
-    I2 --> I2a[Resize]
-    I2a --> I2b[Normalize]
-    
-    I1c --> J[Bbox Transform]
-    J --> J1[Adjust Coordinates]
-    J1 --> J2[Clip to Image]
-    J2 --> J3[Validate Boxes]
-    
-    I2b --> K[Collate]
-    J3 --> L[Random Crop]
-    
-    L --> L1[Calculate Crop]
-    L1 --> L2[Adjust Boxes]
-    L2 --> M[Flip]
-    
-    M --> M1[Horizontal Flip]
-    M1 --> M2[Update Coordinates]
-    M2 --> N[Affine]
-    
-    N --> N1[Apply Transform]
-    N1 --> N2[Update Boxes]
-    N2 --> K
-    
-    K --> K1[Pad to Max Size]
-    K1 --> K2[Stack Tensors]
-    K2 --> O[Batch]
-    
-    O --> O1[Batched Images]
-    O --> O2[Batched Boxes]
-    O --> O3[Batched Labels]
-    O1 --> P[Images + Boxes + Labels]
-    O2 --> P
-    O3 --> P
-    P --> P1[Ready for Model]
-    
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style G fill:#2196F3,stroke:#1976D2,color:#fff
-    style I1 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style K fill:#2196F3,stroke:#1976D2,color:#fff
-    style P fill:#42A5F5,stroke:#1976D2,color:#fff
+    F1 --> G{Augmentation}
+    F2 --> G
+    F3 --> G
+    G -->|Train| H1[Flip + Crop + Color<br/>+ BBox Transform]
+    G -->|Val/Test| H2[Resize + Normalize]
+    H1 --> I[Collate → Batch<br/>Images + Boxes + Labels]
+    H2 --> I
+
+    style A fill:#1565C0,stroke:#0D47A1,color:#fff
+    style B fill:#FF9800,stroke:#F57C00,color:#fff
+    style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C2 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style D fill:#1565C0,stroke:#0D47A1,color:#fff
+    style E fill:#FF9800,stroke:#F57C00,color:#fff
+    style G fill:#FF9800,stroke:#F57C00,color:#fff
+    style I fill:#4CAF50,stroke:#388E3C,color:#fff
 ```
 
 ## COCO Dataset Format

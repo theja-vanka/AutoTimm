@@ -12,71 +12,36 @@ AutoTimm provides specialized data modules for different computer vision tasks:
 
 ## Data Loading Pipeline
 
+### Data Modules
+
 ```mermaid
-graph TD
-    A[Raw Data] --> A1[Locate Data Source]
-    A1 --> A2[Validate Structure]
-    A2 --> B{Data Module}
-    
-    B -->|ImageDataModule| C1[Classification]
-    C1 --> C1a[Load Image Paths]
-    C1a --> C1b[Parse Labels]
-    C1b --> C1c[Create Train/Val/Test Splits]
-    
-    B -->|MultiLabelImageDataModule| C4[Multi-Label]
-    C4 --> C4a[Parse CSV]
-    C4a --> C4b[Multi-hot Encoding]
-    C4b --> C4c[Validate Labels]
-    
-    B -->|DetectionDataModule| C2[Detection]
-    C2 --> C2a[Parse COCO/CSV]
-    C2a --> C2b[Load Bounding Boxes]
-    C2b --> C2c[Validate Annotations]
-    
-    B -->|SegmentationDataModule| C3[Segmentation]
-    C3 --> C3a[Load Images & Masks]
-    C3a --> C3b[Convert Mask Format]
-    C3b --> C3c[Verify Alignment]
+graph LR
+    A[Raw Data] --> B{Data Module}
+    B --> C1[<b>ImageDataModule</b><br/>Folders / CSV / Built-in]
+    B --> C2[<b>MultiLabelImageDataModule</b><br/>CSV → Multi-hot labels]
+    B --> C3[<b>DetectionDataModule</b><br/>COCO JSON / CSV]
+    B --> C4[<b>SegmentationDataModule</b><br/>PNG / VOC / Cityscapes / CSV]
 
-    C1c --> D1[Transforms]
-    C4c --> D1
-    D1 --> D1a[Resize]
-    D1a --> D1b[Augmentation]
-    D1b --> D1c[Normalize]
-    
-    C2c --> D2[Transforms + BBox]
-    D2 --> D2a[Resize with BBox]
-    D2a --> D2b[Augment with BBox]
-    D2b --> D2c[Normalize]
-    
-    C3c --> D3[Transforms + Masks]
-    D3 --> D3a[Resize with Masks]
-    D3a --> D3b[Augment with Masks]
-    D3b --> D3c[Normalize]
-
-    D1c --> E[DataLoader]
-    D2c --> E
-    D3c --> E
-    
-    E --> E1[Configure Workers]
-    E1 --> E2[Set Batch Size]
-    E2 --> E3[Enable Shuffling]
-    E3 --> E4[Pin Memory]
-    E4 --> F[Training Batches]
-    
-    F --> F1[Collate Function]
-    F1 --> F2[Batch Tensor]
-    F2 --> F3[Ready for Model]
-
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C1 fill:#2196F3,stroke:#1976D2,color:#fff
+    style A fill:#1565C0,stroke:#0D47A1,color:#fff
+    style B fill:#FF9800,stroke:#F57C00,color:#fff
+    style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
     style C2 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C3 fill:#2196F3,stroke:#1976D2,color:#fff
+    style C3 fill:#42A5F5,stroke:#1976D2,color:#fff
     style C4 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E fill:#2196F3,stroke:#1976D2,color:#fff
-    style F fill:#42A5F5,stroke:#1976D2,color:#fff
-    style F3 fill:#2196F3,stroke:#1976D2,color:#fff
+```
+
+### Transform & Batch
+
+```mermaid
+graph LR
+    A[Dataset] --> B[Transforms<br/>Resize + Augment + Normalize]
+    B --> C[DataLoader<br/>Workers / Batch Size / Shuffle]
+    C --> D[Training Batches]
+
+    style A fill:#1565C0,stroke:#0D47A1,color:#fff
+    style B fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C fill:#42A5F5,stroke:#1976D2,color:#fff
+    style D fill:#4CAF50,stroke:#388E3C,color:#fff
 ```
 
 ## Quick Start

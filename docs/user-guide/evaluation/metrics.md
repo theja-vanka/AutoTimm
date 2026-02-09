@@ -4,70 +4,45 @@ AutoTimm uses explicit metric configuration through `MetricConfig` and `MetricMa
 
 ## Metric Lifecycle
 
+### Configure & Attach
+
+```mermaid
+graph LR
+    A[MetricConfig] --> B[MetricManager]
+    B --> C[Attach to Model]
+    C --> D{Training Loop}
+
+    style A fill:#1565C0,stroke:#0D47A1,color:#fff
+    style B fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C fill:#42A5F5,stroke:#1976D2,color:#fff
+    style D fill:#FF9800,stroke:#F57C00,color:#fff
+```
+
+### Compute & Log
+
 ```mermaid
 graph TD
-    A[MetricConfig] --> A1[Set Name]
-    A1 --> A2[Choose Backend]
-    A2 --> A3[Configure Parameters]
-    A3 --> B[MetricManager]
-    B --> B1[Initialize Metrics]
-    B1 --> B2[Setup Collections]
-    B2 --> C[Model Init]
-    
-    C --> C1[Attach to Model]
-    C1 --> C2[Register Metrics]
-    C2 --> D{Training Loop}
-    
-    D -->|Step| E1[Compute Metric]
-    E1 --> E1a[Forward Pass]
-    E1a --> E1b[Get Predictions]
-    E1b --> E1c[Update Metric State]
-    E1c --> E1d[Metric Calculation]
-    
-    D -->|Epoch End| E2[Aggregate]
-    E2 --> E2a[Compute Over Epoch]
-    E2a --> E2b[Reset State]
-    
-    E1d --> F1[Log on Step]
-    F1 --> F1a[Train Metrics]
-    F1a --> F1b[Batch Stats]
-    
-    E2b --> F2[Log on Epoch]
-    F2 --> F2a[Val Metrics]
-    F2a --> F2b[Test Metrics]
-    
-    F1b --> G[Logger Backend]
-    F2b --> G
-    
-    G --> G1[Format Metrics]
-    G1 --> G2[Add Prefixes]
-    G2 --> H{Distribution}
-    
-    H -->|TensorBoard| H1[tensorboard/]
-    H1 --> H1a[Scalars]
-    H1a --> H1b[Histograms]
-    H1b --> H1c[Images]
-    
-    H -->|W&B| H2[wandb/]
-    H2 --> H2a[Charts]
-    H2a --> H2b[Tables]
-    H2b --> H2c[Artifacts]
-    
-    H -->|MLflow| H3[mlflow/]
-    H3 --> H3a[Experiments]
-    H3a --> H3b[Runs]
-    H3b --> H3c[Parameters]
-    
-    E2 --> I[Progress Bar]
-    I --> I1[Format Display]
-    I1 --> I2[Update Console]
-    
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    A{Training Loop} -->|Each Step| B[Update Metric State]
+    A -->|Epoch End| C[Aggregate & Reset]
+    B --> D[Log Step Metrics]
+    C --> E[Log Epoch Metrics]
+    D --> F{Logger Backend}
+    E --> F
+    F --> G1[TensorBoard]
+    F --> G2[Weights & Biases]
+    F --> G3[MLflow]
+    C --> H[Progress Bar]
+
+    style A fill:#FF9800,stroke:#F57C00,color:#fff
     style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style D fill:#2196F3,stroke:#1976D2,color:#fff
-    style E1 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style G fill:#2196F3,stroke:#1976D2,color:#fff
-    style H1 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C fill:#42A5F5,stroke:#1976D2,color:#fff
+    style D fill:#42A5F5,stroke:#1976D2,color:#fff
+    style E fill:#42A5F5,stroke:#1976D2,color:#fff
+    style F fill:#FF9800,stroke:#F57C00,color:#fff
+    style G1 fill:#4CAF50,stroke:#388E3C,color:#fff
+    style G2 fill:#4CAF50,stroke:#388E3C,color:#fff
+    style G3 fill:#4CAF50,stroke:#388E3C,color:#fff
+    style H fill:#4CAF50,stroke:#388E3C,color:#fff
 ```
 
 ## MetricConfig

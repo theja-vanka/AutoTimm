@@ -4,86 +4,41 @@ This guide covers how to use trained AutoTimm models for inference and predictio
 
 ## Inference Pipeline
 
+### Load & Preprocess
+
 ```mermaid
-graph TD
-    A[Trained Model] --> A1[Locate Checkpoint]
-    A1 --> A2[Verify Path]
-    A2 --> B[Load Checkpoint]
-    B --> B1[Load State Dict]
-    B1 --> B2[Restore Weights]
-    B2 --> B3[Load Hyperparams]
-    B3 --> C[Set Eval Mode]
-    
-    C --> C1[Disable Dropout]
-    C1 --> C2[Fix BatchNorm]
-    C2 --> C3[No Gradient Tracking]
-    C3 --> D[Preprocess Image]
-    
-    D --> D1[Load Image]
-    D1 --> D2[Apply Transforms]
-    D2 --> D3[Resize]
-    D3 --> D4[Normalize]
-    D4 --> D5[To Tensor]
-    D5 --> D6[Add Batch Dim]
-    D6 --> E{Inference}
+graph LR
+    A[Trained Model] --> B[Load Checkpoint]
+    B --> C[Set Eval Mode]
+    C --> D[Preprocess Image<br/>Resize + Normalize + Tensor]
+    D --> E{Task-Specific<br/>Inference}
 
-    E -->|Classification| F1[Logits]
-    F1 --> F1a[Forward Pass]
-    F1a --> F1b[Extract Logits]
-    
-    E -->|Multi-Label| F4[Logits]
-    F4 --> F4a[Forward Pass]
-    F4a --> F4b[Extract Logits]
-    
-    E -->|Detection| F2[Boxes + Classes]
-    F2 --> F2a[Forward Pass]
-    F2a --> F2b[Decode Predictions]
-    
-    E -->|Segmentation| F3[Pixel Masks]
-    F3 --> F3a[Forward Pass]
-    F3a --> F3b[Extract Masks]
-
-    F1b --> G1[Softmax]
-    G1 --> G1a[Class Probabilities]
-    G1a --> G1b[Top-K Classes]
-    
-    F4b --> G4[Sigmoid + Threshold]
-    G4 --> G4a[Class Probabilities]
-    G4a --> G4b[Apply Threshold]
-    G4b --> G4c[Multi-label Output]
-    
-    F2b --> G2[NMS]
-    G2 --> G2a[Filter by Score]
-    G2a --> G2b[IoU Suppression]
-    G2b --> G2c[Final Detections]
-    
-    F3b --> G3[Argmax]
-    G3 --> G3a[Class per Pixel]
-    G3a --> G3b[Create Mask]
-
-    G1b --> H[Predictions]
-    G4c --> H
-    G2c --> H
-    G3b --> H
-
-    H --> I[Post-process]
-    I --> I1[Format Results]
-    I1 --> I2[Add Metadata]
-    I2 --> I3[Create Visualizations]
-    I3 --> J[Results]
-    
-    J --> J1[Save Predictions]
-    J1 --> J2[Generate Report]
-    J2 --> J3[Output Files]
-
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style A fill:#1565C0,stroke:#0D47A1,color:#fff
     style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C fill:#2196F3,stroke:#1976D2,color:#fff
+    style C fill:#42A5F5,stroke:#1976D2,color:#fff
     style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E fill:#2196F3,stroke:#1976D2,color:#fff
-    style H fill:#42A5F5,stroke:#1976D2,color:#fff
-    style I fill:#2196F3,stroke:#1976D2,color:#fff
-    style J fill:#42A5F5,stroke:#1976D2,color:#fff
+    style E fill:#FF9800,stroke:#F57C00,color:#fff
+```
+
+### Task-Specific Output
+
+```mermaid
+graph LR
+    A[Forward Pass] --> B1[Classification<br/>Softmax → Top-K]
+    A --> B2[Multi-Label<br/>Sigmoid → Threshold]
+    A --> B3[Detection<br/>Decode → NMS]
+    A --> B4[Segmentation<br/>Argmax → Mask]
+    B1 --> C[Results]
+    B2 --> C
+    B3 --> C
+    B4 --> C
+
+    style A fill:#1565C0,stroke:#0D47A1,color:#fff
+    style B1 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style B2 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style B3 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style B4 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C fill:#4CAF50,stroke:#388E3C,color:#fff
 ```
 
 ## Quick Links

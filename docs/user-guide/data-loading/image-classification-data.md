@@ -6,89 +6,32 @@ The `ImageDataModule` handles image classification datasets including built-in d
 
 ```mermaid
 graph TD
-    A[Data Source] --> A1[Verify Availability]
-    A1 --> A2[Check Format]
-    A2 --> B{Dataset Type}
-    
-    B -->|Built-in| C1[CIFAR/MNIST]
-    C1 --> C1a[Select Dataset]
-    C1a --> C1b[torchvision.datasets]
-    C1b --> C1c[Check Cache]
-    C1c --> D[Auto Download]
-    D --> D1[Download Files]
-    D1 --> D2[Extract Archive]
-    D2 --> D3[Verify Integrity]
-    
-    B -->|Custom| C2[ImageFolder]
-    C2 --> C2a[Validate Structure]
-    C2a --> C2b[class_1/, class_2/, ...]
-    C2b --> C2c[Find Image Files]
-    C2c --> E[Scan Directories]
-    E --> E1[List Files]
-    E1 --> E2[Filter Extensions]
-    E2 --> E3[Build Dataset Index]
-    
-    D3 --> F[ImageDataModule]
-    E3 --> F
-    
-    F --> F1[Initialize Module]
-    F1 --> F2[Set Parameters]
-    F2 --> F3[Configure Paths]
-    F3 --> G{Split Strategy}
-    
-    G -->|Has val/| H1[Use val/ folder]
-    H1 --> H1a[Load train/]
-    H1a --> H1b[Load val/]
-    H1b --> H1c[Load test/]
-    
-    G -->|No val/| H2[Auto split val_split=0.1]
-    H2 --> H2a[Load all from train/]
-    H2a --> H2b[Random Split]
-    H2b --> H2c[Create Val Set]
-    
-    H1c --> I[Train/Val/Test Splits]
-    H2c --> I
-    
-    I --> I1[Create Subsets]
-    I1 --> I2[Assign Indices]
-    I2 --> I3[Validate Splits]
-    I3 --> J[TransformConfig]
-    
-    J -->|Train| K1[Augmentation]
-    K1 --> K1a[RandomResizedCrop]
-    K1a --> K1b[RandomHorizontalFlip]
-    K1b --> K1c[ColorJitter]
-    K1c --> K1d[RandAugment]
-    K1d --> K1e[Normalize]
-    
-    J -->|Val/Test| K2[Resize + Normalize]
-    K2 --> K2a[Resize]
-    K2a --> K2b[CenterCrop]
-    K2b --> K2c[ToTensor]
-    K2c --> K2d[Normalize]
-    
-    K1e --> L[DataLoader]
-    K2d --> L
-    
-    L --> L1[Create Loaders]
-    L1 --> L2[Set Batch Size]
-    L2 --> L3[Configure Workers]
-    L3 --> L4[Enable Shuffling]
-    L4 --> L5[Pin Memory]
-    L5 --> M[Batches]
-    
-    M --> M1[Collate Samples]
-    M1 --> M2[Stack Tensors]
-    M2 --> M3[Batch Ready]
-    
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
+    A[Data Source] --> B{Dataset Type}
+    B -->|Built-in| C1[CIFAR / MNIST<br/>Auto download]
+    B -->|Custom Folder| C2[ImageFolder<br/>class_1/, class_2/, ...]
+    B -->|CSV| C3[CSVImageDataset<br/>image_path, label]
+    C1 --> D[ImageDataModule]
+    C2 --> D
+    C3 --> D
+    D --> E{Split Strategy}
+    E -->|val/ exists| F1[Use val/ folder]
+    E -->|No val/| F2[Auto split<br/>val_split=0.1]
+    F1 --> G[Transforms]
+    F2 --> G
+    G -->|Train| H1[Augment + Normalize]
+    G -->|Val/Test| H2[Resize + Normalize]
+    H1 --> I[DataLoader → Batches]
+    H2 --> I
+
+    style A fill:#1565C0,stroke:#0D47A1,color:#fff
+    style B fill:#FF9800,stroke:#F57C00,color:#fff
     style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C2 fill:#2196F3,stroke:#1976D2,color:#fff
-    style F fill:#42A5F5,stroke:#1976D2,color:#fff
-    style J fill:#2196F3,stroke:#1976D2,color:#fff
-    style L fill:#42A5F5,stroke:#1976D2,color:#fff
-    style M fill:#2196F3,stroke:#1976D2,color:#fff
-    style M3 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C2 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C3 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style D fill:#1565C0,stroke:#0D47A1,color:#fff
+    style E fill:#FF9800,stroke:#F57C00,color:#fff
+    style G fill:#42A5F5,stroke:#1976D2,color:#fff
+    style I fill:#4CAF50,stroke:#388E3C,color:#fff
 ```
 
 ## Built-in Datasets

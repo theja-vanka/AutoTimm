@@ -4,100 +4,60 @@ AutoTimm provides comprehensive tools for interpreting and visualizing deep lear
 
 ## Interpretation Workflow
 
+### Choose a Method
+
 ```mermaid
-graph TD
-    A[Model + Image] --> A1[Load Model]
-    A1 --> A2[Preprocess Image]
-    A2 --> A3[Set Eval Mode]
-    A3 --> B{Method}
-    
-    B -->|GradCAM| C1[Gradient-based]
-    C1 --> C1a[Forward Pass]
-    C1a --> C1b[Target Layer Hook]
-    C1b --> C1c[Backward to Target]
-    C1c --> C1d[Compute Gradients]
-    C1d --> C1e[Global Average Pool]
-    C1e --> C1f[Weight Feature Maps]
-    
-    B -->|Integrated Gradients| C2[Path-based]
-    C2 --> C2a[Create Baseline]
-    C2a --> C2b[Generate Path]
-    C2b --> C2c[Interpolate Inputs]
-    C2c --> C2d[Compute Gradients]
-    C2d --> C2e[Integrate Path]
-    C2e --> C2f[Accumulate Attribution]
-    
-    B -->|Attention| C3[Attention-based]
-    C3 --> C3a[Extract Attention]
-    C3a --> C3b[Attention Rollout]
-    C3b --> C3c[Aggregate Layers]
-    C3c --> C3d[Normalize Scores]
-    
-    B -->|SmoothGrad| C4[Noise-based]
-    C4 --> C4a[Generate Noise]
-    C4a --> C4b[Add to Input]
-    C4b --> C4c[Compute Gradients]
-    C4c --> C4d[Average Results]
-    C4d --> C4e[Smooth Attribution]
-    
-    C1f --> D[Heatmap]
-    C2f --> D
-    C3d --> D
-    C4e --> D
-    
-    D --> D1[Resize to Input]
-    D1 --> D2[Normalize Values]
-    D2 --> D3[Apply Colormap]
-    D3 --> E{Task Adapter}
-    
-    E -->|Classification| F1[Class Attribution]
-    F1 --> F1a[Target Class]
-    F1a --> F1b[Attribution Map]
-    F1b --> F1c[Overlay on Image]
-    
-    E -->|Detection| F2[Box Attribution]
-    F2 --> F2a[Per-Box Maps]
-    F2a --> F2b[Localization]
-    F2b --> F2c[Class-specific]
-    
-    E -->|Segmentation| F3[Pixel Attribution]
-    F3 --> F3a[Dense Maps]
-    F3a --> F3b[Per-class Maps]
-    F3b --> F3c[Segmentation Overlay]
-    
-    F1c --> G[Visualization]
-    F2c --> G
-    F3c --> G
-    
-    G --> G1[Generate Plots]
-    G1 --> G2[Add Annotations]
-    G2 --> G3[Create HTML Report]
-    G3 --> G4[Interactive Dashboard]
-    
-    G4 --> H[Quality Metrics]
-    H --> H1[Faithfulness]
-    H1 --> H1a[Perturbation Test]
-    H --> H2[Sensitivity]
-    H2 --> H2a[Input Variation]
-    H --> H3[Localization]
-    H3 --> H3a[Ground Truth IoU]
-    
-    H1a --> I[Analysis]
-    H2a --> I
-    H3a --> I
-    I --> I1[Metric Scores]
-    I1 --> I2[Comparison Report]
-    I2 --> I3[Recommendations]
-    
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
+graph LR
+    A[Model + Image] --> B{Method}
+    B --> C1[<b>GradCAM</b><br/>Gradient-weighted<br/>activation maps]
+    B --> C2[<b>Integrated Gradients</b><br/>Path-based<br/>attribution]
+    B --> C3[<b>Attention Rollout</b><br/>ViT attention<br/>aggregation]
+    B --> C4[<b>SmoothGrad</b><br/>Noise-averaged<br/>gradients]
+
+    style A fill:#1565C0,stroke:#0D47A1,color:#fff
+    style B fill:#FF9800,stroke:#F57C00,color:#fff
     style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C2 fill:#2196F3,stroke:#1976D2,color:#fff
+    style C2 fill:#42A5F5,stroke:#1976D2,color:#fff
     style C3 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C4 fill:#2196F3,stroke:#1976D2,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style G fill:#2196F3,stroke:#1976D2,color:#fff
-    style H fill:#42A5F5,stroke:#1976D2,color:#fff
-    style I fill:#2196F3,stroke:#1976D2,color:#fff
+    style C4 fill:#42A5F5,stroke:#1976D2,color:#fff
+```
+
+### Generate & Visualize
+
+```mermaid
+graph LR
+    A[Heatmap] --> B{Task Adapter}
+    B --> C1[Classification<br/>Class attribution overlay]
+    B --> C2[Detection<br/>Per-box attribution]
+    B --> C3[Segmentation<br/>Per-class pixel maps]
+    C1 --> D[Visualization<br/>Plots + HTML Reports]
+    C2 --> D
+    C3 --> D
+
+    style A fill:#1565C0,stroke:#0D47A1,color:#fff
+    style B fill:#FF9800,stroke:#F57C00,color:#fff
+    style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C2 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C3 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style D fill:#4CAF50,stroke:#388E3C,color:#fff
+```
+
+### Evaluate Quality
+
+```mermaid
+graph LR
+    A[Explanation] --> B1[Faithfulness<br/>Perturbation test]
+    A --> B2[Sensitivity<br/>Input variation]
+    A --> B3[Localization<br/>Ground truth IoU]
+    B1 --> C[Metric Scores<br/>+ Comparison Report]
+    B2 --> C
+    B3 --> C
+
+    style A fill:#1565C0,stroke:#0D47A1,color:#fff
+    style B1 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style B2 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style B3 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C fill:#4CAF50,stroke:#388E3C,color:#fff
 ```
 
 ## Overview
