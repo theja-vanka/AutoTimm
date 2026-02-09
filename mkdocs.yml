@@ -191,6 +191,7 @@ nav:
           - ImageDataModule: api/data.md
           - MultiLabelImageDataModule: api/multilabel_data.md
           - DetectionDataModule: api/detection_data.md
+          - CSV Data Loading: api/csv_data.md
           - TransformConfig: api/transforms.md
       - Training:
           - AutoTrainer: api/trainer.md

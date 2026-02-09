@@ -279,120 +279,34 @@ print(data.summary())
 
 ---
 
-# MultiLabelImageDataModule
+## CSV Data Loading
 
-Lightning data module for multi-label image classification from CSV files.
+For CSV-based data loading, `ImageDataModule` supports `train_csv`, `val_csv`, and `test_csv` parameters for single-label classification.
 
-## Overview
+For multi-label classification from CSV files, see [MultiLabelImageDataModule](multilabel_data.md).
 
-`MultiLabelImageDataModule` loads multi-label datasets from CSV files where each row contains an image path and binary label columns. Pair with `ImageClassifier(multi_label=True)` for end-to-end multi-label training.
+For direct CSV dataset usage (without DataModules), see the [CSV Data Loading API](csv_data.md) documentation.
 
-## API Reference
-
-::: autotimm.MultiLabelImageDataModule
-    options:
-      show_source: true
-      members:
-        - __init__
-        - setup
-        - train_dataloader
-        - val_dataloader
-        - test_dataloader
-        - summary
-        - num_labels
-        - label_names
-
-## Usage Examples
-
-### Basic Usage
+### CSV Classification Example
 
 ```python
-from autotimm import MultiLabelImageDataModule
+from autotimm import ImageDataModule
 
-data = MultiLabelImageDataModule(
+data = ImageDataModule(
     train_csv="train.csv",
-    image_dir="./images",
     val_csv="val.csv",
+    image_dir="./images",
     image_size=224,
     batch_size=32,
 )
-data.setup("fit")
-print(f"Labels: {data.num_labels}")
-print(f"Label names: {data.label_names}")
 ```
 
-### With Auto Validation Split
-
-```python
-data = MultiLabelImageDataModule(
-    train_csv="train.csv",
-    image_dir="./images",
-    val_split=0.2,
-)
+**CSV Format:**
+```csv
+image_path,label
+img001.jpg,cat
+img002.jpg,dog
 ```
 
-### With Albumentations
+See [CSV Data API](csv_data.md#csvimagedataset) for detailed CSV format specification.
 
-```python
-data = MultiLabelImageDataModule(
-    train_csv="train.csv",
-    image_dir="./images",
-    transform_backend="albumentations",
-    augmentation_preset="strong",
-)
-```
-
-### With Explicit Label Columns
-
-```python
-data = MultiLabelImageDataModule(
-    train_csv="train.csv",
-    image_dir="./images",
-    label_columns=["cat", "dog"],
-    image_column="filepath",
-)
-```
-
-## Parameters
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `train_csv` | `str \| Path` | Required | Path to training CSV |
-| `image_dir` | `str \| Path` | `"."` | Root directory for images |
-| `val_csv` | `str \| Path \| None` | `None` | Validation CSV (auto-splits if None) |
-| `test_csv` | `str \| Path \| None` | `None` | Test CSV |
-| `label_columns` | `list[str] \| None` | `None` | Label columns (auto-detected if None) |
-| `image_column` | `str \| None` | `None` | Image column (first column if None) |
-| `image_size` | `int` | `224` | Target image size |
-| `batch_size` | `int` | `32` | Batch size |
-| `num_workers` | `int` | `4` | Data loading workers |
-| `val_split` | `float` | `0.1` | Validation split fraction |
-| `train_transforms` | `Callable \| None` | `None` | Custom train transforms |
-| `eval_transforms` | `Callable \| None` | `None` | Custom eval transforms |
-| `augmentation_preset` | `str \| None` | `None` | Preset name |
-| `transform_backend` | `str` | `"torchvision"` | `"torchvision"` or `"albumentations"` |
-| `pin_memory` | `bool` | `True` | Pin memory for GPU |
-| `persistent_workers` | `bool` | `False` | Keep workers alive |
-| `prefetch_factor` | `int \| None` | `None` | Prefetch batches |
-
-## Attributes
-
-| Attribute | Type | Description |
-|-----------|------|-------------|
-| `num_labels` | `int \| None` | Number of labels (after setup) |
-| `label_names` | `list[str] \| None` | Label column names (after setup) |
-| `train_dataset` | `Dataset \| None` | Training dataset (after setup) |
-| `val_dataset` | `Dataset \| None` | Validation dataset (after setup) |
-| `test_dataset` | `Dataset \| None` | Test dataset (after setup) |
-
-## CSV Format
-
-```
-image_path,cat,dog,outdoor,indoor
-img1.jpg,1,0,1,0
-img2.jpg,0,1,0,1
-img3.jpg,1,1,1,0
-```
-
-- First column: relative image path (resolved against `image_dir`)
-- Remaining columns: binary label indicators (0 or 1)

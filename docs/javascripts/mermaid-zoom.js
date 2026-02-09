@@ -4,6 +4,78 @@
  * Works with MkDocs Material's built-in mermaid rendering.
  */
 
+/**
+ * Configure Mermaid theme based on current color scheme
+ */
+function configureMermaidTheme() {
+    if (typeof mermaid === 'undefined') return;
+    
+    const scheme = document.querySelector('[data-md-color-scheme]')?.getAttribute('data-md-color-scheme');
+    const isDark = scheme === 'slate';
+    
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: isDark ? 'dark' : 'default',
+        themeVariables: isDark ? {
+            primaryColor: '#42A5F5',
+            primaryTextColor: '#E0E0E0',
+            primaryBorderColor: '#90CAF9',
+            lineColor: '#90CAF9',
+            secondaryColor: '#1E3A5F',
+            tertiaryColor: '#2C5282',
+            noteBkgColor: '#1E3A5F',
+            noteBorderColor: '#42A5F5',
+            noteTextColor: '#E0E0E0',
+            textColor: '#E0E0E0',
+            mainBkg: '#1E3A5F',
+            secondBkg: '#2C5282',
+            border1: '#90CAF9',
+            border2: '#42A5F5',
+            arrowheadColor: '#90CAF9',
+            fontFamily: 'Roboto, sans-serif',
+            fontSize: '16px',
+            labelBackground: '#1A1A1A',
+            labelTextColor: '#E0E0E0',
+            edgeLabelBackground: '#1A1A1A',
+            clusterBkg: '#1E3A5F',
+            clusterBorder: '#90CAF9',
+            defaultLinkColor: '#90CAF9',
+            titleColor: '#E0E0E0',
+            actorBorder: '#90CAF9',
+            actorBkg: '#2C5282',
+            actorTextColor: '#E0E0E0',
+            actorLineColor: '#90CAF9',
+            signalColor: '#E0E0E0',
+            signalTextColor: '#E0E0E0',
+            labelBoxBkgColor: '#1A1A1A',
+            labelBoxBorderColor: '#90CAF9',
+            loopTextColor: '#E0E0E0',
+            activationBorderColor: '#90CAF9',
+            activationBkgColor: '#2C5282',
+            sequenceNumberColor: '#E0E0E0'
+        } : {
+            primaryColor: '#2196F3',
+            primaryTextColor: '#212121',
+            primaryBorderColor: '#1976D2',
+            lineColor: '#1976D2',
+            secondaryColor: '#E3F2FD',
+            tertiaryColor: '#BBDEFB',
+            noteBkgColor: '#E3F2FD',
+            noteBorderColor: '#2196F3',
+            noteTextColor: '#212121',
+            textColor: '#212121',
+            mainBkg: '#E3F2FD',
+            secondBkg: '#BBDEFB',
+            border1: '#1976D2',
+            border2: '#2196F3',
+            fontFamily: 'Roboto, sans-serif',
+            fontSize: '16px'
+        },
+        securityLevel: 'loose',
+        logLevel: 'error'
+    });
+}
+
 function initializeMermaidZoom() {
     const mermaidDiagrams = document.querySelectorAll('.mermaid');
 
@@ -192,9 +264,41 @@ function observeMermaidRendering() {
 // Initial setup
 var mermaidObserver = observeMermaidRendering();
 
+// Configure theme on initial load
+configureMermaidTheme();
+
 // Also run on initial load in case SVGs are already rendered
 document.addEventListener('DOMContentLoaded', function() {
+    configureMermaidTheme();
     initializeMermaidZoom();
+});
+
+// Watch for color scheme changes
+var schemeObserver = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+        if (mutation.attributeName === 'data-md-color-scheme') {
+            configureMermaidTheme();
+            // Re-render mermaid diagrams with new theme
+            if (typeof mermaid !== 'undefined') {
+                document.querySelectorAll('.mermaid').forEach(function(element) {
+                    var code = element.getAttribute('data-mermaid-src');
+                    if (code) {
+                        element.removeAttribute('data-processed');
+                        element.innerHTML = code;
+                    }
+                });
+                mermaid.init(undefined, document.querySelectorAll('.mermaid:not([data-processed])'));
+                setTimeout(initializeMermaidZoom, 100);
+            }
+        }
+    });
+});
+
+// Observe the document element for color scheme changes
+schemeObserver.observe(document.querySelector('body'), { 
+    attributes: true, 
+    subtree: true,
+    attributeFilter: ['data-md-color-scheme']
 });
 
 // Re-initialize on Material instant navigation
@@ -203,6 +307,7 @@ if (typeof document$ !== 'undefined') {
         // Disconnect old observer and start a new one for the new page
         if (mermaidObserver) mermaidObserver.disconnect();
         mermaidObserver = observeMermaidRendering();
+        configureMermaidTheme();
         // Also try immediately in case SVGs are already present
         initializeMermaidZoom();
     });

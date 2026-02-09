@@ -7,7 +7,7 @@
 /* Light mode colors */
 [data-md-color-scheme="default"] .mermaid {
   --mermaid-primary-color: #2196F3;
-  --mermaid-primary-text-color: #fff;
+  --mermaid-primary-text-color: #212121;
   --mermaid-primary-border-color: #1976D2;
   --mermaid-line-color: #1976D2;
   --mermaid-secondary-color: #E3F2FD;
@@ -15,12 +15,13 @@
   --mermaid-note-bg-color: #E3F2FD;
   --mermaid-note-border-color: #2196F3;
   --mermaid-text-color: #212121;
+  --mermaid-label-color: #212121;
 }
 
-/* Dark mode colors */
+/* Dark mode colors - optimized for visibility */
 [data-md-color-scheme="slate"] .mermaid {
   --mermaid-primary-color: #42A5F5;
-  --mermaid-primary-text-color: #000;
+  --mermaid-primary-text-color: #1A1A1A;
   --mermaid-primary-border-color: #90CAF9;
   --mermaid-line-color: #90CAF9;
   --mermaid-secondary-color: #1E3A5F;
@@ -28,4 +29,30 @@
   --mermaid-note-bg-color: #1E3A5F;
   --mermaid-note-border-color: #42A5F5;
   --mermaid-text-color: #E0E0E0;
+  --mermaid-label-color: #E0E0E0;
+}
+
+/* Ensure text is always visible in dark mode */
+[data-md-color-scheme="slate"] .mermaid text,
+[data-md-color-scheme="slate"] .mermaid .label,
+[data-md-color-scheme="slate"] .mermaid .nodeLabel,
+[data-md-color-scheme="slate"] .mermaid .edgeLabel,
+[data-md-color-scheme="slate"] .mermaid .labelText {
+  fill: #E0E0E0 !important;
+  color: #E0E0E0 !important;
+}
+
+/* Ensure labels on colored backgrounds have good contrast */
+[data-md-color-scheme="slate"] .mermaid .label text,
+[data-md-color-scheme="slate"] .mermaid rect.label-container + text {
+  fill: #1A1A1A !important;
+}
+
+/* Light mode text visibility */
+[data-md-color-scheme="default"] .mermaid text,
+[data-md-color-scheme="default"] .mermaid .label,
+[data-md-color-scheme="default"] .mermaid .nodeLabel,
+[data-md-color-scheme="default"] .mermaid .edgeLabel {
+  fill: #212121 !important;
+  color: #212121 !important;
 }

@@ -56,16 +56,40 @@ graph LR
 
 ## Core Classes
 
+### Task Models
+
 | Class | Description |
 |-------|-------------|
 | [ImageClassifier](classifier.md) | End-to-end image classifier with timm backbone |
 | [ObjectDetector](detection.md) | FCOS-style anchor-free object detector |
 | [SemanticSegmentor](segmentation.md#semanticsegmentor) | DeepLabV3+ / FCN semantic segmentation |
 | [InstanceSegmentor](segmentation.md#instancesegmentor) | Mask R-CNN style instance segmentation |
-| [ImageDataModule](data.md) | Data module for images (folder or built-in datasets) |
-| [DetectionDataModule](detection_data.md) | Data module for object detection (COCO format) |
-| [SegmentationDataModule](segmentation.md#segmentationdatamodule) | Data module for semantic segmentation |
-| [InstanceSegmentationDataModule](segmentation.md#instancesegmentationdatamodule) | Data module for instance segmentation |
+
+### Data Modules
+
+| Class | Description |
+|-------|-------------|
+| [ImageDataModule](data.md) | Image classification (folder/built-in/CSV) |
+| [MultiLabelImageDataModule](multilabel_data.md) | Multi-label classification from CSV |
+| [DetectionDataModule](detection_data.md) | Object detection (COCO/CSV) |
+| [SegmentationDataModule](segmentation.md#segmentationdatamodule) | Semantic segmentation |
+| [InstanceSegmentationDataModule](segmentation.md#instancesegmentationdatamodule) | Instance segmentation (COCO/CSV) |
+
+### CSV Datasets
+
+For direct CSV dataset usage without DataModules, see [CSV Data Loading API](csv_data.md):
+
+| Dataset | Task | Description |
+|---------|------|-------------|
+| [CSVImageDataset](csv_data.md#csvimagedataset) | Classification | Single-label from CSV |
+| [MultiLabelImageDataset](csv_data.md#multilabelimagedataset) | Multi-Label | Multi-label from CSV |
+| [CSVDetectionDataset](csv_data.md#csvdetectiondataset) | Detection | Bounding boxes from CSV |
+| [CSVInstanceDataset](csv_data.md#csvinstancedataset) | Instance Seg | Masks from CSV |
+
+### Training
+
+| Class | Description |
+|-------|-------------|
 | [AutoTrainer](trainer.md) | Configured PyTorch Lightning Trainer |
 
 ## Configuration Classes
