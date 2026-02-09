@@ -7,7 +7,11 @@ from autotimm.metrics import MetricConfig
 from autotimm.tasks.classification import ImageClassifier
 
 
-# Helper fixture for common metric configs
+# ---------------------------------------------------------------------------
+# Fixtures
+# ---------------------------------------------------------------------------
+
+
 @pytest.fixture
 def basic_metrics():
     return [
@@ -16,6 +20,23 @@ def basic_metrics():
             backend="torchmetrics",
             metric_class="Accuracy",
             params={"task": "multiclass"},
+            stages=["train", "val", "test"],
+            prog_bar=True,
+        ),
+    ]
+
+
+NUM_LABELS = 4
+
+
+@pytest.fixture
+def multilabel_metrics():
+    return [
+        MetricConfig(
+            name="accuracy",
+            backend="torchmetrics",
+            metric_class="MultilabelAccuracy",
+            params={"num_labels": NUM_LABELS},
             stages=["train", "val", "test"],
             prog_bar=True,
         ),
@@ -197,3 +218,138 @@ def test_training_without_metrics():
 
     # Test step should work
     model.test_step((x, y), batch_idx=0)
+
+
+# ---------------------------------------------------------------------------
+# Multi-label tests
+# ---------------------------------------------------------------------------
+
+
+def test_multi_label_forward_shape():
+    model = ImageClassifier(
+        backbone="resnet18",
+        num_classes=NUM_LABELS,
+        multi_label=True,
+    )
+    model.eval()
+    x = torch.randn(2, 3, 224, 224)
+    with torch.no_grad():
+        out = model(x)
+    assert out.shape == (2, NUM_LABELS)
+
+
+def test_multi_label_training_step(multilabel_metrics):
+    model = ImageClassifier(
+        backbone="resnet18",
+        num_classes=NUM_LABELS,
+        multi_label=True,
+        metrics=multilabel_metrics,
+    )
+    model.train()
+    x = torch.randn(4, 3, 224, 224)
+    # Multi-hot targets
+    y = torch.zeros(4, NUM_LABELS)
+    y[0, [0, 2]] = 1
+    y[1, [1]] = 1
+    y[2, [0, 1, 3]] = 1
+    y[3, [3]] = 1
+
+    loss = model.training_step((x, y), batch_idx=0)
+    assert loss.ndim == 0  # scalar
+    assert loss.requires_grad
+
+
+def test_multi_label_predict_step():
+    model = ImageClassifier(
+        backbone="resnet18",
+        num_classes=NUM_LABELS,
+        multi_label=True,
+    )
+    model.eval()
+    x = torch.randn(2, 3, 224, 224)
+    with torch.no_grad():
+        probs = model.predict_step((x,), batch_idx=0)
+    assert probs.shape == (2, NUM_LABELS)
+    # Sigmoid outputs are each in [0, 1] but do NOT sum to 1
+    assert (probs >= 0).all() and (probs <= 1).all()
+    # Very unlikely that sigmoid outputs sum exactly to 1 for all rows
+    # (unless num_labels == 1), so just check they are valid probabilities
+
+
+def test_multi_label_validation_step(multilabel_metrics):
+    model = ImageClassifier(
+        backbone="resnet18",
+        num_classes=NUM_LABELS,
+        multi_label=True,
+        metrics=multilabel_metrics,
+    )
+    model.eval()
+    x = torch.randn(4, 3, 224, 224)
+    y = torch.zeros(4, NUM_LABELS)
+    y[0, [0, 2]] = 1
+    y[1, [1]] = 1
+
+    # Should not raise
+    model.validation_step((x, y), batch_idx=0)
+
+
+def test_multi_label_with_metrics():
+    metrics = [
+        MetricConfig(
+            name="accuracy",
+            backend="torchmetrics",
+            metric_class="MultilabelAccuracy",
+            params={"num_labels": NUM_LABELS},
+            stages=["train", "val"],
+            prog_bar=True,
+        ),
+        MetricConfig(
+            name="f1",
+            backend="torchmetrics",
+            metric_class="MultilabelF1Score",
+            params={"num_labels": NUM_LABELS, "average": "macro"},
+            stages=["val"],
+        ),
+    ]
+    model = ImageClassifier(
+        backbone="resnet18",
+        num_classes=NUM_LABELS,
+        multi_label=True,
+        metrics=metrics,
+    )
+
+    assert "accuracy" in model.train_metrics
+    assert "accuracy" in model.val_metrics
+    assert "f1" in model.val_metrics
+    assert "f1" not in model.train_metrics
+
+
+def test_multi_label_label_smoothing_error():
+    with pytest.raises(ValueError, match="label_smoothing.*not supported.*multi_label"):
+        ImageClassifier(
+            backbone="resnet18",
+            num_classes=NUM_LABELS,
+            multi_label=True,
+            label_smoothing=0.1,
+        )
+
+
+def test_multi_label_inference_without_metrics():
+    """Test multi-label works for inference without metrics."""
+    model = ImageClassifier(
+        backbone="resnet18",
+        num_classes=NUM_LABELS,
+        multi_label=True,
+        metrics=None,
+    )
+    model.eval()
+
+    x = torch.randn(2, 3, 224, 224)
+    with torch.no_grad():
+        out = model(x)
+    assert out.shape == (2, NUM_LABELS)
+
+    with torch.no_grad():
+        probs = model.predict_step((x,), batch_idx=0)
+    assert probs.shape == (2, NUM_LABELS)
+    assert (probs >= 0).all() and (probs <= 1).all()

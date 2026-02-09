@@ -22,7 +22,11 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
 
     Parameters:
         backbone: A timm model name (str) or a :class:`BackboneConfig`.
-        num_classes: Number of target classes.
+        num_classes: Number of target classes (or labels for multi-label).
+        multi_label: If ``True``, use ``BCEWithLogitsLoss`` and sigmoid-based
+            predictions for multi-label classification. Default is ``False``.
+        threshold: Prediction threshold for multi-label mode. Sigmoid outputs
+            above this value are predicted as positive. Default is ``0.5``.
         metrics: A :class:`MetricManager` instance or list of :class:`MetricConfig`
             objects. Optional - if ``None``, no metrics will be computed during training.
             This is useful for inference-only scenarios.
@@ -42,6 +46,7 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
         scheduler_kwargs: Extra kwargs forwarded to the LR scheduler.
         head_dropout: Dropout before the classification linear layer.
         label_smoothing: Label smoothing factor for cross-entropy.
+            Not supported with ``multi_label=True`` (raises ``ValueError``).
         freeze_backbone: If ``True``, backbone parameters are frozen
             (useful for linear probing).
         mixup_alpha: If > 0, apply Mixup augmentation with this alpha.
@@ -94,6 +99,8 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
         self,
         backbone: str | BackboneConfig,
         num_classes: int,
+        multi_label: bool = False,
+        threshold: float = 0.5,
         metrics: MetricManager | list[MetricConfig] | None = None,
         logging_config: LoggingConfig | None = None,
         transform_config: TransformConfig | None = None,
@@ -112,6 +119,13 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
         seed: int | None = 42,
         deterministic: bool = True,
     ):
+        # Validate multi-label + label_smoothing combination
+        if multi_label and label_smoothing > 0:
+            raise ValueError(
+                "label_smoothing is not supported with multi_label=True. "
+                "BCEWithLogitsLoss does not support label smoothing."
+            )
+
         # Seed for reproducibility
         if seed is not None:
             seed_everything(seed, deterministic=deterministic)
@@ -126,7 +140,14 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
         in_features = get_backbone_out_features(self.backbone)
         self.head = ClassificationHead(in_features, num_classes, dropout=head_dropout)
 
-        self.criterion = nn.CrossEntropyLoss(label_smoothing=label_smoothing)
+        # Multi-label mode
+        self._multi_label = multi_label
+        self._threshold = threshold
+
+        if multi_label:
+            self.criterion = nn.BCEWithLogitsLoss()
+        else:
+            self.criterion = nn.CrossEntropyLoss(label_smoothing=label_smoothing)
 
         # Initialize metrics from config
         if metrics is not None:
@@ -150,8 +171,8 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
             log_gradient_norm=False,
         )
 
-        # For confusion matrix logging
-        if self._logging_config.log_confusion_matrix:
+        # For confusion matrix logging (not meaningful for multi-label)
+        if self._logging_config.log_confusion_matrix and not multi_label:
             self._val_confusion = torchmetrics.ConfusionMatrix(
                 task="multiclass", num_classes=num_classes
             )
@@ -197,6 +218,10 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
     ) -> torch.Tensor:
         x, y = batch
 
+        # BCEWithLogitsLoss requires float targets
+        if self._multi_label:
+            y = y.float()
+
         if self._mixup_alpha > 0 and self.training:
             lam = (
                 torch.distributions.Beta(self._mixup_alpha, self._mixup_alpha)
@@ -214,7 +239,10 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
             logits = self(x)
             loss = self.criterion(logits, y)
 
-        preds = logits.argmax(dim=-1)
+        if self._multi_label:
+            preds = (logits.sigmoid() > self._threshold).int()
+        else:
+            preds = logits.argmax(dim=-1)
 
         # Log loss
         self.log("train/loss", loss, prog_bar=True)
@@ -273,9 +301,17 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
         self, batch: tuple[torch.Tensor, torch.Tensor], batch_idx: int
     ) -> None:
         x, y = batch
+
+        if self._multi_label:
+            y = y.float()
+
         logits = self(x)
         loss = self.criterion(logits, y)
-        preds = logits.argmax(dim=-1)
+
+        if self._multi_label:
+            preds = (logits.sigmoid() > self._threshold).int()
+        else:
+            preds = logits.argmax(dim=-1)
 
         # Log loss
         self.log("val/loss", loss, prog_bar=True)
@@ -294,13 +330,13 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
                         prog_bar=config.prog_bar,
                     )
 
-        # Update confusion matrix if enabled
-        if self._logging_config.log_confusion_matrix:
+        # Update confusion matrix if enabled (not meaningful for multi-label)
+        if self._logging_config.log_confusion_matrix and not self._multi_label:
             self._val_confusion.update(preds, y)
 
     def on_validation_epoch_end(self) -> None:
         """Log confusion matrix at the end of validation epoch."""
-        if not self._logging_config.log_confusion_matrix:
+        if not self._logging_config.log_confusion_matrix or self._multi_label:
             return
 
         if self.logger is None:
@@ -428,9 +464,17 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
         self, batch: tuple[torch.Tensor, torch.Tensor], batch_idx: int
     ) -> None:
         x, y = batch
+
+        if self._multi_label:
+            y = y.float()
+
         logits = self(x)
         loss = self.criterion(logits, y)
-        preds = logits.argmax(dim=-1)
+
+        if self._multi_label:
+            preds = (logits.sigmoid() > self._threshold).int()
+        else:
+            preds = logits.argmax(dim=-1)
 
         # Log loss
         self.log("test/loss", loss)
@@ -451,7 +495,10 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
 
     def predict_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
         x = batch[0] if isinstance(batch, (tuple, list)) else batch
-        return self(x).softmax(dim=-1)
+        logits = self(x)
+        if self._multi_label:
+            return logits.sigmoid()
+        return logits.softmax(dim=-1)
 
     def to_torchscript(
         self,

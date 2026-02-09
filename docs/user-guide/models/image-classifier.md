@@ -321,12 +321,101 @@ model = ImageClassifier(
 
 **Note:** First training/inference run will be slower due to compilation overhead. Subsequent runs benefit from optimization. Falls back gracefully on PyTorch < 2.0.
 
+## Multi-Label Classification
+
+For tasks where each image can belong to multiple classes simultaneously (e.g., content tagging, attribute recognition, medical imaging), enable multi-label mode:
+
+```python
+from autotimm import ImageClassifier, MetricConfig
+
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=4,          # number of labels
+    multi_label=True,       # switches to BCEWithLogitsLoss + sigmoid
+    threshold=0.5,          # prediction threshold for sigmoid outputs
+    metrics=[
+        MetricConfig(
+            name="accuracy",
+            backend="torchmetrics",
+            metric_class="MultilabelAccuracy",
+            params={"num_labels": 4},
+            stages=["train", "val"],
+            prog_bar=True,
+        ),
+    ],
+)
+```
+
+**What changes with `multi_label=True`:**
+
+| Aspect | Single-label (default) | Multi-label |
+|--------|----------------------|-------------|
+| Loss | `CrossEntropyLoss` | `BCEWithLogitsLoss` |
+| Predictions | `argmax` (one class) | `sigmoid > threshold` (multiple) |
+| `predict_step` output | `softmax` (sums to 1) | `sigmoid` (independent per label) |
+| Targets | Integer class indices | Multi-hot float vectors |
+| Confusion matrix | Supported | Skipped |
+| Label smoothing | Supported | Not supported (raises `ValueError`) |
+
+### Multi-Label Data
+
+Use `MultiLabelImageDataModule` with CSV files:
+
+```python
+from autotimm import MultiLabelImageDataModule
+
+# CSV format:
+#   image_path,cat,dog,outdoor,indoor
+#   img1.jpg,1,0,1,0
+#   img2.jpg,0,1,0,1
+
+data = MultiLabelImageDataModule(
+    train_csv="train.csv",
+    image_dir="./images",
+    val_csv="val.csv",
+    image_size=224,
+    batch_size=32,
+)
+```
+
+### Multi-Label Metrics
+
+Use `torchmetrics.classification.Multilabel*` metrics:
+
+```python
+from autotimm import MetricConfig
+
+metrics = [
+    MetricConfig(
+        name="accuracy",
+        backend="torchmetrics",
+        metric_class="MultilabelAccuracy",
+        params={"num_labels": 4},
+        stages=["train", "val"],
+        prog_bar=True,
+    ),
+    MetricConfig(
+        name="f1",
+        backend="torchmetrics",
+        metric_class="MultilabelF1Score",
+        params={"num_labels": 4, "average": "macro"},
+        stages=["val"],
+    ),
+]
+```
+
+Common multilabel metrics: `MultilabelAccuracy`, `MultilabelF1Score`, `MultilabelPrecision`, `MultilabelRecall`, `MultilabelAUROC`, `MultilabelHammingDistance`.
+
+---
+
 ## Full Parameter Reference
 
 ```python
 ImageClassifier(
     backbone="resnet50",           # Model name or BackboneConfig
-    num_classes=10,                # Number of classes
+    num_classes=10,                # Number of classes (or labels for multi-label)
+    multi_label=False,             # Enable multi-label classification
+    threshold=0.5,                 # Prediction threshold (multi-label only)
     metrics=metrics,               # MetricManager or list of MetricConfig
     logging_config=None,           # LoggingConfig for enhanced logging
     lr=1e-3,                       # Learning rate
@@ -336,7 +425,7 @@ ImageClassifier(
     scheduler="cosine",            # Scheduler name, dict, or None
     scheduler_kwargs=None,         # Extra scheduler kwargs
     head_dropout=0.0,              # Dropout before classifier
-    label_smoothing=0.0,           # Label smoothing factor
+    label_smoothing=0.0,           # Label smoothing (not for multi-label)
     freeze_backbone=False,         # Freeze backbone weights
     mixup_alpha=0.0,               # Mixup augmentation alpha
     compile_model=True,            # Enable torch.compile (PyTorch 2.0+)
