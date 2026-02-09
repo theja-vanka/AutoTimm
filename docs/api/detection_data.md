@@ -284,3 +284,11 @@ print(data.summary())
 │ Augmentation        │ default      │
 └─────────────────────┴──────────────┘
 ```
+
+## See Also
+
+- [CSV Data Loading API](csv_data.md#csvdetectiondataset) - CSV dataset for object detection
+- [ObjectDetector](detection.md) - Object detection model
+- [TransformConfig](transforms.md) - Unified transform configuration
+- [Object Detection Data Guide](../user-guide/data-loading/object-detection-data.md) - Complete data loading guide
+- [Object Detection Example](../examples/tasks/object-detection.md) - End-to-end detection example
