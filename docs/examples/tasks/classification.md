@@ -5,7 +5,7 @@ This page demonstrates image classification tasks using AutoTimm.
 ## Classification Workflow
 
 ```mermaid
-graph LR
+graph TD
     A[Dataset] --> B[ImageDataModule]
     
     C[Backbone] --> D[ImageClassifier]

@@ -5,7 +5,7 @@ The `ImageDataModule` handles image classification datasets including built-in d
 ## Data Loading Flow
 
 ```mermaid
-graph LR
+graph TD
     A[Data Source] --> B{Dataset Type}
     
     B -->|Built-in| C1[CIFAR/MNIST]

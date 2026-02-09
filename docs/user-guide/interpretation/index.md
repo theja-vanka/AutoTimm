@@ -5,7 +5,7 @@ AutoTimm provides comprehensive tools for interpreting and visualizing deep lear
 ## Interpretation Workflow
 
 ```mermaid
-graph LR
+graph TD
     A[Model + Image] --> B{Method}
     
     B -->|GradCAM| C1[Gradient-based]

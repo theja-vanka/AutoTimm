@@ -5,7 +5,7 @@ AutoTimm seamlessly integrates with Hugging Face Hub, giving you access to thous
 ## HF Hub Integration Flow
 
 ```mermaid
-graph LR
+graph TD
     A[HF Hub] --> B[Search Models]
     
     B --> C[list_hf_hub_backbones]

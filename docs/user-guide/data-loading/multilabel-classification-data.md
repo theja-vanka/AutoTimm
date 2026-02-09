@@ -5,7 +5,7 @@ The `MultiLabelImageDataModule` handles multi-label image classification dataset
 ## Data Loading Flow
 
 ```mermaid
-graph LR
+graph TD
     A[CSV File] --> B[MultiLabelImageDataset]
     C[Image Dir] --> B
 
@@ -16,13 +16,13 @@ graph LR
     E -->|val_csv provided| F1[Separate val set]
     E -->|No val_csv| F2[Auto split val_split]
 
-    F1 --> G[Train/Val/Test Splits]
+    F1 --> G[Train / Val / Test Splits]
     F2 --> G
 
     G --> H[Transforms]
 
     H -->|Train| I1[Augmentation]
-    H -->|Val/Test| I2[Resize + Normalize]
+    H -->|Val / Test| I2[Resize + Normalize]
 
     I1 --> J[DataLoader]
     I2 --> J
