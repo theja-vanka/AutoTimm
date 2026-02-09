@@ -71,11 +71,11 @@ graph TD
     K2 --> K3[Save Checkpoint]
     K3 --> K4[Upload to Hub]
     
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style C fill:#42A5F5,stroke:#1976D2,color:#fff
-    style F fill:#2196F3,stroke:#1976D2,color:#fff
-    style H fill:#42A5F5,stroke:#1976D2,color:#fff
-    style K fill:#2196F3,stroke:#1976D2,color:#fff
+    style A fill:#2196F3,stroke:#1976D2
+    style C fill:#1976D2,stroke:#1565C0
+    style F fill:#2196F3,stroke:#1976D2
+    style H fill:#1976D2,stroke:#1565C0
+    style K fill:#2196F3,stroke:#1976D2
 ```
 
 ## Overview

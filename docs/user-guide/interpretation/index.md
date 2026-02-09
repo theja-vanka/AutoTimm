@@ -14,12 +14,12 @@ graph LR
     B --> C3[<b>Attention Rollout</b><br/>ViT attention<br/>aggregation]
     B --> C4[<b>SmoothGrad</b><br/>Noise-averaged<br/>gradients]
 
-    style A fill:#1565C0,stroke:#0D47A1,color:#fff
-    style B fill:#FF9800,stroke:#F57C00,color:#fff
-    style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C2 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C3 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C4 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#FF9800,stroke:#F57C00
+    style C1 fill:#1976D2,stroke:#1565C0
+    style C2 fill:#1976D2,stroke:#1565C0
+    style C3 fill:#1976D2,stroke:#1565C0
+    style C4 fill:#1976D2,stroke:#1565C0
 ```
 
 ### Generate & Visualize
@@ -34,12 +34,12 @@ graph LR
     C2 --> D
     C3 --> D
 
-    style A fill:#1565C0,stroke:#0D47A1,color:#fff
-    style B fill:#FF9800,stroke:#F57C00,color:#fff
-    style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C2 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C3 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style D fill:#4CAF50,stroke:#388E3C,color:#fff
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#FF9800,stroke:#F57C00
+    style C1 fill:#1976D2,stroke:#1565C0
+    style C2 fill:#1976D2,stroke:#1565C0
+    style C3 fill:#1976D2,stroke:#1565C0
+    style D fill:#4CAF50,stroke:#388E3C
 ```
 
 ### Evaluate Quality
@@ -53,11 +53,11 @@ graph LR
     B2 --> C
     B3 --> C
 
-    style A fill:#1565C0,stroke:#0D47A1,color:#fff
-    style B1 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style B2 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style B3 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C fill:#4CAF50,stroke:#388E3C,color:#fff
+    style A fill:#1565C0,stroke:#0D47A1
+    style B1 fill:#1976D2,stroke:#1565C0
+    style B2 fill:#1976D2,stroke:#1565C0
+    style B3 fill:#1976D2,stroke:#1565C0
+    style C fill:#4CAF50,stroke:#388E3C
 ```
 
 ## Overview

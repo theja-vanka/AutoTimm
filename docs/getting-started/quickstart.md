@@ -13,13 +13,13 @@ graph LR
     E --> F[<b>6. Train</b><br/>trainer.fit]
     F --> G[<b>7. Evaluate</b><br/>trainer.test]
 
-    style A fill:#1565C0,stroke:#0D47A1,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C fill:#1565C0,stroke:#0D47A1,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E fill:#1565C0,stroke:#0D47A1,color:#fff
-    style F fill:#42A5F5,stroke:#1976D2,color:#fff
-    style G fill:#4CAF50,stroke:#388E3C,color:#fff
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#1565C0,stroke:#0D47A1
+    style D fill:#1976D2,stroke:#1565C0
+    style E fill:#1565C0,stroke:#0D47A1
+    style F fill:#1976D2,stroke:#1565C0
+    style G fill:#4CAF50,stroke:#388E3C
 ```
 
 ## Basic Training

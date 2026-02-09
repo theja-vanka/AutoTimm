@@ -15,11 +15,11 @@ graph LR
     C --> E
     D --> E
 
-    style A fill:#FF9800,stroke:#F57C00,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C fill:#42A5F5,stroke:#1976D2,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E fill:#1565C0,stroke:#0D47A1,color:#fff
+    style A fill:#FF9800,stroke:#F57C00
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#1976D2,stroke:#1565C0
+    style D fill:#1976D2,stroke:#1565C0
+    style E fill:#1565C0,stroke:#0D47A1
 ```
 
 ### Deterministic Pipeline
@@ -32,12 +32,12 @@ graph LR
     D --> E1[Same seed = same results]
     D --> E2[Different seed = different results]
 
-    style A fill:#1565C0,stroke:#0D47A1,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C fill:#42A5F5,stroke:#1976D2,color:#fff
-    style D fill:#FF9800,stroke:#F57C00,color:#fff
-    style E1 fill:#4CAF50,stroke:#388E3C,color:#fff
-    style E2 fill:#4CAF50,stroke:#388E3C,color:#fff
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#1976D2,stroke:#1565C0
+    style D fill:#FF9800,stroke:#F57C00
+    style E1 fill:#4CAF50,stroke:#388E3C
+    style E2 fill:#4CAF50,stroke:#388E3C
 ```
 
 ## Why Reproducibility Matters
@@ -499,7 +499,7 @@ See complete working examples in the repository:
 
 ## API Reference
 
-- [`seed_everything()`](../../api/utils.md#seed_everything) - Manual seeding function
+- [`seed_everything()`](../../api/utils.md) - Manual seeding function
 - [`ImageClassifier`](../models/image-classifier.md) - Model seeding parameters
 - [`AutoTrainer`](../../api/trainer.md) - Trainer seeding parameters
 

@@ -7,7 +7,7 @@ Complete examples for training semantic segmentation models with AutoTimm.
 ```mermaid
 graph TD
     A[Input Image] --> A1[Preprocess]
-    A1 --> A2[Resize to H×W]
+    A1 --> A2[Resize to HxW]
     A2 --> A3[Normalize]
     A3 --> B[Backbone]
     
@@ -17,21 +17,21 @@ graph TD
     B3 --> C{Head Type}
     
     C -->|DeepLabV3+| D1[ASPP Module]
-    D1 --> D1a[1×1 Conv]
-    D1a --> D1b[3×3 Atrous Conv (r=6)]
-    D1b --> D1c[3×3 Atrous Conv (r=12)]
-    D1c --> D1d[3×3 Atrous Conv (r=18)]
+    D1 --> D1a[1x1 Conv]
+    D1a --> D1b["3x3 Atrous Conv r=6"]
+    D1b --> D1c["3x3 Atrous Conv r=12"]
+    D1c --> D1d["3x3 Atrous Conv r=18"]
     D1d --> D1e[Global Pooling]
     D1e --> D1f[Concatenate]
     D1f --> E1[Decoder]
-    E1 --> E1a[Upsample 4×]
+    E1 --> E1a[Upsample 4x]
     E1a --> E1b[Concat Low-level]
     E1b --> E1c[Conv Layers]
     E1c --> E1d[Upsample to Input]
     
     C -->|FCN| D2[FCN Head]
     D2 --> D2a[Conv Layers]
-    D2a --> D2b[1×1 Conv]
+    D2a --> D2b[1x1 Conv]
     D2b --> D2c[Upsample]
     D2c --> F
     
@@ -85,13 +85,13 @@ graph TD
     M --> M1[Aggregate Metrics]
     M1 --> M2[Generate Report]
     
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style D1 fill:#2196F3,stroke:#1976D2,color:#fff
-    style D2 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style F fill:#2196F3,stroke:#1976D2,color:#fff
-    style I fill:#42A5F5,stroke:#1976D2,color:#fff
-    style K fill:#2196F3,stroke:#1976D2,color:#fff
+    style A fill:#2196F3,stroke:#1976D2
+    style B fill:#1976D2,stroke:#1565C0
+    style D1 fill:#2196F3,stroke:#1976D2
+    style D2 fill:#1976D2,stroke:#1565C0
+    style F fill:#2196F3,stroke:#1976D2
+    style I fill:#1976D2,stroke:#1565C0
+    style K fill:#2196F3,stroke:#1976D2
 ```
 
 ## Basic Example: Cityscapes

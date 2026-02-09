@@ -8,7 +8,7 @@ AutoTimm provides CSV dataset classes for loading data from CSV files with custo
 
 | Dataset | Task | Description |
 |---------|------|-------------|
-| [CSVImageDataset](#csvimag edataset) | Classification | Single-label classification from CSV |
+| [CSVImageDataset](#csvimagedataset) | Classification | Single-label classification from CSV |
 | [MultiLabelImageDataset](#multilabelimagedataset) | Multi-Label | Multi-label classification from CSV |
 | [CSVDetectionDataset](#csvdetectiondataset) | Detection | Object detection with bounding boxes |
 | [CSVInstanceDataset](#csvinstancedataset) | Instance Seg | Instance segmentation with masks |

@@ -78,9 +78,9 @@ graph TD
     K4 --> L
     
     L --> M1[Mask mAP]
-    M1 --> M1a[AP@0.5]
-    M1a --> M1b[AP@0.75]
-    M1b --> M1c[AP@[.5:.95]]
+    M1 --> M1a["AP@0.5"]
+    M1a --> M1b["AP@0.75"]
+    M1b --> M1c["AP@.5:.95"]
     
     L --> M2[Box mAP]
     M2 --> M2a[Detection mAP]
@@ -96,14 +96,14 @@ graph TD
     N --> N1[Aggregate Scores]
     N1 --> N2[Generate Report]
     
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C fill:#2196F3,stroke:#1976D2,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style F fill:#2196F3,stroke:#1976D2,color:#fff
-    style J fill:#42A5F5,stroke:#1976D2,color:#fff
-    style K fill:#2196F3,stroke:#1976D2,color:#fff
-    style L fill:#42A5F5,stroke:#1976D2,color:#fff
+    style A fill:#2196F3,stroke:#1976D2
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#2196F3,stroke:#1976D2
+    style D fill:#1976D2,stroke:#1565C0
+    style F fill:#2196F3,stroke:#1976D2
+    style J fill:#1976D2,stroke:#1565C0
+    style K fill:#2196F3,stroke:#1976D2
+    style L fill:#1976D2,stroke:#1565C0
 ```
 
 ## Basic Example: COCO

@@ -69,15 +69,15 @@ graph TD
     K1 --> K2[Best Performance]
     K2 --> K3[Production Ready]
     
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C2 fill:#2196F3,stroke:#1976D2,color:#fff
-    style C3 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C4 fill:#2196F3,stroke:#1976D2,color:#fff
-    style C5 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style I fill:#2196F3,stroke:#1976D2,color:#fff
-    style J fill:#42A5F5,stroke:#1976D2,color:#fff
-    style K fill:#2196F3,stroke:#1976D2,color:#fff
+    style A fill:#2196F3,stroke:#1976D2
+    style C1 fill:#1976D2,stroke:#1565C0
+    style C2 fill:#2196F3,stroke:#1976D2
+    style C3 fill:#1976D2,stroke:#1565C0
+    style C4 fill:#2196F3,stroke:#1976D2
+    style C5 fill:#1976D2,stroke:#1565C0
+    style I fill:#2196F3,stroke:#1976D2
+    style J fill:#1976D2,stroke:#1565C0
+    style K fill:#2196F3,stroke:#1976D2
 ```
 
 ## Auto-Tuning

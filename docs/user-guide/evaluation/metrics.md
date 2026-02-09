@@ -12,10 +12,10 @@ graph LR
     B --> C[Attach to Model]
     C --> D{Training Loop}
 
-    style A fill:#1565C0,stroke:#0D47A1,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C fill:#42A5F5,stroke:#1976D2,color:#fff
-    style D fill:#FF9800,stroke:#F57C00,color:#fff
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#1976D2,stroke:#1565C0
+    style D fill:#FF9800,stroke:#F57C00
 ```
 
 ### Compute & Log
@@ -33,16 +33,16 @@ graph TD
     F --> G3[MLflow]
     C --> H[Progress Bar]
 
-    style A fill:#FF9800,stroke:#F57C00,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C fill:#42A5F5,stroke:#1976D2,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E fill:#42A5F5,stroke:#1976D2,color:#fff
-    style F fill:#FF9800,stroke:#F57C00,color:#fff
-    style G1 fill:#4CAF50,stroke:#388E3C,color:#fff
-    style G2 fill:#4CAF50,stroke:#388E3C,color:#fff
-    style G3 fill:#4CAF50,stroke:#388E3C,color:#fff
-    style H fill:#4CAF50,stroke:#388E3C,color:#fff
+    style A fill:#FF9800,stroke:#F57C00
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#1976D2,stroke:#1565C0
+    style D fill:#1976D2,stroke:#1565C0
+    style E fill:#1976D2,stroke:#1565C0
+    style F fill:#FF9800,stroke:#F57C00
+    style G1 fill:#4CAF50,stroke:#388E3C
+    style G2 fill:#4CAF50,stroke:#388E3C
+    style G3 fill:#4CAF50,stroke:#388E3C
+    style H fill:#4CAF50,stroke:#388E3C
 ```
 
 ## MetricConfig

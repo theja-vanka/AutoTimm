@@ -62,13 +62,13 @@ graph TD
     K1 --> K2[Stack Labels]
     K2 --> K3[Ready for Model]
 
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style D fill:#2196F3,stroke:#1976D2,color:#fff
-    style H fill:#42A5F5,stroke:#1976D2,color:#fff
-    style J fill:#2196F3,stroke:#1976D2,color:#fff
-    style K fill:#42A5F5,stroke:#1976D2,color:#fff
-    style K3 fill:#2196F3,stroke:#1976D2,color:#fff
+    style A fill:#2196F3,stroke:#1976D2
+    style B fill:#1976D2,stroke:#1565C0
+    style D fill:#2196F3,stroke:#1976D2
+    style H fill:#1976D2,stroke:#1565C0
+    style J fill:#2196F3,stroke:#1976D2
+    style K fill:#1976D2,stroke:#1565C0
+    style K3 fill:#2196F3,stroke:#1976D2
 ```
 
 ## CSV Format
@@ -286,4 +286,4 @@ trainer.fit(model, datamodule=data)
 - [Image Classification Data](image-classification-data.md) - Single-label classification data loading
 - [Image Classifier Guide](../models/image-classifier.md#multi-label-classification) - Multi-label model configuration
 - [Multi-Label Example](../../examples/tasks/classification.md#multi-label-classification) - Runnable example
-- [API Reference](../../api/data.md#multilabelimagedatamodule) - Full API docs
+- [API Reference](../../api/multilabel_data.md) - Full API docs

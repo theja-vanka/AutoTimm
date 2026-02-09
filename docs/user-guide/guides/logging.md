@@ -79,14 +79,12 @@ graph TD
     G3c --> B
     G4c --> B
     
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style D1 fill:#2196F3,stroke:#1976D2,color:#fff
-    style D2 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style D3 fill:#2196F3,stroke:#1976D2,color:#fff
-    style D4 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style G1 fill:#E3F2FD
-    style G2 fill:#E3F2FD
+    style A fill:#2196F3,stroke:#1976D2
+    style B fill:#1976D2,stroke:#1565C0
+    style D1 fill:#2196F3,stroke:#1976D2
+    style D2 fill:#1976D2,stroke:#1565C0
+    style D3 fill:#2196F3,stroke:#1976D2
+    style D4 fill:#1976D2,stroke:#1565C0
 ```
 
 ## LoggerConfig

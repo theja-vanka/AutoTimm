@@ -13,11 +13,11 @@ graph LR
     C --> D[Preprocess Image<br/>Resize + Normalize + Tensor]
     D --> E{Task-Specific<br/>Inference}
 
-    style A fill:#1565C0,stroke:#0D47A1,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C fill:#42A5F5,stroke:#1976D2,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E fill:#FF9800,stroke:#F57C00,color:#fff
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#1976D2,stroke:#1565C0
+    style D fill:#1976D2,stroke:#1565C0
+    style E fill:#FF9800,stroke:#F57C00
 ```
 
 ### Task-Specific Output
@@ -33,12 +33,12 @@ graph LR
     B3 --> C
     B4 --> C
 
-    style A fill:#1565C0,stroke:#0D47A1,color:#fff
-    style B1 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style B2 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style B3 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style B4 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C fill:#4CAF50,stroke:#388E3C,color:#fff
+    style A fill:#1565C0,stroke:#0D47A1
+    style B1 fill:#1976D2,stroke:#1565C0
+    style B2 fill:#1976D2,stroke:#1565C0
+    style B3 fill:#1976D2,stroke:#1565C0
+    style B4 fill:#1976D2,stroke:#1565C0
+    style C fill:#4CAF50,stroke:#388E3C
 ```
 
 ## Quick Links

@@ -68,14 +68,14 @@ graph TD
     J2 --> J3[Ensure Float32]
     J3 --> J4[Ready for Model]
     
-    style B fill:#2196F3,stroke:#1976D2,color:#fff
-    style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C2 fill:#2196F3,stroke:#1976D2,color:#fff
-    style E fill:#42A5F5,stroke:#1976D2,color:#fff
-    style F fill:#2196F3,stroke:#1976D2,color:#fff
-    style H fill:#42A5F5,stroke:#1976D2,color:#fff
-    style J fill:#2196F3,stroke:#1976D2,color:#fff
-    style J4 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style B fill:#2196F3,stroke:#1976D2
+    style C1 fill:#1976D2,stroke:#1565C0
+    style C2 fill:#2196F3,stroke:#1976D2
+    style E fill:#1976D2,stroke:#1565C0
+    style F fill:#2196F3,stroke:#1976D2
+    style H fill:#1976D2,stroke:#1565C0
+    style J fill:#2196F3,stroke:#1976D2
+    style J4 fill:#1976D2,stroke:#1565C0
 ```
 
 ## Overview

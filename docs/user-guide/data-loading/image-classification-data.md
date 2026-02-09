@@ -23,15 +23,15 @@ graph TD
     H1 --> I[DataLoader → Batches]
     H2 --> I
 
-    style A fill:#1565C0,stroke:#0D47A1,color:#fff
-    style B fill:#FF9800,stroke:#F57C00,color:#fff
-    style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C2 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C3 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style D fill:#1565C0,stroke:#0D47A1,color:#fff
-    style E fill:#FF9800,stroke:#F57C00,color:#fff
-    style G fill:#42A5F5,stroke:#1976D2,color:#fff
-    style I fill:#4CAF50,stroke:#388E3C,color:#fff
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#FF9800,stroke:#F57C00
+    style C1 fill:#1976D2,stroke:#1565C0
+    style C2 fill:#1976D2,stroke:#1565C0
+    style C3 fill:#1976D2,stroke:#1565C0
+    style D fill:#1565C0,stroke:#0D47A1
+    style E fill:#FF9800,stroke:#F57C00
+    style G fill:#1976D2,stroke:#1565C0
+    style I fill:#4CAF50,stroke:#388E3C
 ```
 
 ## Built-in Datasets

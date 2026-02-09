@@ -51,13 +51,13 @@ graph TD
     L1 --> L2[Save Predictions]
     L2 --> L3[Plot Metrics]
     
-    style B fill:#2196F3,stroke:#1976D2,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style F fill:#2196F3,stroke:#1976D2,color:#fff
-    style G fill:#42A5F5,stroke:#1976D2,color:#fff
-    style I fill:#2196F3,stroke:#1976D2,color:#fff
-    style K fill:#42A5F5,stroke:#1976D2,color:#fff
-    style L fill:#2196F3,stroke:#1976D2,color:#fff
+    style B fill:#2196F3,stroke:#1976D2
+    style D fill:#1976D2,stroke:#1565C0
+    style F fill:#2196F3,stroke:#1976D2
+    style G fill:#1976D2,stroke:#1565C0
+    style I fill:#2196F3,stroke:#1976D2
+    style K fill:#1976D2,stroke:#1565C0
+    style L fill:#2196F3,stroke:#1976D2
 ```
 
 ## CIFAR-10 Classification

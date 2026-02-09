@@ -31,27 +31,27 @@ graph LR
     E --> E2[MetricConfig]
     E --> E3[LoggerConfig]
 
-    style A fill:#1565C0,stroke:#0D47A1,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C fill:#1565C0,stroke:#0D47A1,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E fill:#1565C0,stroke:#0D47A1,color:#fff
-    style B1 fill:#BBDEFB,stroke:#1976D2
-    style B2 fill:#BBDEFB,stroke:#1976D2
-    style B3 fill:#BBDEFB,stroke:#1976D2
-    style B4 fill:#BBDEFB,stroke:#1976D2
-    style B5 fill:#BBDEFB,stroke:#1976D2
-    style C1 fill:#BBDEFB,stroke:#1976D2
-    style C2 fill:#BBDEFB,stroke:#1976D2
-    style C3 fill:#BBDEFB,stroke:#1976D2
-    style C4 fill:#BBDEFB,stroke:#1976D2
-    style C5 fill:#BBDEFB,stroke:#1976D2
-    style D1 fill:#BBDEFB,stroke:#1976D2
-    style D2 fill:#BBDEFB,stroke:#1976D2
-    style D3 fill:#BBDEFB,stroke:#1976D2
-    style E1 fill:#BBDEFB,stroke:#1976D2
-    style E2 fill:#BBDEFB,stroke:#1976D2
-    style E3 fill:#BBDEFB,stroke:#1976D2
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#1565C0,stroke:#0D47A1
+    style D fill:#1976D2,stroke:#1565C0
+    style E fill:#1565C0,stroke:#0D47A1
+    style B1 fill:#1976D2,stroke:#1565C0
+    style B2 fill:#1976D2,stroke:#1565C0
+    style B3 fill:#1976D2,stroke:#1565C0
+    style B4 fill:#1976D2,stroke:#1565C0
+    style B5 fill:#1976D2,stroke:#1565C0
+    style C1 fill:#1976D2,stroke:#1565C0
+    style C2 fill:#1976D2,stroke:#1565C0
+    style C3 fill:#1976D2,stroke:#1565C0
+    style C4 fill:#1976D2,stroke:#1565C0
+    style C5 fill:#1976D2,stroke:#1565C0
+    style D1 fill:#1976D2,stroke:#1565C0
+    style D2 fill:#1976D2,stroke:#1565C0
+    style D3 fill:#1976D2,stroke:#1565C0
+    style E1 fill:#1976D2,stroke:#1565C0
+    style E2 fill:#1976D2,stroke:#1565C0
+    style E3 fill:#1976D2,stroke:#1565C0
 ```
 
 ## Core Classes

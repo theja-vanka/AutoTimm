@@ -55,13 +55,13 @@ graph TD
     H3 --> H3a[Quick Prototyping]
     H3a --> H3b[Less Control]
     
-    style C fill:#2196F3,stroke:#1976D2,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E fill:#2196F3,stroke:#1976D2,color:#fff
-    style G1 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style H1 fill:#2196F3,stroke:#1976D2,color:#fff
-    style H2 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style H3 fill:#2196F3,stroke:#1976D2,color:#fff
+    style C fill:#2196F3,stroke:#1976D2
+    style D fill:#1976D2,stroke:#1565C0
+    style E fill:#2196F3,stroke:#1976D2
+    style G1 fill:#1976D2,stroke:#1565C0
+    style H1 fill:#2196F3,stroke:#1976D2
+    style H2 fill:#1976D2,stroke:#1565C0
+    style H3 fill:#2196F3,stroke:#1976D2
 ```
 
 ## Quick Reference

@@ -28,7 +28,7 @@ graph TD
     
     B -->|LLRD| C4[Layer-wise LR<br/>Decay per Layer]
     C4 --> C4a[Base LR = 1e-4]
-    C4a --> C4b[Layer i: LR × decay^i]
+    C4a --> C4b[Layer i: LR x decay^i]
     C4b --> C4c[Different LR per Layer]
 
     C1c --> E1[Fast + No Overfit]
@@ -61,15 +61,15 @@ graph TD
     F2 --> F3[Choose Strategy]
     F3 --> F4[Final Model]
 
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C2 fill:#2196F3,stroke:#1976D2,color:#fff
-    style C3 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C4 fill:#2196F3,stroke:#1976D2,color:#fff
-    style E1 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E2 fill:#2196F3,stroke:#1976D2,color:#fff
-    style E3 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E4 fill:#2196F3,stroke:#1976D2,color:#fff
+    style A fill:#2196F3,stroke:#1976D2
+    style C1 fill:#1976D2,stroke:#1565C0
+    style C2 fill:#2196F3,stroke:#1976D2
+    style C3 fill:#1976D2,stroke:#1565C0
+    style C4 fill:#2196F3,stroke:#1976D2
+    style E1 fill:#1976D2,stroke:#1565C0
+    style E2 fill:#2196F3,stroke:#1976D2
+    style E3 fill:#1976D2,stroke:#1565C0
+    style E4 fill:#2196F3,stroke:#1976D2
 ```
 
 ## Overview

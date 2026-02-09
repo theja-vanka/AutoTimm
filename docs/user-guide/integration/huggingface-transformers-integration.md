@@ -62,14 +62,14 @@ graph TD
     H --> I4[Checkpointing]
     I4 --> I4a[Save/Load States]
     
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C2 fill:#2196F3,stroke:#1976D2,color:#fff
-    style C3 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C4 fill:#2196F3,stroke:#1976D2,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style G fill:#2196F3,stroke:#1976D2,color:#fff
-    style H fill:#42A5F5,stroke:#1976D2,color:#fff
+    style A fill:#2196F3,stroke:#1976D2
+    style C1 fill:#1976D2,stroke:#1565C0
+    style C2 fill:#2196F3,stroke:#1976D2
+    style C3 fill:#1976D2,stroke:#1565C0
+    style C4 fill:#2196F3,stroke:#1976D2
+    style D fill:#1976D2,stroke:#1565C0
+    style G fill:#2196F3,stroke:#1976D2
+    style H fill:#1976D2,stroke:#1565C0
 ```
 
 ## Overview

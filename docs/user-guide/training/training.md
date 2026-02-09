@@ -22,18 +22,18 @@ graph TD
     K -->|Yes| D
     K -->|No| L[Load Best → Test → Final Metrics]
 
-    style A fill:#1565C0,stroke:#0D47A1,color:#fff
-    style B fill:#FF9800,stroke:#F57C00,color:#fff
-    style C fill:#42A5F5,stroke:#1976D2,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E fill:#42A5F5,stroke:#1976D2,color:#fff
-    style F fill:#42A5F5,stroke:#1976D2,color:#fff
-    style G fill:#FF9800,stroke:#F57C00,color:#fff
-    style H fill:#42A5F5,stroke:#1976D2,color:#fff
-    style I fill:#FF9800,stroke:#F57C00,color:#fff
-    style J fill:#42A5F5,stroke:#1976D2,color:#fff
-    style K fill:#FF9800,stroke:#F57C00,color:#fff
-    style L fill:#4CAF50,stroke:#388E3C,color:#fff
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#FF9800,stroke:#F57C00
+    style C fill:#1976D2,stroke:#1565C0
+    style D fill:#1976D2,stroke:#1565C0
+    style E fill:#1976D2,stroke:#1565C0
+    style F fill:#1976D2,stroke:#1565C0
+    style G fill:#FF9800,stroke:#F57C00
+    style H fill:#1976D2,stroke:#1565C0
+    style I fill:#FF9800,stroke:#F57C00
+    style J fill:#1976D2,stroke:#1565C0
+    style K fill:#FF9800,stroke:#F57C00
+    style L fill:#4CAF50,stroke:#388E3C
 ```
 
 ## AutoTrainer

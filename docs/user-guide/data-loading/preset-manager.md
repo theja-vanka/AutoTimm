@@ -63,14 +63,14 @@ graph TD
     J2 --> J3[Create DataLoaders]
     J3 --> J4[Ready for Training]
     
-    style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style D1 fill:#2196F3,stroke:#1976D2,color:#fff
-    style D2 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style H1 fill:#2196F3,stroke:#1976D2,color:#fff
-    style I fill:#42A5F5,stroke:#1976D2,color:#fff
-    style J fill:#2196F3,stroke:#1976D2,color:#fff
-    style J4 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style A fill:#2196F3,stroke:#1976D2
+    style B fill:#1976D2,stroke:#1565C0
+    style D1 fill:#2196F3,stroke:#1976D2
+    style D2 fill:#1976D2,stroke:#1565C0
+    style H1 fill:#2196F3,stroke:#1976D2
+    style I fill:#1976D2,stroke:#1565C0
+    style J fill:#2196F3,stroke:#1976D2
+    style J4 fill:#1976D2,stroke:#1565C0
 ```
 
 ## Quick Start

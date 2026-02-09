@@ -15,15 +15,15 @@ graph LR
     A --> H[<b>Integration</b><br/>HuggingFace, timm,<br/>Lightning]
     A --> I[<b>Task-Specific</b><br/>Classification,<br/>detection, segmentation]
 
-    style A fill:#1565C0,stroke:#0D47A1,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C fill:#1565C0,stroke:#0D47A1,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E fill:#1565C0,stroke:#0D47A1,color:#fff
-    style F fill:#42A5F5,stroke:#1976D2,color:#fff
-    style G fill:#1565C0,stroke:#0D47A1,color:#fff
-    style H fill:#42A5F5,stroke:#1976D2,color:#fff
-    style I fill:#1565C0,stroke:#0D47A1,color:#fff
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#1976D2,stroke:#1565C0
+    style C fill:#1565C0,stroke:#0D47A1
+    style D fill:#1976D2,stroke:#1565C0
+    style E fill:#1565C0,stroke:#0D47A1
+    style F fill:#1976D2,stroke:#1565C0
+    style G fill:#1565C0,stroke:#0D47A1
+    style H fill:#1976D2,stroke:#1565C0
+    style I fill:#1565C0,stroke:#0D47A1
 ```
 
 ## Browse by Category

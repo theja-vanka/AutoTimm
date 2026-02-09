@@ -13,13 +13,13 @@ graph TD
     B -->|Mobile| F[<b>Mobile Export</b><br/>iOS, Android]
     B -->|Edge| G[<b>Quantized</b><br/>INT8 / FP16]
 
-    style A fill:#1565C0,stroke:#0D47A1,color:#fff
-    style B fill:#FF9800,stroke:#F57C00,color:#fff
-    style C fill:#42A5F5,stroke:#1976D2,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E fill:#42A5F5,stroke:#1976D2,color:#fff
-    style F fill:#42A5F5,stroke:#1976D2,color:#fff
-    style G fill:#42A5F5,stroke:#1976D2,color:#fff
+    style A fill:#1565C0,stroke:#0D47A1
+    style B fill:#FF9800,stroke:#F57C00
+    style C fill:#1976D2,stroke:#1565C0
+    style D fill:#1976D2,stroke:#1565C0
+    style E fill:#1976D2,stroke:#1565C0
+    style F fill:#1976D2,stroke:#1565C0
+    style G fill:#1976D2,stroke:#1565C0
 ```
 
 ## Model Export Overview
