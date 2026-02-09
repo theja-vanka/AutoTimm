@@ -5,7 +5,7 @@ AutoTimm provides a flexible transform system for image preprocessing and augmen
 ## Transform Pipeline
 
 ```mermaid
-graph LR
+graph TD
     A[Raw Image] --> B{TransformConfig}
     
     B -->|Backend| C1[torchvision]

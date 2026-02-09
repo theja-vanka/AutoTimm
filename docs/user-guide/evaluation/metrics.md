@@ -5,7 +5,7 @@ AutoTimm uses explicit metric configuration through `MetricConfig` and `MetricMa
 ## Metric Lifecycle
 
 ```mermaid
-graph LR
+graph TD
     A[MetricConfig] --> B[MetricManager]
     B --> C[Model Init]
     

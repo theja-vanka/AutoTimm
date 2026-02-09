@@ -317,6 +317,33 @@ config = LoggingConfig(
 | `Precision` | `task="binary"` |
 | `Recall` | `task="binary"` |
 
+### Multi-Label Classification
+
+Use `torchmetrics.classification.Multilabel*` metrics with `ImageClassifier(multi_label=True)`.
+These are resolved automatically from the `torchmetrics.classification` submodule.
+
+| Metric Class | Common Params |
+|--------------|---------------|
+| `MultilabelAccuracy` | `num_labels=N` |
+| `MultilabelF1Score` | `num_labels=N`, `average="macro"` |
+| `MultilabelPrecision` | `num_labels=N`, `average="macro"` |
+| `MultilabelRecall` | `num_labels=N`, `average="macro"` |
+| `MultilabelAUROC` | `num_labels=N` |
+| `MultilabelHammingDistance` | `num_labels=N` |
+
+```python
+MetricConfig(
+    name="accuracy",
+    backend="torchmetrics",
+    metric_class="MultilabelAccuracy",
+    params={"num_labels": 4},
+    stages=["train", "val"],
+    prog_bar=True,
+)
+```
+
+**Note:** `num_classes` and `num_labels` are auto-injected by `MetricManager` from the model's `num_classes` value. Auto-injected parameters that a metric doesn't accept are automatically filtered out.
+
 ### Average Options
 
 | Value | Description |

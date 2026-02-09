@@ -5,7 +5,7 @@ AutoTimm provides specialized model architectures for different computer vision 
 ## Model Architecture Overview
 
 ```mermaid
-graph TB
+graph TD
     subgraph Classification
         A[ImageClassifier] --> A1[Backbone<br/>1000+ timm models]
         A1 --> A2[Classification Head]

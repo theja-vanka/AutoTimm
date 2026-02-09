@@ -1,10 +1,12 @@
-"""OpenCV-backed image datasets for use with albumentations."""
+"""Image datasets for classification tasks."""
 
 from __future__ import annotations
 
+import csv
 from pathlib import Path
 from typing import Any, Callable
 
+import torch
 from torch.utils.data import Dataset
 
 
@@ -80,3 +82,126 @@ class ImageFolderCV2(Dataset):
             image = transformed["image"]
 
         return image, target
+
+
+class MultiLabelImageDataset(Dataset):
+    """Dataset for multi-label classification from CSV.
+
+    CSV format::
+
+        image_path,label_0,label_1,...,label_N
+        img1.jpg,1,0,1,...,0
+        img2.jpg,0,1,0,...,1
+
+    Parameters:
+        csv_path: Path to CSV file.
+        image_dir: Root directory for resolving image paths.
+        label_columns: List of column names to use as labels.
+            If ``None``, uses all columns except the image column.
+        image_column: Name of the column containing image paths.
+            If ``None``, uses the first column.
+        transform: Transform to apply to images. Supports both
+            torchvision transforms (PIL input) and albumentations
+            transforms (numpy input with ``image`` key).
+        use_albumentations: If ``True``, load images with OpenCV and
+            pass as numpy arrays to an albumentations transform.
+            Default is ``False`` (PIL + torchvision).
+    """
+
+    def __init__(
+        self,
+        csv_path: str | Path,
+        image_dir: str | Path = ".",
+        label_columns: list[str] | None = None,
+        image_column: str | None = None,
+        transform: Callable | None = None,
+        use_albumentations: bool = False,
+    ):
+        self.csv_path = Path(csv_path)
+        self.image_dir = Path(image_dir)
+        self.transform = transform
+        self.use_albumentations = use_albumentations
+
+        # Parse CSV
+        with open(self.csv_path, newline="") as f:
+            reader = csv.DictReader(f)
+            fieldnames = list(reader.fieldnames or [])
+            if not fieldnames:
+                raise ValueError(f"CSV file has no columns: {self.csv_path}")
+
+            # Determine image column
+            self._image_column = image_column or fieldnames[0]
+            if self._image_column not in fieldnames:
+                raise ValueError(
+                    f"Image column '{self._image_column}' not found in CSV. "
+                    f"Available columns: {fieldnames}"
+                )
+
+            # Determine label columns
+            if label_columns is not None:
+                for col in label_columns:
+                    if col not in fieldnames:
+                        raise ValueError(
+                            f"Label column '{col}' not found in CSV. "
+                            f"Available columns: {fieldnames}"
+                        )
+                self._label_columns = label_columns
+            else:
+                self._label_columns = [
+                    c for c in fieldnames if c != self._image_column
+                ]
+
+            if not self._label_columns:
+                raise ValueError(
+                    "No label columns found. Provide label_columns explicitly "
+                    "or ensure the CSV has columns beyond the image column."
+                )
+
+            # Read rows
+            self._image_paths: list[str] = []
+            self._labels: list[list[float]] = []
+            for row in reader:
+                self._image_paths.append(row[self._image_column])
+                self._labels.append(
+                    [float(row[col]) for col in self._label_columns]
+                )
+
+        if len(self._image_paths) == 0:
+            raise ValueError(f"CSV file has no data rows: {self.csv_path}")
+
+    @property
+    def num_labels(self) -> int:
+        """Number of label columns."""
+        return len(self._label_columns)
+
+    @property
+    def label_names(self) -> list[str]:
+        """Names of the label columns."""
+        return list(self._label_columns)
+
+    def __len__(self) -> int:
+        return len(self._image_paths)
+
+    def __getitem__(self, index: int) -> tuple[Any, torch.Tensor]:
+        img_path = self.image_dir / self._image_paths[index]
+        label_tensor = torch.tensor(self._labels[index], dtype=torch.float32)
+
+        if self.use_albumentations:
+            import cv2
+
+            image = cv2.imread(str(img_path), cv2.IMREAD_COLOR)
+            if image is None:
+                raise RuntimeError(f"Failed to load image: {img_path}")
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+            if self.transform is not None:
+                transformed = self.transform(image=image)
+                image = transformed["image"]
+        else:
+            from PIL import Image
+
+            image = Image.open(img_path).convert("RGB")
+            if self.transform is not None:
+                image = self.transform(image)
+
+        return image, label_tensor

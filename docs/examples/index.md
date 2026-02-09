@@ -5,36 +5,13 @@ The [`examples/`](https://github.com/theja-vanka/AutoTimm/tree/main/examples) di
 ## Examples Organization
 
 ```mermaid
-graph TB
+graph LR
     A[AutoTimm Examples] --> B[Getting Started]
     A --> C[Computer Vision]
     A --> D[HuggingFace Hub]
     A --> E[Training & Optimization]
     A --> F[Model Understanding]
-    
-    B --> B1[CIFAR-10]
-    B --> B2[Custom Folder]
-    B --> B3[ViT Fine-tuning]
-    
-    C --> C1[Object Detection]
-    C --> C2[Semantic Segmentation]
-    C --> C3[Instance Segmentation]
-    
-    C1 --> C1A[FCOS/YOLOX/RT-DETR]
-    
-    D --> D1[Basic Integration]
-    D --> D2[Interpretation]
-    D --> D3[Transfer Learning]
-    D --> D4[Deployment]
-    
-    E --> E1[Auto-tuning]
-    E --> E2[Multi-GPU]
-    E --> E3[Augmentation]
-    
-    F --> F1[GradCAM]
-    F --> F2[Attention Maps]
-    F --> F3[Backbone Discovery]
-    
+
     style A fill:#2196F3,stroke:#1976D2,color:#fff
     style B fill:#42A5F5,stroke:#1976D2,color:#fff
     style C fill:#2196F3,stroke:#1976D2,color:#fff
@@ -132,6 +109,7 @@ graph TB
 | [`data_training/balanced_sampling.py`](utilities/data-handling.md#balanced-sampling) | Weighted sampling for imbalanced data |
 | [`data_training/albumentations_cifar10.py`](utilities/data-handling.md#albumentations-strong-augmentation) | Albumentations strong augmentation |
 | [`data_training/albumentations_custom_folder.py`](utilities/data-handling.md#custom-albumentations-pipeline) | Custom albumentations pipeline |
+| [`data_training/multilabel_classification.py`](tasks/classification.md#multi-label-classification) | Multi-label classification with CSV data |
 | [`data_training/hf_custom_data.py`](utilities/hf_custom_data.md) | Advanced augmentation, multi-label, validation |
 
 ### ⚙️ Training & Optimization
@@ -169,6 +147,7 @@ graph TB
 |--------|-------------|
 | [`logging_inference/inference.py`](../user-guide/inference/classification-inference.md) | Model inference and batch prediction |
 | [`logging_inference/inference_without_metrics.py`](../user-guide/inference/classification-inference.md#inference-without-metrics) | Inference without metrics |
+| [`logging_inference/multilabel_inference.py`](../user-guide/inference/classification-inference.md#multi-label-inference) | Multi-label inference and per-label probabilities |
 | [`logging_inference/detection_inference.py`](../user-guide/inference/object-detection-inference.md) | Object detection inference |
 | [`logging_inference/segmentation_inference.py`](../user-guide/inference/semantic-segmentation-inference.md) | Segmentation inference |
 | [`logging_inference/backbone_discovery.py`](utilities/backbone-utilities.md#backbone-discovery) | Explore timm backbones |
@@ -205,16 +184,16 @@ Start your journey with CIFAR-10 classification and custom datasets.
 - **Basic Integration** - 8 task-specific examples
 - **Advanced Techniques** - Interpretation, transfer learning, ensemble, deployment (4 examples)
 
-### 📊 Data & Training (9 examples)
-- **Data & Augmentation** - Balanced sampling, augmentation strategies (4 examples)
+### 📊 Data & Training (10 examples)
+- **Data & Augmentation** - Balanced sampling, augmentation, multi-label (5 examples)
 - **Training & Optimization** - Auto-tuning, multi-GPU, HPO (5 examples)
 
-### 🔍 Understanding & Deployment (12 examples)
+### 🔍 Understanding & Deployment (13 examples)
 - **Model Interpretation** - GradCAM, attention, interactive viz (6 examples)
 - **Logging & Tracking** - TensorBoard, MLflow, evaluation (3 examples)
-- **Inference & Utilities** - Model inference and backbone discovery (3 examples)
+- **Inference & Utilities** - Model inference, multi-label inference, and backbone discovery (4 examples)
 
-**Total: 44 runnable examples**
+**Total: 46 runnable examples**
 
 
 

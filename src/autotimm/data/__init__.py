@@ -1,5 +1,6 @@
 from autotimm.data.datamodule import ImageDataModule
-from autotimm.data.dataset import ImageFolderCV2
+from autotimm.data.dataset import ImageFolderCV2, MultiLabelImageDataset
+from autotimm.data.multilabel_datamodule import MultiLabelImageDataModule
 from autotimm.data.detection_datamodule import DetectionDataModule
 from autotimm.data.detection_dataset import COCODetectionDataset, detection_collate_fn
 from autotimm.data.detection_transforms import (
@@ -37,6 +38,8 @@ __all__ = [
     # Classification data
     "ImageDataModule",
     "ImageFolderCV2",
+    "MultiLabelImageDataset",
+    "MultiLabelImageDataModule",
     # Detection data
     "COCODetectionDataset",
     "DetectionDataModule",

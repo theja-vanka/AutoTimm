@@ -3,6 +3,7 @@
 AutoTimm provides specialized data modules for different computer vision tasks:
 
 - **[ImageDataModule](image-classification-data.md)**: Image classification datasets (CIFAR, MNIST, custom folders)
+- **[MultiLabelImageDataModule](multilabel-classification-data.md)**: Multi-label classification from CSV files
 - **[DetectionDataModule](object-detection-data.md)**: Object detection datasets in COCO format
 - **[SegmentationDataModule](segmentation-data.md)**: Semantic segmentation datasets
 - **[Transforms](transforms.md)**: Image transforms and augmentation system
@@ -10,27 +11,30 @@ AutoTimm provides specialized data modules for different computer vision tasks:
 ## Data Loading Pipeline
 
 ```mermaid
-graph LR
+graph TD
     A[Raw Data] --> B{Data Module}
     B -->|ImageDataModule| C1[Classification]
+    B -->|MultiLabelImageDataModule| C4[Multi-Label]
     B -->|DetectionDataModule| C2[Detection]
     B -->|SegmentationDataModule| C3[Segmentation]
-    
+
     C1 --> D1[Transforms]
+    C4 --> D1
     C2 --> D2[Transforms + BBox]
     C3 --> D3[Transforms + Masks]
-    
+
     D1 --> E[DataLoader]
     D2 --> E
     D3 --> E
-    
+
     E --> F[Training Batches]
-    
+
     style A fill:#2196F3,stroke:#1976D2,color:#fff
     style B fill:#42A5F5,stroke:#1976D2,color:#fff
     style C1 fill:#2196F3,stroke:#1976D2,color:#fff
     style C2 fill:#42A5F5,stroke:#1976D2,color:#fff
     style C3 fill:#2196F3,stroke:#1976D2,color:#fff
+    style C4 fill:#42A5F5,stroke:#1976D2,color:#fff
     style E fill:#42A5F5,stroke:#1976D2,color:#fff
     style F fill:#2196F3,stroke:#1976D2,color:#fff
 ```
@@ -58,7 +62,24 @@ data = ImageDataModule(
 )
 ```
 
-👉 **[Full Image Classification Data Guide](image-classification-data.md)**
+**[Full Image Classification Data Guide](image-classification-data.md)**
+
+### Multi-Label Classification
+
+```python
+from autotimm import MultiLabelImageDataModule
+
+# CSV with columns: image_path, cat, dog, outdoor, indoor
+data = MultiLabelImageDataModule(
+    train_csv="train.csv",
+    image_dir="./images",
+    val_csv="val.csv",
+    image_size=224,
+    batch_size=32,
+)
+```
+
+**[Full Multi-Label Classification Data Guide](multilabel-classification-data.md)**
 
 ### Object Detection
 
@@ -83,6 +104,7 @@ data = DetectionDataModule(
 | Task | Data Module | Input Format | Output |
 |------|-------------|--------------|---------|
 | Image Classification | `ImageDataModule` | Images in class folders | Class labels |
+| Multi-Label Classification | `MultiLabelImageDataModule` | CSV + images | Multi-hot labels |
 | Object Detection | `DetectionDataModule` | COCO JSON + images | Bounding boxes + labels |
 
 ---
@@ -156,6 +178,16 @@ Learn about:
 - Custom augmentations
 
 **[Read the Image Classification Data Guide →](image-classification-data.md)**
+
+### Multi-Label Classification
+Learn about:
+- CSV-based multi-label data format
+- Auto-detected and explicit label columns
+- Auto validation split
+- Transform backends and augmentation presets
+- Integration with `ImageClassifier(multi_label=True)`
+
+**[Read the Multi-Label Classification Data Guide →](multilabel-classification-data.md)**
 
 ### Object Detection
 Learn about:
@@ -286,6 +318,7 @@ trainer.fit(model, datamodule=data)
 ## See Also
 
 - [Image Classification Data Guide](image-classification-data.md)
+- [Multi-Label Classification Data Guide](multilabel-classification-data.md)
 - [Object Detection Data Guide](object-detection-data.md)
 - [Data Handling Examples](../../examples/utilities/data-handling.md)
 - [Training Guide](../training/training.md)

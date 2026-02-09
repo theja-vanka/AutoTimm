@@ -5,7 +5,7 @@ The `DetectionDataModule` handles object detection datasets in COCO format, incl
 ## Detection Data Pipeline
 
 ```mermaid
-graph TB
+graph TD
     A[COCO Dataset] --> B[Annotations JSON]
     A --> C[Images]
     

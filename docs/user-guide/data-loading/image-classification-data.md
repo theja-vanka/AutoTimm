@@ -5,7 +5,7 @@ The `ImageDataModule` handles image classification datasets including built-in d
 ## Data Loading Flow
 
 ```mermaid
-graph LR
+graph TD
     A[Data Source] --> B{Dataset Type}
     
     B -->|Built-in| C1[CIFAR/MNIST]
@@ -385,8 +385,143 @@ trainer.test(model, datamodule=data)
 
 ---
 
+## Multi-Label Classification Data
+
+For multi-label tasks (where each image can have multiple labels), use `MultiLabelImageDataModule` with CSV files.
+
+### CSV Format
+
+```
+image_path,cat,dog,outdoor,indoor
+img1.jpg,1,0,1,0
+img2.jpg,0,1,0,1
+img3.jpg,1,1,1,0
+```
+
+The first column is the image path (relative to `image_dir`), and the remaining columns are binary label indicators.
+
+### Basic Usage
+
+```python
+from autotimm import MultiLabelImageDataModule
+
+data = MultiLabelImageDataModule(
+    train_csv="train.csv",
+    image_dir="./images",
+    val_csv="val.csv",          # Optional: auto-splits from train if omitted
+    image_size=224,
+    batch_size=32,
+    num_workers=4,
+)
+data.setup("fit")
+print(f"Labels: {data.num_labels}")       # 4
+print(f"Label names: {data.label_names}")  # ['cat', 'dog', 'outdoor', 'indoor']
+```
+
+### Auto Validation Split
+
+If no `val_csv` is provided, a fraction of training data is held out:
+
+```python
+data = MultiLabelImageDataModule(
+    train_csv="train.csv",
+    image_dir="./images",
+    val_split=0.2,   # 20% for validation
+)
+```
+
+### Explicit Label Columns
+
+By default, all columns except the first are used as labels. To select specific columns:
+
+```python
+data = MultiLabelImageDataModule(
+    train_csv="train.csv",
+    image_dir="./images",
+    label_columns=["cat", "dog"],  # Only use these labels
+    image_column="image_path",     # Explicit image column name
+)
+```
+
+### With Albumentations
+
+```python
+data = MultiLabelImageDataModule(
+    train_csv="train.csv",
+    image_dir="./images",
+    transform_backend="albumentations",
+    augmentation_preset="strong",
+)
+```
+
+### Complete Multi-Label Training
+
+```python
+from autotimm import (
+    AutoTrainer,
+    ImageClassifier,
+    MetricConfig,
+    MultiLabelImageDataModule,
+)
+
+data = MultiLabelImageDataModule(
+    train_csv="train.csv",
+    image_dir="./images",
+    val_csv="val.csv",
+    image_size=224,
+    batch_size=32,
+)
+data.setup("fit")
+
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=data.num_labels,
+    multi_label=True,
+    metrics=[
+        MetricConfig(
+            name="accuracy",
+            backend="torchmetrics",
+            metric_class="MultilabelAccuracy",
+            params={"num_labels": data.num_labels},
+            stages=["train", "val"],
+            prog_bar=True,
+        ),
+    ],
+)
+
+trainer = AutoTrainer(max_epochs=10)
+trainer.fit(model, datamodule=data)
+```
+
+### Full Parameter Reference
+
+```python
+MultiLabelImageDataModule(
+    train_csv="train.csv",          # Path to training CSV
+    image_dir="./images",           # Root directory for image paths
+    val_csv=None,                   # Optional validation CSV
+    test_csv=None,                  # Optional test CSV
+    label_columns=None,             # Label column names (auto-detected if None)
+    image_column=None,              # Image column name (first column if None)
+    image_size=224,                 # Target image size
+    batch_size=32,                  # Batch size
+    num_workers=4,                  # Data loading workers
+    val_split=0.1,                  # Validation split (when val_csv is None)
+    train_transforms=None,          # Custom train transforms
+    eval_transforms=None,           # Custom eval transforms
+    augmentation_preset=None,       # Preset name
+    transform_backend="torchvision",  # "torchvision" or "albumentations"
+    pin_memory=True,                # Pin memory for GPU
+    persistent_workers=False,       # Keep workers alive
+    prefetch_factor=None,           # Prefetch batches per worker
+)
+```
+
+---
+
 ## See Also
 
 - [Object Detection Data](object-detection-data.md) - For COCO format object detection datasets
 - [Data Handling Examples](../../examples/utilities/data-handling.md) - More examples and use cases
 - [Training Guide](../training/training.md) - How to train models with your data
+- [Multi-Label Classification Example](../../examples/tasks/classification.md#multi-label-classification) - Complete multi-label example

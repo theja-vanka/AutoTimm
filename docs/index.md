@@ -8,7 +8,7 @@ AutoTimm lets you train image classifiers, object detectors, and segmentation mo
 ## AutoTimm Workflow
 
 ```mermaid
-graph LR
+graph TD
     A[Data] -->|ImageDataModule| B[Model]
     B -->|ImageClassifier<br/>ObjectDetector<br/>SemanticSegmentor| C[Trainer]
     C -->|AutoTrainer| D[Training]

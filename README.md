@@ -58,7 +58,14 @@ From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-G
 </tr>
 </table>
 
-## What's New in v0.7.2
+## What's New in v0.7.3
+
+- **Multi-Label Classification** - Native multi-label support in `ImageClassifier` with `multi_label=True`, using `BCEWithLogitsLoss` and sigmoid predictions
+- **MultiLabelImageDataModule** - New data module for loading multi-label datasets from CSV files with auto-detected label columns, validation splits, and rich summary tables
+- **Multi-Label Metrics** - `MetricManager` now auto-injects `num_labels` and resolves `torchmetrics.classification` metrics (e.g., `MultilabelAccuracy`, `MultilabelF1Score`)
+
+<details>
+<summary><strong>v0.7.2</strong></summary>
 
 - **torch.inference_mode** - Faster inference across all tasks, export, and interpretation using `torch.inference_mode()` instead of `torch.no_grad()`
 - **Reproducibility by Default** - Automatic seeding with `seed=42` and deterministic mode enabled out-of-the-box for fully reproducible training and inference
@@ -71,6 +78,8 @@ From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-G
 - **TransformConfig** - Unified transform configuration with presets and model-specific normalization
 - **Optional Metrics** - Metrics now optional for inference-only deployments
 - **Python 3.10-3.14** - Latest Python support
+
+</details>
 
 ## Quick Start
 
@@ -145,7 +154,7 @@ trainer.fit(model, datamodule=data)
 <table>
 <tr>
 <td><strong>4 Vision Tasks</strong></td>
-<td>Classification • Object Detection • Semantic Segmentation • Instance Segmentation</td>
+<td>Classification (single & multi-label) • Object Detection • Semantic Segmentation • Instance Segmentation</td>
 </tr>
 <tr>
 <td><strong>1000+ Backbones</strong></td>
@@ -201,6 +210,42 @@ model = ImageClassifier(
     backbone="efficientnet_b0",  # or "hf-hub:timm/resnet50.a1_in1k"
     num_classes=10,
     metrics=metrics,  # Optional for inference!
+)
+
+trainer = AutoTrainer(max_epochs=10)
+trainer.fit(model, datamodule=data)
+```
+
+### Multi-Label Classification
+
+```python
+from autotimm import ImageClassifier, MultiLabelImageDataModule, MetricConfig
+
+# CSV data with columns: image_path, cat, dog, outdoor, indoor
+data = MultiLabelImageDataModule(
+    train_csv="train.csv",
+    image_dir="./images",
+    val_csv="val.csv",
+    image_size=224,
+    batch_size=32,
+)
+data.setup("fit")
+
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=data.num_labels,
+    multi_label=True,       # BCEWithLogitsLoss + sigmoid
+    threshold=0.5,
+    metrics=[
+        MetricConfig(
+            name="accuracy",
+            backend="torchmetrics",
+            metric_class="MultilabelAccuracy",
+            params={"num_labels": data.num_labels},
+            stages=["train", "val"],
+            prog_bar=True,
+        ),
+    ],
 )
 
 trainer = AutoTrainer(max_epochs=10)
@@ -701,7 +746,7 @@ Comprehensive documentation with **interactive diagrams**, search optimization, 
 | [Interpretation Guide](https://theja-vanka.github.io/AutoTimm/user-guide/interpretation/) | Model explainability and visualization |
 | [YOLOX Guide](https://theja-vanka.github.io/AutoTimm/user-guide/models/yolox-detector/) | Complete YOLOX implementation guide |
 | [API Reference](https://theja-vanka.github.io/AutoTimm/api/) | Complete API documentation |
-| [Examples](https://theja-vanka.github.io/AutoTimm/examples/) | 40+ runnable code examples |
+| [Examples](https://theja-vanka.github.io/AutoTimm/examples/) | 45+ runnable code examples |
 
 ### Ready-to-Run Examples
 
@@ -719,7 +764,7 @@ Comprehensive documentation with **interactive diagrams**, search optimization, 
 - Advanced: [hf_interpretation.py](examples/huggingface/hf_interpretation.py), [hf_transfer_learning.py](examples/huggingface/hf_transfer_learning.py), [hf_ensemble.py](examples/huggingface/hf_ensemble.py), [hf_deployment.py](examples/huggingface/hf_deployment.py)
 
 **📊 Data & Training**
-- Data: [hf_custom_data.py](examples/data_training/hf_custom_data.py) - Advanced augmentation, multi-label
+- Data: [multilabel_classification.py](examples/data_training/multilabel_classification.py) - Multi-label from CSV, [hf_custom_data.py](examples/data_training/hf_custom_data.py) - Advanced augmentation
 - Training: [multi_gpu_training.py](examples/data_training/multi_gpu_training.py), [hf_hyperparameter_tuning.py](examples/data_training/hf_hyperparameter_tuning.py)
 - Optimization: [preset_manager.py](examples/data_training/preset_manager.py), [performance_optimization_demo.py](examples/data_training/performance_optimization_demo.py)
 
@@ -734,7 +779,7 @@ Comprehensive documentation with **interactive diagrams**, search optimization, 
 
 **Classification**
 - Models: Any timm backbone (1000+)
-- Losses: CrossEntropy with label smoothing, Mixup
+- Losses: CrossEntropy with label smoothing, Mixup; BCEWithLogitsLoss for multi-label
 
 **Object Detection**
 - Architectures: FCOS, YOLOX (official & custom)
@@ -783,12 +828,12 @@ For major changes, please open an issue first.
 ## Citation
 
 ```bibtex
-@software{autotimm2026,
+@software{autotimm,
   author = {Krishnatheja Vanka},
   title = {AutoTimm: Automatic PyTorch Image Models},
   url = {https://github.com/theja-vanka/AutoTimm},
   year = {2026},
-  version = {0.7.2}
+  version = {0.7.3}
 }
 ```
 

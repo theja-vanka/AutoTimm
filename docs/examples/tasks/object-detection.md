@@ -5,7 +5,7 @@ This page demonstrates object detection tasks using AutoTimm.
 ## Detection Architectures
 
 ```mermaid
-graph TB
+graph TD
     subgraph "FCOS (Anchor-free)"
         F1[Backbone + FPN] --> F2[Classification Head]
         F1 --> F3[Regression Head]

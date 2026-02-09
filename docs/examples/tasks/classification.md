@@ -5,7 +5,7 @@ This page demonstrates image classification tasks using AutoTimm.
 ## Classification Workflow
 
 ```mermaid
-graph LR
+graph TD
     A[Dataset] --> B[ImageDataModule]
     
     C[Backbone] --> D[ImageClassifier]
@@ -206,6 +206,80 @@ if __name__ == "__main__":
 
 ---
 
+## Multi-Label Classification
+
+Multi-label classification where each image can belong to multiple classes simultaneously.
+Uses `MultiLabelImageDataModule` for CSV-based data and `ImageClassifier` with `multi_label=True`.
+
+```python
+from autotimm import (
+    AutoTrainer,
+    ImageClassifier,
+    MetricConfig,
+    MultiLabelImageDataModule,
+)
+
+
+def main():
+    # Data - CSV with columns: image_path, cat, dog, outdoor, indoor
+    data = MultiLabelImageDataModule(
+        train_csv="train.csv",
+        val_csv="val.csv",
+        image_dir="./images",
+        image_size=224,
+        batch_size=32,
+    )
+    data.setup("fit")
+
+    num_labels = data.num_labels  # auto-detected from CSV
+
+    # Multilabel metrics
+    metrics = [
+        MetricConfig(
+            name="accuracy",
+            backend="torchmetrics",
+            metric_class="MultilabelAccuracy",
+            params={"num_labels": num_labels},
+            stages=["train", "val"],
+            prog_bar=True,
+        ),
+        MetricConfig(
+            name="f1",
+            backend="torchmetrics",
+            metric_class="MultilabelF1Score",
+            params={"num_labels": num_labels, "average": "macro"},
+            stages=["val"],
+        ),
+    ]
+
+    # Model - multi_label=True switches to BCEWithLogitsLoss + sigmoid
+    model = ImageClassifier(
+        backbone="resnet50",
+        num_classes=num_labels,
+        multi_label=True,
+        threshold=0.5,
+        metrics=metrics,
+        lr=1e-3,
+    )
+
+    # Train
+    trainer = AutoTrainer(max_epochs=10)
+    trainer.fit(model, datamodule=data)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+**Key differences from single-label:**
+
+- Data: CSV with multi-hot label columns instead of ImageFolder directories
+- Model: `multi_label=True` uses `BCEWithLogitsLoss` and sigmoid predictions
+- Metrics: Use `Multilabel*` metrics (e.g., `MultilabelAccuracy`, `MultilabelF1Score`)
+- `predict_step` returns per-label sigmoid probabilities (each in [0, 1], don't sum to 1)
+
+---
+
 ## Running Classification Examples
 
 ```bash
@@ -217,11 +291,12 @@ pip install -e ".[all]"
 python examples/getting_started/classify_cifar10.py
 python examples/getting_started/classify_custom_folder.py
 python examples/getting_started/vit_finetuning.py
+python examples/data_training/multilabel_classification.py
 ```
 
 ## See Also
 
 - [Image Classifier Guide](../../user-guide/models/image-classifier.md)
+- [Multi-Label Data Loading](../../user-guide/data-loading/image-classification-data.md#multi-label-classification-data)
 - [Classification Inference](../../user-guide/inference/classification-inference.md)
-- [Data Loading](../../user-guide/data-loading/image-classification-data.md)
 - [API Reference](../../api/classifier.md)

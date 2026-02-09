@@ -5,7 +5,7 @@ AutoTimm can work alongside HuggingFace Transformers vision models (ViT, DeiT, B
 ## Direct Model Integration
 
 ```mermaid
-graph TB
+graph TD
     A[HF Transformers] --> B{Model Type}
     
     B -->|ViT| C1[ViTModel + ViTConfig]

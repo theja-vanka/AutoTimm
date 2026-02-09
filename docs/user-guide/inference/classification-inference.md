@@ -359,6 +359,158 @@ for path, result in zip(image_paths, results):
 
 ---
 
+## Multi-Label Inference
+
+Multi-label models output **per-label sigmoid probabilities** (each in [0, 1], independent of each other) instead of softmax probabilities.
+
+### Loading a Multi-Label Model
+
+```python
+import torch
+from autotimm import ImageClassifier, MetricConfig, TransformConfig
+
+metrics = [
+    MetricConfig(
+        name="accuracy",
+        backend="torchmetrics",
+        metric_class="MultilabelAccuracy",
+        params={"num_labels": 4},
+        stages=["val"],
+    ),
+]
+
+model = ImageClassifier.load_from_checkpoint(
+    "path/to/checkpoint.ckpt",
+    backbone="resnet50",
+    num_classes=4,
+    multi_label=True,
+    threshold=0.5,
+    metrics=metrics,
+    transform_config=TransformConfig(),
+)
+model.eval()
+```
+
+### Single Image — Per-Label Probabilities
+
+```python
+from PIL import Image
+
+image = Image.open("image.jpg").convert("RGB")
+input_tensor = model.preprocess(image)
+
+with torch.inference_mode():
+    logits = model(input_tensor)
+    probs = logits.sigmoid().squeeze(0)  # (num_labels,)
+
+label_names = ["cat", "dog", "outdoor", "indoor"]
+threshold = 0.5
+
+for name, prob in zip(label_names, probs):
+    marker = "+" if prob > threshold else " "
+    print(f"  [{marker}] {name}: {prob:.2%}")
+
+# Get predicted labels
+predicted = [n for n, p in zip(label_names, probs) if p > threshold]
+print(f"Predicted: {predicted}")
+```
+
+**Output Example:**
+```
+  [+] cat: 92.15%
+  [ ] dog: 12.40%
+  [+] outdoor: 87.63%
+  [ ] indoor: 3.11%
+Predicted: ['cat', 'outdoor']
+```
+
+### Batch Prediction
+
+```python
+model.eval()
+device = next(model.parameters()).device
+threshold = 0.5
+
+all_preds = []
+all_probs = []
+
+with torch.inference_mode():
+    for images, _ in dataloader:
+        images = images.to(device)
+        logits = model(images)
+        probs = logits.sigmoid()
+        preds = (probs > threshold).int()
+
+        all_preds.extend(preds.cpu().tolist())
+        all_probs.extend(probs.cpu().tolist())
+```
+
+### Using Trainer.predict
+
+`predict_step` returns sigmoid probabilities automatically for multi-label models:
+
+```python
+from autotimm import AutoTrainer, MultiLabelImageDataModule
+
+data = MultiLabelImageDataModule(
+    train_csv="data.csv",
+    image_dir="./images",
+    image_size=224,
+    batch_size=32,
+)
+data.setup("fit")
+
+trainer = AutoTrainer()
+predictions = trainer.predict(model, dataloaders=data.val_dataloader())
+
+# predictions is a list of batched sigmoid probability tensors
+all_probs = torch.cat(predictions, dim=0)   # (N, num_labels)
+all_preds = (all_probs > 0.5).int()          # binary predictions
+```
+
+### Adjusting the Threshold
+
+Different thresholds trade off precision and recall per label:
+
+```python
+# Stricter — fewer but more confident predictions
+strict_preds = (probs > 0.7).int()
+
+# Lenient — more predictions, some less confident
+lenient_preds = (probs > 0.3).int()
+
+# Per-label thresholds (tuned on validation set)
+thresholds = torch.tensor([0.4, 0.6, 0.5, 0.3])
+custom_preds = (probs > thresholds).int()
+```
+
+### Exporting Multi-Label Predictions
+
+```python
+import csv
+
+label_names = ["cat", "dog", "outdoor", "indoor"]
+
+with open("predictions.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["index"] + label_names + [f"{n}_prob" for n in label_names])
+    for i, (pred, prob) in enumerate(zip(all_preds, all_probs)):
+        row = [i] + [int(p) for p in pred] + [f"{p:.4f}" for p in prob]
+        writer.writerow(row)
+```
+
+### Key Differences from Single-Label
+
+| | Single-Label | Multi-Label |
+|---|---|---|
+| **Output activation** | `softmax` (sums to 1) | `sigmoid` (each in [0, 1]) |
+| **Prediction** | `argmax` → one class | `sigmoid > threshold` → multiple labels |
+| **Loss** | `CrossEntropyLoss` | `BCEWithLogitsLoss` |
+| **Targets** | Integer class index | Multi-hot float vector |
+| **Confidence** | Max softmax probability | Per-label sigmoid probability |
+
+---
+
 ## Performance Optimization
 
 ### 1. Batch Processing
@@ -458,7 +610,13 @@ For classification inference issues, see the [Troubleshooting - Export & Inferen
 - Slow inference
 - Wrong predictions
 - Batch processing issues
-# Use exact same normalization as training
+
+### Quick Troubleshooting Checklist
+
+```python
+# 1. Use exact same normalization as training
+config = model.get_data_config()
+transform = transforms.Normalize(mean=config['mean'], std=config['std'])
 
 # 2. Ensure model is in eval mode
 model.eval()

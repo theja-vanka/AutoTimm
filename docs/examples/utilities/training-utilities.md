@@ -5,7 +5,7 @@ This page demonstrates training optimization utilities including auto-tuning and
 ## Training Optimization Strategies
 
 ```mermaid
-graph TB
+graph TD
     A[Training Config] --> B{Optimizations}
     
     B -->|Auto-tuning| C1[LR Finder]

@@ -139,6 +139,29 @@ model = ImageClassifier(
 )
 ```
 
+### Multi-Label Classification
+
+```python
+from autotimm import ImageClassifier, MetricConfig
+
+model = ImageClassifier(
+    backbone="resnet50",
+    num_classes=4,           # number of labels
+    multi_label=True,        # BCEWithLogitsLoss + sigmoid
+    threshold=0.5,           # prediction threshold
+    metrics=[
+        MetricConfig(
+            name="accuracy",
+            backend="torchmetrics",
+            metric_class="MultilabelAccuracy",
+            params={"num_labels": 4},
+            stages=["train", "val"],
+            prog_bar=True,
+        ),
+    ],
+)
+```
+
 ### With TransformConfig (Preprocessing)
 
 Enable inference-time preprocessing with model-specific normalization:
@@ -202,8 +225,10 @@ print(f"Input size: {config['input_size']}")
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `backbone` | `str \| BackboneConfig` | Required | Model name or config |
-| `num_classes` | `int` | Required | Number of target classes |
-| `metrics` | `MetricManager \| list[MetricConfig]` | Required | Metrics configuration |
+| `num_classes` | `int` | Required | Number of target classes (or labels) |
+| `multi_label` | `bool` | `False` | Enable multi-label classification |
+| `threshold` | `float` | `0.5` | Prediction threshold (multi-label only) |
+| `metrics` | `MetricManager \| list[MetricConfig]` | `None` | Metrics configuration |
 | `logging_config` | `LoggingConfig \| None` | `None` | Enhanced logging options |
 | `transform_config` | `TransformConfig \| None` | `None` | Transform config for preprocessing |
 | `lr` | `float` | `1e-3` | Learning rate |
@@ -213,7 +238,7 @@ print(f"Input size: {config['input_size']}")
 | `scheduler` | `str \| dict \| None` | `"cosine"` | Scheduler name or config |
 | `scheduler_kwargs` | `dict \| None` | `None` | Extra scheduler kwargs |
 | `head_dropout` | `float` | `0.0` | Dropout before classifier |
-| `label_smoothing` | `float` | `0.0` | Label smoothing factor |
+| `label_smoothing` | `float` | `0.0` | Label smoothing (not for multi-label) |
 | `freeze_backbone` | `bool` | `False` | Freeze backbone weights |
 | `mixup_alpha` | `float` | `0.0` | Mixup augmentation alpha |
 
@@ -258,7 +283,9 @@ ImageClassifier
 ├── head (ClassificationHead)
 │   ├── dropout (if head_dropout > 0)
 │   └── Linear(num_features, num_classes)
-└── criterion (CrossEntropyLoss)
+└── criterion
+    ├── CrossEntropyLoss  (multi_label=False, default)
+    └── BCEWithLogitsLoss (multi_label=True)
 ```
 
 ## Logged Metrics

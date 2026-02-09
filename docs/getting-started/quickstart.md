@@ -5,7 +5,7 @@ This guide walks you through training your first image classifier with AutoTimm.
 ## Training Workflow
 
 ```mermaid
-graph LR
+graph TD
     A[1. Import] --> B[2. Data]
     B --> C[3. Metrics]
     C --> D[4. Model]

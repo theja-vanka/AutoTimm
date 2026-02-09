@@ -7,6 +7,7 @@ from typing import Any
 
 import torch
 import torchmetrics
+import torchmetrics.classification
 
 
 @dataclass
@@ -184,28 +185,58 @@ class MetricManager:
         backend = config.backend
         params = config.params.copy()
 
-        # Inject num_classes if not specified
+        # Auto-inject num_classes / num_labels if the user didn't provide them.
+        # These are tracked separately so _create_torchmetrics_metric can
+        # filter them out when the metric constructor doesn't accept them.
+        auto_injected: set[str] = set()
+
         if "num_classes" not in params:
             params["num_classes"] = self._num_classes
+            auto_injected.add("num_classes")
+
+        if "num_labels" not in params:
+            params["num_labels"] = self._num_classes
+            auto_injected.add("num_labels")
 
         if backend == "torchmetrics":
-            return self._create_torchmetrics_metric(config.metric_class, params)
+            return self._create_torchmetrics_metric(
+                config.metric_class, params, auto_injected
+            )
         elif backend == "custom":
             return self._create_custom_metric(config.metric_class, params)
         else:
             raise ValueError(f"Unknown backend: {backend}")
 
     def _create_torchmetrics_metric(
-        self, metric_class: str, params: dict[str, Any]
+        self,
+        metric_class: str,
+        params: dict[str, Any],
+        auto_injected: set[str] | None = None,
     ) -> torchmetrics.Metric:
         """Create a torchmetrics Metric instance."""
-        if not hasattr(torchmetrics, metric_class):
+        # Try top-level torchmetrics first, then torchmetrics.classification
+        if hasattr(torchmetrics, metric_class):
+            metric_cls = getattr(torchmetrics, metric_class)
+        elif hasattr(torchmetrics.classification, metric_class):
+            metric_cls = getattr(torchmetrics.classification, metric_class)
+        else:
             raise ValueError(
                 f"Unknown torchmetrics metric: {metric_class}. "
                 f"Check torchmetrics documentation for available metrics."
             )
-        metric_cls = getattr(torchmetrics, metric_class)
-        return metric_cls(**params)
+
+        # Try creating the metric.  If it fails due to unexpected kwargs
+        # that were auto-injected, remove them and retry.
+        try:
+            return metric_cls(**params)
+        except (TypeError, ValueError):
+            if not auto_injected:
+                raise
+            # Remove auto-injected params and retry
+            filtered = {
+                k: v for k, v in params.items() if k not in auto_injected
+            }
+            return metric_cls(**filtered)
 
     def _create_custom_metric(
         self, metric_class: str, params: dict[str, Any]

@@ -5,27 +5,30 @@ This guide covers how to use trained AutoTimm models for inference and predictio
 ## Inference Pipeline
 
 ```mermaid
-graph LR
+graph TD
     A[Trained Model] --> B[Load Checkpoint]
     B --> C[Set Eval Mode]
     C --> D[Preprocess Image]
     D --> E{Inference}
-    
+
     E -->|Classification| F1[Logits]
+    E -->|Multi-Label| F4[Logits]
     E -->|Detection| F2[Boxes + Classes]
     E -->|Segmentation| F3[Pixel Masks]
-    
+
     F1 --> G1[Softmax]
+    F4 --> G4[Sigmoid + Threshold]
     F2 --> G2[NMS]
     F3 --> G3[Argmax]
-    
+
     G1 --> H[Predictions]
+    G4 --> H
     G2 --> H
     G3 --> H
-    
+
     H --> I[Post-process]
     I --> J[Results]
-    
+
     style A fill:#2196F3,stroke:#1976D2,color:#fff
     style B fill:#42A5F5,stroke:#1976D2,color:#fff
     style C fill:#2196F3,stroke:#1976D2,color:#fff
@@ -69,6 +72,30 @@ image = Image.open("test.jpg").convert("RGB")
 with torch.inference_mode():
     logits = model(model.preprocess(image))
     predicted_class = logits.argmax(dim=1).item()
+```
+
+### Multi-Label Classification
+
+```python
+from autotimm import ImageClassifier, MetricConfig, TransformConfig
+import torch
+from PIL import Image
+
+model = ImageClassifier.load_from_checkpoint(
+    "multilabel.ckpt",
+    backbone="resnet50",
+    num_classes=4,
+    multi_label=True,
+    threshold=0.5,
+    transform_config=TransformConfig(),
+)
+model.eval()
+
+image = Image.open("test.jpg").convert("RGB")
+with torch.inference_mode():
+    logits = model(model.preprocess(image))
+    probs = logits.sigmoid().squeeze(0)        # per-label probabilities
+    predicted = (probs > 0.5).nonzero().squeeze(-1).tolist()
 ```
 
 ### Object Detection
@@ -122,6 +149,6 @@ torch.onnx.export(model, torch.randn(1, 3, 224, 224), "model.onnx")
 
 ## Detailed Guides
 
-- **[Classification Inference](classification-inference.md)** - Single/batch prediction, top-K, pipelines
+- **[Classification Inference](classification-inference.md)** - Single/batch prediction, top-K, multi-label, pipelines
 - **[Object Detection Inference](object-detection-inference.md)** - Bounding boxes, visualization, NMS tuning
 - **[Model Export](model-export.md)** - TorchScript, ONNX, quantization

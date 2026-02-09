@@ -96,6 +96,7 @@ nav:
       - Data Loading:
           - Overview: user-guide/data-loading/index.md
           - Image Classification Data: user-guide/data-loading/image-classification-data.md
+          - Multi-Label Classification Data: user-guide/data-loading/multilabel-classification-data.md
           - Object Detection Data: user-guide/data-loading/object-detection-data.md
           - Segmentation Data: user-guide/data-loading/segmentation-data.md
           - Transforms: user-guide/data-loading/transforms.md
@@ -187,6 +188,7 @@ nav:
           - Segmentation: api/segmentation.md
       - Data:
           - ImageDataModule: api/data.md
+          - MultiLabelImageDataModule: api/multilabel_data.md
           - DetectionDataModule: api/detection_data.md
           - TransformConfig: api/transforms.md
       - Training:

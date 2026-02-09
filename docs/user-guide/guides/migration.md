@@ -5,7 +5,7 @@ This guide helps you migrate existing deep learning projects to AutoTimm from ot
 ## Migration Workflow Comparison
 
 ```mermaid
-graph TB
+graph TD
     subgraph "Pure PyTorch"
         P1[Manual Data Loading] --> P2[Manual Model Setup]
         P2 --> P3[Manual Training Loop]
