@@ -6,17 +6,60 @@ Master transfer learning strategies for optimal performance with pretrained mode
 
 ```mermaid
 graph TD
-    A[Pretrained Model] --> B{Strategy}
+    A[Pretrained Model] --> A1[Load Checkpoint]
+    A1 --> A2[Verify Weights]
+    A2 --> A3[Initialize Architecture]
+    A3 --> B{Strategy}
 
     B -->|Frozen| C1[Freeze Backbone<br/>Train Head Only]
+    C1 --> C1a[backbone.requires_grad = False]
+    C1a --> C1b[Train Classification Head]
+    C1b --> C1c[Fast Convergence]
+    
     B -->|Fine-tune| C2[Unfreeze All<br/>Same LR All Layers]
+    C2 --> C2a[All requires_grad = True]
+    C2a --> C2b[Single Learning Rate]
+    C2b --> C2c[Update All Weights]
+    
     B -->|Progressive| C3[Gradual Unfreeze<br/>Head → Last → All]
+    C3 --> C3a[Phase 1: Train Head]
+    C3a --> C3b[Phase 2: Unfreeze Last]
+    C3b --> C3c[Phase 3: Unfreeze All]
+    
     B -->|LLRD| C4[Layer-wise LR<br/>Decay per Layer]
+    C4 --> C4a[Base LR = 1e-4]
+    C4a --> C4b[Layer i: LR × decay^i]
+    C4b --> C4c[Different LR per Layer]
 
-    C1 --> E1[Fast + No Overfit]
-    C2 --> E2[Better Features]
-    C3 --> E3[Controlled Transfer]
-    C4 --> E4[Optimal Adaptation]
+    C1c --> E1[Fast + No Overfit]
+    E1 --> E1a[Quick Training]
+    E1a --> E1b[Feature Reuse]
+    E1b --> E1c[Minimal Adaptation]
+    
+    C2c --> E2[Better Features]
+    E2 --> E2a[Full Adaptation]
+    E2a --> E2b[Risk of Overfit]
+    E2b --> E2c[Higher Accuracy]
+    
+    C3c --> E3[Controlled Transfer]
+    E3 --> E3a[Gradual Learning]
+    E3a --> E3b[Stable Training]
+    E3b --> E3c[Best Balance]
+    
+    C4c --> E4[Optimal Adaptation]
+    E4 --> E4a[Fine-grained Control]
+    E4a --> E4b[Preserve Features]
+    E4b --> E4c[SOTA Results]
+    
+    E1c --> F[Select Best]
+    E2c --> F
+    E3c --> F
+    E4c --> F
+    
+    F --> F1[Evaluate Performance]
+    F1 --> F2[Compare Metrics]
+    F2 --> F3[Choose Strategy]
+    F3 --> F4[Final Model]
 
     style A fill:#2196F3,stroke:#1976D2,color:#fff
     style C1 fill:#42A5F5,stroke:#1976D2,color:#fff

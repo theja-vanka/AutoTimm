@@ -99,6 +99,7 @@ nav:
           - Multi-Label Classification Data: user-guide/data-loading/multilabel-classification-data.md
           - Object Detection Data: user-guide/data-loading/object-detection-data.md
           - Segmentation Data: user-guide/data-loading/segmentation-data.md
+          - CSV Data Loading: user-guide/data-loading/csv-data.md
           - Transforms: user-guide/data-loading/transforms.md
           - Preset Manager: user-guide/data-loading/preset-manager.md
       - Models:
@@ -219,6 +220,7 @@ nav:
           - Deployment: examples/integration/hf_deployment.md
       - Data & Training:
           - Data Handling: examples/utilities/data-handling.md
+          - CSV Data Loading: examples/utilities/csv-data-loading.md
           - Custom Data & Augmentation: examples/utilities/hf_custom_data.md
           - Training Utilities: examples/utilities/training-utilities.md
           - Hyperparameter Tuning: examples/utilities/hf_hyperparameter_tuning.md
@@ -240,12 +242,36 @@ extra:
     provider: google
     property: !ENV GOOGLE_ANALYTICS_KEY
   meta:
-    keywords: >-
-      PyTorch, Computer Vision, Deep Learning, Image Classification,
-      Object Detection, Semantic Segmentation, Instance Segmentation,
-      Transfer Learning, timm, YOLOX, AutoML, Machine Learning,
-      Neural Networks, CNN, Vision Transformer, Model Training,
-      Model Deployment, TorchScript
+    - name: google-site-verification
+      content: "p_z6B5TiMdq2eo0Nv7iOWaYanUBHwf2pxQ5B-qvbE_o"
+    - name: description
+      content: "AutoTimm - Automatic PyTorch Image Models for Computer Vision. Build, train, and deploy state-of-the-art models for image classification, object detection, and segmentation with minimal code."
+    - name: keywords
+      content: "PyTorch, Computer Vision, Deep Learning, Image Classification, Object Detection, Semantic Segmentation, Instance Segmentation, Transfer Learning, timm, YOLOX, AutoML, Machine Learning, Neural Networks, CNN, Vision Transformer, Model Training, Model Deployment, TorchScript"
+    - name: author
+      content: "Krishnatheja Vanka"
+    - name: robots
+      content: "index, follow"
+    - property: og:type
+      content: website
+    - property: og:title
+      content: "AutoTimm - Automatic PyTorch Image Models"
+    - property: og:description
+      content: "Build, train, and deploy state-of-the-art computer vision models with minimal code. Support for classification, detection, and segmentation tasks."
+    - property: og:url
+      content: "https://theja-vanka.github.io/AutoTimm"
+    - property: og:site_name
+      content: "AutoTimm"
+    - property: og:image
+      content: "https://theja-vanka.github.io/AutoTimm/assets/logo.png"
+    - name: twitter:card
+      content: summary_large_image
+    - name: twitter:title
+      content: "AutoTimm - Automatic PyTorch Image Models"
+    - name: twitter:description
+      content: "Build, train, and deploy state-of-the-art computer vision models with minimal code."
+    - name: twitter:image
+      content: "https://theja-vanka.github.io/AutoTimm/assets/logo.png"
 
 extra_javascript:
   - javascripts/mermaid-zoom.js

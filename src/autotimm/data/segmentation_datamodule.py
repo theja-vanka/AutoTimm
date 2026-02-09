@@ -25,7 +25,7 @@ class SegmentationDataModule(pl.LightningDataModule):
 
     Args:
         data_dir: Root directory of the dataset
-        format: Dataset format ('png', 'coco', 'cityscapes', 'voc')
+        format: Dataset format ('png', 'coco', 'cityscapes', 'voc', 'csv')
         image_size: Target image size (square)
         batch_size: Batch size for dataloaders
         num_workers: Number of dataloader workers
@@ -37,6 +37,9 @@ class SegmentationDataModule(pl.LightningDataModule):
         transform_config: Optional TransformConfig for unified transform configuration.
             When provided along with backbone, uses model-specific normalization.
         backbone: Optional backbone name or module for model-specific normalization.
+        train_csv: Path to training CSV file (used when format='csv').
+        val_csv: Path to validation CSV file (used when format='csv').
+        test_csv: Path to test CSV file (used when format='csv').
     """
 
     def __init__(
@@ -53,10 +56,16 @@ class SegmentationDataModule(pl.LightningDataModule):
         ignore_index: int = 255,
         transform_config: TransformConfig | None = None,
         backbone: str | nn.Module | None = None,
+        train_csv: str | Path | None = None,
+        val_csv: str | Path | None = None,
+        test_csv: str | Path | None = None,
     ):
         super().__init__()
         self.data_dir = Path(data_dir)
         self.format = format
+        self.train_csv = Path(train_csv) if train_csv else None
+        self.val_csv = Path(val_csv) if val_csv else None
+        self.test_csv = Path(test_csv) if test_csv else None
         self.image_size = image_size
         self.batch_size = batch_size
         self.num_workers = num_workers
@@ -126,6 +135,7 @@ class SegmentationDataModule(pl.LightningDataModule):
                 transforms=train_transforms,
                 class_mapping=self.class_mapping,
                 ignore_index=self.ignore_index,
+                csv_path=self.train_csv,
             )
 
             # Try to load validation set
@@ -138,8 +148,9 @@ class SegmentationDataModule(pl.LightningDataModule):
                     transforms=val_transforms,
                     class_mapping=self.class_mapping,
                     ignore_index=self.ignore_index,
+                    csv_path=self.val_csv,
                 )
-            except FileNotFoundError:
+            except (FileNotFoundError, ValueError):
                 # No validation set available
                 self.val_dataset = None
 
@@ -152,6 +163,7 @@ class SegmentationDataModule(pl.LightningDataModule):
                 transforms=val_transforms,
                 class_mapping=self.class_mapping,
                 ignore_index=self.ignore_index,
+                csv_path=self.val_csv,
             )
 
         if stage == "test":
@@ -163,6 +175,7 @@ class SegmentationDataModule(pl.LightningDataModule):
                 transforms=val_transforms,
                 class_mapping=self.class_mapping,
                 ignore_index=self.ignore_index,
+                csv_path=self.test_csv,
             )
 
         # Automatically print data summary

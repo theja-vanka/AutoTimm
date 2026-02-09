@@ -7,31 +7,73 @@ This page demonstrates object detection tasks using AutoTimm.
 ```mermaid
 graph TD
     subgraph "FCOS (Anchor-free)"
-        F1[Backbone + FPN] --> F2[Classification Head]
-        F1 --> F3[Regression Head]
-        F1 --> F4[Centerness Head]
-        F2 --> F5[Focal Loss]
-        F3 --> F6[GIoU Loss]
+        F1[Backbone + FPN] --> F1a[Extract Features]
+        F1a --> F1b[Feature Pyramid]
+        F1b --> F2[Classification Head]
+        F2 --> F2a[Conv Layers]
+        F2a --> F2b[Class Scores]
+        F1b --> F3[Regression Head]
+        F3 --> F3a[Conv Layers]
+        F3a --> F3b[Box Offsets]
+        F1b --> F4[Centerness Head]
+        F4 --> F4a[Conv Layers]
+        F4a --> F4b[Centerness Scores]
+        F2b --> F5[Focal Loss]
+        F3b --> F6[GIoU Loss]
+        F4b --> F7[BCE Loss]
+        F5 --> F8[Combined Loss]
+        F6 --> F8
+        F7 --> F8
     end
     
     subgraph "YOLOX (One-stage)"
-        Y1[CSPDarknet] --> Y2[PANet]
-        Y2 --> Y3[Decoupled Head]
-        Y3 --> Y4[SimOTA]
+        Y1[CSPDarknet] --> Y1a[Dark2]
+        Y1a --> Y1b[Dark3]
+        Y1b --> Y1c[Dark4]
+        Y1c --> Y1d[Dark5]
+        Y1d --> Y2[PANet]
+        Y2 --> Y2a[Bottom-up]
+        Y2a --> Y2b[Top-down]
+        Y2b --> Y2c[Lateral]
+        Y2c --> Y3[Decoupled Head]
+        Y3 --> Y3a[Classification Branch]
+        Y3 --> Y3b[Regression Branch]
+        Y3a --> Y3c[Class Predictions]
+        Y3b --> Y3d[Box Predictions]
+        Y3c --> Y4[SimOTA]
+        Y3d --> Y4
+        Y4 --> Y4a[Label Assignment]
+        Y4a --> Y4b[Loss Calculation]
     end
     
     subgraph "RT-DETR (Transformer)"
-        R1[Backbone] --> R2[Hybrid Encoder]
-        R2 --> R3[Transformer Decoder]
-        R3 --> R4[Set Prediction]
+        R1[Backbone] --> R1a[ResNet/ViT]
+        R1a --> R1b[Multi-scale Features]
+        R1b --> R2[Hybrid Encoder]
+        R2 --> R2a[Efficient Attention]
+        R2a --> R2b[Intra-scale Fusion]
+        R2b --> R2c[Cross-scale Fusion]
+        R2c --> R3[Transformer Decoder]
+        R3 --> R3a[Query Embeddings]
+        R3a --> R3b[Self Attention]
+        R3b --> R3c[Cross Attention]
+        R3c --> R4[Set Prediction]
+        R4 --> R4a[Classification Head]
+        R4 --> R4b[Box Regression]
+        R4a --> R4c[Hungarian Matching]
+        R4b --> R4c
+        R4c --> R4d[Final Predictions]
     end
     
     style F1 fill:#2196F3,stroke:#1976D2,color:#fff
     style F5 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style Y1 fill:#2196F3,stroke:#1976D2,color:#fff
-    style Y4 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style F8 fill:#2196F3,stroke:#1976D2,color:#fff
+    style Y1 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style Y4 fill:#2196F3,stroke:#1976D2,color:#fff
+    style Y4b fill:#42A5F5,stroke:#1976D2,color:#fff
     style R1 fill:#2196F3,stroke:#1976D2,color:#fff
     style R4 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style R4d fill:#2196F3,stroke:#1976D2,color:#fff
 ```
 
 ## Object Detection on COCO

@@ -1,8 +1,10 @@
-"""COCO-format detection dataset."""
+"""Detection datasets (COCO-format and CSV-format)."""
 
 from __future__ import annotations
 
+import csv
 import json
+from collections import defaultdict
 from pathlib import Path
 from typing import Any, Callable
 
@@ -170,6 +172,146 @@ class COCODetectionDataset(Dataset):
             "boxes": boxes,
             "labels": labels,
             "image_id": img_id,
+            "orig_size": torch.tensor([orig_h, orig_w]),
+        }
+
+
+class CSVDetectionDataset(Dataset):
+    """Dataset for object detection from CSV.
+
+    CSV format (one row per bounding box)::
+
+        image_path,x_min,y_min,x_max,y_max,label
+        img001.jpg,10,20,100,200,cat
+        img001.jpg,50,60,150,250,dog
+        img002.jpg,30,40,120,220,cat
+
+    Multiple rows per image are grouped automatically.
+
+    Parameters:
+        csv_path: Path to CSV file.
+        image_dir: Directory containing image files.
+        image_column: Column name for image paths. Default ``"image_path"``.
+        bbox_columns: Column names for bounding box coordinates.
+            Default ``["x_min", "y_min", "x_max", "y_max"]``.
+        label_column: Column name for class labels. Default ``"label"``.
+        transform: Albumentations transform with bbox_params.
+        min_bbox_area: Minimum bbox area to include. Default 0.
+
+    Attributes:
+        class_names: List of class names.
+        num_classes: Number of classes.
+    """
+
+    def __init__(
+        self,
+        csv_path: str | Path,
+        image_dir: str | Path = ".",
+        image_column: str = "image_path",
+        bbox_columns: list[str] | None = None,
+        label_column: str = "label",
+        transform: Callable | None = None,
+        min_bbox_area: float = 0.0,
+    ):
+        self.csv_path = Path(csv_path)
+        self.image_dir = Path(image_dir)
+        self.transform = transform
+        self.min_bbox_area = min_bbox_area
+
+        if bbox_columns is None:
+            bbox_columns = ["x_min", "y_min", "x_max", "y_max"]
+        self._bbox_columns = bbox_columns
+        self._image_column = image_column
+        self._label_column = label_column
+
+        # Parse CSV and group by image
+        image_anns: dict[str, list[dict]] = defaultdict(list)
+        with open(self.csv_path, newline="") as f:
+            reader = csv.DictReader(f)
+            fieldnames = list(reader.fieldnames or [])
+
+            # Validate columns exist
+            for col in [image_column, label_column] + bbox_columns:
+                if col not in fieldnames:
+                    raise ValueError(
+                        f"Column '{col}' not found in CSV. "
+                        f"Available columns: {fieldnames}"
+                    )
+
+            for row in reader:
+                img_path = row[image_column]
+                x1 = float(row[bbox_columns[0]])
+                y1 = float(row[bbox_columns[1]])
+                x2 = float(row[bbox_columns[2]])
+                y2 = float(row[bbox_columns[3]])
+
+                # Filter by area
+                area = (x2 - x1) * (y2 - y1)
+                if area < min_bbox_area:
+                    continue
+
+                image_anns[img_path].append(
+                    {"bbox": [x1, y1, x2, y2], "label": row[label_column]}
+                )
+
+        if not image_anns:
+            raise ValueError(
+                f"No images with valid annotations found in {self.csv_path}."
+            )
+
+        # Build class mapping
+        all_labels = sorted(
+            {ann["label"] for anns in image_anns.values() for ann in anns}
+        )
+        self.class_names: list[str] = all_labels
+        self._class_to_idx: dict[str, int] = {
+            name: idx for idx, name in enumerate(all_labels)
+        }
+        self.num_classes: int = len(all_labels)
+
+        # Store as ordered list for indexing
+        self._image_paths: list[str] = sorted(image_anns.keys())
+        self._image_anns = image_anns
+
+    def __len__(self) -> int:
+        return len(self._image_paths)
+
+    def __getitem__(self, index: int) -> dict[str, Any]:
+        import cv2
+
+        img_rel = self._image_paths[index]
+        img_path = self.image_dir / img_rel
+        anns = self._image_anns[img_rel]
+
+        image = cv2.imread(str(img_path))
+        if image is None:
+            raise RuntimeError(f"Failed to load image: {img_path}")
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+        orig_h, orig_w = image.shape[:2]
+
+        # Boxes are already in xyxy format
+        bboxes = [ann["bbox"] for ann in anns]
+        labels = [self._class_to_idx[ann["label"]] for ann in anns]
+
+        if self.transform is not None:
+            transformed = self.transform(image=image, bboxes=bboxes, labels=labels)
+            image = transformed["image"]
+            bboxes = transformed["bboxes"]
+            labels = transformed["labels"]
+
+        if len(bboxes) > 0:
+            boxes = torch.tensor(bboxes, dtype=torch.float32)
+            labels = torch.tensor(labels, dtype=torch.int64)
+        else:
+            boxes = torch.zeros((0, 4), dtype=torch.float32)
+            labels = torch.zeros((0,), dtype=torch.int64)
+
+        return {
+            "image": image,
+            "boxes": boxes,
+            "labels": labels,
+            "image_id": index,
             "orig_size": torch.tensor([orig_h, orig_w]),
         }
 

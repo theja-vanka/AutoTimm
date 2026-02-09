@@ -6,30 +6,95 @@ Complete examples for training instance segmentation models with AutoTimm.
 
 ```mermaid
 graph TD
-    A[Input Image] --> B[Backbone + FPN]
+    A[Input Image] --> A1[Preprocess]
+    A1 --> A2[Resize & Normalize]
+    A2 --> A3[To Tensor]
+    A3 --> B[Backbone + FPN]
     
-    B --> C[Detection Head]
-    B --> D[Mask Head]
+    B --> B1[Backbone Features]
+    B1 --> B2[Multi-scale Extraction]
+    B2 --> B3[FPN Levels P2-P5]
+    B3 --> B4[Top-down Pathway]
+    B4 --> B5[Lateral Connections]
     
-    C --> E[RoI Proposals]
-    E --> F[RoI Align]
+    B5 --> C[Detection Head]
+    C --> C1[RPN Network]
+    C1 --> C2[Classification Branch]
+    C1 --> C3[Regression Branch]
+    C2 --> C4[Objectness Scores]
+    C3 --> C5[Anchor Adjustments]
     
-    F --> D
+    B5 --> D[Mask Head]
+    D --> D1[Mask Branch]
     
-    D --> G[Instance Masks]
+    C4 --> E[RoI Proposals]
+    C5 --> E
+    E --> E1[Generate Proposals]
+    E1 --> E2[Filter by Score]
+    E2 --> E3[Apply NMS]
+    E3 --> F[RoI Align]
+    
+    F --> F1[Spatial Sampling]
+    F1 --> F2[Bilinear Interpolation]
+    F2 --> F3[Fixed-size Features]
+    
+    F3 --> D1
+    D1 --> D2[Conv Layers]
+    D2 --> D3[Deconv Layers]
+    D3 --> D4[Per-instance Masks]
+    
+    F3 --> C
     C --> H[Bounding Boxes]
+    H --> H1[Box Refinement]
+    H1 --> H2[Coordinate Predictions]
+    
     C --> I[Class Scores]
+    I --> I1[Classification Head]
+    I1 --> I2[Softmax]
+    I2 --> I3[Class Probabilities]
     
-    H --> J{NMS}
-    I --> J
-    G --> J
+    D4 --> G[Instance Masks]
+    G --> G1[Sigmoid Activation]
+    G1 --> G2[Binary Masks]
+    G2 --> G3[Resize to RoI]
     
-    J --> K[Final Predictions]
+    H2 --> J{NMS}
+    I3 --> J
+    G3 --> J
     
-    K --> L{Metrics}
+    J --> J1[Score Filtering]
+    J1 --> J2[IoU Suppression]
+    J2 --> J3[Top-K Selection]
+    J3 --> K[Final Predictions]
+    
+    K --> K1[Boxes]
+    K --> K2[Masks]
+    K --> K3[Classes]
+    K --> K4[Scores]
+    
+    K1 --> L{Metrics}
+    K2 --> L
+    K3 --> L
+    K4 --> L
+    
     L --> M1[Mask mAP]
+    M1 --> M1a[AP@0.5]
+    M1a --> M1b[AP@0.75]
+    M1b --> M1c[AP@[.5:.95]]
+    
     L --> M2[Box mAP]
+    M2 --> M2a[Detection mAP]
+    M2a --> M2b[Precision-Recall]
+    
     L --> M3[Instance IoU]
+    M3 --> M3a[Mask IoU]
+    M3a --> M3b[Per-class IoU]
+    
+    M1c --> N[Evaluation]
+    M2b --> N
+    M3b --> N
+    N --> N1[Aggregate Scores]
+    N1 --> N2[Generate Report]
     
     style A fill:#2196F3,stroke:#1976D2,color:#fff
     style B fill:#42A5F5,stroke:#1976D2,color:#fff
@@ -38,6 +103,7 @@ graph TD
     style F fill:#2196F3,stroke:#1976D2,color:#fff
     style J fill:#42A5F5,stroke:#1976D2,color:#fff
     style K fill:#2196F3,stroke:#1976D2,color:#fff
+    style L fill:#42A5F5,stroke:#1976D2,color:#fff
 ```
 
 ## Basic Example: COCO

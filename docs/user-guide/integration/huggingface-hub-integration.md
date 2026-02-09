@@ -6,32 +6,70 @@ AutoTimm seamlessly integrates with Hugging Face Hub, giving you access to thous
 
 ```mermaid
 graph TD
-    A[HF Hub] --> B[Search Models]
+    A[HF Hub] --> A1[huggingface.co/models]
+    A1 --> A2[Browse Repository]
+    A2 --> B[Search Models]
     
-    B --> C[list_hf_hub_backbones]
+    B --> B1[Define Criteria]
+    B1 --> B2[Set Filters]
+    B2 --> C[list_hf_hub_backbones]
     
-    C --> D{Filter}
+    C --> C1[Query API]
+    C1 --> C2[Fetch Results]
+    C2 --> D{Filter}
+    
     D -->|By Name| E1[model_name='resnet']
+    E1 --> E1a[Match Pattern]
+    E1a --> E1b[Return Matches]
+    
     D -->|By Author| E2[author='timm']
+    E2 --> E2a[Filter Publisher]
+    E2a --> E2b[Return Matches]
+    
     D -->|By Tag| E3[tag='image-classification']
+    E3 --> E3a[Filter Tags]
+    E3a --> E3b[Return Matches]
     
-    E1 --> F[Model List]
-    E2 --> F
-    E3 --> F
+    E1b --> F[Model List]
+    E2b --> F
+    E3b --> F
     
-    F --> G[Select Model]
+    F --> F1[Display Results]
+    F1 --> F2[Show Metadata]
+    F2 --> G[Select Model]
     
-    G --> H[hf-hub:timm/model]
+    G --> G1[Review Model Card]
+    G1 --> G2[Check Performance]
+    G2 --> G3[Verify Compatibility]
+    G3 --> H[hf-hub:timm/model]
     
-    H --> I{Task}
+    H --> H1[Download Model]
+    H1 --> H2[Cache Locally]
+    H2 --> I{Task}
     
     I -->|Classification| J1[ImageClassifier]
-    I -->|Detection| J2[ObjectDetector]
-    I -->|Segmentation| J3[SemanticSegmentor]
+    J1 --> J1a[backbone='hf-hub:...']
+    J1a --> J1b[Load Weights]
+    J1b --> J1c[Add Head]
     
-    J1 --> K[Training]
-    J2 --> K
-    J3 --> K
+    I -->|Detection| J2[ObjectDetector]
+    J2 --> J2a[backbone='hf-hub:...']
+    J2a --> J2b[Load Weights]
+    J2b --> J2c[Add Detector]
+    
+    I -->|Segmentation| J3[SemanticSegmentor]
+    J3 --> J3a[backbone='hf-hub:...']
+    J3a --> J3b[Load Weights]
+    J3b --> J3c[Add Decoder]
+    
+    J1c --> K[Training]
+    J2c --> K
+    J3c --> K
+    
+    K --> K1[Configure Trainer]
+    K1 --> K2[Start Training]
+    K2 --> K3[Save Checkpoint]
+    K3 --> K4[Upload to Hub]
     
     style A fill:#2196F3,stroke:#1976D2,color:#fff
     style C fill:#42A5F5,stroke:#1976D2,color:#fff

@@ -5,15 +5,57 @@ Comprehensive troubleshooting guide for common issues when using AutoTimm.
 ## Quick Navigation
 
 ```mermaid
-graph LR
-    A[Problem Category] --> B[Training]
-    A --> C[Performance]
-    A --> D[Data]
-    A --> E[Models]
-    A --> F[Deployment]
-    A --> G[Environment]
-    A --> H[Integration]
-    A --> I[Task-Specific]
+graph TD
+    A[Problem Category] --> A1[Identify Issue]
+    A1 --> A2[Classify Type]
+    A2 --> B[Training]
+    A2 --> C[Performance]
+    A2 --> D[Data]
+    A2 --> E[Models]
+    A2 --> F[Deployment]
+    A2 --> G[Environment]
+    A2 --> H[Integration]
+    A2 --> I[Task-Specific]
+    
+    B --> B1[Loss Issues]
+    B --> B2[Convergence]
+    B --> B3[Gradients]
+    B --> B4[Learning Rate]
+    
+    C --> C1[Memory]
+    C --> C2[Speed]
+    C --> C3[GPU Utilization]
+    C --> C4[Bottlenecks]
+    
+    D --> D1[Loading Errors]
+    D --> D2[Format Issues]
+    D --> D3[Augmentation]
+    D --> D4[Validation]
+    
+    E --> E1[Architecture]
+    E --> E2[Pretrained]
+    E --> E3[Custom Models]
+    E --> E4[Compatibility]
+    
+    F --> F1[Export]
+    F --> F2[Optimization]
+    F --> F3[Serving]
+    F --> F4[Inference]
+    
+    G --> G1[Dependencies]
+    G --> G2[CUDA]
+    G --> G3[Installation]
+    G --> G4[Conflicts]
+    
+    H --> H1[HuggingFace]
+    H --> H2[timm]
+    H --> H3[PyTorch Lightning]
+    H --> H4[Custom]
+    
+    I --> I1[Classification]
+    I --> I2[Detection]
+    I --> I3[Segmentation]
+    I --> I4[Multi-task]
 
     style A fill:#2196F3,stroke:#1976D2,color:#fff
     style B fill:#42A5F5,stroke:#1976D2,color:#fff

@@ -6,28 +6,61 @@ AutoTimm can work alongside HuggingFace Transformers vision models (ViT, DeiT, B
 
 ```mermaid
 graph TD
-    A[HF Transformers] --> B{Model Type}
+    A[HF Transformers] --> A1[transformers Library]
+    A1 --> B{Model Type}
     
     B -->|ViT| C1[ViTModel + ViTConfig]
+    C1 --> C1a[Load Pretrained]
+    C1a --> C1b[Configure Architecture]
+    
     B -->|DeiT| C2[DeiTModel + DeiTConfig]
+    C2 --> C2a[Load Pretrained]
+    C2a --> C2b[Configure Architecture]
+    
     B -->|BEiT| C3[BeitModel + BeitConfig]
+    C3 --> C3a[Load Pretrained]
+    C3a --> C3b[Configure Architecture]
+    
     B -->|Swin| C4[SwinModel + SwinConfig]
+    C4 --> C4a[Load Pretrained]
+    C4a --> C4b[Configure Architecture]
     
-    C1 --> D[Custom LightningModule]
-    C2 --> D
-    C3 --> D
-    C4 --> D
+    C1b --> D[Custom LightningModule]
+    C2b --> D
+    C3b --> D
+    C4b --> D
     
-    D --> E[Add Task Head]
-    E --> F[Configure Optimizers]
-    F --> G[Training Steps]
+    D --> D1[Initialize Module]
+    D1 --> D2[Setup Model]
+    D2 --> E[Add Task Head]
+    E --> E1[Classification Head]
+    E --> E2[Detection Head]
+    E --> E3[Segmentation Head]
     
-    G --> H[PyTorch Lightning]
+    E1 --> F[Configure Optimizers]
+    E2 --> F
+    E3 --> F
+    F --> F1[Select Optimizer]
+    F1 --> F2[Set Learning Rate]
+    F2 --> F3[Configure Scheduler]
+    
+    F3 --> G[Training Steps]
+    G --> G1[training_step]
+    G1 --> G2[validation_step]
+    G2 --> G3[test_step]
+    G3 --> G4[predict_step]
+    
+    G4 --> H[PyTorch Lightning]
     
     H --> I1[DDP]
+    I1 --> I1a[Multi-GPU Training]
     H --> I2[Mixed Precision]
+    I2 --> I2a[AMP/FP16]
     H --> I3[Callbacks]
+    I3 --> I3a[EarlyStopping]
+    I3 --> I3b[ModelCheckpoint]
     H --> I4[Checkpointing]
+    I4 --> I4a[Save/Load States]
     
     style A fill:#2196F3,stroke:#1976D2,color:#fff
     style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
@@ -35,7 +68,8 @@ graph TD
     style C3 fill:#42A5F5,stroke:#1976D2,color:#fff
     style C4 fill:#2196F3,stroke:#1976D2,color:#fff
     style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style H fill:#2196F3,stroke:#1976D2,color:#fff
+    style G fill:#2196F3,stroke:#1976D2,color:#fff
+    style H fill:#42A5F5,stroke:#1976D2,color:#fff
 ```
 
 ## Overview

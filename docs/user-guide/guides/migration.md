@@ -7,21 +7,51 @@ This guide helps you migrate existing deep learning projects to AutoTimm from ot
 ```mermaid
 graph TD
     subgraph "Pure PyTorch"
-        P1[Manual Data Loading] --> P2[Manual Model Setup]
-        P2 --> P3[Manual Training Loop]
-        P3 --> P4[Manual Logging]
-        P4 --> P5[Manual Checkpointing]
-        P5 --> P6[Manual Validation]
+        P1[Manual Data Loading] --> P1a[Create Dataset Class]
+        P1a --> P1b[Define __getitem__]
+        P1b --> P1c[Create DataLoader]
+        P1c --> P2[Manual Model Setup]
+        P2 --> P2a[Define Architecture]
+        P2a --> P2b[Initialize Weights]
+        P2b --> P2c[Move to Device]
+        P2c --> P3[Manual Training Loop]
+        P3 --> P3a[Epoch Iteration]
+        P3a --> P3b[Batch Processing]
+        P3b --> P3c[Loss Computation]
+        P3c --> P3d[Backward Pass]
+        P3d --> P3e[Optimizer Step]
+        P3e --> P4[Manual Logging]
+        P4 --> P4a[Write TensorBoard]
+        P4a --> P4b[Save Metrics]
+        P4b --> P5[Manual Checkpointing]
+        P5 --> P5a[Save State Dict]
+        P5a --> P5b[Track Best Model]
+        P5b --> P6[Manual Validation]
+        P6 --> P6a[Disable Gradients]
+        P6a --> P6b[Evaluate Loop]
+        P6b --> P6c[Compute Metrics]
     end
     
     subgraph "AutoTimm"
-        A1[ImageDataModule] --> A2[ImageClassifier]
-        A2 --> A3[AutoTrainer]
-        A3 --> A4[Automatic Everything]
-        A4 --> A5[Results]
+        A1[ImageDataModule] --> A1a[One-line Setup]
+        A1a --> A1b[Built-in Transforms]
+        A1b --> A2[ImageClassifier]
+        A2 --> A2a[Select Backbone]
+        A2a --> A2b[Auto Configuration]
+        A2b --> A3[AutoTrainer]
+        A3 --> A3a[trainer.fit]
+        A3a --> A4[Automatic Everything]
+        A4 --> A4a[Auto Checkpointing]
+        A4a --> A4b[Auto Logging]
+        A4b --> A4c[Auto Validation]
+        A4c --> A4d[Auto Metrics]
+        A4d --> A5[Results]
+        A5 --> A5a[Best Model Saved]
+        A5a --> A5b[Metrics Logged]
+        A5b --> A5c[Ready for Deploy]
     end
     
-    P6 -.Migration.-> A1
+    P6c -."Migration<br/>Simplify Code"..-> A1
     
     style P1 fill:#757575,stroke:#424242,color:#fff
     style P3 fill:#757575,stroke:#424242,color:#fff

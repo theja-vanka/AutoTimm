@@ -6,33 +6,74 @@ AutoTimm provides `AutoTrainer`, a configured PyTorch Lightning Trainer with sen
 
 ```mermaid
 graph TD
-    A[Initialize Model & Data] --> B{Auto-Tuning?}
+    A[Initialize Model & Data] --> A1[Load DataModule]
+    A1 --> A2[Create Model Instance]
+    A2 --> A3[Configure Optimizer]
+    A3 --> B{Auto-Tuning?}
+    
     B -->|Yes| C[Find LR & Batch Size]
-    B -->|No| D[Start Training]
-    C --> D
-    D --> E[Training Loop]
-    E --> F[Forward Pass]
-    F --> G[Compute Loss]
-    G --> H[Backward Pass]
-    H --> I[Update Weights]
-    I --> J{Validation?}
+    C --> C1[LR Range Test]
+    C1 --> C2[Batch Size Finder]
+    C2 --> C3[Apply Best Values]
+    C3 --> D[Start Training]
+    
+    B -->|No| D
+    D --> D1[Setup Epoch Loop]
+    D1 --> E[Training Loop]
+    
+    E --> E1[Load Batch]
+    E1 --> E2[Move to Device]
+    E2 --> F[Forward Pass]
+    F --> F1[Model Prediction]
+    F1 --> G[Compute Loss]
+    
+    G --> G1[Calculate Task Loss]
+    G1 --> G2[Apply Regularization]
+    G2 --> H[Backward Pass]
+    
+    H --> H1[Compute Gradients]
+    H1 --> H2[Gradient Clipping]
+    H2 --> I[Update Weights]
+    
+    I --> I1[Optimizer Step]
+    I1 --> I2[Scheduler Step]
+    I2 --> I3[Zero Gradients]
+    I3 --> J{Validation?}
+    
     J -->|Every N epochs| K[Validation Loop]
-    K --> L[Compute Metrics]
-    L --> M{Save Checkpoint?}
+    K --> K1[Disable Gradients]
+    K1 --> K2[Evaluate Batches]
+    K2 --> L[Compute Metrics]
+    
+    L --> L1[Aggregate Results]
+    L1 --> L2[Log Metrics]
+    L2 --> M{Save Checkpoint?}
+    
     M -->|Best metric| N[Save Model]
-    M -->|No| O{Continue?}
+    N --> N1[Save Weights]
+    N1 --> N2[Save Optimizer State]
+    N2 --> N3[Save Hyperparameters]
+    N3 --> O{Continue?}
+    
+    M -->|No| O
     J -->|No| O
-    N --> O
     O -->|More epochs| E
     O -->|Done| P[Test Model]
-    P --> Q[Final Metrics]
+    
+    P --> P1[Load Best Checkpoint]
+    P1 --> P2[Evaluate Test Set]
+    P2 --> Q[Final Metrics]
+    Q --> Q1[Generate Reports]
+    Q1 --> Q2[Save Results]
     
     style A fill:#2196F3,stroke:#1976D2,color:#fff
     style C fill:#42A5F5,stroke:#1976D2,color:#fff
     style E fill:#2196F3,stroke:#1976D2,color:#fff
-    style K fill:#42A5F5,stroke:#1976D2,color:#fff
-    style N fill:#2196F3,stroke:#1976D2,color:#fff
-    style P fill:#42A5F5,stroke:#1976D2,color:#fff
+    style G fill:#42A5F5,stroke:#1976D2,color:#fff
+    style K fill:#2196F3,stroke:#1976D2,color:#fff
+    style N fill:#42A5F5,stroke:#1976D2,color:#fff
+    style P fill:#2196F3,stroke:#1976D2,color:#fff
+    style Q fill:#42A5F5,stroke:#1976D2,color:#fff
 ```
 
 ## AutoTrainer

@@ -6,25 +6,57 @@ This page demonstrates image classification tasks using AutoTimm.
 
 ```mermaid
 graph TD
-    A[Dataset] --> B[ImageDataModule]
+    A[Dataset] --> A1[Download/Locate]
+    A1 --> A2[Verify Structure]
+    A2 --> B[ImageDataModule]
+    B --> B1[Configure Transforms]
+    B1 --> B2[Setup DataLoaders]
     
-    C[Backbone] --> D[ImageClassifier]
-    E[MetricConfig] --> F[MetricManager]
-    F --> D
+    C[Backbone] --> C1[Select Architecture]
+    C1 --> C2[Load Pretrained]
+    C2 --> D[ImageClassifier]
+    D --> D1[Add Task Head]
     
-    B --> G[AutoTrainer]
+    E[MetricConfig] --> E1[Choose Metrics]
+    E1 --> E2[Set Parameters]
+    E2 --> F[MetricManager]
+    F --> F1[Initialize Metrics]
+    F1 --> D
+    
+    B2 --> G[AutoTrainer]
     D --> G
-    H[LoggerConfig] --> G
+    H[LoggerConfig] --> H1[Configure Backend]
+    H1 --> H2[Set Parameters]
+    H2 --> G
     
-    G --> I[Training]
-    I --> J[Validation]
-    J --> K[Testing]
-    K --> L[Results]
+    G --> G1[Setup Callbacks]
+    G1 --> G2[Configure GPUs]
+    G2 --> I[Training]
+    
+    I --> I1[Training Loop]
+    I1 --> I2[Log Metrics]
+    I2 --> I3[Save Checkpoints]
+    I3 --> J[Validation]
+    
+    J --> J1[Compute Metrics]
+    J1 --> J2[Early Stopping Check]
+    J2 --> J3{Continue?}
+    J3 -->|Yes| I1
+    J3 -->|No| K[Testing]
+    
+    K --> K1[Load Best Model]
+    K1 --> K2[Test Evaluation]
+    K2 --> L[Results]
+    L --> L1[Generate Reports]
+    L1 --> L2[Save Predictions]
+    L2 --> L3[Plot Metrics]
     
     style B fill:#2196F3,stroke:#1976D2,color:#fff
     style D fill:#42A5F5,stroke:#1976D2,color:#fff
     style F fill:#2196F3,stroke:#1976D2,color:#fff
     style G fill:#42A5F5,stroke:#1976D2,color:#fff
+    style I fill:#2196F3,stroke:#1976D2,color:#fff
+    style K fill:#42A5F5,stroke:#1976D2,color:#fff
     style L fill:#2196F3,stroke:#1976D2,color:#fff
 ```
 

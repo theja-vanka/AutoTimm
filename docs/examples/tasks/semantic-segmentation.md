@@ -6,40 +6,92 @@ Complete examples for training semantic segmentation models with AutoTimm.
 
 ```mermaid
 graph TD
-    A[Input Image] --> B[Backbone]
+    A[Input Image] --> A1[Preprocess]
+    A1 --> A2[Resize to H×W]
+    A2 --> A3[Normalize]
+    A3 --> B[Backbone]
     
-    B --> C{Head Type}
+    B --> B1[Extract Features]
+    B1 --> B2[Multi-scale Features]
+    B2 --> B3[Feature Maps]
+    B3 --> C{Head Type}
     
     C -->|DeepLabV3+| D1[ASPP Module]
+    D1 --> D1a[1×1 Conv]
+    D1a --> D1b[3×3 Atrous Conv (r=6)]
+    D1b --> D1c[3×3 Atrous Conv (r=12)]
+    D1c --> D1d[3×3 Atrous Conv (r=18)]
+    D1d --> D1e[Global Pooling]
+    D1e --> D1f[Concatenate]
+    D1f --> E1[Decoder]
+    E1 --> E1a[Upsample 4×]
+    E1a --> E1b[Concat Low-level]
+    E1b --> E1c[Conv Layers]
+    E1c --> E1d[Upsample to Input]
+    
     C -->|FCN| D2[FCN Head]
+    D2 --> D2a[Conv Layers]
+    D2a --> D2b[1×1 Conv]
+    D2b --> D2c[Upsample]
+    D2c --> F
+    
     C -->|UPerNet| D3[UPerNet Head]
+    D3 --> D3a[PPM Module]
+    D3a --> D3b[FPN Decoder]
+    D3b --> D3c[Multi-scale Fusion]
+    D3c --> F
     
-    D1 --> E1[Decoder]
-    E1 --> F[Segmentation Map]
+    E1d --> F[Segmentation Map]
     
-    D2 --> F
-    D3 --> F
-    
-    F --> G{Loss}
+    F --> F1[Per-pixel Logits]
+    F1 --> F2[Softmax]
+    F2 --> F3[Class Predictions]
+    F3 --> G{Loss}
     
     G --> H1[Cross-Entropy]
+    H1 --> H1a[Pixel-wise CE]
+    H1a --> H1b[Class Weighting]
+    
     G --> H2[Dice Loss]
+    H2 --> H2a[Per-class Dice]
+    H2a --> H2b[Average Dice]
     
-    H1 --> I[Combined Loss]
-    H2 --> I
+    H1b --> I[Combined Loss]
+    H2b --> I
     
-    I --> J[Backprop]
+    I --> I1[Weighted Sum]
+    I1 --> I2[Total Loss]
+    I2 --> J[Backprop]
     
-    F --> K{Metrics}
+    J --> J1[Compute Gradients]
+    J1 --> J2[Update Weights]
+    
+    F3 --> K{Metrics}
     K --> L1[mIoU]
+    L1 --> L1a[Per-class IoU]
+    L1a --> L1b[Mean IoU]
+    
     K --> L2[Pixel Accuracy]
+    L2 --> L2a[Correct Pixels]
+    L2a --> L2b[Total Pixels]
+    
     K --> L3[Dice Score]
+    L3 --> L3a[Per-class Dice]
+    L3a --> L3b[Macro Average]
+    
+    L1b --> M[Evaluation]
+    L2b --> M
+    L3b --> M
+    M --> M1[Aggregate Metrics]
+    M1 --> M2[Generate Report]
     
     style A fill:#2196F3,stroke:#1976D2,color:#fff
     style B fill:#42A5F5,stroke:#1976D2,color:#fff
     style D1 fill:#2196F3,stroke:#1976D2,color:#fff
-    style F fill:#42A5F5,stroke:#1976D2,color:#fff
-    style I fill:#2196F3,stroke:#1976D2,color:#fff
+    style D2 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style F fill:#2196F3,stroke:#1976D2,color:#fff
+    style I fill:#42A5F5,stroke:#1976D2,color:#fff
+    style K fill:#2196F3,stroke:#1976D2,color:#fff
 ```
 
 ## Basic Example: Cityscapes

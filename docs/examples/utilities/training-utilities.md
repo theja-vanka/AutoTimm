@@ -6,28 +6,68 @@ This page demonstrates training optimization utilities including auto-tuning and
 
 ```mermaid
 graph TD
-    A[Training Config] --> B{Optimizations}
+    A[Training Config] --> A1[Define Hyperparams]
+    A1 --> A2[Set Requirements]
+    A2 --> B{Optimizations}
     
     B -->|Auto-tuning| C1[LR Finder]
+    C1 --> C1a[Range Test]
+    C1a --> C1b[Plot Loss Curve]
+    C1b --> C1c[Select Optimal LR]
+    
     B -->|Auto-tuning| C2[Batch Size Finder]
+    C2 --> C2a[Binary Search]
+    C2a --> C2b[Test Memory]
+    C2b --> C2c[Find Max Batch Size]
+    
     B -->|Multi-GPU| C3[DDP Strategy]
+    C3 --> C3a[Initialize Process Group]
+    C3a --> C3b[Distribute Model]
+    C3b --> C3c[Sync Gradients]
+    
     B -->|Precision| C4[Mixed Precision]
+    C4 --> C4a[FP16/BF16]
+    C4a --> C4b[Loss Scaling]
+    C4b --> C4c[Autocast]
+    
     B -->|Memory| C5[Gradient Accumulation]
+    C5 --> C5a[Accumulate Steps]
+    C5a --> C5b[Delayed Update]
+    C5b --> C5c[Effective Batch]
     
-    C1 --> D[Optimal LR]
-    C2 --> E[Optimal Batch Size]
-    C3 --> F[Parallel Training]
-    C4 --> G[Faster Training]
-    C5 --> H[Larger Effective Batch]
+    C1c --> D[Optimal LR]
+    D --> D1[Set Learning Rate]
+    D1 --> D2[Configure Optimizer]
     
-    D --> I[Better Convergence]
-    E --> I
-    F --> J[Faster Training]
-    G --> J
-    H --> I
+    C2c --> E[Optimal Batch Size]
+    E --> E1[Set Batch Size]
+    E1 --> E2[Configure DataLoader]
+    
+    C3c --> F[Parallel Training]
+    F --> F1[Multi-GPU Speedup]
+    F1 --> F2[Reduced Time]
+    
+    C4c --> G[Faster Training]
+    G --> G1[Lower Memory]
+    G1 --> G2[Faster Computation]
+    
+    C5c --> H[Larger Effective Batch]
+    H --> H1[Better Gradients]
+    H1 --> H2[Stable Training]
+    
+    D2 --> I[Better Convergence]
+    E2 --> I
+    H2 --> I
+    
+    F2 --> J[Faster Training]
+    G2 --> J
     
     I --> K[Final Model]
     J --> K
+    
+    K --> K1[Optimized Training]
+    K1 --> K2[Best Performance]
+    K2 --> K3[Production Ready]
     
     style A fill:#2196F3,stroke:#1976D2,color:#fff
     style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
@@ -35,6 +75,8 @@ graph TD
     style C3 fill:#42A5F5,stroke:#1976D2,color:#fff
     style C4 fill:#2196F3,stroke:#1976D2,color:#fff
     style C5 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style I fill:#2196F3,stroke:#1976D2,color:#fff
+    style J fill:#42A5F5,stroke:#1976D2,color:#fff
     style K fill:#2196F3,stroke:#1976D2,color:#fff
 ```
 

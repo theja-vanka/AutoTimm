@@ -9,7 +9,11 @@ import pytorch_lightning as pl
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-from autotimm.data.detection_dataset import COCODetectionDataset, detection_collate_fn
+from autotimm.data.detection_dataset import (
+    COCODetectionDataset,
+    CSVDetectionDataset,
+    detection_collate_fn,
+)
 from autotimm.data.detection_transforms import (
     detection_eval_transforms,
     get_detection_transforms,
@@ -18,9 +22,11 @@ from autotimm.data.transform_config import TransformConfig
 
 
 class DetectionDataModule(pl.LightningDataModule):
-    """Lightning data module for object detection with COCO-format annotations.
+    """Lightning data module for object detection.
 
-    Expects COCO-style directory structure::
+    Supports two modes:
+
+    1. **COCO mode** (default) -- expects COCO-style directory structure::
 
         data_dir/
           train2017/           # Training images
@@ -29,7 +35,8 @@ class DetectionDataModule(pl.LightningDataModule):
             instances_train2017.json
             instances_val2017.json
 
-    Or custom paths can be provided via constructor arguments.
+    2. **CSV mode** -- provide ``train_csv`` pointing to a CSV file with
+       columns ``image_path,x_min,y_min,x_max,y_max,label``.
 
     Parameters:
         data_dir: Root directory containing images and annotations.
@@ -41,6 +48,13 @@ class DetectionDataModule(pl.LightningDataModule):
             data_dir/annotations/instances_val2017.json.
         test_images_dir: Optional path to test images.
         test_ann_file: Optional path to test annotations.
+        train_csv: Path to training CSV file (CSV mode).
+        val_csv: Path to validation CSV file (CSV mode).
+        test_csv: Path to test CSV file (CSV mode).
+        image_dir: Root directory for resolving image paths in CSV mode.
+        image_column: CSV column name for image paths.
+        bbox_columns: CSV column names for bbox coordinates.
+        label_column: CSV column name for class labels.
         image_size: Target image size (square).
         batch_size: Batch size for all dataloaders.
         num_workers: Number of data-loading workers.
@@ -69,6 +83,13 @@ class DetectionDataModule(pl.LightningDataModule):
         val_ann_file: str | Path | None = None,
         test_images_dir: str | Path | None = None,
         test_ann_file: str | Path | None = None,
+        train_csv: str | Path | None = None,
+        val_csv: str | Path | None = None,
+        test_csv: str | Path | None = None,
+        image_dir: str | Path | None = None,
+        image_column: str = "image_path",
+        bbox_columns: list[str] | None = None,
+        label_column: str = "label",
         image_size: int = 640,
         batch_size: int = 16,
         num_workers: int = 4,
@@ -87,6 +108,13 @@ class DetectionDataModule(pl.LightningDataModule):
         self.save_hyperparameters()
 
         self.data_dir = Path(data_dir)
+        self.train_csv = Path(train_csv) if train_csv else None
+        self.val_csv = Path(val_csv) if val_csv else None
+        self.test_csv = Path(test_csv) if test_csv else None
+        self.image_dir = Path(image_dir) if image_dir else None
+        self.image_column = image_column
+        self.bbox_columns = bbox_columns
+        self.label_column = label_column
         self.image_size = image_size
         self.batch_size = batch_size
         self.num_workers = num_workers
@@ -155,6 +183,56 @@ class DetectionDataModule(pl.LightningDataModule):
         self.class_names: list[str] | None = None
 
     def setup(self, stage: str | None = None) -> None:
+        if self.train_csv is not None:
+            self._setup_csv(stage)
+        else:
+            self._setup_coco(stage)
+
+        # Automatically print data summary
+        self._print_summary()
+
+    def _setup_csv(self, stage: str | None) -> None:
+        img_dir = self.image_dir or self.train_csv.parent
+
+        if stage in ("fit", None):
+            self.train_dataset = CSVDetectionDataset(
+                csv_path=self.train_csv,
+                image_dir=img_dir,
+                image_column=self.image_column,
+                bbox_columns=self.bbox_columns,
+                label_column=self.label_column,
+                transform=self.train_transforms,
+                min_bbox_area=self.min_bbox_area,
+            )
+            self.num_classes = self.train_dataset.num_classes
+            self.class_names = self.train_dataset.class_names
+
+            if self.val_csv is not None:
+                self.val_dataset = CSVDetectionDataset(
+                    csv_path=self.val_csv,
+                    image_dir=img_dir,
+                    image_column=self.image_column,
+                    bbox_columns=self.bbox_columns,
+                    label_column=self.label_column,
+                    transform=self.eval_transforms,
+                    min_bbox_area=0.0,
+                )
+
+        if stage in ("test", None) and self.test_csv is not None:
+            self.test_dataset = CSVDetectionDataset(
+                csv_path=self.test_csv,
+                image_dir=img_dir,
+                image_column=self.image_column,
+                bbox_columns=self.bbox_columns,
+                label_column=self.label_column,
+                transform=self.eval_transforms,
+                min_bbox_area=0.0,
+            )
+            if self.num_classes is None:
+                self.num_classes = self.test_dataset.num_classes
+                self.class_names = self.test_dataset.class_names
+
+    def _setup_coco(self, stage: str | None) -> None:
         if stage in ("fit", None):
             self.train_dataset = COCODetectionDataset(
                 images_dir=self.train_images_dir,
@@ -195,9 +273,6 @@ class DetectionDataModule(pl.LightningDataModule):
             )
             self.num_classes = self.val_dataset.num_classes
             self.class_names = self.val_dataset.class_names
-
-        # Automatically print data summary
-        self._print_summary()
 
     def _print_summary(self) -> None:
         """Print data summary automatically after setup."""

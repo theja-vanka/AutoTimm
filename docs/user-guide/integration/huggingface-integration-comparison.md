@@ -6,30 +6,62 @@ This guide compares the different approaches for using HuggingFace models with A
 
 ```mermaid
 graph TD
-    A[HuggingFace Models] --> B{Integration Type}
+    A[HuggingFace Models] --> A1[Access Model Zoo]
+    A1 --> A2[Choose Integration]
+    A2 --> B{Integration Type}
     
     B -->|Option 1| C[HF Hub timm]
+    C --> C1[Search timm Models]
+    C1 --> C2[hf-hub:timm/model]
+    C2 --> F1[timm + hf_hub]
+    F1 --> F1a[Load Pretrained]
+    F1a --> F1b[timm.create_model]
+    F1b --> G1[ImageClassifier]
+    
+    G1 --> G1a[Pass backbone]
+    G1a --> G1b[Add Task Head]
+    G1b --> G1c[Configure Metrics]
+    G1c --> H1[AutoTrainer ✓]
+    H1 --> H1a[Full Integration]
+    H1a --> H1b[Easy Training]
+    
     B -->|Option 2| D[HF Transformers Direct]
+    D --> D1[Import Specific Model]
+    D1 --> D2[ViTModel/DeiTModel]
+    D2 --> F2[transformers]
+    F2 --> F2a[Load Config]
+    F2a --> F2b[Initialize Model]
+    F2b --> G2[Custom LightningModule]
+    
+    G2 --> G2a[Define training_step]
+    G2a --> G2b[Define configure_optimizers]
+    G2b --> G2c[Add Task Head]
+    G2c --> H2[AutoTrainer ✓]
+    H2 --> H2a[Flexible Control]
+    H2a --> H2b[Manual Setup]
+    
     B -->|Option 3| E[HF Auto Classes]
+    E --> E1[Generic Interface]
+    E1 --> E2[AutoModel/AutoConfig]
+    E2 --> F3[transformers]
+    F3 --> F3a[Auto Detection]
+    F3a --> F3b[Load Model]
+    F3b --> G3[Custom LightningModule]
     
-    C --> F1[timm + hf_hub]
-    C --> G1[ImageClassifier]
-    G1 --> H1[AutoTrainer ✓]
-    
-    D --> F2[transformers]
-    D --> G2[Custom LightningModule]
-    G2 --> H2[AutoTrainer ✓]
-    
-    E --> F3[transformers]
-    E --> G3[Custom LightningModule]
-    G3 --> H3[AutoTrainer ✓]
+    G3 --> G3a[Define training_step]
+    G3a --> G3b[Define configure_optimizers]
+    G3b --> G3c[Add Task Head]
+    G3c --> H3[AutoTrainer ✓]
+    H3 --> H3a[Quick Prototyping]
+    H3a --> H3b[Less Control]
     
     style C fill:#2196F3,stroke:#1976D2,color:#fff
     style D fill:#42A5F5,stroke:#1976D2,color:#fff
     style E fill:#2196F3,stroke:#1976D2,color:#fff
-    style H1 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style G1 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style H1 fill:#2196F3,stroke:#1976D2,color:#fff
     style H2 fill:#42A5F5,stroke:#1976D2,color:#fff
-    style H3 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style H3 fill:#2196F3,stroke:#1976D2,color:#fff
 ```
 
 ## Quick Reference

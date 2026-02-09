@@ -11,6 +11,7 @@ from torch.utils.data import DataLoader
 
 from autotimm.data.instance_dataset import (
     COCOInstanceDataset,
+    CSVInstanceDataset,
     collate_instance_segmentation,
 )
 from autotimm.data.segmentation_transforms import instance_segmentation_transforms
@@ -19,6 +20,12 @@ from autotimm.data.transform_config import TransformConfig
 
 class InstanceSegmentationDataModule(pl.LightningDataModule):
     """PyTorch Lightning DataModule for instance segmentation.
+
+    Supports two modes:
+
+    1. **COCO mode** (default) -- expects COCO-format annotations.
+    2. **CSV mode** -- provide ``train_csv`` pointing to a CSV file with
+       columns ``image_path,x_min,y_min,x_max,y_max,label,mask_path``.
 
     Args:
         data_dir: Root directory of COCO dataset
@@ -33,11 +40,19 @@ class InstanceSegmentationDataModule(pl.LightningDataModule):
         transform_config: Optional TransformConfig for unified transform configuration.
             When provided along with backbone, uses model-specific normalization.
         backbone: Optional backbone name or module for model-specific normalization.
+        train_csv: Path to training CSV file (CSV mode).
+        val_csv: Path to validation CSV file (CSV mode).
+        test_csv: Path to test CSV file (CSV mode).
+        image_dir: Root directory for resolving image/mask paths in CSV mode.
+        image_column: CSV column name for image paths.
+        bbox_columns: CSV column names for bbox coordinates.
+        label_column: CSV column name for class labels.
+        mask_column: CSV column name for mask file paths.
     """
 
     def __init__(
         self,
-        data_dir: str | Path,
+        data_dir: str | Path = ".",
         image_size: int = 640,
         batch_size: int = 4,
         num_workers: int = 4,
@@ -48,9 +63,25 @@ class InstanceSegmentationDataModule(pl.LightningDataModule):
         min_area: float = 0.0,
         transform_config: TransformConfig | None = None,
         backbone: str | nn.Module | None = None,
+        train_csv: str | Path | None = None,
+        val_csv: str | Path | None = None,
+        test_csv: str | Path | None = None,
+        image_dir: str | Path | None = None,
+        image_column: str = "image_path",
+        bbox_columns: list[str] | None = None,
+        label_column: str = "label",
+        mask_column: str = "mask_path",
     ):
         super().__init__()
         self.data_dir = Path(data_dir)
+        self.train_csv = Path(train_csv) if train_csv else None
+        self.val_csv = Path(val_csv) if val_csv else None
+        self.test_csv = Path(test_csv) if test_csv else None
+        self.image_dir = Path(image_dir) if image_dir else None
+        self.image_column = image_column
+        self.bbox_columns = bbox_columns
+        self.label_column = label_column
+        self.mask_column = mask_column
         self.image_size = image_size
         self.batch_size = batch_size
         self.num_workers = num_workers
@@ -112,6 +143,62 @@ class InstanceSegmentationDataModule(pl.LightningDataModule):
                 )
 
         # Setup datasets based on stage
+        if self.train_csv is not None:
+            self._setup_csv(stage, train_transforms, val_transforms)
+        else:
+            self._setup_coco(stage, train_transforms, val_transforms)
+
+        # Automatically print data summary
+        self._print_summary()
+
+    def _setup_csv(self, stage, train_transforms, val_transforms):
+        img_dir = self.image_dir or self.train_csv.parent
+
+        if stage == "fit" or stage is None:
+            self.train_dataset = CSVInstanceDataset(
+                csv_path=self.train_csv,
+                image_dir=img_dir,
+                image_column=self.image_column,
+                bbox_columns=self.bbox_columns,
+                label_column=self.label_column,
+                mask_column=self.mask_column,
+                transform=train_transforms,
+            )
+
+            if self.val_csv is not None:
+                self.val_dataset = CSVInstanceDataset(
+                    csv_path=self.val_csv,
+                    image_dir=img_dir,
+                    image_column=self.image_column,
+                    bbox_columns=self.bbox_columns,
+                    label_column=self.label_column,
+                    mask_column=self.mask_column,
+                    transform=val_transforms,
+                )
+
+        if stage == "validate" and self.val_csv is not None:
+            self.val_dataset = CSVInstanceDataset(
+                csv_path=self.val_csv,
+                image_dir=img_dir,
+                image_column=self.image_column,
+                bbox_columns=self.bbox_columns,
+                label_column=self.label_column,
+                mask_column=self.mask_column,
+                transform=val_transforms,
+            )
+
+        if stage == "test" and self.test_csv is not None:
+            self.test_dataset = CSVInstanceDataset(
+                csv_path=self.test_csv,
+                image_dir=img_dir,
+                image_column=self.image_column,
+                bbox_columns=self.bbox_columns,
+                label_column=self.label_column,
+                mask_column=self.mask_column,
+                transform=val_transforms,
+            )
+
+    def _setup_coco(self, stage, train_transforms, val_transforms):
         if stage == "fit" or stage is None:
             self.train_dataset = COCOInstanceDataset(
                 data_dir=self.data_dir,
@@ -121,7 +208,6 @@ class InstanceSegmentationDataModule(pl.LightningDataModule):
                 min_area=self.min_area,
             )
 
-            # Try to load validation set
             try:
                 self.val_dataset = COCOInstanceDataset(
                     data_dir=self.data_dir,
@@ -131,7 +217,6 @@ class InstanceSegmentationDataModule(pl.LightningDataModule):
                     min_area=self.min_area,
                 )
             except FileNotFoundError:
-                # No validation set available
                 self.val_dataset = None
 
         if stage == "validate":
@@ -151,9 +236,6 @@ class InstanceSegmentationDataModule(pl.LightningDataModule):
                 min_keypoints=self.min_keypoints,
                 min_area=self.min_area,
             )
-
-        # Automatically print data summary
-        self._print_summary()
 
     def _print_summary(self) -> None:
         """Print data summary automatically after setup."""

@@ -9,20 +9,45 @@ AutoTimm lets you train image classifiers, object detectors, and segmentation mo
 
 ```mermaid
 graph TD
-    A[Data] -->|ImageDataModule| B[Model]
-    B -->|ImageClassifier<br/>ObjectDetector<br/>SemanticSegmentor| C[Trainer]
-    C -->|AutoTrainer| D[Training]
-    D --> E{Evaluate}
-    E -->|Metrics| F[Deploy]
-    F -->|TorchScript<br/>ONNX| G[Production]
+    A[Raw Data] --> A1[Data Preprocessing]
+    A1 -->|ImageDataModule| A2[Transforms & Augmentation]
+    A2 --> A3[DataLoaders]
+    
+    A3 --> B[Select Backbone]
+    B --> B1[Choose from 1000+ timm models]
+    B1 --> B2[Build Model]
+    B2 -->|ImageClassifier<br/>ObjectDetector<br/>SemanticSegmentor| C[Configure Training]
+    
+    C --> C1[Set Hyperparameters]
+    C1 -->|AutoTrainer| C2[Initialize Callbacks]
+    C2 --> D[Training Loop]
+    
+    D --> D1[Forward Pass]
+    D1 --> D2[Loss Calculation]
+    D2 --> D3[Backward Pass]
+    D3 --> D4[Weight Update]
+    D4 --> E{Validation}
+    
+    E -->|Compute Metrics| E1[Accuracy/mAP/IoU]
+    E1 --> E2[Save Best Model]
+    E2 --> E3{Training Complete?}
+    E3 -->|No| D
+    E3 -->|Yes| F[Test Model]
+    
+    F --> F1[Final Metrics]
+    F1 --> G[Export Model]
+    G -->|TorchScript<br/>ONNX<br/>TensorRT| H[Production Deployment]
     
     style A fill:#2196F3,stroke:#1976D2,color:#fff
-    style B fill:#42A5F5,stroke:#1976D2,color:#fff
-    style C fill:#2196F3,stroke:#1976D2,color:#fff
-    style D fill:#42A5F5,stroke:#1976D2,color:#fff
-    style E fill:#2196F3,stroke:#1976D2,color:#fff
-    style F fill:#42A5F5,stroke:#1976D2,color:#fff
+    style A2 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style B1 fill:#2196F3,stroke:#1976D2,color:#fff
+    style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style D fill:#2196F3,stroke:#1976D2,color:#fff
+    style D2 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style E1 fill:#2196F3,stroke:#1976D2,color:#fff
+    style F1 fill:#42A5F5,stroke:#1976D2,color:#fff
     style G fill:#2196F3,stroke:#1976D2,color:#fff
+    style H fill:#42A5F5,stroke:#1976D2,color:#fff
 ```
 
 ## Features

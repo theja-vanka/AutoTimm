@@ -1,47 +1,97 @@
 # Object Detection Data
 
-The `DetectionDataModule` handles object detection datasets in COCO format, including support for custom annotations, class filtering, and detection-specific augmentations.
+The `DetectionDataModule` handles object detection datasets in COCO format and [CSV format](csv-data.md#object-detection), including support for custom annotations, class filtering, and detection-specific augmentations.
 
 ## Detection Data Pipeline
 
 ```mermaid
 graph TD
-    A[COCO Dataset] --> B[Annotations JSON]
-    A --> C[Images]
+    A[COCO Dataset] --> A1[Locate Directory]
+    A1 --> A2[Load Config]
+    A2 --> B[Annotations JSON]
+    A --> A3[Verify Structure]
+    A3 --> C[Images]
     
-    B --> D[Parse Annotations]
-    C --> D
+    B --> B1[Parse JSON]
+    B1 --> B2[Extract Metadata]
+    B2 --> B3[Load Annotations]
+    B3 --> D[Parse Annotations]
     
-    D --> E{Preprocessing}
+    C --> C1[List Images]
+    C1 --> C2[Verify Paths]
+    C2 --> D
+    
+    D --> D1[Create Mappings]
+    D1 --> D2[Image ID to Annotations]
+    D2 --> D3[Category ID to Names]
+    D3 --> E{Preprocessing}
     
     E --> F1[Filter Classes]
+    F1 --> F1a[Select Categories]
+    F1a --> F1b[Remap IDs]
+    
     E --> F2[Min Bbox Area]
+    F2 --> F2a[Calculate Areas]
+    F2a --> F2b[Filter Small Boxes]
+    
     E --> F3[Min Visibility]
+    F3 --> F3a[Check Occlusion]
+    F3a --> F3b[Filter Occluded]
     
-    F1 --> G[DetectionDataModule]
-    F2 --> G
-    F3 --> G
+    F1b --> G[DetectionDataModule]
+    F2b --> G
+    F3b --> G
     
-    G --> H{Augmentation}
+    G --> G1[Initialize Module]
+    G1 --> G2[Create Dataset]
+    G2 --> G3[Setup Splits]
+    G3 --> H{Augmentation}
     
     H -->|Train| I1[Preset: strong]
+    I1 --> I1a[HorizontalFlip]
+    I1a --> I1b[ShiftScaleRotate]
+    I1b --> I1c[RandomBrightnessContrast]
+    
     H -->|Val/Test| I2[Resize + Normalize]
+    I2 --> I2a[Resize]
+    I2a --> I2b[Normalize]
     
-    I1 --> J[Bbox Transform]
-    I2 --> K[Collate]
+    I1c --> J[Bbox Transform]
+    J --> J1[Adjust Coordinates]
+    J1 --> J2[Clip to Image]
+    J2 --> J3[Validate Boxes]
     
-    J --> L[Random Crop]
-    L --> M[Flip]
-    M --> N[Affine]
-    N --> K
+    I2b --> K[Collate]
+    J3 --> L[Random Crop]
     
-    K --> O[Batch]
-    O --> P[Images + Boxes + Labels]
+    L --> L1[Calculate Crop]
+    L1 --> L2[Adjust Boxes]
+    L2 --> M[Flip]
+    
+    M --> M1[Horizontal Flip]
+    M1 --> M2[Update Coordinates]
+    M2 --> N[Affine]
+    
+    N --> N1[Apply Transform]
+    N1 --> N2[Update Boxes]
+    N2 --> K
+    
+    K --> K1[Pad to Max Size]
+    K1 --> K2[Stack Tensors]
+    K2 --> O[Batch]
+    
+    O --> O1[Batched Images]
+    O --> O2[Batched Boxes]
+    O --> O3[Batched Labels]
+    O1 --> P[Images + Boxes + Labels]
+    O2 --> P
+    O3 --> P
+    P --> P1[Ready for Model]
     
     style A fill:#2196F3,stroke:#1976D2,color:#fff
     style D fill:#42A5F5,stroke:#1976D2,color:#fff
     style G fill:#2196F3,stroke:#1976D2,color:#fff
-    style J fill:#42A5F5,stroke:#1976D2,color:#fff
+    style I1 fill:#42A5F5,stroke:#1976D2,color:#fff
     style K fill:#2196F3,stroke:#1976D2,color:#fff
     style P fill:#42A5F5,stroke:#1976D2,color:#fff
 ```
@@ -414,6 +464,7 @@ To use your own COCO-format dataset:
 
 ## See Also
 
+- [CSV Data Loading](csv-data.md#object-detection) - Load detection data from CSV files
 - [Image Classification Data](image-classification-data.md) - For classification datasets
 - [Object Detection Examples](../../examples/tasks/object-detection.md) - More examples and use cases
 - [Training Guide](../training/training.md) - How to train detection models

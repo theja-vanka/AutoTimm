@@ -5,12 +5,40 @@ The [`examples/`](https://github.com/theja-vanka/AutoTimm/tree/main/examples) di
 ## Examples Organization
 
 ```mermaid
-graph LR
+graph TD
     A[AutoTimm Examples] --> B[Getting Started]
     A --> C[Computer Vision]
     A --> D[HuggingFace Hub]
     A --> E[Training & Optimization]
     A --> F[Model Understanding]
+
+    B --> B1[Basic Classification]
+    B --> B2[Quick Start Guide]
+    B --> B3[Data Loading]
+    B --> B4[Model Selection]
+    
+    C --> C1[Image Classification]
+    C --> C2[Object Detection]
+    C --> C3[Segmentation]
+    C --> C4[Instance Segmentation]
+    C --> C5[Multi-task Learning]
+    
+    D --> D1[Model Loading]
+    D --> D2[Hub Integration]
+    D --> D3[Custom Models]
+    D --> D4[Model Sharing]
+    
+    E --> E1[Hyperparameter Tuning]
+    E --> E2[Auto-tuning]
+    E --> E3[Multi-GPU Training]
+    E --> E4[Mixed Precision]
+    E --> E5[Custom Callbacks]
+    
+    F --> F1[GradCAM]
+    F --> F2[Attention Visualization]
+    F --> F3[Feature Maps]
+    F --> F4[Model Profiling]
+    F --> F5[Error Analysis]
 
     style A fill:#2196F3,stroke:#1976D2,color:#fff
     style B fill:#42A5F5,stroke:#1976D2,color:#fff
@@ -18,6 +46,8 @@ graph LR
     style D fill:#42A5F5,stroke:#1976D2,color:#fff
     style E fill:#2196F3,stroke:#1976D2,color:#fff
     style F fill:#42A5F5,stroke:#1976D2,color:#fff
+    style B1 fill:#E3F2FD
+    style C1 fill:#E3F2FD
 ```
 
 ## Quick Reference
@@ -110,6 +140,10 @@ graph LR
 | [`data_training/albumentations_cifar10.py`](utilities/data-handling.md#albumentations-strong-augmentation) | Albumentations strong augmentation |
 | [`data_training/albumentations_custom_folder.py`](utilities/data-handling.md#custom-albumentations-pipeline) | Custom albumentations pipeline |
 | [`data_training/multilabel_classification.py`](tasks/classification.md#multi-label-classification) | Multi-label classification with CSV data |
+| [`data_training/csv_classification.py`](utilities/csv-data-loading.md#classification) | Classification from CSV files |
+| [`data_training/csv_detection.py`](utilities/csv-data-loading.md#object-detection) | Object detection from CSV annotations |
+| [`data_training/csv_segmentation.py`](utilities/csv-data-loading.md#semantic-segmentation) | Semantic segmentation from CSV |
+| [`data_training/csv_instance_segmentation.py`](utilities/csv-data-loading.md#instance-segmentation) | Instance segmentation from CSV |
 | [`data_training/hf_custom_data.py`](utilities/hf_custom_data.md) | Advanced augmentation, multi-label, validation |
 
 ### ⚙️ Training & Optimization
@@ -184,8 +218,8 @@ Start your journey with CIFAR-10 classification and custom datasets.
 - **Basic Integration** - 8 task-specific examples
 - **Advanced Techniques** - Interpretation, transfer learning, ensemble, deployment (4 examples)
 
-### 📊 Data & Training (10 examples)
-- **Data & Augmentation** - Balanced sampling, augmentation, multi-label (5 examples)
+### 📊 Data & Training (14 examples)
+- **Data & Augmentation** - Balanced sampling, augmentation, multi-label, CSV loading (9 examples)
 - **Training & Optimization** - Auto-tuning, multi-GPU, HPO (5 examples)
 
 ### 🔍 Understanding & Deployment (13 examples)
@@ -193,7 +227,7 @@ Start your journey with CIFAR-10 classification and custom datasets.
 - **Logging & Tracking** - TensorBoard, MLflow, evaluation (3 examples)
 - **Inference & Utilities** - Model inference, multi-label inference, and backbone discovery (4 examples)
 
-**Total: 46 runnable examples**
+**Total: 50 runnable examples**
 
 
 

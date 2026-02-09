@@ -6,12 +6,41 @@ This guide walks you through training your first image classifier with AutoTimm.
 
 ```mermaid
 graph TD
-    A[1. Import] --> B[2. Data]
-    B --> C[3. Metrics]
-    C --> D[4. Model]
-    D --> E[5. Trainer]
-    E --> F[6. Train]
-    F --> G[7. Evaluate]
+    A[1. Import] --> A1[Import AutoTrainer]
+    A1 --> A2[Import ImageClassifier]
+    A2 --> A3[Import ImageDataModule]
+    A3 --> A4[Import MetricConfig]
+    
+    A4 --> B[2. Data]
+    B --> B1[Set data_dir]
+    B1 --> B2[Configure dataset]
+    B2 --> B3[Set image_size & batch_size]
+    B3 --> B4[Setup transforms]
+    
+    B4 --> C[3. Metrics]
+    C --> C1[Create MetricConfig]
+    C1 --> C2[Initialize MetricManager]
+    
+    C2 --> D[4. Model]
+    D --> D1[Select backbone]
+    D1 --> D2[Set num_classes]
+    D2 --> D3[Configure pretrained]
+    D3 --> D4[Add metrics to model]
+    
+    D4 --> E[5. Trainer]
+    E --> E1[Set max_epochs]
+    E1 --> E2[Configure GPUs]
+    E2 --> E3[Setup callbacks]
+    E3 --> E4[Add loggers]
+    
+    E4 --> F[6. Train]
+    F --> F1[trainer.fit]
+    F1 --> F2[Monitor progress]
+    
+    F2 --> G[7. Evaluate]
+    G --> G1[trainer.test]
+    G1 --> G2[View metrics]
+    G2 --> G3[Analyze results]
     
     style A fill:#2196F3,stroke:#1976D2,color:#fff
     style B fill:#42A5F5,stroke:#1976D2,color:#fff

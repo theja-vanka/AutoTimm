@@ -6,30 +6,68 @@ AutoTimm uses explicit metric configuration through `MetricConfig` and `MetricMa
 
 ```mermaid
 graph TD
-    A[MetricConfig] --> B[MetricManager]
-    B --> C[Model Init]
+    A[MetricConfig] --> A1[Set Name]
+    A1 --> A2[Choose Backend]
+    A2 --> A3[Configure Parameters]
+    A3 --> B[MetricManager]
+    B --> B1[Initialize Metrics]
+    B1 --> B2[Setup Collections]
+    B2 --> C[Model Init]
     
-    C --> D{Training Loop}
+    C --> C1[Attach to Model]
+    C1 --> C2[Register Metrics]
+    C2 --> D{Training Loop}
     
     D -->|Step| E1[Compute Metric]
+    E1 --> E1a[Forward Pass]
+    E1a --> E1b[Get Predictions]
+    E1b --> E1c[Update Metric State]
+    E1c --> E1d[Metric Calculation]
+    
     D -->|Epoch End| E2[Aggregate]
+    E2 --> E2a[Compute Over Epoch]
+    E2a --> E2b[Reset State]
     
-    E1 --> F1[Log on Step]
-    E2 --> F2[Log on Epoch]
+    E1d --> F1[Log on Step]
+    F1 --> F1a[Train Metrics]
+    F1a --> F1b[Batch Stats]
     
-    F1 --> G[Logger Backend]
-    F2 --> G
+    E2b --> F2[Log on Epoch]
+    F2 --> F2a[Val Metrics]
+    F2a --> F2b[Test Metrics]
     
-    G -->|TensorBoard| H1[tensorboard/]
-    G -->|W&B| H2[wandb/]
-    G -->|MLflow| H3[mlflow/]
+    F1b --> G[Logger Backend]
+    F2b --> G
+    
+    G --> G1[Format Metrics]
+    G1 --> G2[Add Prefixes]
+    G2 --> H{Distribution}
+    
+    H -->|TensorBoard| H1[tensorboard/]
+    H1 --> H1a[Scalars]
+    H1a --> H1b[Histograms]
+    H1b --> H1c[Images]
+    
+    H -->|W&B| H2[wandb/]
+    H2 --> H2a[Charts]
+    H2a --> H2b[Tables]
+    H2b --> H2c[Artifacts]
+    
+    H -->|MLflow| H3[mlflow/]
+    H3 --> H3a[Experiments]
+    H3a --> H3b[Runs]
+    H3b --> H3c[Parameters]
     
     E2 --> I[Progress Bar]
+    I --> I1[Format Display]
+    I1 --> I2[Update Console]
     
     style A fill:#2196F3,stroke:#1976D2,color:#fff
     style B fill:#42A5F5,stroke:#1976D2,color:#fff
     style D fill:#2196F3,stroke:#1976D2,color:#fff
-    style G fill:#42A5F5,stroke:#1976D2,color:#fff
+    style E1 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style G fill:#2196F3,stroke:#1976D2,color:#fff
+    style H1 fill:#42A5F5,stroke:#1976D2,color:#fff
 ```
 
 ## MetricConfig

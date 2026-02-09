@@ -8,31 +8,61 @@ AutoTimm provides specialized model architectures for different computer vision 
 graph TD
     subgraph Classification
         A[ImageClassifier] --> A1[Backbone<br/>1000+ timm models]
-        A1 --> A2[Classification Head]
-        A2 --> A3[Class Predictions]
+        A1 --> A1a[Feature Extraction]
+        A1a --> A1b[Global Pooling]
+        A1b --> A2[Classification Head]
+        A2 --> A2a[Linear Layer]
+        A2a --> A2b[Dropout]
+        A2b --> A3[Class Predictions]
+        A3 --> A3a[Softmax/Sigmoid]
     end
     
     subgraph Detection
         B[ObjectDetector] --> B1[Backbone<br/>1000+ timm models]
-        B1 --> B2[FPN]
-        B2 --> B3[Detection Head<br/>FCOS/YOLOX]
-        B3 --> B4[Boxes + Classes]
+        B1 --> B1a[Multi-scale Features]
+        B1a --> B2[FPN]
+        B2 --> B2a[Top-down Pathway]
+        B2a --> B2b[Lateral Connections]
+        B2b --> B3[Detection Head<br/>FCOS/YOLOX]
+        B3 --> B3a[Classification Branch]
+        B3 --> B3b[Regression Branch]
+        B3 --> B3c[Centerness Branch]
+        B3a --> B4[Boxes + Classes]
+        B3b --> B4
+        B3c --> B4
+        B4 --> B4a[NMS Filtering]
         
         C[YOLOXDetector] --> C1[CSPDarknet]
-        C1 --> C2[PAFPN]
-        C2 --> C3[YOLOX Head]
-        C3 --> C4[Boxes + Classes]
+        C1 --> C1a[Darknet Backbone]
+        C1a --> C2[PAFPN]
+        C2 --> C2a[Bottom-up Path]
+        C2a --> C2b[Top-down Path]
+        C2b --> C3[YOLOX Head]
+        C3 --> C3a[Decoupled Head]
+        C3a --> C3b[SimOTA Assignment]
+        C3b --> C4[Boxes + Classes]
+        C4 --> C4a[NMS Filtering]
     end
     
     subgraph Segmentation
         D[SemanticSegmentor] --> D1[Backbone<br/>1000+ timm models]
-        D1 --> D2[DeepLabV3+/FCN]
-        D2 --> D3[Pixel Masks]
+        D1 --> D1a[Encoder Features]
+        D1a --> D2[DeepLabV3+/FCN]
+        D2 --> D2a[ASPP/Decoder]
+        D2a --> D2b[Upsampling]
+        D2b --> D3[Pixel Masks]
+        D3 --> D3a[Argmax]
         
         E[InstanceSegmentor] --> E1[Backbone<br/>1000+ timm models]
-        E1 --> E2[FPN]
-        E2 --> E3[Mask Head]
-        E3 --> E4[Instance Masks]
+        E1 --> E1a[Multi-scale Features]
+        E1a --> E2[FPN]
+        E2 --> E2a[Region Proposals]
+        E2a --> E2b[RoI Align]
+        E2b --> E3[Mask Head]
+        E3 --> E3a[Conv Layers]
+        E3a --> E3b[Deconv Layers]
+        E3b --> E4[Instance Masks]
+        E4 --> E4a[Post-processing]
     end
     
     style A fill:#2196F3,stroke:#1976D2,color:#fff
@@ -40,6 +70,11 @@ graph TD
     style C fill:#2196F3,stroke:#1976D2,color:#fff
     style D fill:#42A5F5,stroke:#1976D2,color:#fff
     style E fill:#2196F3,stroke:#1976D2,color:#fff
+    style A1 fill:#E3F2FD
+    style B1 fill:#E3F2FD
+    style C1 fill:#E3F2FD
+    style D1 fill:#E3F2FD
+    style E1 fill:#E3F2FD
 ```
 
 ## Available Models

@@ -6,27 +6,46 @@ This guide covers deploying AutoTimm models to production environments, includin
 
 ```mermaid
 graph TD
-    A[Trained Model] --> B{Deployment Target}
+    A[Trained Model] --> A1[Load Checkpoint]
+    A1 --> A2[Set Eval Mode]
+    A2 --> B{Deployment Target}
     
     B -->|Python/PyTorch| C[TorchScript]
+    C --> C1[torch.jit.script]
+    C1 --> C2[Optimize]
+    C2 --> C3[Save .pt]
+    C3 --> H1[LibTorch C++]
+    C3 --> H2[PyTorch Mobile]
+    
     B -->|Cross-Platform| D[ONNX]
+    D --> D1[torch.onnx.export]
+    D1 --> D2[Simplify Graph]
+    D2 --> D3[Optimize]
+    D3 --> D4[Save .onnx]
+    D4 --> I1[ONNX Runtime]
+    D4 --> I2[OpenVINO]
+    D4 --> I3[TensorRT]
+    
     B -->|NVIDIA GPU| E[TensorRT]
+    E --> E1[Convert to ONNX]
+    E1 --> E2[TensorRT Builder]
+    E2 --> E3[Optimize Layers]
+    E3 --> E4[Save Engine]
+    E4 --> J[Optimized NVIDIA]
+    
     B -->|Mobile| F[Mobile Export]
+    F --> F1[Optimize for Mobile]
+    F1 --> F2[Quantize]
+    F2 --> F3[Package]
+    F3 --> K1[iOS]
+    F3 --> K2[Android]
+    
     B -->|Edge Devices| G[Quantized Models]
-    
-    C --> H1[LibTorch C++]
-    C --> H2[PyTorch Mobile]
-    
-    D --> I1[ONNX Runtime]
-    D --> I2[OpenVINO]
-    D --> I3[TensorRT]
-    
-    E --> J[Optimized NVIDIA]
-    
-    F --> K1[iOS]
-    F --> K2[Android]
-    
-    G --> L[INT8/FP16]
+    G --> G1[Calibration]
+    G1 --> G2[Quantize Weights]
+    G2 --> G3[INT8/FP16]
+    G3 --> G4[Validate Accuracy]
+    G4 --> L[Deploy to Edge]
     
     style A fill:#2196F3,stroke:#1976D2,color:#fff
     style C fill:#42A5F5,stroke:#1976D2,color:#fff
@@ -34,6 +53,11 @@ graph TD
     style E fill:#42A5F5,stroke:#1976D2,color:#fff
     style F fill:#2196F3,stroke:#1976D2,color:#fff
     style G fill:#42A5F5,stroke:#1976D2,color:#fff
+    style H1 fill:#E3F2FD
+    style I1 fill:#E3F2FD
+    style J fill:#E3F2FD
+    style K1 fill:#E3F2FD
+    style L fill:#E3F2FD
 ```
 
 ## Model Export Overview

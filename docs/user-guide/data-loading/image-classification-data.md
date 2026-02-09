@@ -1,45 +1,94 @@
 # Image Classification Data
 
-The `ImageDataModule` handles image classification datasets including built-in datasets (CIFAR, MNIST) and custom folder-structured datasets.
+The `ImageDataModule` handles image classification datasets including built-in datasets (CIFAR, MNIST), custom folder-structured datasets, and [CSV files](csv-data.md#classification).
 
 ## Data Loading Flow
 
 ```mermaid
 graph TD
-    A[Data Source] --> B{Dataset Type}
+    A[Data Source] --> A1[Verify Availability]
+    A1 --> A2[Check Format]
+    A2 --> B{Dataset Type}
     
     B -->|Built-in| C1[CIFAR/MNIST]
+    C1 --> C1a[Select Dataset]
+    C1a --> C1b[torchvision.datasets]
+    C1b --> C1c[Check Cache]
+    C1c --> D[Auto Download]
+    D --> D1[Download Files]
+    D1 --> D2[Extract Archive]
+    D2 --> D3[Verify Integrity]
+    
     B -->|Custom| C2[ImageFolder]
+    C2 --> C2a[Validate Structure]
+    C2a --> C2b[class_1/, class_2/, ...]
+    C2b --> C2c[Find Image Files]
+    C2c --> E[Scan Directories]
+    E --> E1[List Files]
+    E1 --> E2[Filter Extensions]
+    E2 --> E3[Build Dataset Index]
     
-    C1 --> D[Auto Download]
-    C2 --> E[Scan Directories]
+    D3 --> F[ImageDataModule]
+    E3 --> F
     
-    D --> F[ImageDataModule]
-    E --> F
-    
-    F --> G{Split Strategy}
+    F --> F1[Initialize Module]
+    F1 --> F2[Set Parameters]
+    F2 --> F3[Configure Paths]
+    F3 --> G{Split Strategy}
     
     G -->|Has val/| H1[Use val/ folder]
+    H1 --> H1a[Load train/]
+    H1a --> H1b[Load val/]
+    H1b --> H1c[Load test/]
+    
     G -->|No val/| H2[Auto split val_split=0.1]
+    H2 --> H2a[Load all from train/]
+    H2a --> H2b[Random Split]
+    H2b --> H2c[Create Val Set]
     
-    H1 --> I[Train/Val/Test Splits]
-    H2 --> I
+    H1c --> I[Train/Val/Test Splits]
+    H2c --> I
     
-    I --> J[TransformConfig]
+    I --> I1[Create Subsets]
+    I1 --> I2[Assign Indices]
+    I2 --> I3[Validate Splits]
+    I3 --> J[TransformConfig]
     
     J -->|Train| K1[Augmentation]
+    K1 --> K1a[RandomResizedCrop]
+    K1a --> K1b[RandomHorizontalFlip]
+    K1b --> K1c[ColorJitter]
+    K1c --> K1d[RandAugment]
+    K1d --> K1e[Normalize]
+    
     J -->|Val/Test| K2[Resize + Normalize]
+    K2 --> K2a[Resize]
+    K2a --> K2b[CenterCrop]
+    K2b --> K2c[ToTensor]
+    K2c --> K2d[Normalize]
     
-    K1 --> L[DataLoader]
-    K2 --> L
+    K1e --> L[DataLoader]
+    K2d --> L
     
-    L --> M[Batches]
+    L --> L1[Create Loaders]
+    L1 --> L2[Set Batch Size]
+    L2 --> L3[Configure Workers]
+    L3 --> L4[Enable Shuffling]
+    L4 --> L5[Pin Memory]
+    L5 --> M[Batches]
+    
+    M --> M1[Collate Samples]
+    M1 --> M2[Stack Tensors]
+    M2 --> M3[Batch Ready]
     
     style A fill:#2196F3,stroke:#1976D2,color:#fff
+    style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style C2 fill:#2196F3,stroke:#1976D2,color:#fff
     style F fill:#42A5F5,stroke:#1976D2,color:#fff
     style J fill:#2196F3,stroke:#1976D2,color:#fff
     style L fill:#42A5F5,stroke:#1976D2,color:#fff
     style M fill:#2196F3,stroke:#1976D2,color:#fff
+    style M3 fill:#42A5F5,stroke:#1976D2,color:#fff
 ```
 
 ## Built-in Datasets
@@ -521,6 +570,7 @@ MultiLabelImageDataModule(
 
 ## See Also
 
+- [CSV Data Loading](csv-data.md#classification) - Load classification data from CSV files
 - [Object Detection Data](object-detection-data.md) - For COCO format object detection datasets
 - [Data Handling Examples](../../examples/utilities/data-handling.md) - More examples and use cases
 - [Training Guide](../training/training.md) - How to train models with your data

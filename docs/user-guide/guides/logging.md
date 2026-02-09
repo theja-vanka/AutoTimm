@@ -6,31 +6,78 @@ AutoTimm supports multiple logging backends through `LoggerConfig` and `LoggerMa
 
 ```mermaid
 graph TD
-    A[Training Events] --> B[LoggerManager]
+    A[Training Events] --> A1[Metric Updates]
+    A1 --> A2[Hyperparameter Changes]
+    A2 --> A3[System Events]
+    A3 --> B[LoggerManager]
     
-    B --> C{Logger Backends}
+    B --> B1[Initialize Loggers]
+    B1 --> B2[Setup Backends]
+    B2 --> B3[Configure Handlers]
+    B3 --> C{Logger Backends}
     
     C -->|TensorBoard| D1[TensorBoard Logger]
-    C -->|W&B| D2[WandB Logger]
-    C -->|MLflow| D3[MLflow Logger]
-    C -->|CSV| D4[CSV Logger]
+    D1 --> D1a[Create Writer]
+    D1a --> D1b[Setup Directory]
+    D1b --> D1c[Configure Options]
     
-    D1 --> E1[logs/tensorboard/]
-    D2 --> E2[wandb.ai]
-    D3 --> E3[mlruns/]
-    D4 --> E4[logs/csv/]
+    C -->|W&B| D2[WandB Logger]
+    D2 --> D2a[Initialize Run]
+    D2a --> D2b[Set Project]
+    D2b --> D2c[Configure Entity]
+    
+    C -->|MLflow| D3[MLflow Logger]
+    D3 --> D3a[Setup Tracking]
+    D3a --> D3b[Create Experiment]
+    D3b --> D3c[Start Run]
+    
+    C -->|CSV| D4[CSV Logger]
+    D4 --> D4a[Create Files]
+    D4a --> D4b[Setup Headers]
+    D4b --> D4c[Configure Format]
+    
+    D1c --> E1[logs/tensorboard/]
+    E1 --> E1a[events.out]
+    E1a --> E1b[metadata]
+    
+    D2c --> E2[wandb.ai]
+    E2 --> E2a[Cloud Storage]
+    E2a --> E2b[Dashboard]
+    
+    D3c --> E3[mlruns/]
+    E3 --> E3a[Experiments]
+    E3a --> E3b[Artifacts]
+    
+    D4c --> E4[logs/csv/]
+    E4 --> E4a[metrics.csv]
+    E4a --> E4b[version_X/]
     
     A --> F{Log Types}
     
     F --> G1[Metrics]
-    F --> G2[Hyperparams]
-    F --> G3[Artifacts]
-    F --> G4[System Info]
+    G1 --> G1a[Train Metrics]
+    G1a --> G1b[Val Metrics]
+    G1b --> G1c[Test Metrics]
     
-    G1 --> B
-    G2 --> B
-    G3 --> B
-    G4 --> B
+    F --> G2[Hyperparams]
+    G2 --> G2a[Learning Rate]
+    G2a --> G2b[Batch Size]
+    G2b --> G2c[Architecture]
+    
+    F --> G3[Artifacts]
+    G3 --> G3a[Model Checkpoints]
+    G3a --> G3b[Plots/Images]
+    G3b --> G3c[Confusion Matrix]
+    
+    F --> G4[System Info]
+    G4 --> G4a[GPU Utilization]
+    G4a --> G4b[Memory Usage]
+    G4b --> G4c[Training Speed]
+    
+    G1c --> B
+    G2c --> B
+    G3c --> B
+    G4c --> B
     
     style A fill:#2196F3,stroke:#1976D2,color:#fff
     style B fill:#42A5F5,stroke:#1976D2,color:#fff
@@ -38,6 +85,8 @@ graph TD
     style D2 fill:#42A5F5,stroke:#1976D2,color:#fff
     style D3 fill:#2196F3,stroke:#1976D2,color:#fff
     style D4 fill:#42A5F5,stroke:#1976D2,color:#fff
+    style G1 fill:#E3F2FD
+    style G2 fill:#E3F2FD
 ```
 
 ## LoggerConfig

@@ -1,8 +1,13 @@
 from autotimm.data.datamodule import ImageDataModule
-from autotimm.data.dataset import ImageFolderCV2, MultiLabelImageDataset
+from autotimm.data.dataset import CSVImageDataset, ImageFolderCV2, MultiLabelImageDataset
 from autotimm.data.multilabel_datamodule import MultiLabelImageDataModule
 from autotimm.data.detection_datamodule import DetectionDataModule
-from autotimm.data.detection_dataset import COCODetectionDataset, detection_collate_fn
+from autotimm.data.detection_dataset import (
+    COCODetectionDataset,
+    CSVDetectionDataset,
+    detection_collate_fn,
+)
+from autotimm.data.instance_dataset import CSVInstanceDataset
 from autotimm.data.detection_transforms import (
     detection_eval_transforms,
     detection_strong_train_transforms,
@@ -38,12 +43,16 @@ __all__ = [
     # Classification data
     "ImageDataModule",
     "ImageFolderCV2",
+    "CSVImageDataset",
     "MultiLabelImageDataset",
     "MultiLabelImageDataModule",
     # Detection data
     "COCODetectionDataset",
+    "CSVDetectionDataset",
     "DetectionDataModule",
     "detection_collate_fn",
+    # Instance segmentation data
+    "CSVInstanceDataset",
     # Classification transforms
     "albu_default_eval_transforms",
     "albu_default_train_transforms",
