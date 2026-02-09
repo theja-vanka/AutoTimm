@@ -33,9 +33,12 @@ from autotimm.models import (
     list_yolox_necks,
 )
 from autotimm.data.datamodule import ImageDataModule
+from autotimm.data.dataset import CSVImageDataset, MultiLabelImageDataset
 from autotimm.data.detection_datamodule import DetectionDataModule
+from autotimm.data.detection_dataset import CSVDetectionDataset
 from autotimm.data.multilabel_datamodule import MultiLabelImageDataModule
 from autotimm.data.instance_datamodule import InstanceSegmentationDataModule
+from autotimm.data.instance_dataset import CSVInstanceDataset
 from autotimm.data.segmentation_datamodule import SegmentationDataModule
 from autotimm.data.timm_transforms import (
     create_inference_transform,
@@ -166,6 +169,11 @@ __all__ = [
     "InstanceSegmentationDataModule",
     "MultiLabelImageDataModule",
     "SegmentationDataModule",
+    # Datasets
+    "CSVImageDataset",
+    "MultiLabelImageDataset",
+    "CSVDetectionDataset",
+    "CSVInstanceDataset",
     # Transform config
     "TransformConfig",
     "create_inference_transform",
