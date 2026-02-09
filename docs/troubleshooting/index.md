@@ -5,45 +5,16 @@ Comprehensive troubleshooting guide for common issues when using AutoTimm.
 ## Quick Navigation
 
 ```mermaid
-graph TD
-    A[Problem Category] --> B[Training Issues]
-    A --> C[Performance Issues]
-    A --> D[Data Issues]
-    A --> E[Model Issues]
-    A --> F[Deployment Issues]
-    A --> G[Environment Issues]
-    A --> H[Integration Issues]
-    A --> I[Task-Specific Issues]
-    
-    B --> B1[NaN Losses]
-    B --> B2[Convergence]
-    B --> B3[Gradient Issues]
-    B --> B4[LR Tuning]
-    
-    C --> C1[OOM Errors]
-    C --> C2[Slow Training]
-    C --> C3[Profiling]
-    
-    D --> D1[Data Loading]
-    D --> D2[Augmentation]
-    
-    E --> E1[Model Loading]
-    E --> E2[Metrics]
-    
-    F --> F1[Export/Inference]
-    F --> F2[Production Deploy]
-    
-    G --> G1[Device Errors]
-    G --> G2[Installation]
-    G --> G3[Distributed]
-    
-    H --> H1[Loggers]
-    H --> H2[HuggingFace]
-    H --> H3[Reproducibility]
-    
-    I --> I1[YOLOX]
-    I --> I2[Interpretation]
-    
+graph LR
+    A[Problem Category] --> B[Training]
+    A --> C[Performance]
+    A --> D[Data]
+    A --> E[Models]
+    A --> F[Deployment]
+    A --> G[Environment]
+    A --> H[Integration]
+    A --> I[Task-Specific]
+
     style A fill:#2196F3,stroke:#1976D2,color:#fff
     style B fill:#42A5F5,stroke:#1976D2,color:#fff
     style C fill:#2196F3,stroke:#1976D2,color:#fff

@@ -7,37 +7,23 @@ AutoTimm is designed with reproducibility as a first-class feature. This guide c
 ```mermaid
 graph TD
     A[Experiment] --> B{Seed Sources}
-    
+
     B --> C1[Model seed=42]
     B --> C2[Trainer seed=42]
     B --> C3[Manual seed_everything]
-    
-    C1 --> D[seed_everything]
+
+    C1 --> D[seed_everything<br/>Python, NumPy, PyTorch, CUDA]
     C2 --> D
     C3 --> D
-    
-    D --> E1[Python Random]
-    D --> E2[NumPy Random]
-    D --> E3[PyTorch Random]
-    D --> E4[CUDA Random]
-    
-    E1 --> F[Deterministic Mode]
-    E2 --> F
-    E3 --> F
-    E4 --> F
-    
-    F --> G1[cuDNN Deterministic]
-    F --> G2[cuDNN Benchmark OFF]
-    F --> G3[Dataloader Workers]
-    
-    G1 --> H[Reproducible Results]
-    G2 --> H
-    G3 --> H
-    
+
+    D --> F[Deterministic Mode<br/>cuDNN, Benchmark, Workers]
+
+    F --> H[Reproducible Results]
+
     H --> I{Verification}
-    I --> J1[Same Seed → Same Results]
-    I --> J2[Different Seed → Different Results]
-    
+    I --> J1[Same Seed = Same Results]
+    I --> J2[Different Seed = Different Results]
+
     style A fill:#2196F3,stroke:#1976D2,color:#fff
     style D fill:#42A5F5,stroke:#1976D2,color:#fff
     style F fill:#2196F3,stroke:#1976D2,color:#fff

@@ -7,30 +7,17 @@ Master transfer learning strategies for optimal performance with pretrained mode
 ```mermaid
 graph TD
     A[Pretrained Model] --> B{Strategy}
-    
-    B -->|Frozen| C1[Freeze Backbone]
-    B -->|Fine-tune| C2[Unfreeze All]
-    B -->|Progressive| C3[Gradual Unfreeze]
-    B -->|LLRD| C4[Layer-wise LR]
-    
-    C1 --> D1[Train Head Only]
-    D1 --> E1[Fast + No Overfit]
-    
-    C2 --> D2[Same LR All Layers]
-    D2 --> E2[Better Features]
-    
-    C3 --> D3[Phase 1: Head]
-    D3 --> D4[Phase 2: Last Layer]
-    D4 --> D5[Phase 3: All Layers]
-    D5 --> E3[Controlled Transfer]
-    
-    C4 --> D6[Head: lr]
-    D6 --> D7[Layer4: lr * 0.8]
-    D7 --> D8[Layer3: lr * 0.64]
-    D8 --> D9[Layer2: lr * 0.51]
-    D9 --> D10[Layer1: lr * 0.41]
-    D10 --> E4[Optimal Adaptation]
-    
+
+    B -->|Frozen| C1[Freeze Backbone<br/>Train Head Only]
+    B -->|Fine-tune| C2[Unfreeze All<br/>Same LR All Layers]
+    B -->|Progressive| C3[Gradual Unfreeze<br/>Head → Last → All]
+    B -->|LLRD| C4[Layer-wise LR<br/>Decay per Layer]
+
+    C1 --> E1[Fast + No Overfit]
+    C2 --> E2[Better Features]
+    C3 --> E3[Controlled Transfer]
+    C4 --> E4[Optimal Adaptation]
+
     style A fill:#2196F3,stroke:#1976D2,color:#fff
     style C1 fill:#42A5F5,stroke:#1976D2,color:#fff
     style C2 fill:#2196F3,stroke:#1976D2,color:#fff
