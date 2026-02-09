@@ -5,7 +5,7 @@ Complete examples for training instance segmentation models with AutoTimm.
 ## Instance Segmentation Architecture
 
 ```mermaid
-graph TB
+graph TD
     A[Input Image] --> B[Backbone + FPN]
     
     B --> C[Detection Head]

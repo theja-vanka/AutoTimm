@@ -5,7 +5,7 @@ Complete examples for training semantic segmentation models with AutoTimm.
 ## Semantic Segmentation Architecture
 
 ```mermaid
-graph TB
+graph TD
     A[Input Image] --> B[Backbone]
     
     B --> C{Head Type}

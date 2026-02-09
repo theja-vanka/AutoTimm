@@ -5,7 +5,7 @@ The [`examples/`](https://github.com/theja-vanka/AutoTimm/tree/main/examples) di
 ## Examples Organization
 
 ```mermaid
-graph TB
+graph TD
     A[AutoTimm Examples] --> B[Getting Started]
     A --> C[Computer Vision]
     A --> D[HuggingFace Hub]

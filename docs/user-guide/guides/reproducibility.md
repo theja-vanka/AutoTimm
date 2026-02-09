@@ -5,7 +5,7 @@ AutoTimm is designed with reproducibility as a first-class feature. This guide c
 ## Reproducibility Workflow
 
 ```mermaid
-graph TB
+graph TD
     A[Experiment] --> B{Seed Sources}
     
     B --> C1[Model seed=42]

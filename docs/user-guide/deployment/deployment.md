@@ -5,7 +5,7 @@ This guide covers deploying AutoTimm models to production environments, includin
 ## Deployment Options
 
 ```mermaid
-graph TB
+graph TD
     A[Trained Model] --> B{Deployment Target}
     
     B -->|Python/PyTorch| C[TorchScript]

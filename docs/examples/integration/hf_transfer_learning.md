@@ -5,7 +5,7 @@ Master transfer learning strategies for optimal performance with pretrained mode
 ## Transfer Learning Strategies
 
 ```mermaid
-graph TB
+graph TD
     A[Pretrained Model] --> B{Strategy}
     
     B -->|Frozen| C1[Freeze Backbone]

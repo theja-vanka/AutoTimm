@@ -5,7 +5,7 @@ The Preset Manager is an intelligent system that helps you choose the best trans
 ## Backend Selection Workflow
 
 ```mermaid
-graph TB
+graph TD
     A[Task Requirements] --> B{recommend_backend}
     
     B --> C{Has BBoxes/Masks?}

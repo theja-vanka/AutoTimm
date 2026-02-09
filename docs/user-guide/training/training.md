@@ -5,7 +5,7 @@ AutoTimm provides `AutoTrainer`, a configured PyTorch Lightning Trainer with sen
 ## Training Workflow
 
 ```mermaid
-graph TB
+graph TD
     A[Initialize Model & Data] --> B{Auto-Tuning?}
     B -->|Yes| C[Find LR & Batch Size]
     B -->|No| D[Start Training]

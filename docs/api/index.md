@@ -5,7 +5,7 @@ This section provides detailed API documentation for all AutoTimm classes and fu
 ## API Organization
 
 ```mermaid
-graph TB
+graph TD
     A[AutoTimm API] --> B[Models]
     A --> C[Data]
     A --> D[Training]

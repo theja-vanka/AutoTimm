@@ -5,7 +5,7 @@ Comprehensive troubleshooting guide for common issues when using AutoTimm.
 ## Quick Navigation
 
 ```mermaid
-graph TB
+graph TD
     A[Problem Category] --> B[Training Issues]
     A --> C[Performance Issues]
     A --> D[Data Issues]

@@ -5,7 +5,7 @@ This guide compares the different approaches for using HuggingFace models with A
 ## Integration Approaches
 
 ```mermaid
-graph TB
+graph TD
     A[HuggingFace Models] --> B{Integration Type}
     
     B -->|Option 1| C[HF Hub timm]

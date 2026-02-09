@@ -5,7 +5,7 @@ This guide covers data loading for semantic and instance segmentation tasks.
 ## Segmentation Data Pipeline
 
 ```mermaid
-graph TB
+graph TD
     A[Dataset] --> B{Format}
     
     B -->|PNG| C1[Simple Pairs]

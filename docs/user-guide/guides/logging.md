@@ -5,7 +5,7 @@ AutoTimm supports multiple logging backends through `LoggerConfig` and `LoggerMa
 ## Logging System Architecture
 
 ```mermaid
-graph TB
+graph TD
     A[Training Events] --> B[LoggerManager]
     
     B --> C{Logger Backends}

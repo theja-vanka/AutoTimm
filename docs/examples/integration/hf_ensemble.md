@@ -5,7 +5,7 @@ Combine multiple models and distill knowledge into compact students for producti
 ## Ensemble & Distillation Architecture
 
 ```mermaid
-graph TB
+graph TD
     subgraph "Ensemble Methods"
         A1[Model 1: ResNet] --> E1[Predictions]
         A2[Model 2: MobileNet] --> E2[Predictions]
