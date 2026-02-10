@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dev
+      - zen
     paths:
       - 'docs/**'
       - 'zensical.toml'
