@@ -7,7 +7,6 @@ site_author = "Krishnatheja Vanka"
 site_url = "https://theja-vanka.github.io/AutoTimm"
 repo_name = "theja-vanka/AutoTimm"
 repo_url = "https://github.com/theja-vanka/AutoTimm"
-edit_uri = "edit/dev/docs/"
 copyright = "Copyright &copy; 2026 <a href=\"https://github.com/theja-vanka\" target=\"_blank\">Krishnatheja Vanka</a>. Built with ❤️"
 extra_css = ["stylesheets/mermaid.css", "stylesheets/extra.css"]
 nav = [
@@ -221,8 +220,6 @@ features = [
     "content.code.annotate",
     "content.tabs.link",
     "content.tooltips",
-    "content.action.edit",
-    "content.action.view",
 ]
 
 [project.theme.icon]
