@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://theja-vanka.github.io/AutoTimm/sitemap.xml
