@@ -1,7 +1,7 @@
 /**
  * Mermaid Diagram Zoom and Pan Functionality
  * Adds interactive zoom, pan, and fullscreen capabilities to mermaid diagrams.
- * Works with MkDocs Material's built-in mermaid rendering.
+ * Works with Zensical Material's built-in mermaid rendering.
  */
 
 /**
