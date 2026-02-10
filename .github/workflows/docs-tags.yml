@@ -44,6 +44,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: zensical build --clean
 
+      - name: Enhance sitemap
+        run: python scripts/enhance_sitemap.py
+
       - uses: actions/upload-pages-artifact@v4
         with:
           path: site

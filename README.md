@@ -872,6 +872,13 @@ pip install -e ".[dev,all]"
 pytest tests/ -v
 ```
 
+To build the documentation locally:
+```bash
+./scripts/build_docs.sh
+```
+
+For more details, see [scripts/README.md](scripts/README.md).
+
 For major changes, please open an issue first.
 
 ## Citation

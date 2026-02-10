@@ -255,6 +255,7 @@ toggle.name = "Switch to light mode"
 
 # Sitemap plugin for SEO
 [project.plugins.sitemap]
+enabled = true
 
 [project.plugins.mkdocstrings.handlers.python.options]
 show_source = true

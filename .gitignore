@@ -38,6 +38,7 @@ mlruns/
 
 # Documentation builds
 site/
+*.xml.bak
 
 # Demo artifacts
 demo_cache/
