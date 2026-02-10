@@ -16,7 +16,8 @@ Build the documentation site with enhanced sitemap.
 This script:
 1. Runs `zensical build --clean` to generate the documentation
 2. Enhances the sitemap with SEO metadata (lastmod, changefreq, priority)
-3. Creates a backup of the original sitemap at `site/sitemap.xml.bak`
+3. Copies `robots.txt` to the site directory
+4. Creates a backup of the original sitemap at `site/sitemap.xml.bak`
 
 ### `enhance_sitemap.py`
 
@@ -38,6 +39,7 @@ This script adds:
   - 0.8: User Guide & Examples
   - 0.7: API & Troubleshooting
   - 0.6: Other pages
+- **robots.txt**: Copies to site directory for search engine discovery
 
 ## CI/CD Integration
 
@@ -69,3 +71,4 @@ If the sitemap is not found:
 
 - `site/sitemap.xml` - Enhanced sitemap with SEO metadata
 - `site/sitemap.xml.bak` - Backup of the original sitemap
+- `site/robots.txt` - Copy of robots.txt for search engine crawlers
