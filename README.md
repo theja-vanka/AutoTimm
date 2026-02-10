@@ -58,8 +58,9 @@ From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-G
 </tr>
 </table>
 
-
+<p align="center">
 <a href="https://www.buymeacoffee.com/theja.vanka" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+</p>
 
 ## What's New in v0.7.3
 
