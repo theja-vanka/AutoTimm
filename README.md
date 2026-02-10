@@ -58,6 +58,8 @@ From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-G
 </tr>
 </table>
 
+<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="theja.vanka" data-color="#5F7FFF" data-emoji=""  data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#ffffff" data-coffee-color="#FFDD00" ></script>
+
 ## What's New in v0.7.3
 
 - **CSV Data Loading** - Load data from CSV files for all task types: classification, object detection, semantic segmentation, and instance segmentation
