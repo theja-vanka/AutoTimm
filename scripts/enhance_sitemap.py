@@ -92,6 +92,29 @@ def enhance_sitemap(sitemap_path: str):
     print(f"  - Added changefreq based on content type")
     print(f"  - Added priority based on URL importance")
 
+def copy_robots_txt(project_root: Path, site_url: str):
+    """Copy robots.txt to site directory and ensure it references the sitemap."""
+    source = project_root / 'docs' / 'robots.txt'
+    dest = project_root / 'site' / 'robots.txt'
+    
+    if not source.exists():
+        print(f"⚠ Warning: robots.txt not found at {source}")
+        return
+    
+    # Read and verify content
+    content = source.read_text()
+    sitemap_ref = f"Sitemap: {site_url}/sitemap.xml"
+    
+    if sitemap_ref not in content:
+        print(f"⚠ Warning: robots.txt doesn't reference sitemap correctly")
+        print(f"  Expected: {sitemap_ref}")
+    
+    # Copy to site directory
+    import shutil
+    shutil.copy(source, dest)
+    print(f"✓ Copied robots.txt to site directory")
+    print(f"  - Location: {dest}")
+
 if __name__ == '__main__':
     # Support running from both project root and scripts directory
     script_dir = Path(__file__).parent
@@ -113,3 +136,7 @@ if __name__ == '__main__':
     print(f"✓ Created backup: {backup_path}")
     
     enhance_sitemap(str(sitemap_path))
+    
+    # Copy robots.txt
+    site_url = "https://theja-vanka.github.io/AutoTimm"
+    copy_robots_txt(project_root, site_url)
