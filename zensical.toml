@@ -1,0 +1,339 @@
+# Zensical Configuration for AutoTimm
+
+[project]
+site_name = "AutoTimm"
+site_description = "AutoTimm - Automatic PyTorch Image Models for Computer Vision. Build, train, and deploy state-of-the-art models for image classification, object detection, and segmentation with minimal code."
+site_author = "Krishnatheja Vanka"
+site_url = "https://theja-vanka.github.io/AutoTimm"
+repo_name = "theja-vanka/AutoTimm"
+repo_url = "https://github.com/theja-vanka/AutoTimm"
+edit_uri = "edit/dev/docs/"
+copyright = "Copyright &copy; 2026 <a href=\"https://github.com/theja-vanka\" target=\"_blank\">Krishnatheja Vanka</a>. Built with ❤️"
+extra_css = ["stylesheets/mermaid.css", "stylesheets/extra.css"]
+nav = [
+    { "Home" = "index.md" },
+    { "Getting Started" = [
+        { "Installation" = "getting-started/installation.md" },
+        { "Quick Start" = "getting-started/quickstart.md" },
+    ]},
+    { "User Guide" = [
+        { "Overview" = "user-guide/index.md" },
+        { "Data Loading" = [
+            { "Overview" = "user-guide/data-loading/index.md" },
+            { "Image Classification Data" = "user-guide/data-loading/image-classification-data.md" },
+            { "Multi-Label Classification Data" = "user-guide/data-loading/multilabel-classification-data.md" },
+            { "Object Detection Data" = "user-guide/data-loading/object-detection-data.md" },
+            { "Segmentation Data" = "user-guide/data-loading/segmentation-data.md" },
+            { "CSV Data Loading" = "user-guide/data-loading/csv-data.md" },
+            { "Transforms" = "user-guide/data-loading/transforms.md" },
+            { "Preset Manager" = "user-guide/data-loading/preset-manager.md" },
+        ]},
+        { "Models" = [
+            { "Overview" = "user-guide/models/index.md" },
+            { "ImageClassifier" = "user-guide/models/image-classifier.md" },
+            { "ObjectDetector" = "user-guide/models/object-detector.md" },
+            { "SemanticSegmentor" = "user-guide/models/semantic-segmentation.md" },
+            { "InstanceSegmentor" = "user-guide/models/instance-segmentation.md" },
+            { "YOLOXDetector" = "user-guide/models/yolox-detector.md" },
+        ]},
+        { "Training" = [
+            { "Overview" = "user-guide/training/training.md" },
+            { "Dataset Preparation" = "user-guide/training/dataset-preparation.md" },
+            { "Loss Comparison" = "user-guide/training/loss-comparison.md" },
+            { "Advanced Customization" = "user-guide/training/advanced-customization.md" },
+        ]},
+        { "Evaluation" = [
+            { "Metrics" = "user-guide/evaluation/metrics.md" },
+            { "Metric Selection" = "user-guide/evaluation/metric-selection.md" },
+            { "Benchmarks" = "user-guide/evaluation/benchmarks.md" },
+        ]},
+        { "Interpretation" = [
+            { "Overview" = "user-guide/interpretation/index.md" },
+            { "Interpretation Methods" = "user-guide/interpretation/methods.md" },
+            { "Quality Metrics" = "user-guide/interpretation/metrics.md" },
+            { "Interactive Visualizations" = "user-guide/interpretation/interactive-visualizations.md" },
+            { "Performance Optimization" = "user-guide/interpretation/optimization.md" },
+            { "Feature Visualization" = "user-guide/interpretation/feature-visualization.md" },
+            { "Training Callbacks" = "user-guide/interpretation/callbacks.md" },
+            { "Task-Specific Adapters" = "user-guide/interpretation/task-adapters.md" },
+        ]},
+        { "Integration" = [
+            { "Comparison Overview" = "user-guide/integration/huggingface-integration-comparison.md" },
+            { "HF Hub Integration" = "user-guide/integration/huggingface-hub-integration.md" },
+            { "HF Transformers Integration" = "user-guide/integration/huggingface-transformers-integration.md" },
+        ]},
+        { "Deployment" = [
+            { "Production Deployment" = "user-guide/deployment/deployment.md" },
+            { "TorchScript Export" = "user-guide/deployment/torchscript-export.md" },
+            { "C++ Deployment" = "user-guide/deployment/cpp-deployment.md" },
+            { "Mobile Deployment" = "user-guide/deployment/mobile-deployment.md" },
+        ]},
+        { "Inference" = [
+            { "Overview" = "user-guide/inference/index.md" },
+            { "Classification Inference" = "user-guide/inference/classification-inference.md" },
+            { "Object Detection Inference" = "user-guide/inference/object-detection-inference.md" },
+            { "Segmentation Inference" = "user-guide/inference/semantic-segmentation-inference.md" },
+            { "Model Export" = "user-guide/inference/model-export.md" },
+        ]},
+        { "Guides" = [
+            { "Reproducibility" = "user-guide/guides/reproducibility.md" },
+            { "Logging" = "user-guide/guides/logging.md" },
+            { "Migration Guide" = "user-guide/guides/migration.md" },
+            { "YOLOX Quick Reference" = "user-guide/guides/yolox-quick-reference.md" },
+        ]},
+    ]},
+    { "Troubleshooting" = [
+        { "Overview" = "troubleshooting/index.md" },
+        { "Training Issues" = [
+            { "NaN Losses" = "troubleshooting/training/nan-losses.md" },
+            { "Convergence Problems" = "troubleshooting/training/convergence.md" },
+            { "Gradient Issues" = "troubleshooting/training/gradient-issues.md" },
+            { "LR Tuning Failures" = "troubleshooting/training/lr-tuning.md" },
+        ]},
+        { "Performance Issues" = [
+            { "OOM Errors" = "troubleshooting/performance/oom-errors.md" },
+            { "Slow Training" = "troubleshooting/performance/slow-training.md" },
+            { "Performance Profiling" = "troubleshooting/performance/profiling.md" },
+        ]},
+        { "Data Issues" = [
+            { "Data Loading" = "troubleshooting/data/data-loading.md" },
+            { "Augmentation" = "troubleshooting/data/augmentation.md" },
+        ]},
+        { "Model Issues" = [
+            { "Model Loading" = "troubleshooting/models/model-loading.md" },
+            { "Metrics" = "troubleshooting/models/metrics.md" },
+        ]},
+        { "Deployment Issues" = [
+            { "Export & Inference" = "troubleshooting/deployment/export-inference.md" },
+            { "Production Deployment" = "troubleshooting/deployment/production.md" },
+        ]},
+        { "Environment Issues" = [
+            { "Device Errors" = "troubleshooting/environment/device-errors.md" },
+            { "Installation" = "troubleshooting/environment/installation.md" },
+            { "Distributed Training" = "troubleshooting/environment/distributed.md" },
+        ]},
+        { "Integration Issues" = [
+            { "Loggers" = "troubleshooting/integration/loggers.md" },
+            { "HuggingFace" = "troubleshooting/integration/huggingface.md" },
+            { "Reproducibility" = "troubleshooting/integration/reproducibility.md" },
+        ]},
+        { "Task-Specific Issues" = [
+            { "YOLOX" = "troubleshooting/task-specific/yolox.md" },
+            { "Interpretation" = "troubleshooting/task-specific/interpretation.md" },
+        ]},
+        { "Quick Reference" = [
+            { "Error Reference" = "troubleshooting/reference/error-reference.md" },
+            { "Warnings" = "troubleshooting/reference/warnings.md" },
+        ]},
+    ]},
+    { "API Reference" = [
+        { "Overview" = "api/index.md" },
+        { "Tasks" = [
+            { "ImageClassifier" = "api/classifier.md" },
+            { "ObjectDetector" = "api/detection.md" },
+            { "Segmentation" = "api/segmentation.md" },
+        ]},
+        { "Data" = [
+            { "ImageDataModule" = "api/data.md" },
+            { "MultiLabelImageDataModule" = "api/multilabel_data.md" },
+            { "DetectionDataModule" = "api/detection_data.md" },
+            { "CSV Data Loading" = "api/csv_data.md" },
+            { "TransformConfig" = "api/transforms.md" },
+        ]},
+        { "Training" = [
+            { "AutoTrainer" = "api/trainer.md" },
+        ]},
+        { "Models" = [
+            { "Backbone" = "api/backbone.md" },
+            { "Heads" = "api/heads.md" },
+            { "Losses" = "api/losses.md" },
+        ]},
+        { "Metrics & Logging" = [
+            { "Metrics" = "api/metrics.md" },
+            { "Loggers" = "api/loggers.md" },
+        ]},
+        { "Export" = [
+            { "Export API" = "api/export.md" },
+        ]},
+        { "Utilities" = "api/utils.md" },
+    ]},
+    { "Examples" = [
+        { "Overview" = "examples/index.md" },
+        { "Getting Started" = [
+            { "Classification" = "examples/tasks/classification.md" },
+        ]},
+        { "Computer Vision Tasks" = [
+            { "Object Detection" = "examples/tasks/object-detection.md" },
+            { "Semantic Segmentation" = "examples/tasks/semantic-segmentation.md" },
+            { "Instance Segmentation" = "examples/tasks/instance-segmentation.md" },
+        ]},
+        { "HuggingFace Hub" = [
+            { "Basic Integration" = "examples/integration/huggingface-hub.md" },
+            { "Model Interpretation" = "examples/integration/hf_interpretation.md" },
+            { "Transfer Learning" = "examples/integration/hf_transfer_learning.md" },
+            { "Ensemble & Distillation" = "examples/integration/hf_ensemble.md" },
+            { "Deployment" = "examples/integration/hf_deployment.md" },
+        ]},
+        { "Data & Training" = [
+            { "Data Handling" = "examples/utilities/data-handling.md" },
+            { "CSV Data Loading" = "examples/utilities/csv-data-loading.md" },
+            { "Custom Data & Augmentation" = "examples/utilities/hf_custom_data.md" },
+            { "Training Utilities" = "examples/utilities/training-utilities.md" },
+            { "Hyperparameter Tuning" = "examples/utilities/hf_hyperparameter_tuning.md" },
+        ]},
+        { "Understanding & Deployment" = [
+            { "Model Interpretation" = "examples/utilities/interpretation.md" },
+            { "Logging & Metrics" = "examples/utilities/logging-metrics.md" },
+            { "Backbone Utilities" = "examples/utilities/backbone-utilities.md" },
+        ]},
+    ]},
+]
+
+# ---------------------------------------------------------------------------
+# Theme
+# ---------------------------------------------------------------------------
+
+[project.theme]
+custom_dir = "docs/overrides"
+favicon = "assets/favicon.png"
+logo = "assets/logo.png"
+features = [
+    # Navigation
+    "navigation.instant",
+    "navigation.instant.prefetch",
+    "navigation.instant.progress",
+    "navigation.tracking",
+    "navigation.tabs",
+    "navigation.indexes",
+    "navigation.path",
+    "navigation.top",
+    "navigation.footer",
+    # Search
+    "search.suggest",
+    "search.highlight",
+    # Table of contents
+    "toc.follow",
+    # Header
+    "announce.dismiss",
+    # Content
+    "content.code.copy",
+    "content.code.select",
+    "content.code.annotate",
+    "content.tabs.link",
+    "content.tooltips",
+    "content.action.edit",
+    "content.action.view",
+]
+
+[project.theme.icon]
+logo = "lucide/aperture"
+repo = "fontawesome/brands/github"
+edit = "lucide/pencil"
+view = "lucide/eye"
+
+# Palette toggle: light mode
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+primary = "blue"
+accent = "light blue"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
+
+# Palette toggle: dark mode
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+primary = "blue"
+accent = "light blue"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to light mode"
+
+# ---------------------------------------------------------------------------
+# Plugins
+# ---------------------------------------------------------------------------
+
+[project.plugins.mkdocstrings.handlers.python.options]
+show_source = true
+show_root_heading = true
+show_root_toc_entry = true
+heading_level = 2
+members_order = "source"
+docstring_style = "google"
+show_signature_annotations = true
+separate_signature = true
+
+# ---------------------------------------------------------------------------
+# Markdown Extensions
+# ---------------------------------------------------------------------------
+
+# Python Markdown
+[project.markdown_extensions.abbr]
+[project.markdown_extensions.admonition]
+[project.markdown_extensions.attr_list]
+[project.markdown_extensions.def_list]
+[project.markdown_extensions.footnotes]
+[project.markdown_extensions.md_in_html]
+[project.markdown_extensions.tables]
+
+[project.markdown_extensions.toc]
+permalink = true
+
+# Python Markdown Extensions (pymdownx)
+[project.markdown_extensions.pymdownx.arithmatex]
+generic = true
+
+[project.markdown_extensions.pymdownx.betterem]
+smart_enable = "all"
+
+[project.markdown_extensions.pymdownx.caret]
+[project.markdown_extensions.pymdownx.details]
+
+[project.markdown_extensions.pymdownx.emoji]
+emoji_index = "zensical.extensions.emoji.twemoji"
+emoji_generator = "zensical.extensions.emoji.to_svg"
+
+[project.markdown_extensions.pymdownx.highlight]
+anchor_linenums = true
+line_spans = "__span"
+pygments_lang_class = true
+
+[project.markdown_extensions.pymdownx.inlinehilite]
+[project.markdown_extensions.pymdownx.keys]
+[project.markdown_extensions.pymdownx.mark]
+[project.markdown_extensions.pymdownx.smartsymbols]
+[project.markdown_extensions.pymdownx.snippets]
+
+[project.markdown_extensions.pymdownx.superfences]
+custom_fences = [
+    { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
+]
+
+[project.markdown_extensions.pymdownx.tabbed]
+alternate_style = true
+
+[project.markdown_extensions.pymdownx.tasklist]
+custom_checkbox = true
+
+[project.markdown_extensions.pymdownx.tilde]
+
+# ---------------------------------------------------------------------------
+# Extra
+# ---------------------------------------------------------------------------
+
+[project.extra]
+generator = false
+
+[[project.extra.social]]
+icon = "fontawesome/brands/github"
+link = "https://github.com/theja-vanka/AutoTimm"
+name = "AutoTimm on GitHub"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/python"
+link = "https://pypi.org/project/autotimm/"
+name = "AutoTimm on PyPI"
+
+[project.extra.analytics]
+provider = "google"
+property = "$GOOGLE_ANALYTICS_KEY"
