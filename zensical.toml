@@ -253,6 +253,12 @@ toggle.name = "Switch to light mode"
 # Plugins
 # ---------------------------------------------------------------------------
 
+# Search plugin (enabled by default)
+[project.plugins.search]
+
+# Sitemap plugin for SEO
+[project.plugins.sitemap]
+
 [project.plugins.mkdocstrings.handlers.python.options]
 show_source = true
 show_root_heading = true
