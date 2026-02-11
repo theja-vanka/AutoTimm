@@ -3,3 +3,103 @@
     font-size: 0.8rem;
     line-height: 1.6;
 }
+
+/* Animated logo styles */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+@keyframes glow {
+    0%, 100% { filter: drop-shadow(0 0 5px rgba(25, 118, 210, 0.3)); }
+    50% { filter: drop-shadow(0 0 20px rgba(25, 118, 210, 0.6)); }
+}
+
+.animated-logo {
+    animation: float 3s ease-in-out infinite, glow 3s ease-in-out infinite;
+    display: inline-block;
+}
+
+/* Responsive grid for getting started cards */
+.getting-started-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 25px;
+    margin: 50px 20px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (min-width: 768px) {
+    .getting-started-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Getting started card styles */
+.getting-started-card {
+    background: transparent;
+    padding: 35px 25px;
+    border-radius: 12px;
+    border: 2px solid #1976D2;
+    box-shadow: 0 4px 15px rgba(25, 118, 210, 0.15);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.getting-started-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(25, 118, 210, 0.25);
+}
+
+.getting-started-card .number {
+    font-size: 64px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #1976D2;
+}
+
+.getting-started-card h3 {
+    margin: 15px 0;
+    font-size: 22px;
+}
+
+.getting-started-card .code-box {
+    background: rgba(25, 118, 210, 0.1);
+    border: 1px solid #1976D2;
+    padding: 10px 15px;
+    border-radius: 6px;
+    margin: 20px 0;
+    font-family: monospace;
+    font-size: 16px;
+}
+
+.getting-started-card p {
+    margin: 20px 0;
+    line-height: 1.6;
+}
+
+.getting-started-card a {
+    text-decoration: underline;
+    font-weight: 500;
+    color: #1976D2;
+}
+
+/* Dark mode support */
+[data-md-color-scheme="slate"] .getting-started-card {
+    border-color: #64B5F6;
+}
+
+[data-md-color-scheme="slate"] .getting-started-card .number {
+    color: #64B5F6;
+}
+
+[data-md-color-scheme="slate"] .getting-started-card .code-box {
+    background: rgba(100, 181, 246, 0.1);
+    border-color: #64B5F6;
+}
+
+[data-md-color-scheme="slate"] .getting-started-card a {
+    color: #64B5F6;
+}
