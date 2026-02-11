@@ -507,7 +507,7 @@ if __name__ == "__main__":
 |---------|---------|-----------------|
 | Architecture | Transformer-based | CNN-based |
 | Detection | Query-based | Anchor-free points |
-| NMS required | No ✨ | Yes |
+| NMS required | No :material-star: | Yes |
 | Inference speed | Real-time | Real-time |
 | Memory usage | Higher | Lower |
 | Small objects | Good | Excellent |
@@ -519,7 +519,7 @@ if __name__ == "__main__":
 |-------|------------|-------|----------|
 | `PekingU/rtdetr_r18vd` | 20M | Fastest | Quick experiments |
 | `PekingU/rtdetr_r34vd` | 31M | Fast | Balanced |
-| `PekingU/rtdetr_r50vd` | 42M | Medium | Recommended ⭐ |
+| `PekingU/rtdetr_r50vd` | 42M | Medium | Recommended :material-star: |
 | `PekingU/rtdetr_r101vd` | 76M | Slower | Maximum accuracy |
 
 **When to use RT-DETR:**

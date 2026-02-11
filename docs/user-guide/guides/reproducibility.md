@@ -177,14 +177,14 @@ trainer = AutoTrainer(
 
 **Pros:**
 
-- ✅ Fully reproducible results
-- ✅ Identical outputs across runs
-- ✅ Perfect for research
+- :material-check-circle: Fully reproducible results
+- :material-check-circle: Identical outputs across runs
+- :material-check-circle: Perfect for research
 
 **Cons:**
 
-- ❌ Slower training
-- ❌ May impact performance by 10-30%
+- :material-close-circle: Slower training
+- :material-close-circle: May impact performance by 10-30%
 
 ### Faster Training
 
@@ -211,14 +211,14 @@ trainer = AutoTrainer(
 
 **Pros:**
 
-- ✅ Faster training
-- ✅ Better GPU utilization
-- ✅ Partially reproducible
+- :material-check-circle: Faster training
+- :material-check-circle: Better GPU utilization
+- :material-check-circle: Partially reproducible
 
 **Cons:**
 
-- ❌ Results may vary slightly between runs
-- ❌ Small differences in final metrics
+- :material-close-circle: Results may vary slightly between runs
+- :material-close-circle: Small differences in final metrics
 
 ## Trainer Seeding Options
 
@@ -470,25 +470,25 @@ Expected training time impact:
 ## Best Practices
 
 ### For Research
-- ✅ Use `seed=42, deterministic=True`
-- ✅ Document all versions
-- ✅ Test on multiple seeds
-- ✅ Report mean ± std across seeds
+- :material-check-circle: Use `seed=42, deterministic=True`
+- :material-check-circle: Document all versions
+- :material-check-circle: Test on multiple seeds
+- :material-check-circle: Report mean ± std across seeds
 
 ### For Production
-- ✅ Use `seed=42, deterministic=False`
-- ✅ Prioritize speed
-- ✅ Test on multiple seeds to ensure robustness
+- :material-check-circle: Use `seed=42, deterministic=False`
+- :material-check-circle: Prioritize speed
+- :material-check-circle: Test on multiple seeds to ensure robustness
 
 ### For Debugging
-- ✅ Use `seed=42, deterministic=True`
-- ✅ Minimal training runs
-- ✅ Compare outputs step-by-step
+- :material-check-circle: Use `seed=42, deterministic=True`
+- :material-check-circle: Minimal training runs
+- :material-check-circle: Compare outputs step-by-step
 
 ### For Exploration
-- ✅ Use `seed=None` to explore variance
-- ✅ Try multiple random initializations
-- ✅ Analyze result distribution
+- :material-check-circle: Use `seed=None` to explore variance
+- :material-check-circle: Try multiple random initializations
+- :material-check-circle: Analyze result distribution
 
 ## Examples
 
@@ -531,4 +531,4 @@ model = ImageClassifier(..., seed=None)
 trainer = AutoTrainer(..., seed=None)
 ```
 
-Happy reproducible training! 🎯
+Happy reproducible training! :material-bullseye:

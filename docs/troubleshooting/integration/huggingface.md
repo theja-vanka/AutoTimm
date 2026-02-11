@@ -47,10 +47,10 @@ loaded = ImageClassifier.load_from_checkpoint(
 **Solution:**
 
 ```python
-# ✗ Wrong
+# :material-close: Wrong
 output = model(x)
 
-# ✓ Correct
+# :material-check: Correct
 output = model(pixel_values=x)
 ```
 

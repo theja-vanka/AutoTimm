@@ -7,7 +7,7 @@ site_author = "Krishnatheja Vanka"
 site_url = "https://theja-vanka.github.io/AutoTimm"
 repo_name = "theja-vanka/AutoTimm"
 repo_url = "https://github.com/theja-vanka/AutoTimm"
-copyright = "Copyright &copy; 2026 <a href=\"https://github.com/theja-vanka\" target=\"_blank\">Krishnatheja Vanka</a>. Built with ❤️"
+copyright = "Copyright &copy; 2026 <a href=\"https://github.com/theja-vanka\" target=\"_blank\">Krishnatheja Vanka</a>. Built with <span class=\"heart-icon\">♥</span>"
 extra_css = ["stylesheets/mermaid.css", "stylesheets/extra.css"]
 nav = [
     { "Home" = "index.md" },

@@ -28,7 +28,7 @@ graph LR
 
 ## Browse by Category
 
-### 📦 Data Loading
+### :material-package: Data Loading
 Prepare and load data for any computer vision task.
 
 - **[Overview](data-loading/index.md)** - Data module overview and architecture
@@ -40,7 +40,7 @@ Prepare and load data for any computer vision task.
 - **[Transforms](data-loading/transforms.md)** - Augmentation and preprocessing pipelines
 - **[Preset Manager](data-loading/preset-manager.md)** - Pre-configured transform presets
 
-### 🧠 Models
+### :material-brain: Models
 Task-specific model architectures built on timm.
 
 - **[Overview](models/index.md)** - Model architecture overview
@@ -50,7 +50,7 @@ Task-specific model architectures built on timm.
 - **[InstanceSegmentor](models/instance-segmentation.md)** - Instance segmentation with Mask R-CNN
 - **[YOLOXDetector](models/yolox-detector.md)** - Real-time detection with YOLOX
 
-### 🎓 Training
+### :material-school: Training
 Configure and run training with AutoTrainer.
 
 - **[Overview](training/training.md)** - AutoTrainer setup and configuration
@@ -58,14 +58,14 @@ Configure and run training with AutoTrainer.
 - **[Loss Comparison](training/loss-comparison.md)** - Choosing the right loss function
 - **[Advanced Customization](training/advanced-customization.md)** - Custom callbacks, schedulers, and more
 
-### 📊 Evaluation
+### :material-chart-bar: Evaluation
 Measure and compare model performance.
 
 - **[Metrics](evaluation/metrics.md)** - MetricConfig and MetricManager
 - **[Metric Selection](evaluation/metric-selection.md)** - Choosing metrics per task
 - **[Benchmarks](evaluation/benchmarks.md)** - Performance benchmarks and comparisons
 
-### 👁️ Interpretation
+### :material-eye: Interpretation
 Understand what your models learn.
 
 - **[Overview](interpretation/index.md)** - Interpretation tools overview
@@ -77,14 +77,14 @@ Understand what your models learn.
 - **[Training Callbacks](interpretation/callbacks.md)** - Log interpretations during training
 - **[Task-Specific Adapters](interpretation/task-adapters.md)** - Adapters for detection and segmentation
 
-### 🔌 Integration
+### :material-power-plug: Integration
 Connect with HuggingFace ecosystem.
 
 - **[Comparison Overview](integration/huggingface-integration-comparison.md)** - Compare integration approaches
 - **[HF Hub Integration](integration/huggingface-hub-integration.md)** - Push/pull models from Hub
 - **[HF Transformers Integration](integration/huggingface-transformers-integration.md)** - Use Transformers models
 
-### ☁️ Deployment
+### :material-cloud: Deployment
 Deploy models to production.
 
 - **[Production Deployment](deployment/deployment.md)** - Full production deployment guide
@@ -92,7 +92,7 @@ Deploy models to production.
 - **[C++ Deployment](deployment/cpp-deployment.md)** - Deploy with LibTorch in C++
 - **[Mobile Deployment](deployment/mobile-deployment.md)** - Deploy on iOS and Android
 
-### ▶️ Inference
+### :material-play: Inference
 Run predictions with trained models.
 
 - **[Overview](inference/index.md)** - Inference workflow overview
@@ -101,7 +101,7 @@ Run predictions with trained models.
 - **[Segmentation Inference](inference/semantic-segmentation-inference.md)** - Segment images
 - **[Model Export](inference/model-export.md)** - Export for optimized inference
 
-### 🧭 Guides
+### :material-compass: Guides
 Best practices and reference guides.
 
 - **[Reproducibility](guides/reproducibility.md)** - Achieve reproducible results

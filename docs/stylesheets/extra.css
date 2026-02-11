@@ -103,3 +103,57 @@
 [data-md-color-scheme="slate"] .getting-started-card a {
     color: #64B5F6;
 }
+
+/* Footer styling to match theme */
+.md-footer {
+    background-color: var(--md-default-bg-color);
+}
+
+.md-footer-meta {
+    background-color: var(--md-default-bg-color);
+}
+
+.md-footer-copyright {
+    color: var(--md-primary-bg-color);
+}
+
+.md-footer-copyright a {
+    color: var(--md-primary-bg-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.md-footer-copyright a:hover {
+    color: var(--md-accent-fg-color);
+    text-decoration: underline;
+}
+
+.md-footer-social {
+    color: var(--md-primary-bg-color);
+}
+
+.md-footer-social a {
+    color: var(--md-primary-bg-color);
+}
+
+.md-footer-social a:hover {
+    color: var(--md-accent-fg-color);
+}
+
+/* Heart icon styling */
+.heart-icon {
+    color: #e91e63;
+    font-size: 1.1em;
+    display: inline-block;
+    animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    10%, 30% { transform: scale(1.1); }
+    20%, 40% { transform: scale(1); }
+}
+
+[data-md-color-scheme="slate"] .heart-icon {
+    color: #ff4081;
+}

@@ -367,12 +367,12 @@ flow_map_center = flow_center.explain(image)
 
 | Method | Speed | Quality | Use Case |
 |--------|-------|---------|----------|
-| GradCAM | ⚡⚡⚡ Fast | Good | General CNN visualization |
-| GradCAM++ | ⚡⚡ Medium | Better | Multiple objects |
-| Integrated Gradients | ⚡ Slow | Best | Pixel-level attributions |
-| SmoothGrad | ⚡ Slow | Cleaner | Reducing noise |
-| AttentionRollout | ⚡⚡ Medium | Good | ViTs, global attention |
-| AttentionFlow | ⚡⚡ Medium | Good | ViTs, local attention |
+| GradCAM | :material-lightning-bolt::material-lightning-bolt::material-lightning-bolt: Fast | Good | General CNN visualization |
+| GradCAM++ | :material-lightning-bolt::material-lightning-bolt: Medium | Better | Multiple objects |
+| Integrated Gradients | :material-lightning-bolt: Slow | Best | Pixel-level attributions |
+| SmoothGrad | :material-lightning-bolt: Slow | Cleaner | Reducing noise |
+| AttentionRollout | :material-lightning-bolt::material-lightning-bolt: Medium | Good | ViTs, global attention |
+| AttentionFlow | :material-lightning-bolt::material-lightning-bolt: Medium | Good | ViTs, local attention |
 
 ### When to Use Each Method
 

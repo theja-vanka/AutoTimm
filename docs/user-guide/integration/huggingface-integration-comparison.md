@@ -21,7 +21,7 @@ graph TD
     G1 --> G1a[Pass backbone]
     G1a --> G1b[Add Task Head]
     G1b --> G1c[Configure Metrics]
-    G1c --> H1[AutoTrainer ✓]
+    G1c --> H1[AutoTrainer :material-check:]
     H1 --> H1a[Full Integration]
     H1a --> H1b[Easy Training]
     
@@ -36,7 +36,7 @@ graph TD
     G2 --> G2a[Define training_step]
     G2a --> G2b[Define configure_optimizers]
     G2b --> G2c[Add Task Head]
-    G2c --> H2[AutoTrainer ✓]
+    G2c --> H2[AutoTrainer :material-check:]
     H2 --> H2a[Flexible Control]
     H2a --> H2b[Manual Setup]
     
@@ -51,7 +51,7 @@ graph TD
     G3 --> G3a[Define training_step]
     G3a --> G3b[Define configure_optimizers]
     G3b --> G3c[Add Task Head]
-    G3c --> H3[AutoTrainer ✓]
+    G3c --> H3[AutoTrainer :material-check:]
     H3 --> H3a[Quick Prototyping]
     H3a --> H3b[Less Control]
     
@@ -70,9 +70,9 @@ AutoTimm provides three distinct ways to work with HuggingFace models:
 
 | Approach | Best For | Libraries | AutoTrainer | Integration |
 |----------|----------|-----------|-------------|-------------|
-| **HF Hub timm** | CNNs, Production | timm, hf_hub | ✅ Full | Native |
-| **HF Direct** | Vision Transformers, Custom | transformers | ✅ Full | Manual |
-| **HF Auto** | Prototyping | transformers | ✅ Full | Manual |
+| **HF Hub timm** | CNNs, Production | timm, hf_hub | :material-check-circle: Full | Native |
+| **HF Direct** | Vision Transformers, Custom | transformers | :material-check-circle: Full | Manual |
+| **HF Auto** | Prototyping | transformers | :material-check-circle: Full | Manual |
 
 **All approaches are fully compatible with PyTorch Lightning and AutoTrainer!**
 
@@ -95,7 +95,7 @@ model = ImageClassifier(
 )
 ```
 
-**Status:** ✅ **Fully Compatible** (Recommended for timm models)
+**Status:** :material-check-circle: **Fully Compatible** (Recommended for timm models)
 
 **Requirements:**
 
@@ -146,7 +146,7 @@ class ViTClassifier(pl.LightningModule):
         return self.classifier(outputs.pooler_output)
 ```
 
-**Status:** ✅ **Fully Compatible** (Recommended for transformers)
+**Status:** :material-check-circle: **Fully Compatible** (Recommended for transformers)
 
 **Requirements:**
 
@@ -181,7 +181,7 @@ model = AutoModel.from_pretrained("google/vit-base-patch16-224")
 processor = AutoImageProcessor.from_pretrained("google/vit-base-patch16-224")
 ```
 
-**Status:** ✅ **Compatible** (but not necessary)
+**Status:** :material-check-circle: **Compatible** (but not necessary)
 
 **Requirements:**
 
@@ -202,27 +202,27 @@ processor = AutoImageProcessor.from_pretrained("google/vit-base-patch16-224")
 
 | Feature | HF Hub timm | HF Direct | HF Auto |
 |---------|-------------|-----------|---------|
-| **PyTorch Lightning** | ✅ Full | ✅ Full | ✅ Full |
-| **Training/Val/Test** | ✅ | ✅ | ✅ |
-| **Checkpointing** | ✅ | ✅ | ✅ |
-| **Distributed (DDP)** | ✅ | ✅ | ✅ |
-| **Mixed Precision** | ✅ | ✅ | ✅ |
-| **AutoTimm Integration** | ✅ Native | ⚠️ Manual | ⚠️ Manual |
+| **PyTorch Lightning** | :material-check-circle: Full | :material-check-circle: Full | :material-check-circle: Full |
+| **Training/Val/Test** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
+| **Checkpointing** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
+| **Distributed (DDP)** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
+| **Mixed Precision** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
+| **AutoTimm Integration** | :material-check-circle: Native | :material-alert: Manual | :material-alert: Manual |
 | **Model Type** | timm models | transformers | transformers |
 | **Library Required** | timm, hf_hub | transformers | transformers |
-| **Explicit Config** | ✅ | ✅ | ⚠️ Auto-detected |
-| **Type Safety** | ✅ | ✅ | ⚠️ Limited |
-| **IDE Support** | ✅ | ✅ | ⚠️ Limited |
+| **Explicit Config** | :material-check-circle: | :material-check-circle: | :material-alert: Auto-detected |
+| **Type Safety** | :material-check-circle: | :material-check-circle: | :material-alert: Limited |
+| **IDE Support** | :material-check-circle: | :material-check-circle: | :material-alert: Limited |
 
 ## Quick Decision Guide
 
 ### Use HF Hub timm (Approach 1) when:
 
-- ✅ Working with CNN architectures (ResNet, EfficientNet, ConvNeXt)
-- ✅ Want seamless AutoTimm integration
-- ✅ Need AutoTimm's task-specific heads
-- ✅ Using timm ecosystem
-- ✅ Building production systems
+- :material-check-circle: Working with CNN architectures (ResNet, EfficientNet, ConvNeXt)
+- :material-check-circle: Want seamless AutoTimm integration
+- :material-check-circle: Need AutoTimm's task-specific heads
+- :material-check-circle: Using timm ecosystem
+- :material-check-circle: Building production systems
 
 **Example:**
 ```python
@@ -244,11 +244,11 @@ segmentor = SemanticSegmentor(
 
 ### Use HF Direct (Approach 2) when:
 
-- ✅ Using Vision Transformers (ViT, DeiT, BEiT, Swin)
-- ✅ Need full control over architecture
-- ✅ Want explicit, transparent configuration
-- ✅ Building custom models
-- ✅ Production deployments
+- :material-check-circle: Using Vision Transformers (ViT, DeiT, BEiT, Swin)
+- :material-check-circle: Need full control over architecture
+- :material-check-circle: Want explicit, transparent configuration
+- :material-check-circle: Building custom models
+- :material-check-circle: Production deployments
 
 **Example:**
 ```python
@@ -277,10 +277,10 @@ class CustomViTClassifier(pl.LightningModule):
 
 ### Use HF Auto (Approach 3) when:
 
-- ✅ Rapid prototyping and experimentation
-- ✅ Trying different model architectures quickly
-- ✅ Model type determined at runtime
-- ✅ Quick proof-of-concept
+- :material-check-circle: Rapid prototyping and experimentation
+- :material-check-circle: Trying different model architectures quickly
+- :material-check-circle: Model type determined at runtime
+- :material-check-circle: Quick proof-of-concept
 
 **Example:**
 ```python
@@ -352,9 +352,9 @@ class AutoViTWrapper(pl.LightningModule):
 # All three work with PyTorch Lightning!
 trainer = AutoTrainer(max_epochs=10)
 
-trainer.fit(autotimm_model, datamodule=data)  # ✅ Works
-trainer.fit(vit_model, datamodule=data)       # ✅ Works
-# trainer.fit(auto_vit, datamodule=data)       # ✅ Works
+trainer.fit(autotimm_model, datamodule=data)  # :material-check-circle: Works
+trainer.fit(vit_model, datamodule=data)       # :material-check-circle: Works
+# trainer.fit(auto_vit, datamodule=data)       # :material-check-circle: Works
 ```
 
 ## Key Insights
@@ -365,9 +365,9 @@ AutoTimm is built on the `timm` library:
 
 ```python
 # AutoTimm dependencies
-✅ timm (for models)
-✅ huggingface_hub (for downloading from HF Hub)
-❌ transformers (different library, optional)
+:material-check-circle: timm (for models)
+:material-check-circle: huggingface_hub (for downloading from HF Hub)
+:material-close-circle: transformers (different library, optional)
 ```
 
 You can use **both** in the same project:
@@ -380,10 +380,10 @@ You can use **both** in the same project:
 For production use with transformers:
 
 ```python
-# ❌ Not necessary
+# :material-close-circle: Not necessary
 from transformers import AutoModel, AutoImageProcessor, AutoConfig
 
-# ✅ Recommended: Use specific classes
+# :material-check-circle: Recommended: Use specific classes
 from transformers import ViTModel, ViTConfig, ViTImageProcessor
 ```
 
@@ -396,14 +396,14 @@ Benefits:
 
 Every approach supports **all** PyTorch Lightning features:
 
-- ✅ Training, validation, testing
-- ✅ Checkpointing and resume
-- ✅ Distributed training (DDP, FSDP)
-- ✅ Mixed precision (FP16, BF16)
-- ✅ All callbacks (EarlyStopping, ModelCheckpoint, etc.)
-- ✅ All loggers (TensorBoard, MLflow, W&B)
-- ✅ Gradient accumulation
-- ✅ Multi-GPU training
+- :material-check-circle: Training, validation, testing
+- :material-check-circle: Checkpointing and resume
+- :material-check-circle: Distributed training (DDP, FSDP)
+- :material-check-circle: Mixed precision (FP16, BF16)
+- :material-check-circle: All callbacks (EarlyStopping, ModelCheckpoint, etc.)
+- :material-check-circle: All loggers (TensorBoard, MLflow, W&B)
+- :material-check-circle: Gradient accumulation
+- :material-check-circle: Multi-GPU training
 
 ## Performance Comparison
 
@@ -411,9 +411,9 @@ All three approaches have **identical runtime performance**:
 
 | Metric | HF Hub timm | HF Direct | HF Auto |
 |--------|-------------|-----------|---------|
-| **Training Speed** | ⚡ Fast | ⚡ Fast | ⚡ Fast |
-| **Inference Speed** | ⚡ Fast | ⚡ Fast | ⚡ Fast |
-| **Memory Usage** | 💾 Model-dependent | 💾 Model-dependent | 💾 Model-dependent |
+| **Training Speed** | :material-lightning-bolt: Fast | :material-lightning-bolt: Fast | :material-lightning-bolt: Fast |
+| **Inference Speed** | :material-lightning-bolt: Fast | :material-lightning-bolt: Fast | :material-lightning-bolt: Fast |
+| **Memory Usage** | :material-database: Model-dependent | :material-database: Model-dependent | :material-database: Model-dependent |
 | **Load Time** | First: Slow (download)<br>After: Fast (cached) | First: Slow (download)<br>After: Fast (cached) | First: Slow (download)<br>After: Fast (cached) |
 | **Abstraction Overhead** | None | None | Minimal |
 
@@ -458,19 +458,19 @@ All three approaches have **identical runtime performance**:
 
 ## Summary
 
-✅ **Three approaches, all fully compatible with PyTorch Lightning**
+:material-check-circle: **Three approaches, all fully compatible with PyTorch Lightning**
 
-✅ **Choose based on use case:**
+:material-check-circle: **Choose based on use case:**
 
 - CNNs → HF Hub timm via AutoTimm
 - Vision Transformers → HF Direct classes
 - Quick prototyping → HF Auto classes
 
-✅ **No Auto classes required** for production use
+:material-check-circle: **No Auto classes required** for production use
 
-✅ **AutoTimm and transformers work together** in the same project
+:material-check-circle: **AutoTimm and transformers work together** in the same project
 
-✅ **All Lightning features supported** across all approaches
+:material-check-circle: **All Lightning features supported** across all approaches
 
 ## AutoTrainer Compatibility
 
@@ -480,16 +480,16 @@ All HuggingFace integration approaches are **fully compatible** with AutoTimm's 
 
 All the following AutoTrainer-specific features have been tested and verified:
 
-- ✅ Basic training with AutoTrainer
-- ✅ Checkpoint monitoring and saving
-- ✅ Early stopping callbacks
-- ✅ Multiple callbacks simultaneously
-- ✅ Validation and testing
-- ✅ Gradient accumulation
-- ✅ Mixed precision training (FP16/BF16)
-- ✅ ImageDataModule integration
-- ✅ LoggerManager support
-- ✅ TunerConfig for auto LR/batch size finding
+- :material-check-circle: Basic training with AutoTrainer
+- :material-check-circle: Checkpoint monitoring and saving
+- :material-check-circle: Early stopping callbacks
+- :material-check-circle: Multiple callbacks simultaneously
+- :material-check-circle: Validation and testing
+- :material-check-circle: Gradient accumulation
+- :material-check-circle: Mixed precision training (FP16/BF16)
+- :material-check-circle: ImageDataModule integration
+- :material-check-circle: LoggerManager support
+- :material-check-circle: TunerConfig for auto LR/batch size finding
 
 ### AutoTrainer with HF Hub timm
 
@@ -635,16 +635,16 @@ trainer.fit(model, datamodule=datamodule)
 
 | Feature | HF Hub timm | HF Direct | HF Auto |
 |---------|-------------|-----------|---------|
-| **Basic Training** | ✅ | ✅ | ✅ |
-| **Checkpointing** | ✅ | ✅ | ✅ |
-| **Early Stopping** | ✅ | ✅ | ✅ |
-| **Multiple Callbacks** | ✅ | ✅ | ✅ |
-| **Gradient Accumulation** | ✅ | ✅ | ✅ |
-| **Mixed Precision** | ✅ | ✅ | ✅ |
-| **Validation/Testing** | ✅ | ✅ | ✅ |
-| **ImageDataModule** | ✅ | ✅ | ✅ |
-| **LoggerManager** | ✅ | ✅ | ✅ |
-| **TunerConfig** | ✅ | ✅ | ✅ |
+| **Basic Training** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
+| **Checkpointing** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
+| **Early Stopping** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
+| **Multiple Callbacks** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
+| **Gradient Accumulation** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
+| **Mixed Precision** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
+| **Validation/Testing** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
+| **ImageDataModule** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
+| **LoggerManager** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
+| **TunerConfig** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
 
 ### Production Workflow
 
@@ -723,27 +723,27 @@ trainer.fit(model, datamodule=datamodule)
 trainer.test(model, datamodule=datamodule)
 ```
 
-**Result:** ✅ Everything works perfectly with full AutoTrainer support!
+**Result:** :material-check-circle: Everything works perfectly with full AutoTrainer support!
 
 ## Summary & Recommendations
 
-### ✅ All Approaches Fully Compatible
+### :material-check-circle: All Approaches Fully Compatible
 
 - **PyTorch Lightning**: All features work (training, validation, testing, checkpointing, DDP, AMP, callbacks)
 - **AutoTrainer**: All features work (checkpoint monitoring, early stopping, gradient accumulation, mixed precision, auto LR/batch size, multiple loggers)
 - **Production Ready**: All approaches are stable and tested
 
-### 📊 Test Coverage
+### :material-chart-bar: Test Coverage
 
 | Component | Tests | Status |
 |-----------|-------|--------|
-| HF Hub Lightning | 12 tests | ✅ 100% pass |
-| HF Direct Models | 10 tests | ✅ 100% pass |
-| HF Hub Backbones | 13 tests | ✅ 100% pass |
-| HF AutoTrainer | 12 tests | ✅ 100% pass |
-| **Total** | **47 tests** | **✅ 100% pass** |
+| HF Hub Lightning | 12 tests | :material-check-circle: 100% pass |
+| HF Direct Models | 10 tests | :material-check-circle: 100% pass |
+| HF Hub Backbones | 13 tests | :material-check-circle: 100% pass |
+| HF AutoTrainer | 12 tests | :material-check-circle: 100% pass |
+| **Total** | **47 tests** | **:material-check-circle: 100% pass** |
 
-### 🎯 Quick Decision Guide
+### :material-bullseye: Quick Decision Guide
 
 **Choose HF Hub timm when:**
 
@@ -765,7 +765,7 @@ trainer.test(model, datamodule=datamodule)
 - Quick experimentation
 - Testing multiple architectures
 
-### 💡 Key Insights
+### :material-lightbulb: Key Insights
 
 1. **No Auto classes required** - Use specific classes (`ViTModel`, `DeiTModel`) for better control
 2. **AutoTimm uses timm, not transformers** - Both libraries can be used together

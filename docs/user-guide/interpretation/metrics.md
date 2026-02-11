@@ -180,8 +180,8 @@ print(f"Passes: {result['passes']}")
 - `passes`: True if correlation < 0.5
 
 **Interpretation:**
-- **passes=True**: Method is model-sensitive ✓
-- **passes=False**: ⚠ Method may not be explaining the model
+- **passes=True**: Method is model-sensitive :material-check:
+- **passes=False**: :material-alert: Method may not be explaining the model
 
 ### Data Randomization
 
@@ -202,8 +202,8 @@ print(f"Passes: {result['passes']}")
 - `passes`: True if correlation < 0.5
 
 **Interpretation:**
-- **passes=True**: Method is class-sensitive ✓
-- **passes=False**: ⚠ Method produces similar explanations for all classes
+- **passes=True**: Method is class-sensitive :material-check:
+- **passes=False**: :material-alert: Method produces similar explanations for all classes
 
 ---
 
@@ -230,7 +230,7 @@ print(f"Max location: {result['max_location']}")
 - `bbox`: Input bbox
 
 **Interpretation:**
-- **hit=True**: Explanation correctly localizes object ✓
+- **hit=True**: Explanation correctly localizes object :material-check:
 - **hit=False**: Explanation misses object
 
 **Use cases:**

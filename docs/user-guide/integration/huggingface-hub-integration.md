@@ -188,33 +188,33 @@ model = InstanceSegmentor(
 
 ## PyTorch Lightning Compatibility
 
-**Result: ✅ FULLY COMPATIBLE**
+**Result: :material-check-circle: FULLY COMPATIBLE**
 
 HF Hub models work seamlessly with PyTorch Lightning. All Lightning features are supported:
 
 ### Core Features
 
-- ✅ LightningModule interface
-- ✅ training_step/validation_step/test_step
-- ✅ configure_optimizers
-- ✅ Automatic gradient management
-- ✅ Device placement (CPU/GPU/TPU)
+- :material-check-circle: LightningModule interface
+- :material-check-circle: training_step/validation_step/test_step
+- :material-check-circle: configure_optimizers
+- :material-check-circle: Automatic gradient management
+- :material-check-circle: Device placement (CPU/GPU/TPU)
 
 ### Advanced Features
 
-- ✅ Mixed precision (AMP)
-- ✅ Distributed training (DDP)
-- ✅ Multi-GPU training
-- ✅ Model checkpointing
-- ✅ Resume from checkpoint
-- ✅ Gradient accumulation
+- :material-check-circle: Mixed precision (AMP)
+- :material-check-circle: Distributed training (DDP)
+- :material-check-circle: Multi-GPU training
+- :material-check-circle: Model checkpointing
+- :material-check-circle: Resume from checkpoint
+- :material-check-circle: Gradient accumulation
 
 ### Logging & Monitoring
 
-- ✅ TensorBoard, MLflow, Weights & Biases
-- ✅ Multiple loggers simultaneously
-- ✅ Hyperparameter logging
-- ✅ All Lightning callbacks
+- :material-check-circle: TensorBoard, MLflow, Weights & Biases
+- :material-check-circle: Multiple loggers simultaneously
+- :material-check-circle: Hyperparameter logging
+- :material-check-circle: All Lightning callbacks
 
 ### Example: Distributed Training
 
