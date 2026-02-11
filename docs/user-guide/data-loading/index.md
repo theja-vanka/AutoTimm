@@ -100,7 +100,7 @@ data = DetectionDataModule(
 )
 ```
 
-👉 **[Full Object Detection Data Guide](object-detection-data.md)**
+:material-arrow-right: **[Full Object Detection Data Guide](object-detection-data.md)**
 
 ---
 

@@ -28,7 +28,7 @@ graph LR
 
 ## Browse by Category
 
-### 🔥 Training Issues
+### :material-fire: Training Issues
 Problems during model training and optimization.
 
 - **[NaN Losses](training/nan-losses.md)** - Numerical instability and NaN loss values
@@ -36,52 +36,52 @@ Problems during model training and optimization.
 - **[Gradient Issues](training/gradient-issues.md)** - Gradient explosion and vanishing gradients
 - **[LR Tuning Failures](training/lr-tuning.md)** - Learning rate finder issues
 
-### ⚡ Performance Issues
+### :material-lightning-bolt: Performance Issues
 Memory, speed, and resource optimization.
 
 - **[OOM Errors](performance/oom-errors.md)** - Out of memory errors and solutions
 - **[Slow Training](performance/slow-training.md)** - Training speed bottlenecks
 - **[Performance Profiling](performance/profiling.md)** - Identifying and fixing bottlenecks
 
-### 📊 Data Issues
+### :material-chart-bar: Data Issues
 Data loading and augmentation problems.
 
 - **[Data Loading](data/data-loading.md)** - Dataset loading and format issues
 - **[Augmentation](data/augmentation.md)** - Transform and augmentation errors
 
-### 🤖 Model Issues
+### :material-robot-outline: Model Issues
 Model loading, checkpoints, and metrics.
 
 - **[Model Loading](models/model-loading.md)** - Checkpoint and pretrained model issues
 - **[Metrics](models/metrics.md)** - Metric calculation problems
 
-### 🚀 Deployment Issues
+### :material-rocket-launch: Deployment Issues
 Export, inference, and production deployment.
 
 - **[Export & Inference](deployment/export-inference.md)** - ONNX, TorchScript, and inference issues
 - **[Production Deployment](deployment/production.md)** - C++, iOS, Android, and edge deployment
 
-### 🖥️ Environment Issues
+### :material-monitor: Environment Issues
 Hardware, devices, and distributed training.
 
 - **[Device Errors](environment/device-errors.md)** - CUDA, MPS, and multi-GPU issues
 - **[Installation](environment/installation.md)** - Dependencies and version issues
 - **[Distributed Training](environment/distributed.md)** - Multi-GPU and multi-node problems
 
-### 🔗 Integration Issues
+### :material-link: Integration Issues
 External tools and platform integration.
 
 - **[Loggers](integration/loggers.md)** - WandB, TensorBoard, MLflow issues
 - **[HuggingFace](integration/huggingface.md)** - HuggingFace Hub integration
 - **[Reproducibility](integration/reproducibility.md)** - Seeding and deterministic training
 
-### 🎯 Task-Specific Issues
+### :material-bullseye: Task-Specific Issues
 Issues specific to computer vision tasks.
 
 - **[YOLOX](task-specific/yolox.md)** - YOLOX-specific training and inference
 - **[Interpretation](task-specific/interpretation.md)** - Model interpretation and visualization
 
-### 📖 Quick Reference
+### :material-book-open: Quick Reference
 Fast lookup tables and common patterns.
 
 - **[Error Reference](reference/error-reference.md)** - Common error messages and solutions

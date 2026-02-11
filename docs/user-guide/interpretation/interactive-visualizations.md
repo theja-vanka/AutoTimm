@@ -243,9 +243,9 @@ def explain_prediction(image_id):
 
 | Feature | Static (PNG/JPG) | Interactive (HTML) |
 |---------|------------------|-------------------|
-| **Zoom** | ❌ No | ✅ Yes |
-| **Pan** | ❌ No | ✅ Yes |
-| **Hover Info** | ❌ No | ✅ Yes |
+| **Zoom** | :material-close-circle: No | :material-check-circle: Yes |
+| **Pan** | :material-close-circle: No | :material-check-circle: Yes |
+| **Hover Info** | :material-close-circle: No | :material-check-circle: Yes |
 | **Resolution** | Fixed | Scalable |
 | **File Size** | Small (~100KB) | Larger (~2-5MB) |
 | **Sharing** | Easy | Easy (single HTML) |

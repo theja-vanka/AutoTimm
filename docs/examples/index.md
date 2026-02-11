@@ -22,16 +22,16 @@ graph LR
 
 ## Quick Reference
 
-### 🚀 Getting Started
+### :material-rocket-launch: Getting Started
 - **[Classification](tasks/classification.md)** - Start with CIFAR-10 and custom datasets
 - **[HuggingFace Hub Basics](integration/huggingface-hub.md)** - Load and use HF Hub models
 
-### 🎯 Computer Vision Tasks
+### :material-bullseye: Computer Vision Tasks
 - **[Object Detection](tasks/object-detection.md)** - FCOS, YOLOX, RT-DETR, and transformers
 - **[Semantic Segmentation](tasks/semantic-segmentation.md)** - DeepLabV3+ and FCN
 - **[Instance Segmentation](tasks/instance-segmentation.md)** - Mask R-CNN style
 
-### 🤗 HuggingFace Advanced
+### :simple-huggingface: HuggingFace Advanced
 - **[Model Interpretation](integration/hf_interpretation.md)** - GradCAM, attention visualization, metrics
 - **[Transfer Learning](integration/hf_transfer_learning.md)** - LLRD, progressive unfreezing
 - **[Ensemble & Distillation](integration/hf_ensemble.md)** - Model ensembles and knowledge distillation
@@ -39,18 +39,18 @@ graph LR
 - **[Custom Data](utilities/hf_custom_data.md)** - Advanced augmentation and data handling
 - **[Hyperparameter Tuning](utilities/hf_hyperparameter_tuning.md)** - Optuna integration
 
-### 📊 Training & Optimization
+### :material-chart-bar: Training & Optimization
 - **[Training Utilities](utilities/training-utilities.md)** - Auto-tuning, multi-GPU, presets
 - **[Data Handling](utilities/data-handling.md)** - Balanced sampling, augmentation
 - **[Logging & Metrics](utilities/logging-metrics.md)** - TensorBoard, MLflow, evaluation
 
-### 🔍 Model Understanding
+### :material-magnify: Model Understanding
 - **[Interpretation Methods](utilities/interpretation.md)** - Comprehensive interpretation toolkit
 - **[Backbone Utilities](utilities/backbone-utilities.md)** - Discover and compare models
 
 ## All Examples by Category
 
-### 🚀 Getting Started
+### :material-rocket-launch: Getting Started
 
 | Script | Description |
 |--------|-------------|
@@ -58,7 +58,7 @@ graph LR
 | [`getting_started/classify_custom_folder.py`](tasks/classification.md#custom-folder-dataset) | Train on custom ImageFolder dataset with W&B |
 | [`getting_started/vit_finetuning.py`](tasks/classification.md#vit-fine-tuning) | Two-phase ViT fine-tuning |
 
-### 🎯 Computer Vision Tasks
+### :material-bullseye: Computer Vision Tasks
 
 **Object Detection:**
 
@@ -78,7 +78,7 @@ graph LR
 | [`computer_vision/semantic_segmentation.py`](tasks/semantic-segmentation.md#basic-example-cityscapes) | DeepLabV3+ semantic segmentation |
 | [`computer_vision/instance_segmentation.py`](tasks/instance-segmentation.md#basic-example-coco) | Mask R-CNN style instance segmentation |
 
-### 🤗 HuggingFace Hub Integration
+### :simple-huggingface: HuggingFace Hub Integration
 
 **Basic Integration:**
 
@@ -102,7 +102,7 @@ graph LR
 | [`huggingface/hf_ensemble.py`](integration/hf_ensemble.md) | Ensembles and knowledge distillation |
 | [`huggingface/hf_deployment.py`](integration/hf_deployment.md) | ONNX export, quantization, serving |
 
-### 📊 Data & Augmentation
+### :material-chart-bar: Data & Augmentation
 
 | Script | Description |
 |--------|-------------|
@@ -116,7 +116,7 @@ graph LR
 | [`data_training/csv_instance_segmentation.py`](utilities/csv-data-loading.md#csv-instance-segmentation) | Instance segmentation from CSV |
 | [`data_training/hf_custom_data.py`](utilities/hf_custom_data.md) | Advanced augmentation, multi-label, validation |
 
-### ⚙️ Training & Optimization
+### :material-cog: Training & Optimization
 
 | Script | Description |
 |--------|-------------|
@@ -126,7 +126,7 @@ graph LR
 | [`data_training/performance_optimization_demo.py`](utilities/training-utilities.md#performance-optimization) | Performance optimization techniques |
 | [`data_training/hf_hyperparameter_tuning.py`](utilities/hf_hyperparameter_tuning.md) | Optuna hyperparameter optimization |
 
-### 🔍 Model Interpretation
+### :material-magnify: Model Interpretation
 
 | Script | Description |
 |--------|-------------|
@@ -137,7 +137,7 @@ graph LR
 | [`interpretation/interactive_visualization_demo.py`](utilities/interpretation.md#interactive-visualization) | Interactive Plotly visualizations |
 | [`interpretation/comprehensive_interpretation_tutorial.ipynb`](utilities/interpretation.md#comprehensive-tutorial) | Comprehensive tutorial (Notebook) |
 
-### 📈 Logging & Experiment Tracking
+### :material-trending-up: Logging & Experiment Tracking
 
 | Script | Description |
 |--------|-------------|
@@ -145,7 +145,7 @@ graph LR
 | [`logging_inference/mlflow_tracking.py`](utilities/logging-metrics.md#mlflow-tracking) | MLflow experiment tracking |
 | [`logging_inference/detailed_evaluation.py`](utilities/logging-metrics.md#detailed-evaluation) | Confusion matrix and per-class metrics |
 
-### 🚢 Inference & Utilities
+### :material-play-circle: Inference & Utilities
 
 | Script | Description |
 |--------|-------------|
@@ -176,23 +176,23 @@ python examples/getting_started/classify_cifar10.py
 
 ## Example Categories Summary
 
-### 🚀 Getting Started (3 examples)
+### :material-rocket-launch: Getting Started (3 examples)
 Start your journey with CIFAR-10 classification and custom datasets.
 
-### 🎯 Computer Vision Tasks (8 examples)
+### :material-bullseye: Computer Vision Tasks (8 examples)
 - **Classification** - Basic to advanced classification
 - **Object Detection** - FCOS, YOLOX, RT-DETR, transformers (6 examples)
 - **Segmentation** - Semantic and instance segmentation (2 examples)
 
-### 🤗 HuggingFace Hub (12 examples)
+### :simple-huggingface: HuggingFace Hub (12 examples)
 - **Basic Integration** - 8 task-specific examples
 - **Advanced Techniques** - Interpretation, transfer learning, ensemble, deployment (4 examples)
 
-### 📊 Data & Training (14 examples)
+### :material-chart-bar: Data & Training (14 examples)
 - **Data & Augmentation** - Balanced sampling, augmentation, multi-label, CSV loading (9 examples)
 - **Training & Optimization** - Auto-tuning, multi-GPU, HPO (5 examples)
 
-### 🔍 Understanding & Deployment (13 examples)
+### :material-magnify: Understanding & Deployment (13 examples)
 - **Model Interpretation** - GradCAM, attention, interactive viz (6 examples)
 - **Logging & Tracking** - TensorBoard, MLflow, evaluation (3 examples)
 - **Inference & Utilities** - Model inference, multi-label inference, and backbone discovery (4 examples)

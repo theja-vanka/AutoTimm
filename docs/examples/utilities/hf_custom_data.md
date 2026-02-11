@@ -2,7 +2,7 @@
 
 Comprehensive examples for advanced dataset handling and augmentation strategies with HuggingFace models.
 
-📖 **See also**: [Data Loading Guide](../../user-guide/data-loading/index.md) for general data loading concepts and [Transforms Guide](../../user-guide/data-loading/transforms.md) for transform configuration.
+:material-book-open: **See also**: [Data Loading Guide](../../user-guide/data-loading/index.md) for general data loading concepts and [Transforms Guide](../../user-guide/data-loading/transforms.md) for transform configuration.
 
 ## Overview
 

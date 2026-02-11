@@ -456,10 +456,10 @@ Returns a dictionary with:
 Use relative paths in CSV files:
 
 ```csv
-# Good ✓
+# Good :material-check:
 images/train/img001.jpg,cat
 
-# Bad ✗ (absolute paths break portability)
+# Bad :material-close: (absolute paths break portability)
 /home/user/data/images/train/img001.jpg,cat
 ```
 

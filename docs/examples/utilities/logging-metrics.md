@@ -17,7 +17,7 @@ trainer = AutoTrainer(
 trainer.fit(model, datamodule=data)
 ```
 
-📖 **[Full Logging Documentation](../../user-guide/guides/logging.md)** - All logger backends, configurations, and features.
+:material-book-open: **[Full Logging Documentation](../../user-guide/guides/logging.md)** - All logger backends, configurations, and features.
 
 ---
 

@@ -262,9 +262,9 @@ is_valid = validate_torchscript_export(
 )
 
 if is_valid:
-    print("✓ Export validated successfully")
+    print(":material-check: Export validated successfully")
 else:
-    print("✗ Validation failed - outputs don't match")
+    print(":material-close: Validation failed - outputs don't match")
 ```
 
 **Notes:**
@@ -357,18 +357,18 @@ All AutoTimm task models support TorchScript export:
 ### Export Methods
 
 - **trace** (recommended) - Records operations by running example input
-  - ✅ More reliable
-  - ✅ Better compatibility
-  - ✅ Captures actual execution
-  - ❌ Requires example input
-  - ❌ May not capture dynamic control flow
+  - :material-check-circle: More reliable
+  - :material-check-circle: Better compatibility
+  - :material-check-circle: Captures actual execution
+  - :material-close-circle: Requires example input
+  - :material-close-circle: May not capture dynamic control flow
 
 - **script** - Analyzes Python source code
-  - ✅ No example input required
-  - ✅ Captures control flow
-  - ❌ Not compatible with modern Python type annotations
-  - ❌ Less reliable for complex models
-  - ❌ Not recommended for AutoTimm models
+  - :material-check-circle: No example input required
+  - :material-check-circle: Captures control flow
+  - :material-close-circle: Not compatible with modern Python type annotations
+  - :material-close-circle: Less reliable for complex models
+  - :material-close-circle: Not recommended for AutoTimm models
 
 ---
 

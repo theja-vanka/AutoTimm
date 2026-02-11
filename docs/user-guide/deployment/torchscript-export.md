@@ -230,9 +230,9 @@ is_valid = validate_torchscript_export(
 )
 
 if is_valid:
-    print("✓ Export verified successfully")
+    print(":material-check: Export verified successfully")
 else:
-    print("✗ Export validation failed")
+    print(":material-close: Export validation failed")
 ```
 
 ## Supported Models
@@ -400,20 +400,20 @@ For TorchScript export issues, see the [Troubleshooting - Export & Inference](..
 
 ### What Works
 
-✅ Standard feedforward models
-✅ CNN backbones (ResNet, EfficientNet, etc.)
-✅ Vision Transformers (ViT, Swin, DeiT)
-✅ Detection models (FCOS, YOLOX)
-✅ Segmentation models (DeepLabV3+, FCN)
-✅ Batch inference
-✅ Different input sizes
+:material-check-circle: Standard feedforward models
+:material-check-circle: CNN backbones (ResNet, EfficientNet, etc.)
+:material-check-circle: Vision Transformers (ViT, Swin, DeiT)
+:material-check-circle: Detection models (FCOS, YOLOX)
+:material-check-circle: Segmentation models (DeepLabV3+, FCN)
+:material-check-circle: Batch inference
+:material-check-circle: Different input sizes
 
 ### What Doesn't Work
 
-❌ Python 3.10+ union types with `method="script"`
-❌ Complex dynamic control flow
-❌ Some custom Python operations
-❌ Training-specific features (optimizers, schedulers)
+:material-close-circle: Python 3.10+ union types with `method="script"`
+:material-close-circle: Complex dynamic control flow
+:material-close-circle: Some custom Python operations
+:material-close-circle: Training-specific features (optimizers, schedulers)
 
 **Recommendation:** Use `method="trace"` for maximum compatibility.
 

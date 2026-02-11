@@ -77,7 +77,7 @@ graph TD
 **Key Finding: You don't need Auto classes!** All HuggingFace vision models can be used directly with specific model classes for better control and type safety.
 
 ```python
-# ✅ RECOMMENDED: Specific model classes directly
+# :material-check-circle: RECOMMENDED: Specific model classes directly
 from transformers import (
     ViTModel, ViTConfig, ViTImageProcessor,  # Vision Transformer
     DeiTModel, DeiTConfig,                   # DeiT
@@ -85,7 +85,7 @@ from transformers import (
     SwinModel, SwinConfig,                   # Swin
 )
 
-# ❌ NOT REQUIRED: Auto classes
+# :material-close-circle: NOT REQUIRED: Auto classes
 from transformers import AutoModel, AutoImageProcessor, AutoConfig
 ```
 
@@ -93,13 +93,13 @@ from transformers import AutoModel, AutoImageProcessor, AutoConfig
 
 All PyTorch Lightning features work seamlessly with HuggingFace vision models:
 
-- ✅ Manual model creation and pretrained loading
-- ✅ Lightning training, validation, testing
-- ✅ Checkpoint save/load
-- ✅ Distributed training (DDP)
-- ✅ Mixed precision (FP16/BF16)
-- ✅ All Lightning callbacks
-- ✅ Gradient computation and optimization
+- :material-check-circle: Manual model creation and pretrained loading
+- :material-check-circle: Lightning training, validation, testing
+- :material-check-circle: Checkpoint save/load
+- :material-check-circle: Distributed training (DDP)
+- :material-check-circle: Mixed precision (FP16/BF16)
+- :material-check-circle: All Lightning callbacks
+- :material-check-circle: Gradient computation and optimization
 
 ## Quick Start
 

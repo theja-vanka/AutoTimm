@@ -67,7 +67,7 @@ with torch.inference_mode():
     output = model(input_tensor)
 ```
 
-📖 **[Complete TorchScript Export Guide](torchscript-export.md)** - Detailed documentation including trace vs script modes, optimization, and troubleshooting.
+:material-book-open: **[Complete TorchScript Export Guide](torchscript-export.md)** - Detailed documentation including trace vs script modes, optimization, and troubleshooting.
 
 ---
 
