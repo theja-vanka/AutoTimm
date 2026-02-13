@@ -6,6 +6,12 @@ from autotimm.losses.detection import (
     FocalLoss,
     GIoULoss,
 )
+from autotimm.losses.registry import (
+    LossRegistry,
+    get_loss_registry,
+    list_available_losses,
+    register_custom_loss,
+)
 from autotimm.losses.segmentation import (
     CombinedSegmentationLoss,
     DiceLoss,
@@ -22,6 +28,10 @@ __all__ = [
     "FocalLoss",
     "FocalLossPixelwise",
     "GIoULoss",
+    "LossRegistry",
     "MaskLoss",
     "TverskyLoss",
+    "get_loss_registry",
+    "list_available_losses",
+    "register_custom_loss",
 ]

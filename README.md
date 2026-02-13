@@ -62,6 +62,16 @@ From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-G
 <a href="https://www.buymeacoffee.com/theja.vanka" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 </p>
 
+## What's New in v0.7.4
+
+- **Enhanced Test Coverage** - Added comprehensive test suites for reproducibility (seeding, deterministic mode) and torch.compile integration
+- **Documentation Updates** - Updated API reference with seeding parameters (`seed`, `deterministic`, `use_autotimm_seeding`) for AutoTrainer
+- **Example Fixes** - Updated segmentation examples to use `loss_fn` instead of deprecated `loss_type` parameter
+- **Zensical Icons** - Replaced emojis with Zensical icons in documentation for better rendering
+
+<details>
+<summary><strong>v0.7.3</strong></summary>
+
 ## What's New in v0.7.3
 
 - **CSV Data Loading** - Load data from CSV files for all task types: classification, object detection, semantic segmentation, and instance segmentation
@@ -73,6 +83,8 @@ From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-G
 - **Multi-Label Classification** - Native multi-label support in `ImageClassifier` with `multi_label=True`, using `BCEWithLogitsLoss` and sigmoid predictions
 - **MultiLabelImageDataModule** - New data module for loading multi-label datasets from CSV files with auto-detected label columns, validation splits, and rich summary tables
 - **Multi-Label Metrics** - `MetricManager` now auto-injects `num_labels` and resolves `torchmetrics.classification` metrics (e.g., `MultilabelAccuracy`, `MultilabelF1Score`)
+
+</details>
 
 <details>
 <summary><strong>v0.7.2</strong></summary>
@@ -893,7 +905,7 @@ For major changes, please open an issue first.
   title = {AutoTimm: Automatic PyTorch Image Models},
   url = {https://github.com/theja-vanka/AutoTimm},
   year = {2026},
-  version = {0.7.3}
+  version = {0.7.4}
 }
 ```
 

@@ -17,7 +17,7 @@ from autotimm.backbone import (
 )
 from autotimm.data.transform_config import TransformConfig
 from autotimm.heads import FPN, DetectionHead, YOLOXHead
-from autotimm.losses import FocalLoss, GIoULoss
+from autotimm.losses import FocalLoss, GIoULoss, get_loss_registry
 from autotimm.metrics import LoggingConfig, MetricConfig, MetricManager
 from autotimm.tasks.preprocessing_mixin import PreprocessingMixin
 from autotimm.utils import seed_everything
@@ -33,6 +33,14 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
         num_classes: Number of object classes (excluding background).
         detection_arch: Detection architecture to use. Options: ``"fcos"`` or ``"yolox"``.
             Default is ``"fcos"``. YOLOX uses a decoupled head and no centerness prediction.
+        cls_loss_fn: Classification loss function. Can be:
+            - A string from the loss registry (e.g., 'focal')
+            - An instance of nn.Module (custom loss)
+            - None (uses FocalLoss with focal_alpha and focal_gamma)
+        reg_loss_fn: Regression loss function. Can be:
+            - A string from the loss registry (e.g., 'giou')
+            - An instance of nn.Module (custom loss)
+            - None (uses GIoULoss)
         metrics: A :class:`MetricManager` instance or list of :class:`MetricConfig`
             objects. Optional - if not provided, uses MeanAveragePrecision.
         logging_config: Optional :class:`LoggingConfig` for enhanced logging.
@@ -92,6 +100,8 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
         backbone: str | FeatureBackboneConfig,
         num_classes: int,
         detection_arch: str = "fcos",
+        cls_loss_fn: str | nn.Module | None = None,
+        reg_loss_fn: str | nn.Module | None = None,
         metrics: MetricManager | list[MetricConfig] | None = None,
         logging_config: LoggingConfig | None = None,
         transform_config: TransformConfig | None = None,
@@ -215,10 +225,41 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
         self.reg_loss_weight = reg_loss_weight
         self.centerness_loss_weight = centerness_loss_weight
 
-        self.focal_loss = FocalLoss(
-            alpha=focal_alpha, gamma=focal_gamma, reduction="sum"
-        )
-        self.giou_loss = GIoULoss(reduction="sum")
+        # Setup classification loss
+        if cls_loss_fn is not None:
+            if isinstance(cls_loss_fn, str):
+                registry = get_loss_registry()
+                loss_kwargs = {"reduction": "sum"}
+                if cls_loss_fn == "focal":
+                    loss_kwargs["alpha"] = focal_alpha
+                    loss_kwargs["gamma"] = focal_gamma
+                self.focal_loss = registry.get_loss(cls_loss_fn, **loss_kwargs)
+            elif isinstance(cls_loss_fn, nn.Module):
+                self.focal_loss = cls_loss_fn
+            else:
+                raise TypeError(
+                    f"cls_loss_fn must be a string or nn.Module instance, got {type(cls_loss_fn)}"
+                )
+        else:
+            # Default: FocalLoss
+            self.focal_loss = FocalLoss(
+                alpha=focal_alpha, gamma=focal_gamma, reduction="sum"
+            )
+
+        # Setup regression loss
+        if reg_loss_fn is not None:
+            if isinstance(reg_loss_fn, str):
+                registry = get_loss_registry()
+                self.giou_loss = registry.get_loss(reg_loss_fn, reduction="sum")
+            elif isinstance(reg_loss_fn, nn.Module):
+                self.giou_loss = reg_loss_fn
+            else:
+                raise TypeError(
+                    f"reg_loss_fn must be a string or nn.Module instance, got {type(reg_loss_fn)}"
+                )
+        else:
+            # Default: GIoULoss
+            self.giou_loss = GIoULoss(reduction="sum")
 
         # Initialize metrics
         if metrics is None:

@@ -121,7 +121,7 @@ def main():
         backbone="resnet18",
         num_classes=num_classes,
         head_type="deeplabv3plus",
-        loss_type="combined",
+        loss_fn="combined_segmentation",
         metrics=metric_configs,
         lr=1e-4,
     )

@@ -2,6 +2,123 @@
 
 AutoTimm provides specialized loss functions for object detection and segmentation tasks. This guide compares available losses and helps you choose the right one for your use case.
 
+## Loss Function Registry
+
+AutoTimm includes a centralized loss registry that makes it easy to discover, access, and use built-in loss functions across all tasks.
+
+### Quick Start
+
+```python
+from autotimm.losses import list_available_losses, get_loss_registry
+
+# List all available losses
+print(list_available_losses())
+# Output: ['bce', 'bce_with_logits', 'centerness', 'combined_segmentation', 
+#          'cross_entropy', 'dice', 'fcos', 'focal', 'focal_pixelwise', 
+#          'giou', 'mask', 'mse', 'nll', 'tversky']
+
+# List losses by task
+print(list_available_losses(task="segmentation"))
+# Output: ['combined_segmentation', 'dice', 'focal_pixelwise', 'mask', 'tversky']
+
+# Get a loss from the registry
+registry = get_loss_registry()
+dice_loss = registry.get_loss("dice", num_classes=10)
+```
+
+### Using Losses in Models
+
+You can now pass loss functions to models in three ways:
+
+**1. By Name (from Registry)**
+```python
+from autotimm import SemanticSegmentor
+
+model = SemanticSegmentor(
+    backbone="resnet50",
+    num_classes=19,
+    loss_fn="dice",  # Use loss by name
+)
+```
+
+**2. Custom Loss Instance**
+```python
+import torch.nn as nn
+
+class MyCustomLoss(nn.Module):
+    def forward(self, input, target):
+        # Your custom loss logic
+        return loss_value
+
+model = SemanticSegmentor(
+    backbone="resnet50",
+    num_classes=19,
+    loss_fn=MyCustomLoss(),  # Pass instance
+)
+```
+
+**3. From Registry with Parameters**
+```python
+from autotimm.losses import get_loss_registry
+
+registry = get_loss_registry()
+dice_loss = registry.get_loss("dice", num_classes=19, smooth=2.0)
+
+model = SemanticSegmentor(
+    backbone="resnet50",
+    num_classes=19,
+    loss_fn=dice_loss,
+)
+```
+
+### Available Losses by Task
+
+**Classification:**
+- `cross_entropy` - Standard cross-entropy loss
+- `bce` / `bce_with_logits` - Binary cross-entropy for multi-label
+- `nll` - Negative log likelihood
+- `mse` - Mean squared error
+
+**Detection:**
+- `focal` - Focal loss for classification
+- `giou` - Generalized IoU for box regression
+- `centerness` - Centerness loss (FCOS)
+- `fcos` - Combined FCOS loss
+
+**Segmentation:**
+- `dice` - Dice loss for class overlap
+- `focal_pixelwise` - Pixel-wise focal loss
+- `tversky` - Tversky loss (generalized Dice)
+- `mask` - Binary mask loss
+- `combined_segmentation` - Combined CE + Dice
+
+### Registering Custom Losses
+
+```python
+from autotimm.losses import register_custom_loss
+import torch.nn as nn
+
+class MyWeightedLoss(nn.Module):
+    def __init__(self, weights):
+        super().__init__()
+        self.weights = weights
+    
+    def forward(self, input, target):
+        return (input - target).abs().mean() * self.weights
+
+# Register globally
+register_custom_loss("weighted_loss", MyWeightedLoss, alias="wl")
+
+# Now you can use it by name
+model = ImageClassifier(
+    backbone="resnet18",
+    num_classes=10,
+    loss_fn="weighted_loss",  # or "wl"
+)
+```
+
+---
+
 ## Detection Losses
 
 AutoTimm implements FCOS-style detection losses optimized for anchor-free object detection.

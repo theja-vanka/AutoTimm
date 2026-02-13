@@ -78,6 +78,25 @@ trainer = AutoTrainer(
 trainer.fit(model, datamodule=data)  # Runs tuning first
 ```
 
+#### With Reproducibility Settings
+
+```python
+# Default: seed=42, deterministic=True (Lightning's seeding)
+trainer = AutoTrainer(max_epochs=10)
+
+# Custom seed
+trainer = AutoTrainer(max_epochs=10, seed=123)
+
+# Faster training (disable deterministic mode)
+trainer = AutoTrainer(max_epochs=10, deterministic=False)
+
+# Use AutoTimm's custom seeding instead of Lightning's
+trainer = AutoTrainer(max_epochs=10, use_autotimm_seeding=True)
+
+# Disable seeding completely
+trainer = AutoTrainer(max_epochs=10, seed=None)
+```
+
 #### With Gradient Accumulation
 
 ```python
@@ -110,6 +129,9 @@ trainer.fit(model, datamodule=data)
 | `precision` | `str \| int` | `32` | `32`, `16`, `"bf16-mixed"`, `"16-mixed"` |
 | `logger` | Various | `False` | Logger configuration |
 | `tuner_config` | `TunerConfig \| None` | `None` | Auto-tuning config |
+| `seed` | `int \| None` | `42` | Random seed for reproducibility. Set to `None` to disable seeding |
+| `deterministic` | `bool` | `True` | Enable deterministic algorithms for reproducibility. May impact performance |
+| `use_autotimm_seeding` | `bool` | `False` | Use AutoTimm's `seed_everything()` instead of Lightning's built-in seeding |
 | `checkpoint_monitor` | `str \| None` | `None` | Metric for checkpointing |
 | `checkpoint_mode` | `str` | `"max"` | `"max"` or `"min"` |
 | `callbacks` | `list \| None` | `None` | Lightning callbacks |
