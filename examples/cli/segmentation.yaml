@@ -1,0 +1,32 @@
+# Example AutoTimm CLI config for semantic segmentation.
+#
+# Usage:
+#   autotimm fit --config examples/cli/segmentation.yaml
+#   autotimm fit --config examples/cli/segmentation.yaml --trainer.fast_dev_run true
+#   autotimm fit --config examples/cli/segmentation.yaml --model.init_args.head_type fcn
+
+model:
+  class_path: autotimm.SemanticSegmentor
+  init_args:
+    backbone: resnet50
+    num_classes: 19
+    head_type: deeplabv3plus
+    lr: 0.01
+
+data:
+  class_path: autotimm.SegmentationDataModule
+  init_args:
+    data_dir: ./cityscapes
+    format: cityscapes
+    image_size: 512
+    batch_size: 4
+    num_workers: 4
+
+trainer:
+  max_epochs: 100
+  accelerator: auto
+  devices: auto
+  precision: 32
+  enable_checkpointing: false
+  logger: false
+  tuner_config: false

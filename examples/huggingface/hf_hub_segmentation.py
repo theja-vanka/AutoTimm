@@ -135,7 +135,7 @@ def train_deeplabv3_with_resnet():
         backbone="hf-hub:timm/resnet50.a1_in1k",
         num_classes=19,
         head_type="deeplabv3plus",
-        loss_type="combined",  # CrossEntropy + Dice
+        loss_fn="combined_segmentation",  # CrossEntropy + Dice
         dice_weight=1.0,
         metrics=metrics,
         lr=1e-3,
@@ -198,7 +198,7 @@ def train_fcn_with_convnext():
         backbone="hf-hub:timm/convnext_tiny.fb_in22k",
         num_classes=19,
         head_type="fcn",
-        loss_type="dice",
+        loss_fn="dice",
         metrics=metrics,
         lr=1e-4,  # Lower LR for pretrained ConvNeXt
         optimizer="adamw",

@@ -80,9 +80,9 @@ def main():
         backbone="resnet50",  # Any timm backbone works
         num_classes=21,  # Number of segmentation classes
         head_type="deeplabv3plus",  # Options: "deeplabv3plus", "fcn"
-        loss_type="combined",  # Options: "ce", "dice", "focal", "combined"
-        ce_weight=1.0,  # Weight for cross-entropy loss (when using "combined")
-        dice_weight=1.0,  # Weight for Dice loss (when using "combined")
+        loss_fn="combined_segmentation",  # Options: "cross_entropy", "dice", "focal_pixelwise", "combined_segmentation"
+        ce_weight=1.0,  # Weight for cross-entropy loss (when using "combined_segmentation")
+        dice_weight=1.0,  # Weight for Dice loss (when using "combined_segmentation")
         ignore_index=255,
         metrics=metric_configs,
         logging_config=LoggingConfig(

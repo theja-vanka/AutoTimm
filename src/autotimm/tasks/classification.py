@@ -12,6 +12,7 @@ import torchmetrics
 from autotimm.backbone import BackboneConfig, create_backbone, get_backbone_out_features
 from autotimm.data.transform_config import TransformConfig
 from autotimm.heads import ClassificationHead
+from autotimm.losses import get_loss_registry
 from autotimm.metrics import LoggingConfig, MetricConfig, MetricManager
 from autotimm.tasks.preprocessing_mixin import PreprocessingMixin
 from autotimm.utils import seed_everything
@@ -27,6 +28,10 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
             predictions for multi-label classification. Default is ``False``.
         threshold: Prediction threshold for multi-label mode. Sigmoid outputs
             above this value are predicted as positive. Default is ``0.5``.
+        loss_fn: Loss function to use. Can be:
+            - A string from the loss registry (e.g., 'cross_entropy', 'bce', 'mse')
+            - An instance of nn.Module (custom loss)
+            - None (uses default: CrossEntropyLoss for multi-class, BCEWithLogitsLoss for multi-label)
         metrics: A :class:`MetricManager` instance or list of :class:`MetricConfig`
             objects. Optional - if ``None``, no metrics will be computed during training.
             This is useful for inference-only scenarios.
@@ -101,6 +106,7 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
         num_classes: int,
         multi_label: bool = False,
         threshold: float = 0.5,
+        loss_fn: str | nn.Module | None = None,
         metrics: MetricManager | list[MetricConfig] | None = None,
         logging_config: LoggingConfig | None = None,
         transform_config: TransformConfig | None = None,
@@ -144,10 +150,32 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
         self._multi_label = multi_label
         self._threshold = threshold
 
-        if multi_label:
-            self.criterion = nn.BCEWithLogitsLoss()
+        # Setup loss function
+        if loss_fn is not None:
+            # Use provided loss function
+            if isinstance(loss_fn, str):
+                # Get from registry
+                registry = get_loss_registry()
+                loss_kwargs = {}
+                
+                # Handle label_smoothing for cross_entropy
+                if loss_fn in ["cross_entropy", "ce"] and label_smoothing > 0:
+                    loss_kwargs["label_smoothing"] = label_smoothing
+                    
+                self.criterion = registry.get_loss(loss_fn, **loss_kwargs)
+            elif isinstance(loss_fn, nn.Module):
+                # Use custom loss instance
+                self.criterion = loss_fn
+            else:
+                raise TypeError(
+                    f"loss_fn must be a string or nn.Module instance, got {type(loss_fn)}"
+                )
         else:
-            self.criterion = nn.CrossEntropyLoss(label_smoothing=label_smoothing)
+            # Default behavior based on multi_label
+            if multi_label:
+                self.criterion = nn.BCEWithLogitsLoss()
+            else:
+                self.criterion = nn.CrossEntropyLoss(label_smoothing=label_smoothing)
 
         # Initialize metrics from config
         if metrics is not None:

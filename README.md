@@ -62,6 +62,16 @@ From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-G
 <a href="https://www.buymeacoffee.com/theja.vanka" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 </p>
 
+## What's New in v0.7.4
+
+- **Enhanced Test Coverage** - Added comprehensive test suites for reproducibility (seeding, deterministic mode) and torch.compile integration
+- **Documentation Updates** - Updated API reference with seeding parameters (`seed`, `deterministic`, `use_autotimm_seeding`) for AutoTrainer
+- **Example Fixes** - Updated segmentation examples to use `loss_fn` instead of deprecated `loss_type` parameter
+- **Zensical Icons** - Replaced emojis with Zensical icons in documentation for better rendering
+
+<details>
+<summary><strong>v0.7.3</strong></summary>
+
 ## What's New in v0.7.3
 
 - **CSV Data Loading** - Load data from CSV files for all task types: classification, object detection, semantic segmentation, and instance segmentation
@@ -73,6 +83,8 @@ From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-G
 - **Multi-Label Classification** - Native multi-label support in `ImageClassifier` with `multi_label=True`, using `BCEWithLogitsLoss` and sigmoid predictions
 - **MultiLabelImageDataModule** - New data module for loading multi-label datasets from CSV files with auto-detected label columns, validation splits, and rich summary tables
 - **Multi-Label Metrics** - `MetricManager` now auto-injects `num_labels` and resolves `torchmetrics.classification` metrics (e.g., `MultilabelAccuracy`, `MultilabelF1Score`)
+
+</details>
 
 <details>
 <summary><strong>v0.7.2</strong></summary>
@@ -201,6 +213,10 @@ trainer.fit(model, datamodule=data)
 <tr>
 <td><strong>torch.compile Support</strong></td>
 <td>Automatic PyTorch 2.0+ optimization • Enabled by default • Configurable modes</td>
+</tr>
+<tr>
+<td><strong>CLI Support</strong></td>
+<td>YAML-config-driven training from the command line — <code>autotimm fit --config config.yaml</code></td>
 </tr>
 <tr>
 <td><strong>CSV Data Loading</strong></td>
@@ -734,6 +750,52 @@ trainer = AutoTrainer(
 )
 ```
 
+### Command-Line Interface (CLI)
+
+Train models from the command line using YAML configs — no Python scripts needed:
+
+```bash
+# Train with a config file
+autotimm fit --config config.yaml
+
+# Override any parameter
+autotimm fit --config config.yaml --model.init_args.lr 0.001 --trainer.max_epochs 20
+
+# Quick smoke test
+autotimm fit --config config.yaml --trainer.fast_dev_run true
+
+# Validate or test
+autotimm validate --config config.yaml --ckpt_path best.ckpt
+autotimm test --config config.yaml --ckpt_path best.ckpt
+```
+
+Example `config.yaml`:
+
+```yaml
+model:
+  class_path: autotimm.ImageClassifier
+  init_args:
+    backbone: resnet18
+    num_classes: 10
+
+data:
+  class_path: autotimm.ImageDataModule
+  init_args:
+    dataset_name: CIFAR10
+    data_dir: ./data
+    batch_size: 32
+    image_size: 224
+
+trainer:
+  max_epochs: 10
+  accelerator: auto
+  tuner_config: false
+```
+
+Works with all task types: classification, detection, segmentation, and instance segmentation. See [example configs](examples/cli/) for more.
+
+**[CLI Guide](https://theja-vanka.github.io/AutoTimm/user-guide/training/cli/)** | **[CLI API Reference](https://theja-vanka.github.io/AutoTimm/api/cli/)**
+
 ### Optional Metrics for Inference
 
 ```python
@@ -796,8 +858,9 @@ Comprehensive documentation with **interactive diagrams**, search optimization, 
 | [User Guide](https://theja-vanka.github.io/AutoTimm/user-guide/data-loading/) | In-depth guides for all features |
 | [Interpretation Guide](https://theja-vanka.github.io/AutoTimm/user-guide/interpretation/) | Model explainability and visualization |
 | [YOLOX Guide](https://theja-vanka.github.io/AutoTimm/user-guide/models/yolox-detector/) | Complete YOLOX implementation guide |
+| [CLI Guide](https://theja-vanka.github.io/AutoTimm/user-guide/training/cli/) | Train from YAML configs on the command line |
 | [API Reference](https://theja-vanka.github.io/AutoTimm/api/) | Complete API documentation |
-| [Examples](https://theja-vanka.github.io/AutoTimm/examples/) | 50 runnable code examples |
+| [Examples](https://theja-vanka.github.io/AutoTimm/examples/) | 50+ runnable code examples |
 
 ### Ready-to-Run Examples
 
@@ -824,6 +887,11 @@ Comprehensive documentation with **interactive diagrams**, search optimization, 
 - Interpretation: [comprehensive_interpretation_tutorial.ipynb](examples/interpretation/comprehensive_interpretation_tutorial.ipynb) (40+ cells), [interpretation_metrics_demo.py](examples/interpretation/interpretation_metrics_demo.py)
 - Visualization: [interactive_visualization_demo.py](examples/interpretation/interactive_visualization_demo.py) - Interactive Plotly
 - Tracking: [mlflow_tracking.py](examples/logging_inference/mlflow_tracking.py) - MLflow experiment tracking
+
+**:material-console: CLI Configs**
+- [classification.yaml](examples/cli/classification.yaml) - Classification with ResNet-18 on CIFAR-10
+- [detection.yaml](examples/cli/detection.yaml) - FCOS object detection on COCO
+- [segmentation.yaml](examples/cli/segmentation.yaml) - DeepLabV3+ on Cityscapes
 
 **[Browse all examples →](https://theja-vanka.github.io/AutoTimm/examples/)**
 
@@ -893,7 +961,7 @@ For major changes, please open an issue first.
   title = {AutoTimm: Automatic PyTorch Image Models},
   url = {https://github.com/theja-vanka/AutoTimm},
   year = {2026},
-  version = {0.7.3}
+  version = {0.7.4}
 }
 ```
 

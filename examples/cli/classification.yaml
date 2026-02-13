@@ -1,0 +1,31 @@
+# Example AutoTimm CLI config for image classification.
+#
+# Usage:
+#   autotimm fit --config examples/cli/classification.yaml
+#   autotimm fit --config examples/cli/classification.yaml --trainer.fast_dev_run true
+#   autotimm fit --config examples/cli/classification.yaml --model.init_args.lr 0.001
+
+model:
+  class_path: autotimm.ImageClassifier
+  init_args:
+    backbone: resnet18
+    num_classes: 10
+
+data:
+  class_path: autotimm.ImageDataModule
+  init_args:
+    dataset_name: CIFAR10
+    data_dir: ./data
+    batch_size: 32
+    image_size: 224
+    num_workers: 4
+
+trainer:
+  max_epochs: 10
+  accelerator: auto
+  devices: auto
+  precision: 32
+  fast_dev_run: false
+  enable_checkpointing: false
+  logger: false
+  tuner_config: false

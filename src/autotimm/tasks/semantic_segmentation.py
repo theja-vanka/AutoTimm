@@ -16,6 +16,7 @@ from autotimm.backbone import (
 )
 from autotimm.data.transform_config import TransformConfig
 from autotimm.heads import DeepLabV3PlusHead, FCNHead
+from autotimm.losses import get_loss_registry
 from autotimm.losses.segmentation import CombinedSegmentationLoss, DiceLoss
 from autotimm.metrics import LoggingConfig, MetricConfig, MetricManager
 from autotimm.tasks.preprocessing_mixin import PreprocessingMixin
@@ -29,7 +30,12 @@ class SemanticSegmentor(PreprocessingMixin, pl.LightningModule):
         backbone: A timm model name (str) or a :class:`FeatureBackboneConfig`.
         num_classes: Number of segmentation classes.
         head_type: Type of segmentation head ('deeplabv3plus' or 'fcn').
-        loss_type: Loss function type ('ce', 'dice', 'focal', or 'combined').
+        loss_fn: Loss function to use. Can be:
+            - A string from the loss registry (e.g., 'dice', 'focal_pixelwise', 'combined_segmentation')
+            - An instance of nn.Module (custom loss)
+            - None (uses loss_type parameter for backward compatibility)
+        loss_type: [DEPRECATED] Loss function type ('ce', 'dice', 'focal', or 'combined').
+            Use loss_fn parameter instead for better flexibility.
         dice_weight: Weight for Dice loss when using 'combined' loss (default: 1.0).
         ce_weight: Weight for cross-entropy loss when using 'combined' loss (default: 1.0).
         ignore_index: Index to ignore in loss computation (default: 255).
@@ -82,6 +88,7 @@ class SemanticSegmentor(PreprocessingMixin, pl.LightningModule):
         backbone: str | FeatureBackboneConfig,
         num_classes: int,
         head_type: str = "deeplabv3plus",
+        loss_fn: str | nn.Module | None = None,
         loss_type: str = "combined",
         dice_weight: float = 1.0,
         ce_weight: float = 1.0,
@@ -134,36 +141,64 @@ class SemanticSegmentor(PreprocessingMixin, pl.LightningModule):
         # Create loss function
         self.loss_type = loss_type
         self.ignore_index = ignore_index
-        if loss_type == "ce":
-            self.criterion = nn.CrossEntropyLoss(
-                weight=class_weights,
-                ignore_index=ignore_index,
-            )
-        elif loss_type == "dice":
-            self.criterion = DiceLoss(
-                num_classes=num_classes,
-                ignore_index=ignore_index,
-            )
-        elif loss_type == "combined":
-            self.criterion = CombinedSegmentationLoss(
-                num_classes=num_classes,
-                ce_weight=ce_weight,
-                dice_weight=dice_weight,
-                ignore_index=ignore_index,
-                class_weights=class_weights,
-            )
+        
+        # Priority: loss_fn > loss_type (for backward compatibility)
+        if loss_fn is not None:
+            # Use provided loss function
+            if isinstance(loss_fn, str):
+                # Get from registry
+                registry = get_loss_registry()
+                # Prepare kwargs for loss instantiation
+                loss_kwargs = {"ignore_index": ignore_index}
+                if loss_fn in ["dice", "tversky", "combined_segmentation"]:
+                    loss_kwargs["num_classes"] = num_classes
+                if loss_fn == "combined_segmentation":
+                    loss_kwargs["ce_weight"] = ce_weight
+                    loss_kwargs["dice_weight"] = dice_weight
+                    loss_kwargs["class_weights"] = class_weights
+                elif loss_fn == "cross_entropy" and class_weights is not None:
+                    loss_kwargs["weight"] = class_weights
+                    
+                self.criterion = registry.get_loss(loss_fn, **loss_kwargs)
+            elif isinstance(loss_fn, nn.Module):
+                # Use custom loss instance
+                self.criterion = loss_fn
+            else:
+                raise TypeError(
+                    f"loss_fn must be a string or nn.Module instance, got {type(loss_fn)}"
+                )
         else:
-            from autotimm.losses.segmentation import FocalLossPixelwise
-
-            if loss_type == "focal":
-                self.criterion = FocalLossPixelwise(
+            # Backward compatibility: use loss_type
+            if loss_type == "ce":
+                self.criterion = nn.CrossEntropyLoss(
+                    weight=class_weights,
                     ignore_index=ignore_index,
                 )
-            else:
-                raise ValueError(
-                    f"Unknown loss_type: {loss_type}. "
-                    f"Use 'ce', 'dice', 'focal', or 'combined'."
+            elif loss_type == "dice":
+                self.criterion = DiceLoss(
+                    num_classes=num_classes,
+                    ignore_index=ignore_index,
                 )
+            elif loss_type == "combined":
+                self.criterion = CombinedSegmentationLoss(
+                    num_classes=num_classes,
+                    ce_weight=ce_weight,
+                    dice_weight=dice_weight,
+                    ignore_index=ignore_index,
+                    class_weights=class_weights,
+                )
+            else:
+                from autotimm.losses.segmentation import FocalLossPixelwise
+
+                if loss_type == "focal":
+                    self.criterion = FocalLossPixelwise(
+                        ignore_index=ignore_index,
+                    )
+                else:
+                    raise ValueError(
+                        f"Unknown loss_type: {loss_type}. "
+                        f"Use 'ce', 'dice', 'focal', or 'combined'."
+                    )
 
         # Initialize metrics from config
         if metrics is None:

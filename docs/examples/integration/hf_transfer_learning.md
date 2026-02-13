@@ -202,21 +202,25 @@ python examples/huggingface/hf_transfer_learning.py
 ## Best Practices
 
 1. **Always start with frozen backbone**:
+
    - Establishes baseline
    - Fast sanity check
    - Prevents catastrophic forgetting
 
 2. **Use LLRD for 1-3% improvement**:
+
    - Typical decay factor: 0.8
    - Base LR for head: 1e-3
    - Effective LR for layer1: ~3e-4
 
 3. **Progressive unfreezing for small datasets**:
+
    - Prevents overfitting
    - Allows gradual adaptation
    - More stable than sudden unfreezing
 
 4. **Monitor per-layer gradients**:
+
    - Ensure all layers are learning
    - Avoid vanishing gradients
    - Adjust learning rates accordingly
