@@ -40,6 +40,7 @@ nav = [
             { "Dataset Preparation" = "user-guide/training/dataset-preparation.md" },
             { "Loss Comparison" = "user-guide/training/loss-comparison.md" },
             { "Advanced Customization" = "user-guide/training/advanced-customization.md" },
+            { "CLI" = "user-guide/training/cli.md" },
         ]},
         { "Evaluation" = [
             { "Metrics" = "user-guide/evaluation/metrics.md" },
@@ -141,6 +142,7 @@ nav = [
         ]},
         { "Training" = [
             { "AutoTrainer" = "api/trainer.md" },
+            { "CLI" = "api/cli.md" },
         ]},
         { "Models" = [
             { "Backbone" = "api/backbone.md" },
@@ -179,6 +181,9 @@ nav = [
             { "Custom Data & Augmentation" = "examples/utilities/hf_custom_data.md" },
             { "Training Utilities" = "examples/utilities/training-utilities.md" },
             { "Hyperparameter Tuning" = "examples/utilities/hf_hyperparameter_tuning.md" },
+        ]},
+        { "CLI" = [
+            { "CLI Examples" = "examples/utilities/cli.md" },
         ]},
         { "Understanding & Deployment" = [
             { "Model Interpretation" = "examples/utilities/interpretation.md" },

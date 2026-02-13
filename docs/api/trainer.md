@@ -1,6 +1,6 @@
 # AutoTrainer & TunerConfig
 
-Configured PyTorch Lightning Trainer with auto-tuning support.
+Configured PyTorch Lightning Trainer with auto-tuning support. For YAML-config-driven training from the command line, see [AutoTimmCLI](cli.md).
 
 ## AutoTrainer
 

@@ -1,0 +1,32 @@
+# Example AutoTimm CLI config for object detection.
+#
+# Usage:
+#   autotimm fit --config examples/cli/detection.yaml
+#   autotimm fit --config examples/cli/detection.yaml --trainer.fast_dev_run true
+#   autotimm fit --config examples/cli/detection.yaml --trainer.max_epochs 50
+
+model:
+  class_path: autotimm.ObjectDetector
+  init_args:
+    backbone: resnet50
+    num_classes: 80
+    detection_arch: fcos
+    fpn_channels: 256
+    lr: 0.01
+
+data:
+  class_path: autotimm.DetectionDataModule
+  init_args:
+    data_dir: ./coco
+    image_size: 640
+    batch_size: 8
+    num_workers: 4
+
+trainer:
+  max_epochs: 50
+  accelerator: auto
+  devices: auto
+  precision: 32
+  enable_checkpointing: false
+  logger: false
+  tuner_config: false

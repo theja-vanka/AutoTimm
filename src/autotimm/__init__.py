@@ -76,6 +76,7 @@ from autotimm.tasks.instance_segmentation import InstanceSegmentor
 from autotimm.tasks.object_detection import ObjectDetector
 from autotimm.tasks.semantic_segmentation import SemanticSegmentor
 from autotimm.tasks.yolox_detector import YOLOXDetector
+from autotimm.cli import AutoTimmCLI, main as cli_main
 from autotimm.trainer import AutoTrainer, TunerConfig
 from autotimm.utils import (
     count_parameters,
@@ -133,6 +134,9 @@ task = tasks
 
 __all__ = [
     "__version__",
+    # CLI
+    "AutoTimmCLI",
+    "cli_main",
     # Trainer
     "AutoTrainer",
     "TunerConfig",

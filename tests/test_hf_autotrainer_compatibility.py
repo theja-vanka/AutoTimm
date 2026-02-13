@@ -502,6 +502,7 @@ class TestAutoTrainerWithDataModule:
                 data_dir=str(data_dir),
                 image_size=224,
                 batch_size=2,
+                num_workers=0,
             )
 
             model = ImageClassifier(

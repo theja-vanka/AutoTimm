@@ -11,6 +11,7 @@ graph LR
     A --> D[<b>HuggingFace</b><br/>Hub integration,<br/>model sharing]
     A --> E[<b>Training</b><br/>HPO, multi-GPU,<br/>auto-tuning]
     A --> F[<b>Understanding</b><br/>GradCAM, attention,<br/>feature maps]
+    A --> G[<b>CLI</b><br/>YAML configs,<br/>command line]
 
     style A fill:#1565C0,stroke:#0D47A1
     style B fill:#1976D2,stroke:#1565C0
@@ -18,6 +19,7 @@ graph LR
     style D fill:#1976D2,stroke:#1565C0
     style E fill:#1565C0,stroke:#0D47A1
     style F fill:#1976D2,stroke:#1565C0
+    style G fill:#1565C0,stroke:#0D47A1
 ```
 
 ## Quick Reference
@@ -43,6 +45,9 @@ graph LR
 - **[Training Utilities](utilities/training-utilities.md)** - Auto-tuning, multi-GPU, presets
 - **[Data Handling](utilities/data-handling.md)** - Balanced sampling, augmentation
 - **[Logging & Metrics](utilities/logging-metrics.md)** - TensorBoard, MLflow, evaluation
+
+### :material-console: CLI
+- **[CLI Examples](utilities/cli.md)** - Train from YAML configs on the command line
 
 ### :material-magnify: Model Understanding
 - **[Interpretation Methods](utilities/interpretation.md)** - Comprehensive interpretation toolkit
@@ -145,6 +150,14 @@ graph LR
 | [`logging_inference/mlflow_tracking.py`](utilities/logging-metrics.md#mlflow-tracking) | MLflow experiment tracking |
 | [`logging_inference/detailed_evaluation.py`](utilities/logging-metrics.md#detailed-evaluation) | Confusion matrix and per-class metrics |
 
+### :material-console: CLI
+
+| Config | Description |
+|--------|-------------|
+| [`cli/classification.yaml`](utilities/cli.md#classification) | CLI config for image classification |
+| [`cli/detection.yaml`](utilities/cli.md#object-detection) | CLI config for object detection |
+| [`cli/segmentation.yaml`](utilities/cli.md#semantic-segmentation) | CLI config for semantic segmentation |
+
 ### :material-play-circle: Inference & Utilities
 
 | Script | Description |
@@ -192,12 +205,15 @@ Start your journey with CIFAR-10 classification and custom datasets.
 - **Data & Augmentation** - Balanced sampling, augmentation, multi-label, CSV loading (9 examples)
 - **Training & Optimization** - Auto-tuning, multi-GPU, HPO (5 examples)
 
+### :material-console: CLI (3 configs)
+Train from the command line with YAML configuration files.
+
 ### :material-magnify: Understanding & Deployment (13 examples)
 - **Model Interpretation** - GradCAM, attention, interactive viz (6 examples)
 - **Logging & Tracking** - TensorBoard, MLflow, evaluation (3 examples)
 - **Inference & Utilities** - Model inference, multi-label inference, and backbone discovery (4 examples)
 
-**Total: 50 runnable examples**
+**Total: 50+ runnable examples and configs**
 
 
 

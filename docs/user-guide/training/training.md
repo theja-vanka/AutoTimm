@@ -513,6 +513,21 @@ trainer = AutoTrainer(
 - Smaller objects: Try 800×800 or 1024×1024
 - Faster training: 512×512
 
+## Command-Line Interface
+
+You can also train models from the command line without writing Python scripts. See the [CLI Guide](cli.md) for details.
+
+```bash
+# Train with a YAML config
+autotimm fit --config config.yaml
+
+# Override parameters from the command line
+autotimm fit --config config.yaml --trainer.max_epochs 20 --model.init_args.lr 0.001
+
+# Quick smoke test
+autotimm fit --config config.yaml --trainer.fast_dev_run true
+```
+
 ## Full Parameter Reference
 
 ```python
