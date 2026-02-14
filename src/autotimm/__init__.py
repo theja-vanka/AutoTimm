@@ -89,6 +89,10 @@ from autotimm.export import (
     load_torchscript,
     export_checkpoint_to_torchscript,
     validate_torchscript_export,
+    export_to_onnx,
+    load_onnx,
+    export_checkpoint_to_onnx,
+    validate_onnx_export,
 )
 
 # Interpretation
@@ -214,6 +218,10 @@ __all__ = [
     "load_torchscript",
     "export_checkpoint_to_torchscript",
     "validate_torchscript_export",
+    "export_to_onnx",
+    "load_onnx",
+    "export_checkpoint_to_onnx",
+    "validate_onnx_export",
     # YOLOX Utils
     "list_yolox_models",
     "list_yolox_backbones",

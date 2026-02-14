@@ -3,6 +3,7 @@
 import os
 import tempfile
 
+import numpy as np
 import pytest
 import torch
 
@@ -13,6 +14,14 @@ from autotimm.export import (
     validate_torchscript_export,
 )
 from autotimm.metrics import MetricConfig
+
+try:
+    import onnx
+    import onnxruntime as ort
+
+    HAS_ONNX = True
+except ImportError:
+    HAS_ONNX = False
 
 
 @pytest.fixture(autouse=True, scope="function")
@@ -298,3 +307,159 @@ def test_export_preserves_training_mode():
 
         # Should still be in training mode
         assert model.training
+
+
+# ============================================================================
+# ONNX Export Tests
+# ============================================================================
+
+
+@pytest.mark.skipif(not HAS_ONNX, reason="onnx/onnxruntime not installed")
+def test_export_to_onnx_classification(simple_classifier, tmp_path):
+    """Test exporting classification model to ONNX format."""
+    from autotimm.export import export_to_onnx
+
+    save_path = tmp_path / "model.onnx"
+    example_input = torch.randn(1, 3, 224, 224)
+
+    result_path = export_to_onnx(
+        simple_classifier,
+        save_path,
+        example_input=example_input,
+    )
+
+    # Check file was created
+    assert save_path.exists()
+    assert result_path == str(save_path)
+
+    # Check model can be loaded and validated
+    onnx_model = onnx.load(str(save_path))
+    onnx.checker.check_model(onnx_model)
+
+    # Check inference works
+    session = ort.InferenceSession(str(save_path), providers=["CPUExecutionProvider"])
+    input_name = session.get_inputs()[0].name
+    outputs = session.run(None, {input_name: example_input.numpy()})
+    assert outputs[0].shape == (1, 10)
+
+
+@pytest.mark.skipif(not HAS_ONNX, reason="onnx/onnxruntime not installed")
+def test_load_onnx(simple_classifier, tmp_path):
+    """Test loading an ONNX model."""
+    from autotimm.export import export_to_onnx, load_onnx
+
+    save_path = tmp_path / "model.onnx"
+    example_input = torch.randn(1, 3, 224, 224)
+
+    export_to_onnx(simple_classifier, save_path, example_input)
+
+    # Load model
+    session = load_onnx(save_path)
+    assert session is not None
+
+    # Test inference
+    input_name = session.get_inputs()[0].name
+    outputs = session.run(None, {input_name: example_input.numpy()})
+    assert outputs[0].shape == (1, 10)
+
+
+@pytest.mark.skipif(not HAS_ONNX, reason="onnx/onnxruntime not installed")
+def test_validate_onnx_export(simple_classifier, tmp_path):
+    """Test validating ONNX export matches original model."""
+    from autotimm.export import export_to_onnx, validate_onnx_export
+
+    save_path = tmp_path / "model.onnx"
+    example_input = torch.randn(1, 3, 224, 224)
+
+    export_to_onnx(simple_classifier, save_path, example_input)
+
+    is_valid = validate_onnx_export(
+        simple_classifier,
+        save_path,
+        example_input,
+    )
+    assert is_valid
+
+
+@pytest.mark.skipif(not HAS_ONNX, reason="onnx/onnxruntime not installed")
+def test_model_to_onnx_method(tmp_path):
+    """Test the to_onnx() convenience method on model."""
+    model = ImageClassifier(
+        backbone="resnet18",
+        num_classes=10,
+        compile_model=False,
+        seed=None,
+    )
+    model.eval()
+
+    save_path = tmp_path / "model.onnx"
+    result_path = model.to_onnx(str(save_path))
+
+    # Check file was created
+    assert save_path.exists()
+    assert result_path == str(save_path)
+
+    # Check inference works
+    session = ort.InferenceSession(str(save_path), providers=["CPUExecutionProvider"])
+    input_name = session.get_inputs()[0].name
+    example_input = np.random.randn(1, 3, 224, 224).astype(np.float32)
+    outputs = session.run(None, {input_name: example_input})
+    assert outputs[0].shape == (1, 10)
+
+
+@pytest.mark.skipif(not HAS_ONNX, reason="onnx/onnxruntime not installed")
+def test_export_to_onnx_dynamic_axes(simple_classifier, tmp_path):
+    """Test ONNX export with dynamic batch dimension."""
+    from autotimm.export import export_to_onnx
+
+    save_path = tmp_path / "model.onnx"
+    example_input = torch.randn(1, 3, 224, 224)
+
+    # Export with default dynamic axes (batch dimension)
+    export_to_onnx(simple_classifier, save_path, example_input)
+
+    # Test with different batch sizes
+    session = ort.InferenceSession(str(save_path), providers=["CPUExecutionProvider"])
+    input_name = session.get_inputs()[0].name
+
+    for batch_size in [1, 2, 4]:
+        test_input = np.random.randn(batch_size, 3, 224, 224).astype(np.float32)
+        outputs = session.run(None, {input_name: test_input})
+        assert outputs[0].shape == (batch_size, 10)
+
+
+@pytest.mark.skipif(not HAS_ONNX, reason="onnx/onnxruntime not installed")
+def test_export_onnx_without_example_input(tmp_path):
+    """Test that ONNX export without example_input raises error."""
+    from autotimm.export import export_to_onnx
+
+    model = ImageClassifier(
+        backbone="resnet18",
+        num_classes=10,
+        compile_model=False,
+        seed=None,
+    )
+
+    save_path = tmp_path / "model.onnx"
+    with pytest.raises(RuntimeError):
+        export_to_onnx(model, save_path, example_input=None)
+
+
+@pytest.mark.skipif(not HAS_ONNX, reason="onnx/onnxruntime not installed")
+def test_export_onnx_preserves_training_mode(tmp_path):
+    """Test that ONNX export preserves the original training mode."""
+    from autotimm.export import export_to_onnx
+
+    model = ImageClassifier(
+        backbone="resnet18",
+        num_classes=10,
+        compile_model=False,
+        seed=None,
+    )
+    model.train()  # Set to training mode
+
+    save_path = tmp_path / "model.onnx"
+    export_to_onnx(model, save_path, example_input=torch.randn(1, 3, 224, 224))
+
+    # Should still be in training mode
+    assert model.training

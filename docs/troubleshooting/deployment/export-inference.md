@@ -5,31 +5,38 @@ Problems with model export and inference.
 ## ONNX Export Failures
 
 ```python
+from autotimm import ImageClassifier, export_to_onnx
 import torch
 
-# 1. Export with dynamic axes for variable input sizes
+# 1. Use AutoTimm's export function (handles Lightning modules automatically)
 model = ImageClassifier.load_from_checkpoint("checkpoint.ckpt")
 model.eval()
 
-dummy_input = torch.randn(1, 3, 224, 224)
-torch.onnx.export(
-    model,
-    dummy_input,
-    "model.onnx",
-    input_names=["image"],
-    output_names=["output"],
-    dynamic_axes={
-        "image": {0: "batch_size"},
-        "output": {0: "batch_size"}
-    },
-    opset_version=14,  # Use higher opset for better compatibility
-)
+example_input = torch.randn(1, 3, 224, 224)
+export_to_onnx(model, "model.onnx", example_input)
 
-# 2. If export fails, simplify model
-model.to_torchscript(
-    file_path="model.pt",
-    method="trace",  # Try "script" if trace fails
-)
+# 2. Or use the convenience method
+model.to_onnx("model.onnx")
+
+# 3. If export fails, try a lower opset version
+export_to_onnx(model, "model.onnx", example_input, opset_version=14)
+
+# 4. Validate the export
+from autotimm.export import validate_onnx_export
+is_valid = validate_onnx_export(model, "model.onnx", example_input)
+
+# 5. If ONNX export fails, try TorchScript instead
+model.to_torchscript("model.pt")
+```
+
+### Missing ONNX Dependencies
+
+```bash
+# Install required packages
+pip install onnx onnxruntime onnxscript
+
+# For GPU inference
+pip install onnxruntime-gpu
 ```
 
 ## TorchScript Issues

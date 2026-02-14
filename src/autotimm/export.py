@@ -1,7 +1,8 @@
-"""Model export utilities for TorchScript and other formats.
+"""Model export utilities for TorchScript and ONNX formats.
 
 This module provides utilities to export trained AutoTimm models to various formats
-for deployment, including TorchScript (.pt files) for production inference.
+for deployment, including TorchScript (.pt files) and ONNX (.onnx files) for
+production inference across multiple runtimes and platforms.
 """
 
 from __future__ import annotations
@@ -11,8 +12,33 @@ import warnings
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import torch
 import torch.nn as nn
+
+try:
+    import onnx
+    import onnxruntime as ort
+
+    HAS_ONNX = True
+except ImportError:
+    HAS_ONNX = False
+
+try:
+    import onnxsim
+
+    HAS_ONNXSIM = True
+except ImportError:
+    HAS_ONNXSIM = False
+
+
+def _check_onnx_deps() -> None:
+    """Check that ONNX dependencies are installed."""
+    if not HAS_ONNX:
+        raise ImportError(
+            "ONNX export requires 'onnx' and 'onnxruntime' packages. "
+            "Install them with: pip install onnx onnxruntime"
+        )
 
 
 @contextlib.contextmanager
@@ -56,6 +82,99 @@ class _ForwardWrapper(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         features = self.backbone(x)
         return self.head(features)
+
+
+class _DetectionForwardWrapper(nn.Module):
+    """Wrapper for FCOS-based detection models that flattens list outputs to named tensors.
+
+    ONNX does not support nested list outputs, so this wrapper converts the
+    (cls_outputs, reg_outputs, centerness_outputs) lists into flat named tensors.
+    """
+
+    def __init__(self, model: nn.Module):
+        super().__init__()
+        self.backbone = model.backbone
+        self.fpn = model.fpn
+        self.head = model.head
+
+    def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, ...]:
+        features = self.backbone(x)
+        fpn_features = self.fpn(features)
+        cls_outputs, reg_outputs, centerness_outputs = self.head(fpn_features)
+        return (*cls_outputs, *reg_outputs, *centerness_outputs)
+
+
+class _InstanceDetectionForwardWrapper(nn.Module):
+    """Wrapper for instance segmentation models that flattens detection outputs.
+
+    Exports the detection head only (mask head excluded), flattening
+    (cls_outputs, reg_outputs, centerness_outputs) into named tensors.
+    """
+
+    def __init__(self, model: nn.Module):
+        super().__init__()
+        self.backbone = model.backbone
+        self.fpn = model.fpn
+        self.detection_head = model.detection_head
+
+    def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, ...]:
+        features = self.backbone(x)
+        fpn_features = self.fpn(features)
+        cls_outputs, reg_outputs, centerness_outputs = self.detection_head(fpn_features)
+        return (*cls_outputs, *reg_outputs, *centerness_outputs)
+
+
+class _YOLOXForwardWrapper(nn.Module):
+    """Wrapper for YOLOX detection models that flattens list outputs to named tensors.
+
+    Converts (cls_outputs, reg_outputs) lists into flat named tensors.
+    """
+
+    def __init__(self, model: nn.Module):
+        super().__init__()
+        self.backbone = model.backbone
+        self.neck = model.neck
+        self.head = model.head
+
+    def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, ...]:
+        features = self.backbone(x)
+        pafpn_outputs = self.neck(features)
+        cls_outputs, reg_outputs = self.head(pafpn_outputs)
+        return (*cls_outputs, *reg_outputs)
+
+
+def _get_detection_output_names(model: nn.Module) -> list[str]:
+    """Get flattened output names for detection models."""
+    model_class_name = type(model).__name__
+
+    if model_class_name == "YOLOXDetector":
+        # 3 FPN levels: cls_l0..cls_l2, reg_l0..reg_l2
+        names = []
+        for prefix in ("cls", "reg"):
+            for i in range(3):
+                names.append(f"{prefix}_l{i}")
+        return names
+
+    # FCOS-based: ObjectDetector or InstanceSegmentor
+    # 5 FPN levels: cls_l0..cls_l4, reg_l0..reg_l4, ctr_l0..ctr_l4
+    names = []
+    for prefix in ("cls", "reg", "ctr"):
+        for i in range(5):
+            names.append(f"{prefix}_l{i}")
+    return names
+
+
+def _get_onnx_wrapper(model: nn.Module) -> nn.Module | None:
+    """Get the appropriate ONNX forward wrapper for a model, or None for simple models."""
+    model_class_name = type(model).__name__
+
+    if model_class_name == "ObjectDetector":
+        return _DetectionForwardWrapper(model)
+    elif model_class_name == "InstanceSegmentor":
+        return _InstanceDetectionForwardWrapper(model)
+    elif model_class_name == "YOLOXDetector":
+        return _YOLOXForwardWrapper(model)
+    return None
 
 
 def export_to_torchscript(
@@ -315,9 +434,11 @@ def validate_torchscript_export(
         if len(original_output) != len(scripted_output):
             return False
         return all(
-            torch.allclose(o, s, rtol=rtol, atol=atol)
-            if isinstance(o, torch.Tensor)
-            else o == s
+            (
+                torch.allclose(o, s, rtol=rtol, atol=atol)
+                if isinstance(o, torch.Tensor)
+                else o == s
+            )
             for o, s in zip(original_output, scripted_output)
         )
     else:
@@ -328,9 +449,304 @@ def validate_torchscript_export(
         return False
 
 
+def export_to_onnx(
+    model: nn.Module,
+    save_path: str | Path,
+    example_input: torch.Tensor,
+    opset_version: int = 17,
+    dynamic_axes: dict[str, dict[int, str]] | None = None,
+    input_names: list[str] | None = None,
+    output_names: list[str] | None = None,
+    wrap_model: bool = True,
+    simplify: bool = False,
+) -> str:
+    """Export a PyTorch model to ONNX format.
+
+    ONNX enables deployment to ONNX Runtime, TensorRT, OpenVINO, CoreML, and
+    other inference engines across platforms.
+
+    Args:
+        model: The PyTorch model to export.
+        save_path: Path where the ONNX model will be saved (.onnx extension recommended).
+        example_input: Example input tensor for tracing. Required for ONNX export.
+        opset_version: ONNX opset version. Default is 17.
+        dynamic_axes: Dynamic axes specification. If None, batch dimension is made dynamic.
+        input_names: Names for input tensors. Defaults to ["input"].
+        output_names: Names for output tensors. Defaults to ["output"] for simple models,
+            or per-level names for detection models.
+        wrap_model: If True (default), wraps PyTorch Lightning modules to avoid
+            compatibility issues.
+        simplify: If True, simplifies the ONNX graph using onnxsim (requires
+            onnx-simplifier package). Default is False.
+
+    Returns:
+        The save path as a string.
+
+    Raises:
+        ImportError: If onnx or onnxruntime packages are not installed.
+        ValueError: If example_input is not provided.
+        RuntimeError: If ONNX export fails.
+
+    Example:
+        >>> from autotimm import ImageClassifier
+        >>> from autotimm.export import export_to_onnx
+        >>> import torch
+        >>>
+        >>> model = ImageClassifier(backbone="resnet18", num_classes=10)
+        >>> model.eval()
+        >>> example_input = torch.randn(1, 3, 224, 224)
+        >>> export_to_onnx(model, "model.onnx", example_input)
+    """
+    _check_onnx_deps()
+    save_path = Path(save_path)
+
+    if input_names is None:
+        input_names = ["input"]
+
+    # Determine wrapper and output names for detection models
+    is_lightning = any("LightningModule" in cls.__name__ for cls in type(model).__mro__)
+    detection_wrapper = (
+        _get_onnx_wrapper(model) if wrap_model and is_lightning else None
+    )
+
+    if output_names is None:
+        if detection_wrapper is not None:
+            output_names = _get_detection_output_names(model)
+        else:
+            output_names = ["output"]
+
+    # Auto-generate dynamic_axes for batch dimension if not provided
+    if dynamic_axes is None:
+        dynamic_axes = {name: {0: "batch_size"} for name in input_names}
+        for name in output_names:
+            dynamic_axes[name] = {0: "batch_size"}
+
+    # Ensure model is in eval mode
+    was_training = model.training
+    model.eval()
+
+    try:
+        with _lightning_export_mode(model):
+            if detection_wrapper is not None:
+                model_to_export = detection_wrapper
+            elif wrap_model and is_lightning:
+                model_to_export = _ForwardWrapper(model)
+            else:
+                model_to_export = model
+
+            model_to_export.eval()
+
+            save_path.parent.mkdir(parents=True, exist_ok=True)
+
+            torch.onnx.export(
+                model_to_export,
+                example_input,
+                str(save_path),
+                opset_version=opset_version,
+                input_names=input_names,
+                output_names=output_names,
+                dynamic_axes=dynamic_axes,
+            )
+
+        # Optional simplification
+        if simplify:
+            if not HAS_ONNXSIM:
+                warnings.warn(
+                    "onnx-simplifier not installed. Skipping simplification. "
+                    "Install with: pip install onnx-simplifier",
+                    stacklevel=2,
+                )
+            else:
+                onnx_model = onnx.load(str(save_path))
+                simplified, check = onnxsim.simplify(onnx_model)
+                if check:
+                    onnx.save(simplified, str(save_path))
+                else:
+                    warnings.warn(
+                        "ONNX simplification could not be validated. "
+                        "Using original model.",
+                        stacklevel=2,
+                    )
+
+        file_size_mb = save_path.stat().st_size / (1024 * 1024)
+        print(f"✓ Model exported to ONNX: {save_path} ({file_size_mb:.1f} MB)")
+        return str(save_path)
+
+    except Exception as e:
+        raise RuntimeError(
+            f"Failed to export model to ONNX: {e}\n"
+            f"Ensure your model is compatible with ONNX export "
+            f"(opset_version={opset_version})."
+        ) from e
+
+    finally:
+        if was_training:
+            model.train()
+
+
+def load_onnx(
+    path: str | Path,
+    providers: list[str] | None = None,
+) -> Any:
+    """Load an ONNX model and create an inference session.
+
+    Args:
+        path: Path to the ONNX model file (.onnx).
+        providers: ONNX Runtime execution providers. Defaults to ["CPUExecutionProvider"].
+
+    Returns:
+        An onnxruntime.InferenceSession ready for inference.
+
+    Example:
+        >>> from autotimm.export import load_onnx
+        >>> import numpy as np
+        >>>
+        >>> session = load_onnx("model.onnx")
+        >>> input_data = np.random.randn(1, 3, 224, 224).astype(np.float32)
+        >>> outputs = session.run(None, {"input": input_data})
+    """
+    _check_onnx_deps()
+
+    if providers is None:
+        providers = ["CPUExecutionProvider"]
+
+    # Validate the model
+    onnx_model = onnx.load(str(path))
+    onnx.checker.check_model(onnx_model)
+
+    return ort.InferenceSession(str(path), providers=providers)
+
+
+def validate_onnx_export(
+    original_model: nn.Module,
+    onnx_path: str | Path,
+    example_input: torch.Tensor,
+    rtol: float = 1e-5,
+    atol: float = 1e-5,
+) -> bool:
+    """Validate that ONNX export produces outputs matching the original model.
+
+    Args:
+        original_model: The original PyTorch model.
+        onnx_path: Path to the exported ONNX model.
+        example_input: Input tensor to test with.
+        rtol: Relative tolerance for comparison.
+        atol: Absolute tolerance for comparison.
+
+    Returns:
+        True if outputs match within tolerance, False otherwise.
+
+    Example:
+        >>> from autotimm.export import export_to_onnx, validate_onnx_export
+        >>> import torch
+        >>>
+        >>> example_input = torch.randn(1, 3, 224, 224)
+        >>> export_to_onnx(model, "model.onnx", example_input)
+        >>> is_valid = validate_onnx_export(model, "model.onnx", example_input)
+    """
+    _check_onnx_deps()
+
+    original_model.eval()
+
+    # Get PyTorch output
+    with torch.inference_mode():
+        original_output = original_model(example_input)
+
+    # Get ONNX output
+    session = ort.InferenceSession(str(onnx_path), providers=["CPUExecutionProvider"])
+    input_name = session.get_inputs()[0].name
+    onnx_outputs = session.run(None, {input_name: example_input.numpy()})
+
+    # Compare outputs
+    if isinstance(original_output, torch.Tensor):
+        return np.allclose(
+            original_output.numpy(), onnx_outputs[0], rtol=rtol, atol=atol
+        )
+    elif isinstance(original_output, (tuple, list)):
+        # Flatten nested lists (detection models return list of tensors)
+        flat_original = []
+        for item in original_output:
+            if isinstance(item, (tuple, list)):
+                flat_original.extend(item)
+            elif isinstance(item, torch.Tensor):
+                flat_original.append(item)
+            elif item is None:
+                continue
+
+        if len(flat_original) != len(onnx_outputs):
+            return False
+        return all(
+            np.allclose(o.numpy(), s, rtol=rtol, atol=atol)
+            for o, s in zip(flat_original, onnx_outputs)
+        )
+    else:
+        warnings.warn(
+            f"Cannot validate output type: {type(original_output)}. "
+            "Manual validation recommended.",
+            stacklevel=2,
+        )
+        return False
+
+
+def export_checkpoint_to_onnx(
+    checkpoint_path: str | Path,
+    save_path: str | Path,
+    model_class: type[nn.Module],
+    example_input: torch.Tensor,
+    opset_version: int = 17,
+    load_kwargs: dict[str, Any] | None = None,
+    **export_kwargs: Any,
+) -> str:
+    """Export a Lightning checkpoint directly to ONNX.
+
+    Convenience function that loads a checkpoint and exports it in one step.
+
+    Args:
+        checkpoint_path: Path to the PyTorch Lightning checkpoint (.ckpt).
+        save_path: Path where the ONNX model will be saved (.onnx).
+        model_class: The AutoTimm model class (e.g., ImageClassifier, ObjectDetector).
+        example_input: Example input tensor for export.
+        opset_version: ONNX opset version. Default is 17.
+        load_kwargs: Additional kwargs to pass to model_class.load_from_checkpoint().
+        **export_kwargs: Additional kwargs to pass to export_to_onnx().
+
+    Returns:
+        The save path as a string.
+
+    Example:
+        >>> from autotimm import ImageClassifier
+        >>> from autotimm.export import export_checkpoint_to_onnx
+        >>> import torch
+        >>>
+        >>> path = export_checkpoint_to_onnx(
+        ...     checkpoint_path="model.ckpt",
+        ...     save_path="model.onnx",
+        ...     model_class=ImageClassifier,
+        ...     example_input=torch.randn(1, 3, 224, 224),
+        ... )
+    """
+    _check_onnx_deps()
+    load_kwargs = load_kwargs or {}
+
+    print(f"Loading checkpoint: {checkpoint_path}")
+    model = model_class.load_from_checkpoint(str(checkpoint_path), **load_kwargs)
+
+    return export_to_onnx(
+        model=model,
+        save_path=save_path,
+        example_input=example_input,
+        opset_version=opset_version,
+        **export_kwargs,
+    )
+
+
 __all__ = [
     "export_to_torchscript",
     "load_torchscript",
     "export_checkpoint_to_torchscript",
     "validate_torchscript_export",
+    "export_to_onnx",
+    "load_onnx",
+    "export_checkpoint_to_onnx",
+    "validate_onnx_export",
 ]
