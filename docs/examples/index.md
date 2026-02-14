@@ -158,6 +158,14 @@ graph LR
 | [`cli/detection.yaml`](utilities/cli.md#object-detection) | CLI config for object detection |
 | [`cli/segmentation.yaml`](utilities/cli.md#semantic-segmentation) | CLI config for semantic segmentation |
 
+### :material-cube-send: Deployment & Export
+
+| Script | Description |
+|--------|-------------|
+| [`deployment/export_to_onnx.py`](../user-guide/deployment/onnx-export.md) | Export models to ONNX for cross-platform deployment |
+| [`deployment/export_to_torchscript.py`](../user-guide/deployment/torchscript-export.md) | Export models to TorchScript for production |
+| [`deployment/deploy_torchscript_cpp.py`](../user-guide/deployment/cpp-deployment.md) | C++ and mobile deployment |
+
 ### :material-play-circle: Inference & Utilities
 
 | Script | Description |

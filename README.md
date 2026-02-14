@@ -93,6 +93,7 @@ From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-G
 - **Reproducibility by Default** - Automatic seeding with `seed=42` and deterministic mode enabled out-of-the-box for fully reproducible training and inference
 - **torch.compile by Default** - Automatic PyTorch 2.0+ optimization enabled out-of-the-box for faster training and inference
 - **TorchScript Export** - Export trained models to TorchScript (.pt) for production deployment without Python dependencies
+- **ONNX Export** - Export to ONNX (.onnx) for cross-platform deployment with ONNX Runtime, TensorRT, OpenVINO, and CoreML
 - **Model Interpretation** - Complete explainability toolkit with 6 interpretation methods, 6 quality metrics, interactive Plotly visualizations, and up to 100x speedup with optimization
 - **Tutorial Notebook** - Comprehensive Jupyter notebook covering all interpretation features end-to-end
 - **YOLOX Models** - Official YOLOX implementation (nano to X) with CSPDarknet backbone
@@ -223,8 +224,12 @@ trainer.fit(model, datamodule=data)
 <td>Load any task from CSV files — classification, detection, segmentation, instance segmentation</td>
 </tr>
 <tr>
+<td><strong>Model Export</strong></td>
+<td>TorchScript (.pt) and ONNX (.onnx) export • ONNX Runtime, TensorRT, OpenVINO, CoreML</td>
+</tr>
+<tr>
 <td><strong>Production Ready</strong></td>
-<td>Mixed precision • Multi-GPU • Gradient accumulation • 410+ tests</td>
+<td>Mixed precision • Multi-GPU • Gradient accumulation • 490+ tests</td>
 </tr>
 </table>
 
@@ -658,40 +663,41 @@ seed_everything(42, deterministic=True)
 
 Perfect for research papers, debugging, and ensuring consistent results across runs!
 
-### TorchScript Export
+### Model Export (TorchScript & ONNX)
 
 Export trained models for production deployment:
 
 ```python
-from autotimm import ImageClassifier, export_to_torchscript
+from autotimm import ImageClassifier, export_to_torchscript, export_to_onnx
 import torch
 
-# Load trained model
 model = ImageClassifier.load_from_checkpoint("model.ckpt")
-
-# Export to TorchScript
 example_input = torch.randn(1, 3, 224, 224)
-export_to_torchscript(
-    model,
-    "model.pt",
-    example_input=example_input,
-    method="trace"  # Recommended
-)
 
-# Or use the convenience method
-model.to_torchscript("model.pt")
+# TorchScript export
+export_to_torchscript(model, "model.pt", example_input=example_input)
+model.to_torchscript("model.pt")  # Convenience method
 
-# Load and use in production
+# ONNX export
+export_to_onnx(model, "model.onnx", example_input=example_input)
+model.to_onnx("model.onnx")  # Convenience method
+
+# Load TorchScript (no AutoTimm needed)
 scripted_model = torch.jit.load("model.pt")
 output = scripted_model(image)
+
+# Load ONNX (no AutoTimm needed)
+import onnxruntime as ort
+session = ort.InferenceSession("model.onnx")
+outputs = session.run(None, {"input": image.numpy()})
 ```
 
-**Benefits:**
-- No Python dependencies required
-- Deploy to C++, mobile, or edge devices
-- Faster inference with `torch.inference_mode()` and JIT optimizations
-- Single-file deployment
-- Graceful fallback if JIT optimization fails on your platform
+| Format | Use Case | Runtimes |
+|--------|----------|----------|
+| **TorchScript** | PyTorch ecosystem, C++, mobile | LibTorch, PyTorch Mobile |
+| **ONNX** | Cross-platform, hardware-optimized | ONNX Runtime, TensorRT, OpenVINO, CoreML |
+
+**Shared benefits:** No Python dependencies, single-file deployment, dynamic batch sizes, all 5 task types supported.
 
 ### Smart Backend Selection
 

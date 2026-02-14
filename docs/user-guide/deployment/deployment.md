@@ -75,93 +75,60 @@ with torch.inference_mode():
 
 ONNX provides cross-platform compatibility with runtimes like ONNX Runtime, TensorRT, and OpenVINO.
 
-### Basic ONNX Export
+### Quick Example
 
 ```python
+from autotimm import ImageClassifier, export_to_onnx
 import torch
-import torch.onnx
-from autotimm import ImageClassifier, MetricConfig
 
+# Load trained model
+model = ImageClassifier.load_from_checkpoint("model.ckpt")
 
-def export_onnx(checkpoint_path, output_path, backbone, num_classes, image_size=224):
-    """Export model to ONNX format."""
-    metrics = [
-        MetricConfig(
-            name="accuracy",
-            backend="torchmetrics",
-            metric_class="Accuracy",
-            params={"task": "multiclass"},
-            stages=["val"],
-        )
-    ]
-
-    model = ImageClassifier.load_from_checkpoint(
-        checkpoint_path,
-        backbone=backbone,
-        num_classes=num_classes,
-        metrics=metrics,
-    )
-    model.eval()
-
-    # Create dummy input
-    dummy_input = torch.randn(1, 3, image_size, image_size)
-
-    # Export
-    torch.onnx.export(
-        model,
-        dummy_input,
-        output_path,
-        export_params=True,
-        opset_version=14,
-        do_constant_folding=True,
-        input_names=["image"],
-        output_names=["logits"],
-        dynamic_axes={
-            "image": {0: "batch_size"},
-            "logits": {0: "batch_size"},
-        },
-    )
-
-    print(f"Saved ONNX model to {output_path}")
-
-
-# Usage
-export_onnx(
-    checkpoint_path="checkpoints/best.ckpt",
-    output_path="model.onnx",
-    backbone="resnet50",
-    num_classes=10,
+# Export to ONNX
+example_input = torch.randn(1, 3, 224, 224)
+export_to_onnx(
+    model,
+    "model.onnx",
+    example_input=example_input
 )
 ```
 
-### Verify ONNX Model
+### Convenience Method
 
 ```python
-import onnx
-
-# Load and check
-model = onnx.load("model.onnx")
-onnx.checker.check_model(model)
-
-# Print model graph
-print(onnx.helper.printable_graph(model.graph))
+# One-line export
+model.to_onnx("model.onnx")
 ```
 
-### Dynamic Axes Configuration
+### Loading and Inference
 
 ```python
-# For variable batch size
-dynamic_axes = {
-    "image": {0: "batch_size"},
-    "logits": {0: "batch_size"},
-}
+from autotimm import load_onnx
+import numpy as np
 
-# For variable image size (use with caution)
-dynamic_axes = {
-    "image": {0: "batch_size", 2: "height", 3: "width"},
-    "logits": {0: "batch_size"},
-}
+# Load model (validates integrity automatically)
+session = load_onnx("model.onnx")
+
+# Or use ONNX Runtime directly (no AutoTimm dependency needed)
+import onnxruntime as ort
+session = ort.InferenceSession("model.onnx")
+
+# Run inference
+input_name = session.get_inputs()[0].name
+image = np.random.randn(1, 3, 224, 224).astype(np.float32)
+outputs = session.run(None, {input_name: image})
 ```
+
+### Validation
+
+```python
+from autotimm.export import validate_onnx_export
+
+is_valid = validate_onnx_export(model, "model.onnx", example_input)
+assert is_valid, "Export validation failed!"
+```
+
+:material-book-open: **[Complete ONNX Export Guide](onnx-export.md)** - Detailed documentation including dynamic axes, detection models, GPU inference, and troubleshooting.
 
 ---
 
@@ -845,6 +812,8 @@ if __name__ == "__main__":
 
 ## See Also
 
+- [ONNX Export Guide](onnx-export.md) - Complete ONNX export guide
+- [TorchScript Export Guide](torchscript-export.md) - Complete TorchScript export guide
 - [Model Export](../inference/model-export.md) - Detailed export documentation
 - [Benchmarks](../evaluation/benchmarks.md) - Model performance comparison
 - [Troubleshooting](../../troubleshooting/deployment/production.md) - Common deployment issues

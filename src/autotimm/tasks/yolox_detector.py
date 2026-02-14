@@ -559,6 +559,51 @@ class YOLOXDetector(PreprocessingMixin, pl.LightningModule):
         images = batch["images"] if isinstance(batch, dict) else batch
         return self.predict(images)
 
+    def to_onnx(
+        self,
+        save_path: str | None = None,
+        example_input: torch.Tensor | None = None,
+        opset_version: int = 17,
+        dynamic_axes: dict[str, dict[int, str]] | None = None,
+        **kwargs: Any,
+    ) -> str:
+        """Export model to ONNX format.
+
+        YOLOX outputs are flattened into named tensors (cls_l0..cls_l2, reg_l0..reg_l2).
+
+        Args:
+            save_path: Path to save the ONNX model. If None, uses a temp file.
+            example_input: Example input tensor. If None, uses default shape (1, 3, 640, 640).
+            opset_version: ONNX opset version. Default is 17.
+            dynamic_axes: Dynamic axes specification. If None, batch dimension is dynamic.
+            **kwargs: Additional arguments passed to export_to_onnx.
+
+        Returns:
+            Path to the saved ONNX model.
+
+        Example:
+            >>> model = YOLOXDetector(num_classes=80)
+            >>> path = model.to_onnx("yolox.onnx")
+        """
+        from autotimm.export import export_to_onnx
+
+        if example_input is None:
+            example_input = torch.randn(1, 3, 640, 640)
+
+        if save_path is None:
+            import tempfile
+
+            save_path = tempfile.mktemp(suffix=".onnx")
+
+        return export_to_onnx(
+            self,
+            save_path,
+            example_input,
+            opset_version=opset_version,
+            dynamic_axes=dynamic_axes,
+            **kwargs,
+        )
+
     def configure_optimizers(self) -> dict:
         """Configure optimizer and scheduler.
 

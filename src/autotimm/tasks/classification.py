@@ -157,11 +157,11 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
                 # Get from registry
                 registry = get_loss_registry()
                 loss_kwargs = {}
-                
+
                 # Handle label_smoothing for cross_entropy
                 if loss_fn in ["cross_entropy", "ce"] and label_smoothing > 0:
                     loss_kwargs["label_smoothing"] = label_smoothing
-                    
+
                 self.criterion = registry.get_loss(loss_fn, **loss_kwargs)
             elif isinstance(loss_fn, nn.Module):
                 # Use custom loss instance
@@ -571,6 +571,49 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
             return export_to_torchscript(
                 self, save_path, example_input, method, **kwargs
             )
+
+    def to_onnx(
+        self,
+        save_path: str | None = None,
+        example_input: torch.Tensor | None = None,
+        opset_version: int = 17,
+        dynamic_axes: dict[str, dict[int, str]] | None = None,
+        **kwargs: Any,
+    ) -> str:
+        """Export model to ONNX format.
+
+        Args:
+            save_path: Path to save the ONNX model. If None, uses a temp file.
+            example_input: Example input tensor. If None, uses default shape (1, 3, 224, 224).
+            opset_version: ONNX opset version. Default is 17.
+            dynamic_axes: Dynamic axes specification. If None, batch dimension is dynamic.
+            **kwargs: Additional arguments passed to export_to_onnx.
+
+        Returns:
+            Path to the saved ONNX model.
+
+        Example:
+            >>> model = ImageClassifier(backbone="resnet50", num_classes=10)
+            >>> path = model.to_onnx("model.onnx")
+        """
+        from autotimm.export import export_to_onnx
+
+        if example_input is None:
+            example_input = torch.randn(1, 3, 224, 224)
+
+        if save_path is None:
+            import tempfile
+
+            save_path = tempfile.mktemp(suffix=".onnx")
+
+        return export_to_onnx(
+            self,
+            save_path,
+            example_input,
+            opset_version=opset_version,
+            dynamic_axes=dynamic_axes,
+            **kwargs,
+        )
 
     def configure_optimizers(self) -> dict:
         """Configure optimizer and learning rate scheduler.

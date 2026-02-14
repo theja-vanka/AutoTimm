@@ -69,79 +69,50 @@ scripted_model.save("model_scripted.pt")
 
 ## ONNX Export
 
-ONNX (Open Neural Network Exchange) is a cross-platform format supported by many inference engines.
+ONNX (Open Neural Network Exchange) is a cross-platform format supported by many inference engines including ONNX Runtime, TensorRT, OpenVINO, and CoreML.
 
 ### Basic ONNX Export
 
 ```python
+from autotimm import ImageClassifier, export_to_onnx
 import torch
-import torch.onnx
-from autotimm import ImageClassifier, MetricConfig
 
 # Load model
-metrics = [MetricConfig(name="accuracy", backend="torchmetrics",
-                        metric_class="Accuracy", params={"task": "multiclass"},
-                        stages=["val"])]
-model = ImageClassifier.load_from_checkpoint(
-    "checkpoint.ckpt",
-    backbone="resnet50",
-    num_classes=10,
-    metrics=metrics,
-)
+model = ImageClassifier.load_from_checkpoint("checkpoint.ckpt")
 model.eval()
 
-# Create dummy input
-dummy_input = torch.randn(1, 3, 224, 224)
-
 # Export to ONNX
-torch.onnx.export(
-    model,                          # Model to export
-    dummy_input,                    # Example input
-    "model.onnx",                   # Output file
-    input_names=["image"],          # Input names
-    output_names=["logits"],        # Output names
-    dynamic_axes={                  # Dynamic batch size
-        "image": {0: "batch_size"},
-        "logits": {0: "batch_size"},
-    },
-    opset_version=11,               # ONNX opset version
-    do_constant_folding=True,       # Optimize constant folding
+example_input = torch.randn(1, 3, 224, 224)
+export_to_onnx(model, "model.onnx", example_input)
+
+# Or use the convenience method
+model.to_onnx("model.onnx")
+```
+
+### Verify and Validate
+
+```python
+from autotimm.export import validate_onnx_export
+
+# Validate outputs match original model
+is_valid = validate_onnx_export(
+    original_model=model,
+    onnx_path="model.onnx",
+    example_input=example_input,
 )
-
-print("ONNX model exported successfully!")
+print(f"Export valid: {is_valid}")
 ```
 
-### Verify ONNX Model
+### Checkpoint to ONNX (One Step)
 
 ```python
-import onnx
+from autotimm import export_checkpoint_to_onnx, ImageClassifier
 
-# Load and check model
-onnx_model = onnx.load("model.onnx")
-onnx.checker.check_model(onnx_model)
-print("ONNX model is valid!")
-
-# Print model info
-print(f"Graph: {onnx_model.graph}")
-```
-
-### Advanced ONNX Export Options
-
-```python
-torch.onnx.export(
-    model,
-    dummy_input,
-    "model.onnx",
-    export_params=True,              # Export trained parameters
-    opset_version=14,                # Latest opset for more ops
-    do_constant_folding=True,        # Optimize
-    input_names=["image"],
-    output_names=["logits"],
-    dynamic_axes={
-        "image": {0: "batch_size"},  # Dynamic batch
-        "logits": {0: "batch_size"},
-    },
-    verbose=False,                   # Print conversion steps
+path = export_checkpoint_to_onnx(
+    checkpoint_path="checkpoint.ckpt",
+    save_path="model.onnx",
+    model_class=ImageClassifier,
+    example_input=torch.randn(1, 3, 224, 224),
 )
 ```
 
@@ -152,31 +123,23 @@ torch.onnx.export(
 ### Using ONNX Runtime
 
 ```python
-import onnxruntime as ort
+from autotimm import load_onnx
 import numpy as np
-from PIL import Image
-from torchvision import transforms
 
-# Load ONNX model
+# Load model (validates integrity automatically)
+session = load_onnx("model.onnx")
+
+# Or load directly with ONNX Runtime (no AutoTimm dependency)
+import onnxruntime as ort
 session = ort.InferenceSession("model.onnx")
 
-# Prepare input
-transform = transforms.Compose([
-    transforms.Resize(256),
-    transforms.CenterCrop(224),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-])
-
-image = Image.open("test.jpg").convert("RGB")
-input_tensor = transform(image).unsqueeze(0)
-input_numpy = input_tensor.numpy()
-
 # Run inference
-outputs = session.run(None, {"image": input_numpy})
-logits = outputs[0]
+input_name = session.get_inputs()[0].name
+image = np.random.randn(1, 3, 224, 224).astype(np.float32)
+outputs = session.run(None, {input_name: image})
 
-# Get probabilities
+# Get predictions
+logits = outputs[0]
 probs = np.exp(logits) / np.exp(logits).sum(axis=1, keepdims=True)
 predicted_class = np.argmax(probs, axis=1)[0]
 confidence = probs[0, predicted_class]
@@ -239,26 +202,19 @@ traced_model.save("detector_scripted.pt")
 ### Detection Model to ONNX
 
 ```python
+from autotimm import ObjectDetector, export_to_onnx
 import torch
-import torch.onnx
 
 # Export detection model
-dummy_input = torch.randn(1, 3, 640, 640)
+model = ObjectDetector.load_from_checkpoint("detector.ckpt")
+model.eval()
 
-torch.onnx.export(
-    model,
-    dummy_input,
-    "detector.onnx",
-    input_names=["image"],
-    output_names=["boxes", "scores", "labels"],
-    dynamic_axes={
-        "image": {0: "batch_size"},
-        "boxes": {0: "batch_size", 1: "num_detections"},
-        "scores": {0: "batch_size", 1: "num_detections"},
-        "labels": {0: "batch_size", 1: "num_detections"},
-    },
-    opset_version=11,
-)
+example_input = torch.randn(1, 3, 640, 640)
+export_to_onnx(model, "detector.onnx", example_input)
+
+# Or use convenience method
+model.to_onnx("detector.onnx", example_input=example_input)
+# Detection outputs are automatically flattened: cls_l0..cls_l4, reg_l0..reg_l4, ctr_l0..ctr_l4
 ```
 
 ---
@@ -347,27 +303,19 @@ Complete pipeline for deploying a quantized ONNX model:
 
 ```python
 import torch
-import torch.onnx
 import onnxruntime as ort
 import numpy as np
 from PIL import Image
 from torchvision import transforms
+from autotimm import ImageClassifier, export_to_onnx
 
 # 1. Load and prepare model
 model = ImageClassifier.load_from_checkpoint(...)
 model.eval()
 
 # 2. Export to ONNX
-dummy_input = torch.randn(1, 3, 224, 224)
-torch.onnx.export(
-    model,
-    dummy_input,
-    "model.onnx",
-    input_names=["image"],
-    output_names=["logits"],
-    dynamic_axes={"image": {0: "batch_size"}, "logits": {0: "batch_size"}},
-    opset_version=14,
-)
+example_input = torch.randn(1, 3, 224, 224)
+export_to_onnx(model, "model.onnx", example_input)
 
 # 3. Optimize ONNX model
 from onnxruntime.quantization import quantize_dynamic, QuantType
@@ -392,11 +340,12 @@ def predict(image_path):
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
     ])
-    
+
     image = Image.open(image_path).convert("RGB")
     input_tensor = transform(image).unsqueeze(0).numpy()
-    
-    outputs = session.run(None, {"image": input_tensor})
+
+    input_name = session.get_inputs()[0].name
+    outputs = session.run(None, {input_name: input_tensor})
     logits = outputs[0]
     probs = np.exp(logits) / np.exp(logits).sum(axis=1, keepdims=True)
     
@@ -477,6 +426,8 @@ sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_AL
 
 ## See Also
 
+- [ONNX Export Guide](../deployment/onnx-export.md) - Complete ONNX export guide
+- [TorchScript Export Guide](../deployment/torchscript-export.md) - Complete TorchScript export guide
 - [Classification Inference](classification-inference.md) - Inference with PyTorch models
 - [Object Detection Inference](object-detection-inference.md) - Detection model inference
 - [Training Guide](../training/training.md) - How to train models

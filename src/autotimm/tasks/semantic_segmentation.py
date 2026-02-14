@@ -141,7 +141,7 @@ class SemanticSegmentor(PreprocessingMixin, pl.LightningModule):
         # Create loss function
         self.loss_type = loss_type
         self.ignore_index = ignore_index
-        
+
         # Priority: loss_fn > loss_type (for backward compatibility)
         if loss_fn is not None:
             # Use provided loss function
@@ -158,7 +158,7 @@ class SemanticSegmentor(PreprocessingMixin, pl.LightningModule):
                     loss_kwargs["class_weights"] = class_weights
                 elif loss_fn == "cross_entropy" and class_weights is not None:
                     loss_kwargs["weight"] = class_weights
-                    
+
                 self.criterion = registry.get_loss(loss_fn, **loss_kwargs)
             elif isinstance(loss_fn, nn.Module):
                 # Use custom loss instance
@@ -475,6 +475,49 @@ class SemanticSegmentor(PreprocessingMixin, pl.LightningModule):
             images = batch
 
         return self.predict(images)
+
+    def to_onnx(
+        self,
+        save_path: str | None = None,
+        example_input: torch.Tensor | None = None,
+        opset_version: int = 17,
+        dynamic_axes: dict[str, dict[int, str]] | None = None,
+        **kwargs: Any,
+    ) -> str:
+        """Export model to ONNX format.
+
+        Args:
+            save_path: Path to save the ONNX model. If None, uses a temp file.
+            example_input: Example input tensor. If None, uses default shape (1, 3, 224, 224).
+            opset_version: ONNX opset version. Default is 17.
+            dynamic_axes: Dynamic axes specification. If None, batch dimension is dynamic.
+            **kwargs: Additional arguments passed to export_to_onnx.
+
+        Returns:
+            Path to the saved ONNX model.
+
+        Example:
+            >>> model = SemanticSegmentor(backbone="resnet50", num_classes=21)
+            >>> path = model.to_onnx("model.onnx")
+        """
+        from autotimm.export import export_to_onnx
+
+        if example_input is None:
+            example_input = torch.randn(1, 3, 224, 224)
+
+        if save_path is None:
+            import tempfile
+
+            save_path = tempfile.mktemp(suffix=".onnx")
+
+        return export_to_onnx(
+            self,
+            save_path,
+            example_input,
+            opset_version=opset_version,
+            dynamic_axes=dynamic_axes,
+            **kwargs,
+        )
 
     def configure_optimizers(self) -> dict:
         """Configure optimizer and learning rate scheduler.

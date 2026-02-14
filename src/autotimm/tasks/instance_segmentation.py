@@ -460,7 +460,9 @@ class InstanceSegmentor(PreprocessingMixin, pl.LightningModule):
             size=(self.mask_size, self.mask_size),
             mode="bilinear",
             align_corners=False,
-        ).squeeze(1)  # [total_N, mask_size, mask_size]
+        ).squeeze(
+            1
+        )  # [total_N, mask_size, mask_size]
 
         # Compute mask loss
         loss = self.mask_loss_fn(mask_logits, target_masks_resized)
@@ -662,6 +664,52 @@ class InstanceSegmentor(PreprocessingMixin, pl.LightningModule):
             images = batch
 
         return self.predict(images)
+
+    def to_onnx(
+        self,
+        save_path: str | None = None,
+        example_input: torch.Tensor | None = None,
+        opset_version: int = 17,
+        dynamic_axes: dict[str, dict[int, str]] | None = None,
+        **kwargs: Any,
+    ) -> str:
+        """Export model to ONNX format.
+
+        Exports the detection head only (mask head excluded). Outputs are flattened
+        into named tensors (cls_l0..cls_l4, reg_l0..reg_l4, ctr_l0..ctr_l4).
+
+        Args:
+            save_path: Path to save the ONNX model. If None, uses a temp file.
+            example_input: Example input tensor. If None, uses default shape (1, 3, 224, 224).
+            opset_version: ONNX opset version. Default is 17.
+            dynamic_axes: Dynamic axes specification. If None, batch dimension is dynamic.
+            **kwargs: Additional arguments passed to export_to_onnx.
+
+        Returns:
+            Path to the saved ONNX model.
+
+        Example:
+            >>> model = InstanceSegmentor(backbone="resnet50", num_classes=80)
+            >>> path = model.to_onnx("instance_seg.onnx")
+        """
+        from autotimm.export import export_to_onnx
+
+        if example_input is None:
+            example_input = torch.randn(1, 3, 224, 224)
+
+        if save_path is None:
+            import tempfile
+
+            save_path = tempfile.mktemp(suffix=".onnx")
+
+        return export_to_onnx(
+            self,
+            save_path,
+            example_input,
+            opset_version=opset_version,
+            dynamic_axes=dynamic_axes,
+            **kwargs,
+        )
 
     def configure_optimizers(self) -> dict:
         """Configure optimizer and learning rate scheduler."""
