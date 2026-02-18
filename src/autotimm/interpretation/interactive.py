@@ -7,6 +7,8 @@ Provides interactive HTML-based visualizations for exploring explanations:
 - Hover information and statistics
 """
 
+from __future__ import annotations
+
 from typing import Optional, Union, Dict
 import numpy as np
 from PIL import Image
