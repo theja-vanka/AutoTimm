@@ -343,6 +343,25 @@ class AutoTrainer(pl.Trainer):
             ckpt_path=ckpt_path,
         )
 
+    def _remove_tuner_callbacks(self) -> None:
+        """Remove BatchSizeFinder/LearningRateFinder callbacks injected by Tuner.
+
+        In Lightning >= 2.x, Tuner methods permanently attach their callbacks
+        to the trainer. Calling both scale_batch_size and lr_find sequentially
+        (or calling fit() more than once) triggers a conflict. This method
+        cleans them up after each tuning step.
+        """
+        try:
+            from pytorch_lightning.callbacks import BatchSizeFinder, LearningRateFinder
+
+            self.callbacks[:] = [
+                cb
+                for cb in self.callbacks
+                if not isinstance(cb, (BatchSizeFinder, LearningRateFinder))
+            ]
+        except ImportError:
+            pass
+
     def _run_tuning(
         self,
         model: pl.LightningModule,
@@ -370,6 +389,11 @@ class AutoTrainer(pl.Trainer):
             except Exception as e:
                 print(f"Batch size finder failed: {e}")
                 print("Continuing with user-specified batch size.")
+            finally:
+                # Remove the BatchSizeFinder callback Tuner injected so the
+                # subsequent lr_find call (and any future fit() call) won't
+                # see a duplicate and raise an error.
+                self._remove_tuner_callbacks()
 
         # Run LR finder (if enabled)
         if config.auto_lr:
@@ -398,6 +422,9 @@ class AutoTrainer(pl.Trainer):
             except Exception as e:
                 print(f"LR finder failed: {e}")
                 print("Continuing with user-specified learning rate.")
+            finally:
+                # Remove the LearningRateFinder callback so fit() starts clean.
+                self._remove_tuner_callbacks()
 
     @property
     def tuner_config(self) -> TunerConfig | None:
