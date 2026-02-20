@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Any
 
@@ -31,7 +32,7 @@ class InstanceSegmentationDataModule(pl.LightningDataModule):
         data_dir: Root directory of COCO dataset
         image_size: Target image size (square)
         batch_size: Batch size for dataloaders
-        num_workers: Number of dataloader workers
+        num_workers: Number of dataloader workers. Defaults to ``os.cpu_count()``.
         augmentation_preset: Augmentation strength ('default', 'strong', 'light')
         custom_train_transforms: Optional custom training transforms
         custom_val_transforms: Optional custom validation transforms
@@ -55,7 +56,7 @@ class InstanceSegmentationDataModule(pl.LightningDataModule):
         data_dir: str | Path = ".",
         image_size: int = 640,
         batch_size: int = 4,
-        num_workers: int = 4,
+        num_workers: int = os.cpu_count() or 4,
         augmentation_preset: str = "default",
         custom_train_transforms: Any = None,
         custom_val_transforms: Any = None,
