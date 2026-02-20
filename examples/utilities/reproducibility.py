@@ -95,16 +95,18 @@ def example_4_disable_seeding():
     print("Example 4: Disable Seeding")
     print("=" * 70)
 
-    # No seeding
+    # No seeding (set deterministic=False to avoid warning)
     model = ImageClassifier(
         backbone="resnet18",
         num_classes=10,
-        seed=None,  # Disable seeding
+        seed=None,            # Disable seeding
+        deterministic=False,  # Must be False when seed=None
     )
 
     trainer = AutoTrainer(
         max_epochs=10,
-        seed=None,  # Disable seeding
+        seed=None,            # Disable seeding
+        deterministic=False,  # Must be False when seed=None
     )
 
     print("✓ Seeding disabled (seed=None)")
@@ -138,7 +140,8 @@ def example_5_manual_seeding():
     model = ImageClassifier(
         backbone="resnet18",
         num_classes=10,
-        seed=None,  # Don't seed again in model
+        seed=None,            # Don't seed again in model
+        deterministic=False,  # Already set by manual seed_everything
     )
     print("✓ Model created with manual seed")
 

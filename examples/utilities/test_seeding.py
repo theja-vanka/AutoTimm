@@ -201,7 +201,8 @@ def test_no_seeding():
     model = ImageClassifier(
         backbone="resnet18",
         num_classes=10,
-        seed=None,  # Disable seeding completely
+        seed=None,            # Disable seeding completely
+        deterministic=False,  # Avoid warning when seed=None
         compile_model=False,
     )
 

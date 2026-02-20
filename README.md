@@ -52,7 +52,7 @@ From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-G
 <td width="33%">
 <h3 align="center">Production Ready</h3>
 <p align="center">
-410+ tests, comprehensive logging, checkpoint management. Deploy with confidence.
+487 tests, comprehensive logging, checkpoint management. Deploy with confidence.
 </p>
 </td>
 </tr>
@@ -61,30 +61,6 @@ From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-G
 <p align="center">
 <a href="https://www.buymeacoffee.com/theja.vanka" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 </p>
-
-## What's New in v0.7.4
-
-- **Enhanced Test Coverage** - Added comprehensive test suites for reproducibility (seeding, deterministic mode) and torch.compile integration
-- **Documentation Updates** - Updated API reference with seeding parameters (`seed`, `deterministic`, `use_autotimm_seeding`) for AutoTrainer
-- **Example Fixes** - Updated segmentation examples to use `loss_fn` instead of deprecated `loss_type` parameter
-- **Zensical Icons** - Replaced emojis with Zensical icons in documentation for better rendering
-
-<details>
-<summary><strong>v0.7.3</strong></summary>
-
-## What's New in v0.7.3
-
-- **CSV Data Loading** - Load data from CSV files for all task types: classification, object detection, semantic segmentation, and instance segmentation
-- **CSVImageDataset** - Single-label classification from CSV with auto class detection and both torchvision/albumentations backends
-- **CSVDetectionDataset** - Object detection from CSV with multi-row-per-image grouping and `xyxy` bbox format
-- **CSVInstanceDataset** - Instance segmentation from CSV with binary mask PNGs (no pycocotools required)
-- **CSV Segmentation** - Semantic segmentation from CSV via `format="csv"` in `SemanticSegmentationDataset`
-- **All DataModules Updated** - `ImageDataModule`, `DetectionDataModule`, `SegmentationDataModule`, and `InstanceSegmentationDataModule` all support `train_csv`/`val_csv`/`test_csv` parameters
-- **Multi-Label Classification** - Native multi-label support in `ImageClassifier` with `multi_label=True`, using `BCEWithLogitsLoss` and sigmoid predictions
-- **MultiLabelImageDataModule** - New data module for loading multi-label datasets from CSV files with auto-detected label columns, validation splits, and rich summary tables
-- **Multi-Label Metrics** - `MetricManager` now auto-injects `num_labels` and resolves `torchmetrics.classification` metrics (e.g., `MultilabelAccuracy`, `MultilabelF1Score`)
-
-</details>
 
 <details>
 <summary><strong>v0.7.2</strong></summary>
@@ -229,7 +205,7 @@ trainer.fit(model, datamodule=data)
 </tr>
 <tr>
 <td><strong>Production Ready</strong></td>
-<td>Mixed precision • Multi-GPU • Gradient accumulation • 490+ tests</td>
+<td>Mixed precision • Multi-GPU • Gradient accumulation • 487 tests</td>
 </tr>
 </table>
 
@@ -644,6 +620,9 @@ trainer = AutoTrainer(max_epochs=10, seed=123)
 model = ImageClassifier(backbone="resnet50", num_classes=10, deterministic=False)
 trainer = AutoTrainer(max_epochs=10, deterministic=False)
 
+# Disable seeding (warns if deterministic=True)
+model = ImageClassifier(backbone="resnet50", num_classes=10, seed=None, deterministic=False)
+
 # Manual seeding
 from autotimm import seed_everything
 seed_everything(42, deterministic=True)
@@ -923,7 +902,7 @@ Comprehensive documentation with **interactive diagrams**, search optimization, 
 
 ## Testing
 
-Comprehensive test suite with **410+ tests**:
+Comprehensive test suite with **487 tests**:
 
 ```bash
 # Run all tests
@@ -967,7 +946,7 @@ For major changes, please open an issue first.
   title = {AutoTimm: Automatic PyTorch Image Models},
   url = {https://github.com/theja-vanka/AutoTimm},
   year = {2026},
-  version = {0.7.4}
+  version = {0.7.10}
 }
 ```
 

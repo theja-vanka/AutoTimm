@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Callable
+from typing import Any
 
 import torch.nn as nn
 
@@ -23,22 +23,22 @@ from autotimm.losses.segmentation import (
 
 class LossRegistry:
     """Central registry for all loss functions available in AutoTimm.
-    
+
     This registry provides a unified interface for accessing and instantiating
     loss functions across different tasks (classification, detection, segmentation).
-    
+
     Usage:
         >>> # Get available losses
         >>> registry = LossRegistry()
         >>> print(registry.list_losses())
-        
+
         >>> # Create a loss function
         >>> loss_fn = registry.get_loss("dice", num_classes=10)
-        
+
         >>> # Register a custom loss
         >>> registry.register_loss("custom_dice", MyCustomDiceLoss)
     """
-    
+
     # Classification losses
     CLASSIFICATION_LOSSES = {
         "cross_entropy": nn.CrossEntropyLoss,
@@ -47,7 +47,7 @@ class LossRegistry:
         "nll": nn.NLLLoss,
         "mse": nn.MSELoss,
     }
-    
+
     # Detection losses
     DETECTION_LOSSES = {
         "focal": FocalLoss,
@@ -55,7 +55,7 @@ class LossRegistry:
         "centerness": CenternessLoss,
         "fcos": FCOSLoss,
     }
-    
+
     # Segmentation losses
     SEGMENTATION_LOSSES = {
         "dice": DiceLoss,
@@ -64,14 +64,14 @@ class LossRegistry:
         "mask": MaskLoss,
         "combined_segmentation": CombinedSegmentationLoss,
     }
-    
+
     def __init__(self):
         """Initialize the loss registry with all available losses."""
         self._registry = {}
         self._registry.update(self.CLASSIFICATION_LOSSES)
         self._registry.update(self.DETECTION_LOSSES)
         self._registry.update(self.SEGMENTATION_LOSSES)
-        
+
         # Add aliases for common usage
         self._aliases = {
             "ce": "cross_entropy",
@@ -79,7 +79,7 @@ class LossRegistry:
             "focal": "focal",
             "combined": "combined_segmentation",
         }
-    
+
     def register_loss(
         self,
         name: str,
@@ -87,15 +87,15 @@ class LossRegistry:
         alias: str | None = None,
     ) -> None:
         """Register a custom loss function.
-        
+
         Args:
             name: Name of the loss function.
             loss_class: The loss class (must be a subclass of nn.Module).
             alias: Optional alias for the loss.
-            
+
         Raises:
             ValueError: If the loss class is not a subclass of nn.Module.
-            
+
         Example:
             >>> registry = LossRegistry()
             >>> registry.register_loss("my_loss", MyLossClass, alias="ml")
@@ -104,28 +104,28 @@ class LossRegistry:
             raise ValueError(
                 f"loss_class must be a subclass of nn.Module, got {loss_class}"
             )
-        
+
         self._registry[name] = loss_class
         if alias:
             self._aliases[alias] = name
-    
+
     def get_loss(
         self,
         name: str,
         **kwargs: Any,
     ) -> nn.Module:
         """Get a loss function instance by name.
-        
+
         Args:
             name: Name or alias of the loss function.
             **kwargs: Keyword arguments to pass to the loss constructor.
-            
+
         Returns:
             Instantiated loss function.
-            
+
         Raises:
             ValueError: If the loss name is not found in the registry.
-            
+
         Example:
             >>> registry = LossRegistry()
             >>> dice_loss = registry.get_loss("dice", num_classes=10)
@@ -133,27 +133,27 @@ class LossRegistry:
         """
         # Resolve alias
         resolved_name = self._aliases.get(name, name)
-        
+
         if resolved_name not in self._registry:
             available = self.list_losses()
             raise ValueError(
                 f"Loss '{name}' not found in registry. "
                 f"Available losses: {available}"
             )
-        
+
         loss_class = self._registry[resolved_name]
         return loss_class(**kwargs)
-    
+
     def list_losses(self, task: str | None = None) -> list[str]:
         """List all available loss functions.
-        
+
         Args:
             task: Optional task filter. One of: 'classification', 'detection', 'segmentation'.
                 If None, returns all losses.
-                
+
         Returns:
             List of available loss names.
-            
+
         Example:
             >>> registry = LossRegistry()
             >>> registry.list_losses()  # All losses
@@ -161,7 +161,7 @@ class LossRegistry:
         """
         if task is None:
             return sorted(list(self._registry.keys()))
-        
+
         task = task.lower()
         if task == "classification":
             return sorted(list(self.CLASSIFICATION_LOSSES.keys()))
@@ -174,16 +174,16 @@ class LossRegistry:
                 f"Unknown task: {task}. "
                 f"Use 'classification', 'detection', or 'segmentation'."
             )
-    
+
     def has_loss(self, name: str) -> bool:
         """Check if a loss function is registered.
-        
+
         Args:
             name: Name or alias of the loss function.
-            
+
         Returns:
             True if the loss is registered, False otherwise.
-            
+
         Example:
             >>> registry = LossRegistry()
             >>> registry.has_loss("dice")  # True
@@ -191,13 +191,13 @@ class LossRegistry:
         """
         resolved_name = self._aliases.get(name, name)
         return resolved_name in self._registry
-    
+
     def get_loss_info(self) -> dict[str, dict[str, list[str]]]:
         """Get information about all registered losses organized by task.
-        
+
         Returns:
             Dictionary with task categories and their loss functions.
-            
+
         Example:
             >>> registry = LossRegistry()
             >>> info = registry.get_loss_info()
@@ -216,10 +216,10 @@ _global_registry = LossRegistry()
 
 def get_loss_registry() -> LossRegistry:
     """Get the global loss registry instance.
-    
+
     Returns:
         The global LossRegistry instance.
-        
+
     Example:
         >>> from autotimm.losses import get_loss_registry
         >>> registry = get_loss_registry()
@@ -234,12 +234,12 @@ def register_custom_loss(
     alias: str | None = None,
 ) -> None:
     """Register a custom loss function in the global registry.
-    
+
     Args:
         name: Name of the loss function.
         loss_class: The loss class (must be a subclass of nn.Module).
         alias: Optional alias for the loss.
-        
+
     Example:
         >>> from autotimm.losses import register_custom_loss
         >>> register_custom_loss("my_loss", MyLossClass, alias="ml")
@@ -249,13 +249,13 @@ def register_custom_loss(
 
 def list_available_losses(task: str | None = None) -> list[str]:
     """List all available loss functions.
-    
+
     Args:
         task: Optional task filter. One of: 'classification', 'detection', 'segmentation'.
-            
+
     Returns:
         List of available loss names.
-        
+
     Example:
         >>> from autotimm.losses import list_available_losses
         >>> print(list_available_losses())  # All losses

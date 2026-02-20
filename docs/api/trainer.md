@@ -93,8 +93,8 @@ trainer = AutoTrainer(max_epochs=10, deterministic=False)
 # Use AutoTimm's custom seeding instead of Lightning's
 trainer = AutoTrainer(max_epochs=10, use_autotimm_seeding=True)
 
-# Disable seeding completely
-trainer = AutoTrainer(max_epochs=10, seed=None)
+# Disable seeding completely (set deterministic=False to avoid warning)
+trainer = AutoTrainer(max_epochs=10, seed=None, deterministic=False)
 ```
 
 #### With Gradient Accumulation
@@ -128,9 +128,9 @@ trainer.fit(model, datamodule=data)
 | `devices` | `int \| str` | `"auto"` | Number of devices |
 | `precision` | `str \| int` | `32` | `32`, `16`, `"bf16-mixed"`, `"16-mixed"` |
 | `logger` | Various | `False` | Logger configuration |
-| `tuner_config` | `TunerConfig \| None` | `None` | Auto-tuning config |
+| `tuner_config` | `TunerConfig \| None \| bool` | `None` | Auto-tuning config. `None`/`True` creates default config, `False` disables |
 | `seed` | `int \| None` | `42` | Random seed for reproducibility. Set to `None` to disable seeding |
-| `deterministic` | `bool` | `True` | Enable deterministic algorithms for reproducibility. May impact performance |
+| `deterministic` | `bool` | `False` | Enable deterministic algorithms for reproducibility. May impact performance |
 | `use_autotimm_seeding` | `bool` | `False` | Use AutoTimm's `seed_everything()` instead of Lightning's built-in seeding |
 | `checkpoint_monitor` | `str \| None` | `None` | Metric for checkpointing |
 | `checkpoint_mode` | `str` | `"max"` | `"max"` or `"min"` |

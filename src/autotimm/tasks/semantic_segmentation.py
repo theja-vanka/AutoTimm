@@ -112,6 +112,14 @@ class SemanticSegmentor(PreprocessingMixin, pl.LightningModule):
         # Seed for reproducibility
         if seed is not None:
             seed_everything(seed, deterministic=deterministic)
+        elif deterministic:
+            import warnings
+
+            warnings.warn(
+                "deterministic=True has no effect when seed=None. "
+                "Set a seed value to enable deterministic behavior.",
+                stacklevel=2,
+            )
 
         super().__init__()
         self.save_hyperparameters(
@@ -257,6 +265,13 @@ class SemanticSegmentor(PreprocessingMixin, pl.LightningModule):
                     f"Ensure you have PyTorch 2.0+ for compile support.",
                     stacklevel=2,
                 )
+        elif compile_kwargs is not None:
+            import warnings
+
+            warnings.warn(
+                "compile_kwargs is ignored when compile_model=False.",
+                stacklevel=2,
+            )
 
         # Setup transforms from config (PreprocessingMixin)
         self._setup_transforms(transform_config, task="segmentation")

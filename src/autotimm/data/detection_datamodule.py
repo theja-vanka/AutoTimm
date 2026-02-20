@@ -22,11 +22,13 @@ from autotimm.data.detection_transforms import (
 from autotimm.data.transform_config import TransformConfig
 
 import builtins
+
 try:
     from rich.console import Console
 
     console = Console()
 except Exception:
+
     class _ConsoleFallback:
         def print(self, *args, **kwargs):
             builtins.print(*args, **kwargs)
@@ -200,9 +202,6 @@ class DetectionDataModule(pl.LightningDataModule):
             self._setup_csv(stage)
         else:
             self._setup_coco(stage)
-
-        # Automatically print data summary
-        self._print_summary()
 
     def _setup_csv(self, stage: str | None) -> None:
         img_dir = self.image_dir or self.train_csv.parent

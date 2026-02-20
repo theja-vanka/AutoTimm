@@ -1,5 +1,9 @@
 from autotimm.data.datamodule import ImageDataModule
-from autotimm.data.dataset import CSVImageDataset, ImageFolderCV2, MultiLabelImageDataset
+from autotimm.data.dataset import (
+    CSVImageDataset,
+    ImageFolderCV2,
+    MultiLabelImageDataset,
+)
 from autotimm.data.multilabel_datamodule import MultiLabelImageDataModule
 from autotimm.data.detection_datamodule import DetectionDataModule
 from autotimm.data.detection_dataset import (

@@ -201,8 +201,6 @@ class MultiLabelImageDataModule(pl.LightningDataModule):
                 use_albumentations=use_albu,
             )
 
-        self._print_summary()
-
     def _loader_kwargs(self) -> dict:
         kwargs: dict = {
             "batch_size": self.batch_size,
@@ -274,9 +272,7 @@ class MultiLabelImageDataModule(pl.LightningDataModule):
         """
         from rich.table import Table
 
-        table = Table(
-            title="MultiLabelImageDataModule Summary", show_lines=True
-        )
+        table = Table(title="MultiLabelImageDataModule Summary", show_lines=True)
         table.add_column("Field", style="bold cyan")
         table.add_column("Value", style="white")
 

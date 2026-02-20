@@ -180,9 +180,6 @@ class SegmentationDataModule(pl.LightningDataModule):
                 csv_path=self.test_csv,
             )
 
-        # Automatically print data summary
-        self._print_summary()
-
     def _print_summary(self) -> None:
         """Print data summary automatically after setup."""
         try:

@@ -272,9 +272,7 @@ class MultiLabelImageDataset(Dataset):
                         )
                 self._label_columns = label_columns
             else:
-                self._label_columns = [
-                    c for c in fieldnames if c != self._image_column
-                ]
+                self._label_columns = [c for c in fieldnames if c != self._image_column]
 
             if not self._label_columns:
                 raise ValueError(
@@ -287,9 +285,7 @@ class MultiLabelImageDataset(Dataset):
             self._labels: list[list[float]] = []
             for row in reader:
                 self._image_paths.append(row[self._image_column])
-                self._labels.append(
-                    [float(row[col]) for col in self._label_columns]
-                )
+                self._labels.append([float(row[col]) for col in self._label_columns])
 
         if len(self._image_paths) == 0:
             raise ValueError(f"CSV file has no data rows: {self.csv_path}")

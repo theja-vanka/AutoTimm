@@ -547,6 +547,9 @@ AutoTrainer(
     val_check_interval=1.0,         # Validation frequency
     enable_checkpointing=True,      # Save checkpoints
     fast_dev_run=False,             # True, False, or int (number of batches)
+    seed=42,                        # Random seed for reproducibility (None to disable)
+    deterministic=False,            # Enable deterministic algorithms
+    use_autotimm_seeding=False,     # Use AutoTimm's seed_everything() instead of Lightning's
     # ... any other pl.Trainer argument
 )
 ```

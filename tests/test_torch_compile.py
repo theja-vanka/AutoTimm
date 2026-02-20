@@ -11,7 +11,6 @@ import pytest
 import torch
 from autotimm import ImageClassifier, ObjectDetector, SemanticSegmentor
 
-
 # Check PyTorch version
 TORCH_VERSION = tuple(int(x) for x in torch.__version__.split("+")[0].split(".")[:2])
 HAS_COMPILE = TORCH_VERSION >= (2, 0) and hasattr(torch, "compile")

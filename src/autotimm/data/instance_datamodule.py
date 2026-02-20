@@ -150,9 +150,6 @@ class InstanceSegmentationDataModule(pl.LightningDataModule):
         else:
             self._setup_coco(stage, train_transforms, val_transforms)
 
-        # Automatically print data summary
-        self._print_summary()
-
     def _setup_csv(self, stage, train_transforms, val_transforms):
         img_dir = self.image_dir or self.train_csv.parent
 

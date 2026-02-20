@@ -95,6 +95,7 @@ def test_trainer_no_seeding():
     trainer = AutoTrainer(
         max_epochs=1,
         seed=None,
+        deterministic=False,  # Avoid warning when seed=None
         fast_dev_run=True,
         logger=False,
         enable_checkpointing=False,

@@ -5,7 +5,7 @@ Tests for reproducibility features: seeding and deterministic mode.
 import pytest
 import torch
 import numpy as np
-from autotimm import ImageClassifier, AutoTrainer, seed_everything
+from autotimm import AutoTrainer, seed_everything
 from autotimm.tasks.classification import ImageClassifier
 
 
@@ -59,11 +59,15 @@ class TestModelLevelSeeding:
 
     def test_default_seed(self):
         """Test that models use default seed=42."""
-        model1 = ImageClassifier(backbone="resnet18", num_classes=10, compile_model=False)
+        model1 = ImageClassifier(
+            backbone="resnet18", num_classes=10, compile_model=False
+        )
         initial_weights1 = model1.head.fc.weight.clone()
 
         # Create another model with default seed
-        model2 = ImageClassifier(backbone="resnet18", num_classes=10, compile_model=False)
+        model2 = ImageClassifier(
+            backbone="resnet18", num_classes=10, compile_model=False
+        )
         initial_weights2 = model2.head.fc.weight.clone()
 
         # Should have identical initialization
@@ -72,18 +76,12 @@ class TestModelLevelSeeding:
     def test_custom_seed(self):
         """Test custom seed values."""
         model1 = ImageClassifier(
-            backbone="resnet18",
-            num_classes=10,
-            seed=42,
-            compile_model=False
+            backbone="resnet18", num_classes=10, seed=42, compile_model=False
         )
         weights1 = model1.head.fc.weight.clone()
 
         model2 = ImageClassifier(
-            backbone="resnet18",
-            num_classes=10,
-            seed=42,
-            compile_model=False
+            backbone="resnet18", num_classes=10, seed=42, compile_model=False
         )
         weights2 = model2.head.fc.weight.clone()
 
@@ -92,10 +90,7 @@ class TestModelLevelSeeding:
 
         # Different seed
         model3 = ImageClassifier(
-            backbone="resnet18",
-            num_classes=10,
-            seed=123,
-            compile_model=False
+            backbone="resnet18", num_classes=10, seed=123, compile_model=False
         )
         weights3 = model3.head.fc.weight.clone()
 
@@ -108,7 +103,8 @@ class TestModelLevelSeeding:
             backbone="resnet18",
             num_classes=10,
             seed=None,
-            compile_model=False
+            deterministic=False,
+            compile_model=False,
         )
         weights1 = model1.head.fc.weight.clone()
 
@@ -116,7 +112,8 @@ class TestModelLevelSeeding:
             backbone="resnet18",
             num_classes=10,
             seed=None,
-            compile_model=False
+            deterministic=False,
+            compile_model=False,
         )
         weights2 = model2.head.fc.weight.clone()
 
@@ -127,24 +124,24 @@ class TestModelLevelSeeding:
     def test_deterministic_parameter(self):
         """Test deterministic parameter."""
         # Create model with deterministic=True
-        model = ImageClassifier(
+        _model1 = ImageClassifier(
             backbone="resnet18",
             num_classes=10,
             seed=42,
             deterministic=True,
-            compile_model=False
+            compile_model=False,
         )
 
         # Deterministic mode should be enabled
         assert torch.backends.cudnn.deterministic is True
 
         # Create model with deterministic=False
-        model = ImageClassifier(
+        _model2 = ImageClassifier(
             backbone="resnet18",
             num_classes=10,
             seed=42,
             deterministic=False,
-            compile_model=False
+            compile_model=False,
         )
 
         # Benchmark should be enabled for faster training
@@ -171,7 +168,9 @@ class TestTrainerLevelSeeding:
 
     def test_trainer_deterministic(self):
         """Test deterministic parameter in AutoTrainer."""
-        trainer = AutoTrainer(max_epochs=1, seed=42, deterministic=True, fast_dev_run=True)
+        trainer = AutoTrainer(
+            max_epochs=1, seed=42, deterministic=True, fast_dev_run=True
+        )
 
         # Verify trainer was created successfully
         assert trainer is not None
@@ -183,7 +182,9 @@ class TestTrainerLevelSeeding:
         assert trainer1 is not None
 
         # Use AutoTimm's custom seeding
-        trainer2 = AutoTrainer(max_epochs=1, seed=42, use_autotimm_seeding=True, fast_dev_run=True)
+        trainer2 = AutoTrainer(
+            max_epochs=1, seed=42, use_autotimm_seeding=True, fast_dev_run=True
+        )
         assert trainer2 is not None
 
     def test_trainer_disable_seeding(self):
@@ -222,7 +223,7 @@ class TestReproducibleTraining:
             seed=42,
             deterministic=True,
             compile_model=False,
-            metrics=None
+            metrics=None,
         )
 
         trainer1 = AutoTrainer(
@@ -231,7 +232,7 @@ class TestReproducibleTraining:
             deterministic=True,
             fast_dev_run=5,
             logger=False,
-            enable_checkpointing=False
+            enable_checkpointing=False,
         )
 
         trainer1.fit(model1, train_loader, val_loader)
@@ -244,7 +245,7 @@ class TestReproducibleTraining:
             seed=42,
             deterministic=True,
             compile_model=False,
-            metrics=None
+            metrics=None,
         )
 
         trainer2 = AutoTrainer(
@@ -253,7 +254,7 @@ class TestReproducibleTraining:
             deterministic=True,
             fast_dev_run=5,
             logger=False,
-            enable_checkpointing=False
+            enable_checkpointing=False,
         )
 
         trainer2.fit(model2, train_loader, val_loader)
@@ -272,7 +273,7 @@ class TestReproducibleTraining:
             num_classes=10,
             seed=42,
             compile_model=False,
-            metrics=None
+            metrics=None,
         )
 
         trainer1 = AutoTrainer(
@@ -280,7 +281,7 @@ class TestReproducibleTraining:
             seed=42,
             fast_dev_run=5,
             logger=False,
-            enable_checkpointing=False
+            enable_checkpointing=False,
         )
 
         trainer1.fit(model1, train_loader, val_loader)
@@ -292,7 +293,7 @@ class TestReproducibleTraining:
             num_classes=10,
             seed=123,
             compile_model=False,
-            metrics=None
+            metrics=None,
         )
 
         trainer2 = AutoTrainer(
@@ -300,7 +301,7 @@ class TestReproducibleTraining:
             seed=123,
             fast_dev_run=5,
             logger=False,
-            enable_checkpointing=False
+            enable_checkpointing=False,
         )
 
         trainer2.fit(model2, train_loader, val_loader)

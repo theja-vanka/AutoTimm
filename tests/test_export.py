@@ -103,6 +103,7 @@ def simple_classifier():
         metrics=metrics,
         compile_model=False,  # Disable torch.compile for TorchScript compatibility
         seed=None,  # Disable seeding for TorchScript compatibility
+        deterministic=False,
     )
     model.eval()
     return model
@@ -211,6 +212,7 @@ def test_model_to_torchscript_method(tmp_path):
         num_classes=10,
         compile_model=False,
         seed=None,  # Disable seeding for TorchScript compatibility
+        deterministic=False,
     )
     model.eval()
 
@@ -237,6 +239,7 @@ def test_model_to_torchscript_no_save():
         num_classes=10,
         compile_model=False,
         seed=None,  # Disable seeding for TorchScript compatibility
+        deterministic=False,
     )
     model.eval()
 
@@ -257,6 +260,7 @@ def test_export_trace_without_example_input():
         num_classes=10,
         compile_model=False,
         seed=None,  # Disable seeding for TorchScript compatibility
+        deterministic=False,
     )
 
     with tempfile.NamedTemporaryFile(suffix=".pt") as tmp:
@@ -276,6 +280,7 @@ def test_export_with_invalid_method():
         num_classes=10,
         compile_model=False,
         seed=None,  # Disable seeding for TorchScript compatibility
+        deterministic=False,
     )
 
     with tempfile.NamedTemporaryFile(suffix=".pt") as tmp:
@@ -295,6 +300,7 @@ def test_export_preserves_training_mode():
         num_classes=10,
         compile_model=False,
         seed=None,  # Disable seeding for TorchScript compatibility
+        deterministic=False,
     )
     model.train()  # Set to training mode
 
@@ -389,6 +395,7 @@ def test_model_to_onnx_method(tmp_path):
         num_classes=10,
         compile_model=False,
         seed=None,
+        deterministic=False,
     )
     model.eval()
 
@@ -438,6 +445,7 @@ def test_export_onnx_without_example_input(tmp_path):
         num_classes=10,
         compile_model=False,
         seed=None,
+        deterministic=False,
     )
 
     save_path = tmp_path / "model.onnx"
@@ -455,6 +463,7 @@ def test_export_onnx_preserves_training_mode(tmp_path):
         num_classes=10,
         compile_model=False,
         seed=None,
+        deterministic=False,
     )
     model.train()  # Set to training mode
 
