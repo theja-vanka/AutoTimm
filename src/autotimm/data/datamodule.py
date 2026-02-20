@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from collections import Counter
 from pathlib import Path
 from typing import Callable
@@ -60,7 +61,7 @@ class ImageDataModule(pl.LightningDataModule):
         label_column: Name of the CSV column containing class labels.
         image_size: Target image size (square).
         batch_size: Batch size for all dataloaders.
-        num_workers: Number of data-loading workers.
+        num_workers: Number of data-loading workers. Defaults to ``os.cpu_count()``.
         val_split: Fraction of training data used for validation when
             no explicit val set exists.
         train_transforms: Custom training transforms; defaults used if None.
@@ -109,7 +110,7 @@ class ImageDataModule(pl.LightningDataModule):
         label_column: str | None = None,
         image_size: int = 224,
         batch_size: int = 32,
-        num_workers: int = 4,
+        num_workers: int = os.cpu_count() or 4,
         val_split: float = 0.1,
         train_transforms: Callable | None = None,
         eval_transforms: Callable | None = None,

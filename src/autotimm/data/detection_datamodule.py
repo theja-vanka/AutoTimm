@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Callable
 
@@ -69,7 +70,7 @@ class DetectionDataModule(pl.LightningDataModule):
         label_column: CSV column name for class labels.
         image_size: Target image size (square).
         batch_size: Batch size for all dataloaders.
-        num_workers: Number of data-loading workers.
+        num_workers: Number of data-loading workers. Defaults to ``os.cpu_count()``.
         train_transforms: Custom training transforms. Must include bbox_params.
         eval_transforms: Custom eval transforms. Must include bbox_params.
         augmentation_preset: Preset name (``"default"``, ``"strong"``).
@@ -104,7 +105,7 @@ class DetectionDataModule(pl.LightningDataModule):
         label_column: str = "label",
         image_size: int = 640,
         batch_size: int = 16,
-        num_workers: int = 4,
+        num_workers: int = os.cpu_count() or 4,
         train_transforms: Callable | None = None,
         eval_transforms: Callable | None = None,
         augmentation_preset: str = "default",
