@@ -253,6 +253,8 @@ ObjectDetector(
     regress_ranges=None,                    # Custom regression ranges
     compile_model=True,                     # Enable torch.compile (PyTorch 2.0+)
     compile_kwargs=None,                    # Custom torch.compile options
+    seed=42,                                # Random seed for reproducibility (None to disable)
+    deterministic=True,                     # Enable deterministic algorithms
 )
 ```
 

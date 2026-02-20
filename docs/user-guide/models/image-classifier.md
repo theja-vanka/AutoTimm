@@ -430,6 +430,8 @@ ImageClassifier(
     mixup_alpha=0.0,               # Mixup augmentation alpha
     compile_model=True,            # Enable torch.compile (PyTorch 2.0+)
     compile_kwargs=None,           # Custom torch.compile options
+    seed=42,                       # Random seed for reproducibility (None to disable)
+    deterministic=True,            # Enable deterministic algorithms
 )
 ```
 

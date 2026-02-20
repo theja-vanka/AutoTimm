@@ -1,6 +1,71 @@
 # Utilities
 
-Utility functions for model inspection and discovery.
+Utility functions for model inspection, discovery, and reproducibility.
+
+## seed_everything
+
+Set random seeds for reproducibility across all libraries.
+
+### API Reference
+
+::: autotimm.seed_everything
+    options:
+      show_source: true
+
+### Usage Examples
+
+#### Default Seed
+
+```python
+from autotimm import seed_everything
+
+# Seed all RNGs with default value (42)
+seed_everything()
+```
+
+#### Deterministic Mode
+
+```python
+# Full deterministic training (slower but reproducible)
+seed_everything(42, deterministic=True)
+```
+
+#### Custom Seed
+
+```python
+seed_everything(123)
+```
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `seed` | `int` | `42` | Random seed value |
+| `deterministic` | `bool` | `False` | Enable deterministic algorithms (may reduce performance) |
+
+### Returns
+
+| Type | Description |
+|------|-------------|
+| `int` | The seed value that was set |
+
+### What Gets Seeded
+
+- Python's `random` module
+- NumPy's random number generator
+- PyTorch (CPU & all CUDA devices)
+- `PYTHONHASHSEED` environment variable
+- cuDNN backend settings (when `deterministic=True`)
+- `torch.use_deterministic_algorithms()` (when `deterministic=True`)
+
+### Notes
+
+- Setting `deterministic=True` may reduce performance due to slower deterministic algorithm implementations.
+- When `deterministic=False` (default), cuDNN benchmark mode is enabled for faster training.
+- All task classes call `seed_everything()` automatically with `seed=42, deterministic=True` by default.
+- If `seed=None` is passed to a task class, `seed_everything()` is not called and a warning is emitted if `deterministic=True`.
+
+---
 
 ## count_parameters
 

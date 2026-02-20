@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import builtins
 from dataclasses import dataclass
 from typing import Any
 
@@ -13,13 +14,12 @@ from autotimm.utils import seed_everything
 
 # Module-level flag to ensure watermark is printed only once per session
 _WATERMARK_PRINTED = False
-
-import builtins
 try:
     from rich.console import Console
 
     console = Console()
 except Exception:
+
     class _ConsoleFallback:
         def print(self, *args, **kwargs):
             builtins.print(*args, **kwargs)
@@ -37,7 +37,9 @@ def _print_watermark() -> None:
     try:
         from watermark import watermark
 
-        console.print(watermark(packages="torch,lightning,timm,transformers", python=True))
+        console.print(
+            watermark(packages="torch,lightning,timm,transformers", python=True)
+        )
     except ImportError:
         # Fallback if watermark is not available
         import sys
@@ -47,16 +49,11 @@ def _print_watermark() -> None:
         console.print(f"Python: {sys.version}")
         console.print(f"PyTorch: {torch.__version__}")
         try:
-            import lightning
+            import pytorch_lightning
 
-            console.print(f"Lightning: {lightning.__version__}")
-        except ImportError:
-            try:
-                import pytorch_lightning as pl_fallback
-
-                console.print(f"PyTorch Lightning: {pl_fallback.__version__}")
-            except Exception:
-                pass
+            console.print(f"Lightning: {pytorch_lightning.__version__}")
+        except Exception:
+            pass
         try:
             import timm
 
@@ -251,24 +248,10 @@ class AutoTrainer(pl.Trainer):
         # Print environment watermark on first AutoTrainer instantiation
         _print_watermark()
 
-        # Handle seeding
-        if seed is not None and use_autotimm_seeding:
-            # Use AutoTimm's custom seed_everything with deterministic support
-            seed_everything(seed, deterministic=deterministic)
-        elif seed is not None and not use_autotimm_seeding:
-            # Use PyTorch Lightning's built-in seeding (if not already in trainer_kwargs)
-            if "seed_everything" not in trainer_kwargs:
-                # Pass seed to Lightning's Trainer
-                import pytorch_lightning as pl_seed
-
-                pl_seed.seed_everything(seed, workers=True)
-                # Note: Lightning doesn't have built-in deterministic parameter,
-                # so we still apply our deterministic settings
-                if deterministic:
-                    import torch
-
-                    torch.backends.cudnn.deterministic = True
-                    torch.backends.cudnn.benchmark = False
+        # Store seeding params — actual seeding is deferred to fit()
+        self._seed = seed
+        self._deterministic = deterministic
+        self._use_autotimm_seeding = use_autotimm_seeding
 
         if isinstance(logger, LoggerManager):
             resolved_logger = logger.loggers
@@ -301,11 +284,16 @@ class AutoTrainer(pl.Trainer):
         # Disable auto-tuning during fast_dev_run or if explicitly set to False
         if fast_dev_run or tuner_config is False:
             self._tuner_config = None
-        elif tuner_config is None:
+        elif tuner_config is None or tuner_config is True:
             # Enable auto-tuning by default with sensible defaults
             self._tuner_config = TunerConfig()
-        else:
+        elif isinstance(tuner_config, TunerConfig):
             self._tuner_config = tuner_config
+        else:
+            raise TypeError(
+                f"tuner_config must be a TunerConfig, None, True, or False, "
+                f"got {type(tuner_config).__name__}"
+            )
 
         # Guard flag: Lightning's Tuner internally calls trainer.fit(), which would
         # re-enter our fit() override and trigger a recursive tuning loop. This flag
@@ -349,6 +337,13 @@ class AutoTrainer(pl.Trainer):
             datamodule: A LightningDataModule instance.
             ckpt_path: Path to checkpoint for resuming training.
         """
+        # Apply seeding at the start of fit() so trainer seed is authoritative
+        self._apply_seeding()
+
+        # Print model and dataset summaries (skip during internal tuning calls)
+        if not self._is_tuning:
+            self._print_summaries(model, datamodule)
+
         if self._tuner_config is not None and not self._is_tuning:
             self._is_tuning = True
             try:
@@ -363,6 +358,54 @@ class AutoTrainer(pl.Trainer):
             datamodule=datamodule,
             ckpt_path=ckpt_path,
         )
+
+    def _apply_seeding(self) -> None:
+        """Apply seeding based on stored parameters."""
+        if self._seed is not None and self._use_autotimm_seeding:
+            seed_everything(self._seed, deterministic=self._deterministic)
+        elif self._seed is not None:
+            import pytorch_lightning as pl_seed
+
+            pl_seed.seed_everything(self._seed, workers=True)
+            if self._deterministic:
+                import torch
+
+                torch.backends.cudnn.deterministic = True
+                torch.backends.cudnn.benchmark = False
+        elif self._seed is None and self._deterministic:
+            import warnings
+
+            warnings.warn(
+                "deterministic=True has no effect when seed=None. "
+                "Set a seed value to enable deterministic behavior.",
+                stacklevel=2,
+            )
+
+    def _print_summaries(
+        self,
+        model: pl.LightningModule,
+        datamodule: pl.LightningDataModule | None,
+    ) -> None:
+        """Print model and dataset summaries before training."""
+        # Model summary (Lightning ModelSummary)
+        try:
+            from pytorch_lightning.utilities.model_summary import ModelSummary
+
+            summary = ModelSummary(model)
+            console.print(str(summary))
+        except Exception:
+            pass
+
+        # Dataset summary
+        if datamodule is not None and hasattr(datamodule, "summary"):
+            try:
+                console.print(datamodule.summary())
+            except Exception:
+                if hasattr(datamodule, "_print_summary"):
+                    try:
+                        datamodule._print_summary()
+                    except Exception:
+                        pass
 
     def _remove_tuner_callbacks(self) -> None:
         """Remove BatchSizeFinder/LearningRateFinder callbacks injected by Tuner.

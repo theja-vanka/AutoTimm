@@ -18,7 +18,6 @@ from autotimm.data.segmentation_datamodule import SegmentationDataModule
 from autotimm.data.instance_dataset import CSVInstanceDataset
 from autotimm.data.instance_datamodule import InstanceSegmentationDataModule
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -181,9 +180,7 @@ class TestCSVImageDataset:
             tfm = transforms.Compose(
                 [transforms.Resize((IMG_SIZE, IMG_SIZE)), transforms.ToTensor()]
             )
-            ds = CSVImageDataset(
-                csv_path=csv_path, image_dir=img_dir, transform=tfm
-            )
+            ds = CSVImageDataset(csv_path=csv_path, image_dir=img_dir, transform=tfm)
 
             image, target = ds[0]
             assert isinstance(image, torch.Tensor)
@@ -326,9 +323,7 @@ class TestImageDataModuleCSV:
 
     def test_balanced_sampling_with_csv(self):
         with tempfile.TemporaryDirectory() as tmpdir:
-            csv_path, img_dir, _ = _create_classification_csv(
-                tmpdir, num_images=12
-            )
+            csv_path, img_dir, _ = _create_classification_csv(tmpdir, num_images=12)
 
             dm = ImageDataModule(
                 train_csv=csv_path,

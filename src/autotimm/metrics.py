@@ -233,9 +233,7 @@ class MetricManager:
             if not auto_injected:
                 raise
             # Remove auto-injected params and retry
-            filtered = {
-                k: v for k, v in params.items() if k not in auto_injected
-            }
+            filtered = {k: v for k, v in params.items() if k not in auto_injected}
             return metric_cls(**filtered)
 
     def _create_custom_metric(

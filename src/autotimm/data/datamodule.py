@@ -22,11 +22,13 @@ from autotimm.data.transforms import (
 )
 
 import builtins
+
 try:
     from rich.console import Console
 
     console = Console()
 except Exception:
+
     class _ConsoleFallback:
         def print(self, *args, **kwargs):
             builtins.print(*args, **kwargs)
@@ -215,9 +217,6 @@ class ImageDataModule(pl.LightningDataModule):
             self._setup_folder_cv2(stage)
         else:
             self._setup_folder(stage)
-
-        # Automatically print data summary
-        self._print_summary()
 
     def _setup_builtin(self, stage: str | None) -> None:
         cls = self.BUILTIN_DATASETS[self.dataset_name]

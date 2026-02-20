@@ -316,16 +316,24 @@ Sometimes you want to explore model variance:
 model = ImageClassifier(
     backbone="resnet50",
     num_classes=10,
-    seed=None,  # No seeding
+    seed=None,            # No seeding
+    deterministic=False,  # Avoid warning
 )
 
 trainer = AutoTrainer(
     max_epochs=10,
-    seed=None,  # No seeding
+    seed=None,            # No seeding
+    deterministic=False,  # Avoid warning
 )
 
 # Results will vary between runs
 ```
+
+!!! warning "seed=None with deterministic=True"
+
+    Setting `seed=None` with `deterministic=True` (the default) emits a warning because
+    deterministic mode requires seeding to be effective. Either set a seed or set
+    `deterministic=False` when disabling seeding.
 
 ## Reproducible Inference
 

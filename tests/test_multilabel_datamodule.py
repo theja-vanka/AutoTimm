@@ -12,7 +12,6 @@ from torchvision import transforms
 from autotimm.data.dataset import MultiLabelImageDataset
 from autotimm.data.multilabel_datamodule import MultiLabelImageDataModule
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -127,9 +126,7 @@ class TestMultiLabelImageDataset:
 class TestMultiLabelImageDataModule:
     def test_setup_with_val_csv(self):
         with tempfile.TemporaryDirectory() as tmpdir:
-            train_csv, img_dir, label_names = _create_test_csv(
-                tmpdir, num_images=20
-            )
+            train_csv, img_dir, label_names = _create_test_csv(tmpdir, num_images=20)
             # Create a separate val CSV
             val_dir = os.path.join(tmpdir, "val_data")
             val_csv, _, _ = _create_test_csv(
@@ -169,9 +166,7 @@ class TestMultiLabelImageDataModule:
 
     def test_dataloaders(self):
         with tempfile.TemporaryDirectory() as tmpdir:
-            csv_path, img_dir, label_names = _create_test_csv(
-                tmpdir, num_images=10
-            )
+            csv_path, img_dir, label_names = _create_test_csv(tmpdir, num_images=10)
 
             dm = MultiLabelImageDataModule(
                 train_csv=csv_path,

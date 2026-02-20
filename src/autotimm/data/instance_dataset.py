@@ -318,9 +318,7 @@ class CSVInstanceDataset(Dataset):
                 )
 
         if not image_anns:
-            raise ValueError(
-                f"No images with annotations found in {self.csv_path}."
-            )
+            raise ValueError(f"No images with annotations found in {self.csv_path}.")
 
         # Build class mapping
         all_labels = sorted(

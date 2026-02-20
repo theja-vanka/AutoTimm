@@ -27,7 +27,9 @@ from autotimm.tasks.yolox_detector import YOLOXDetector  # noqa: F401
 from autotimm.data.datamodule import ImageDataModule  # noqa: F401
 from autotimm.data.detection_datamodule import DetectionDataModule  # noqa: F401
 from autotimm.data.segmentation_datamodule import SegmentationDataModule  # noqa: F401
-from autotimm.data.instance_datamodule import InstanceSegmentationDataModule  # noqa: F401
+from autotimm.data.instance_datamodule import (  # noqa: F401
+    InstanceSegmentationDataModule,
+)
 from autotimm.data.multilabel_datamodule import MultiLabelImageDataModule  # noqa: F401
 
 
@@ -43,6 +45,7 @@ class AutoTimmCLI(LightningCLI):
         >>> # autotimm fit --config config.yaml
         >>> # autotimm fit --config config.yaml --trainer.max_epochs 20
     """
+
 
 def main() -> None:
     """Entry point for the AutoTimm CLI."""
