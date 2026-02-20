@@ -20,6 +20,18 @@ from autotimm.data.detection_transforms import (
 )
 from autotimm.data.transform_config import TransformConfig
 
+import builtins
+try:
+    from rich.console import Console
+
+    console = Console()
+except Exception:
+    class _ConsoleFallback:
+        def print(self, *args, **kwargs):
+            builtins.print(*args, **kwargs)
+
+    console = _ConsoleFallback()
+
 
 class DetectionDataModule(pl.LightningDataModule):
     """Lightning data module for object detection.
@@ -277,30 +289,24 @@ class DetectionDataModule(pl.LightningDataModule):
     def _print_summary(self) -> None:
         """Print data summary automatically after setup."""
         try:
-            from rich.console import Console
-
-            console = Console()
             console.print(self.summary())
-        except ImportError:
-            # Fallback to basic print if rich is not available
-            print(f"\n{'=' * 50}")
-            print("DetectionDataModule Summary")
-            print(f"{'=' * 50}")
-            print(f"Data dir: {self.data_dir}")
-            print(f"Image size: {self.image_size}")
-            print(f"Batch size: {self.batch_size}")
-            if self.num_classes is not None:
-                print(f"Num classes: {self.num_classes}")
-            if self.train_dataset is not None:
-                print(f"Train images: {len(self.train_dataset)}")
-            if self.val_dataset is not None:
-                print(f"Val images: {len(self.val_dataset)}")
-            if self.test_dataset is not None:
-                print(f"Test images: {len(self.test_dataset)}")
-            print(f"{'=' * 50}\n")
         except Exception:
-            # Silently ignore any errors in summary printing
-            pass
+            # Fallback to simple output using console (which itself falls back to builtin print)
+            console.print(f"\n{'=' * 50}")
+            console.print("DetectionDataModule Summary")
+            console.print(f"{'=' * 50}")
+            console.print(f"Data dir: {self.data_dir}")
+            console.print(f"Image size: {self.image_size}")
+            console.print(f"Batch size: {self.batch_size}")
+            if self.num_classes is not None:
+                console.print(f"Num classes: {self.num_classes}")
+            if self.train_dataset is not None:
+                console.print(f"Train images: {len(self.train_dataset)}")
+            if self.val_dataset is not None:
+                console.print(f"Val images: {len(self.val_dataset)}")
+            if self.test_dataset is not None:
+                console.print(f"Test images: {len(self.test_dataset)}")
+            console.print(f"{'=' * 50}\n")
 
     def _loader_kwargs(self) -> dict:
         kwargs: dict = {

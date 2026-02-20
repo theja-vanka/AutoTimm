@@ -73,6 +73,7 @@ class InstanceSegmentationDataModule(pl.LightningDataModule):
         mask_column: str = "mask_path",
     ):
         super().__init__()
+        self.save_hyperparameters()
         self.data_dir = Path(data_dir)
         self.train_csv = Path(train_csv) if train_csv else None
         self.val_csv = Path(val_csv) if val_csv else None

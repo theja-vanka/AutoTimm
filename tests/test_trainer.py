@@ -47,10 +47,10 @@ class TestTunerConfig:
     """Tests for TunerConfig dataclass."""
 
     def test_default_config(self):
-        """Test that default TunerConfig enables both auto_lr and auto_batch_size."""
+        """Test that default TunerConfig disables both auto_lr and auto_batch_size."""
         config = TunerConfig()
-        assert config.auto_lr is True
-        assert config.auto_batch_size is True
+        assert config.auto_lr is False
+        assert config.auto_batch_size is False
         # Default kwargs should be populated
         assert "min_lr" in config.lr_find_kwargs
         assert "max_lr" in config.lr_find_kwargs
@@ -106,11 +106,11 @@ def test_auto_trainer_with_tuner_config():
 def test_auto_trainer_without_tuner_config():
     """Test that AutoTrainer creates default TunerConfig when none is provided."""
     trainer = AutoTrainer(max_epochs=1, logger=False, enable_checkpointing=False)
-    # Default behavior: auto-tuning enabled
+    # Default behavior: auto-tuning disabled
     assert trainer.tuner_config is not None
     assert isinstance(trainer.tuner_config, TunerConfig)
-    assert trainer.tuner_config.auto_lr is True
-    assert trainer.tuner_config.auto_batch_size is True
+    assert trainer.tuner_config.auto_lr is False
+    assert trainer.tuner_config.auto_batch_size is False
 
 
 def test_auto_trainer_disable_tuning():

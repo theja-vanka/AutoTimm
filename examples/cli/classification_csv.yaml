@@ -1,0 +1,74 @@
+# CSV-based AutoTimm CLI config for image classification.
+# Usage:
+#   autotimm fit --config examples/cli/classification_csv.yaml
+
+model:
+  class_path: autotimm.ImageClassifier
+  init_args:
+    backbone: resnet50
+    num_classes: 10
+    lr: 1e-3
+    metrics:
+      - name: accuracy
+        backend: torchmetrics
+        metric_class: Accuracy
+        params:
+          task: multiclass
+        stages: [train, val, test]
+        prog_bar: true
+
+      - name: f1_macro
+        backend: torchmetrics
+        metric_class: F1Score
+        params:
+          task: multiclass
+          average: macro
+        stages: [val, test]
+
+    logging_config:
+      log_learning_rate: true
+      log_gradient_norm: true
+      log_confusion_matrix: false
+
+data:
+  class_path: autotimm.ImageDataModule
+  init_args:
+    # Use CSV mode: provide paths to CSV files with 'image_path,label' columns
+    train_csv: ./data/train.csv
+    val_csv: ./data/val.csv
+    test_csv: ./data/test.csv
+    image_dir: ./data/images
+    image_column: image_path
+    label_column: label
+    batch_size: 32
+    image_size: 224
+    num_workers: 4
+    transform_backend: torchvision
+
+trainer:
+  max_epochs: 20
+  accelerator: auto
+  devices: auto
+  precision: 32
+  fast_dev_run: false
+  enable_checkpointing: true
+  checkpoint_monitor: val/accuracy
+  checkpoint_mode: max
+  # Configure loggers (TensorBoard + CSV logger)
+  logger:
+    - backend: tensorboard
+      params:
+        save_dir: logs/tensorboard
+        name: csv_run
+
+    - backend: csv
+      params:
+        save_dir: logs/csv
+
+  # Keep tuner disabled by default; enable explicitly if desired
+  tuner_config: false
+
+# Example overrides when running locally:
+# autotimm fit --config examples/cli/classification_csv.yaml \
+#   --model.init_args.lr 5e-4 \
+#   --trainer.max_epochs 30

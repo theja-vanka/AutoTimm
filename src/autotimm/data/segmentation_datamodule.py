@@ -61,6 +61,7 @@ class SegmentationDataModule(pl.LightningDataModule):
         test_csv: str | Path | None = None,
     ):
         super().__init__()
+        self.save_hyperparameters()
         self.data_dir = Path(data_dir)
         self.format = format
         self.train_csv = Path(train_csv) if train_csv else None
