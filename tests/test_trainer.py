@@ -106,11 +106,11 @@ def test_auto_trainer_with_tuner_config():
 def test_auto_trainer_without_tuner_config():
     """Test that AutoTrainer creates default TunerConfig when none is provided."""
     trainer = AutoTrainer(max_epochs=1, logger=False, enable_checkpointing=False)
-    # Default behavior: auto-tuning enabled
+    # Default behavior: auto-tuning disabled
     assert trainer.tuner_config is not None
     assert isinstance(trainer.tuner_config, TunerConfig)
-    assert trainer.tuner_config.auto_lr is True
-    assert trainer.tuner_config.auto_batch_size is True
+    assert trainer.tuner_config.auto_lr is False
+    assert trainer.tuner_config.auto_batch_size is False
 
 
 def test_auto_trainer_disable_tuning():
