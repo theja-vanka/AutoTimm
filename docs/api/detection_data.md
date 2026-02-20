@@ -262,29 +262,6 @@ batch = {
 }
 ```
 
-## Summary Output
-
-```python
-data.setup("fit")
-print(data.summary())
-```
-
-```
-┌─────────────────────┬──────────────┐
-│ Field               │ Value        │
-├─────────────────────┼──────────────┤
-│ Data dir            │ ./coco       │
-│ Image size          │ 640          │
-│ Batch size          │ 16           │
-│ Num classes         │ 80           │
-│ Train samples       │ 118287       │
-│ Val samples         │ 5000         │
-│ Test samples        │ 0            │
-│ Transform backend   │ torchvision  │
-│ Augmentation        │ default      │
-└─────────────────────┴──────────────┘
-```
-
 ## See Also
 
 - [CSV Data Loading API](csv_data.md#csvdetectiondataset) - CSV dataset for object detection

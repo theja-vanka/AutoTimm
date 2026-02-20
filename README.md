@@ -23,6 +23,62 @@
 
 ---
 
+<details>
+<summary><strong>v0.7 Changelog</strong></summary>
+
+### v0.7.10 — Loguru Logging & Dependency Cleanup
+
+**Logging Migration: `rich` → `loguru`**
+
+- New `autotimm.logging` module with a centralized loguru-based `logger` and `log_table()` helper
+- `logger` exported at the top level: `from autotimm import logger`
+- All internal `print()` and `rich` console output replaced with structured loguru calls (`logger.info`, `logger.warning`, `logger.success`, `logger.error`) across trainer, export, data modules, interpretation, and YOLOX utilities
+- Colored, timestamped log format: `HH:mm:ss | LEVEL | module:function - message`
+
+**Dependency Changes**
+
+- `loguru>=0.7` added as a core dependency
+- `plotly>=5.0` promoted from optional `[interactive]` extra to core dependency
+- `rich>=13.0` removed as a dependency
+- `[interactive]` install extra removed (plotly is now always available)
+
+**Removed**
+
+- `summary()` and `_print_summary()` methods removed from all DataModules (`ImageDataModule`, `DetectionDataModule`, `SegmentationDataModule`, `InstanceSegmentationDataModule`, `MultiLabelImageDataModule`)
+- `AutoTrainer._print_summaries()` removed — pre-training model/data summary printing is no longer automatic
+
+### v0.7.9 — Reproducibility by Default
+
+- Default random seeding (`seed=42`, `deterministic=True`) for all task classes and `AutoTrainer`
+- New `seed_everything()` utility function
+- Trainer supports `use_autotimm_seeding` flag to choose between Lightning's seeding and AutoTimm's custom seeding
+
+### v0.7.8 — torch.compile Integration
+
+- `torch.compile()` enabled by default for all task types (`compile_model=True`)
+- Compiles backbone, heads, FPN, neck across all architectures
+- Graceful fallback on PyTorch < 2.0
+
+### v0.7.5 — ONNX Export
+
+- ONNX export via `export_to_onnx()`, `load_onnx()`, `validate_onnx_export()`, `export_checkpoint_to_onnx()`
+- `model.to_onnx()` convenience method on all task models
+- Dynamic batch dimension by default
+
+### v0.7.2 — TorchScript Export & Model Interpretation
+
+- TorchScript export with `export_to_torchscript()` and `model.to_torchscript()`
+- 6 interpretation methods (GradCAM, GradCAM++, Integrated Gradients, SmoothGrad, AttentionRollout, AttentionFlow)
+- 6 explanation quality metrics
+- Interactive Plotly visualizations
+- YOLOX official model support
+- Smart backend selection and TransformConfig
+- CLI support (`autotimm fit --config config.yaml`)
+
+</details>
+
+---
+
 ## What is AutoTimm?
 
 AutoTimm is a **production-ready** computer vision framework that combines [timm](https://github.com/huggingface/pytorch-image-models) (1000+ pretrained models) with [PyTorch Lightning](https://github.com/Lightning-AI/pytorch-lightning). Train image classifiers, object detectors, and segmentation models with any timm backbone using a simple, intuitive API.
@@ -62,24 +118,6 @@ From idea to trained model in minutes. Auto-tuning, mixed precision, and multi-G
 <a href="https://www.buymeacoffee.com/theja.vanka" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 </p>
 
-<details>
-<summary><strong>v0.7.2</strong></summary>
-
-- **torch.inference_mode** - Faster inference across all tasks, export, and interpretation using `torch.inference_mode()` instead of `torch.no_grad()`
-- **Reproducibility by Default** - Automatic seeding with `seed=42` and deterministic mode enabled out-of-the-box for fully reproducible training and inference
-- **torch.compile by Default** - Automatic PyTorch 2.0+ optimization enabled out-of-the-box for faster training and inference
-- **TorchScript Export** - Export trained models to TorchScript (.pt) for production deployment without Python dependencies
-- **ONNX Export** - Export to ONNX (.onnx) for cross-platform deployment with ONNX Runtime, TensorRT, OpenVINO, and CoreML
-- **Model Interpretation** - Complete explainability toolkit with 6 interpretation methods, 6 quality metrics, interactive Plotly visualizations, and up to 100x speedup with optimization
-- **Tutorial Notebook** - Comprehensive Jupyter notebook covering all interpretation features end-to-end
-- **YOLOX Models** - Official YOLOX implementation (nano to X) with CSPDarknet backbone
-- **Smart Backend Selection** - AI-powered recommendation for optimal transform backends
-- **TransformConfig** - Unified transform configuration with presets and model-specific normalization
-- **Optional Metrics** - Metrics now optional for inference-only deployments
-- **Python 3.10-3.14** - Latest Python support
-
-</details>
-
 ## Quick Start
 
 ### Installation
@@ -98,9 +136,6 @@ pip install autotimm
 pip install autotimm[tensorboard]  # TensorBoard
 pip install autotimm[wandb]        # Weights & Biases
 pip install autotimm[mlflow]       # MLflow
-
-# Interpretation
-pip install autotimm[interactive]  # Interactive Plotly visualizations
 
 # All extras
 pip install autotimm[all]          # Everything

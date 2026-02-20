@@ -31,7 +31,8 @@ This installs the core package with **all** vision task dependencies:
 - `transformers>=4.30` *(included by default)*
 - `matplotlib>=3.7` *(included by default)*
 - `watermark>=2.3`
-- `rich>=13.0`
+- `loguru>=0.7`
+- `plotly>=5.0`
 
 !!! note "All tasks supported out of the box"
     The core installation now includes everything needed for classification, detection, segmentation, and instance segmentation tasks. No additional extras needed!
@@ -51,24 +52,13 @@ pip install autotimm[wandb]
 pip install autotimm[mlflow]
 ```
 
-#### Interactive Visualizations
-
-For interactive Plotly visualizations in model interpretation:
-
-```bash
-pip install autotimm[interactive]
-```
-
-This includes:
-- `plotly>=5.0` - Interactive plots with zoom/pan/hover
-
 #### Everything
 
 ```bash
 pip install autotimm[all]
 ```
 
-Includes all optional dependencies: tensorboard, mlflow, wandb, and plotly.
+Includes all optional dependencies: tensorboard, mlflow, and wandb.
 
 ## Development Installation
 

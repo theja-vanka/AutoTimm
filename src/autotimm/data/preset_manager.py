@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
+from autotimm.logging import logger
+
 from autotimm.data.transform_config import (
     ALBUMENTATIONS_PRESETS,
     TORCHVISION_PRESETS,
@@ -287,96 +289,40 @@ def compare_backends(verbose: bool = True) -> dict[str, dict]:
 
 
 def _print_comparison(comparison: dict) -> None:
-    """Pretty print the backend comparison."""
-    try:
-        from rich.console import Console
-        from rich.table import Table
+    """Pretty print the backend comparison using loguru."""
+    from autotimm.logging import log_table
 
-        console = Console()
+    # Build comparison table
+    features = ["Backend", "Speed", "Augmentations", "BBox/Mask Support", "Best For", "Presets"]
+    feature_keys = ["backend", "speed", "augmentations", "bbox_mask_support", "best_for", "presets"]
 
-        table = Table(
-            title="Transform Backend Comparison",
-            show_header=True,
-            header_style="bold magenta",
-        )
-        table.add_column("Feature", style="cyan", width=20)
-        table.add_column("Torchvision", style="green", width=35)
-        table.add_column("Albumentations", style="yellow", width=35)
+    rows = []
+    for feature, key in zip(features, feature_keys):
+        tv = comparison["torchvision"][key]
+        albu = comparison["albumentations"][key]
+        if isinstance(tv, list):
+            tv = ", ".join(tv)
+        if isinstance(albu, list):
+            albu = ", ".join(albu)
+        rows.append([feature, tv, albu])
 
-        # Add rows
-        table.add_row(
-            "Backend",
-            comparison["torchvision"]["backend"],
-            comparison["albumentations"]["backend"],
-        )
-        table.add_row(
-            "Speed",
-            comparison["torchvision"]["speed"],
-            comparison["albumentations"]["speed"],
-        )
-        table.add_row(
-            "Augmentations",
-            comparison["torchvision"]["augmentations"],
-            comparison["albumentations"]["augmentations"],
-        )
-        table.add_row(
-            "BBox/Mask Support",
-            comparison["torchvision"]["bbox_mask_support"],
-            comparison["albumentations"]["bbox_mask_support"],
-        )
-        table.add_row(
-            "Best For",
-            "\n".join(f"• {x}" for x in comparison["torchvision"]["best_for"]),
-            "\n".join(f"• {x}" for x in comparison["albumentations"]["best_for"]),
-        )
-        table.add_row(
-            "Available Presets",
-            ", ".join(comparison["torchvision"]["presets"]),
-            ", ".join(comparison["albumentations"]["presets"]),
-        )
+    log_table("Transform Backend Comparison", ["Feature", "Torchvision", "Albumentations"], rows)
 
-        console.print(table)
-        console.print()
+    # Print pros and cons
+    lines = ["\nTorchvision - Pros:"]
+    for pro in comparison["torchvision"]["pros"]:
+        lines.append(f"  + {pro}")
+    lines.append("\nTorchvision - Cons:")
+    for con in comparison["torchvision"]["cons"]:
+        lines.append(f"  - {con}")
+    lines.append("\nAlbumentations - Pros:")
+    for pro in comparison["albumentations"]["pros"]:
+        lines.append(f"  + {pro}")
+    lines.append("\nAlbumentations - Cons:")
+    for con in comparison["albumentations"]["cons"]:
+        lines.append(f"  - {con}")
 
-        # Print pros and cons
-        console.print("[bold cyan]Torchvision - Pros:[/bold cyan]")
-        for pro in comparison["torchvision"]["pros"]:
-            console.print(f"  ✓ {pro}")
-
-        console.print("\n[bold cyan]Torchvision - Cons:[/bold cyan]")
-        for con in comparison["torchvision"]["cons"]:
-            console.print(f"  ✗ {con}")
-
-        console.print("\n[bold yellow]Albumentations - Pros:[/bold yellow]")
-        for pro in comparison["albumentations"]["pros"]:
-            console.print(f"  ✓ {pro}")
-
-        console.print("\n[bold yellow]Albumentations - Cons:[/bold yellow]")
-        for con in comparison["albumentations"]["cons"]:
-            console.print(f"  ✗ {con}")
-
-    except ImportError:
-        # Fallback to simple print if rich is not available
-        print("=" * 70)
-        print("Transform Backend Comparison".center(70))
-        print("=" * 70)
-        print()
-        for backend_name, data in comparison.items():
-            print(f"\n{backend_name.upper()}")
-            print("-" * 70)
-            print(f"Backend: {data['backend']}")
-            print(f"Speed: {data['speed']}")
-            print(f"Augmentations: {data['augmentations']}")
-            print(f"BBox/Mask Support: {data['bbox_mask_support']}")
-            print(f"Best For: {', '.join(data['best_for'])}")
-            print(f"Presets: {', '.join(data['presets'])}")
-            print()
-            print("Pros:")
-            for pro in data["pros"]:
-                print(f"  + {pro}")
-            print("Cons:")
-            for con in data["cons"]:
-                print(f"  - {con}")
+    logger.info("\n".join(lines))
 
 
 __all__ = [

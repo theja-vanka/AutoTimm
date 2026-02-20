@@ -21,21 +21,6 @@ from autotimm.data.detection_transforms import (
 )
 from autotimm.data.transform_config import TransformConfig
 
-import builtins
-
-try:
-    from rich.console import Console
-
-    console = Console()
-except Exception:
-
-    class _ConsoleFallback:
-        def print(self, *args, **kwargs):
-            builtins.print(*args, **kwargs)
-
-    console = _ConsoleFallback()
-
-
 class DetectionDataModule(pl.LightningDataModule):
     """Lightning data module for object detection.
 
@@ -286,28 +271,6 @@ class DetectionDataModule(pl.LightningDataModule):
             self.num_classes = self.val_dataset.num_classes
             self.class_names = self.val_dataset.class_names
 
-    def _print_summary(self) -> None:
-        """Print data summary automatically after setup."""
-        try:
-            console.print(self.summary())
-        except Exception:
-            # Fallback to simple output using console (which itself falls back to builtin print)
-            console.print(f"\n{'=' * 50}")
-            console.print("DetectionDataModule Summary")
-            console.print(f"{'=' * 50}")
-            console.print(f"Data dir: {self.data_dir}")
-            console.print(f"Image size: {self.image_size}")
-            console.print(f"Batch size: {self.batch_size}")
-            if self.num_classes is not None:
-                console.print(f"Num classes: {self.num_classes}")
-            if self.train_dataset is not None:
-                console.print(f"Train images: {len(self.train_dataset)}")
-            if self.val_dataset is not None:
-                console.print(f"Val images: {len(self.val_dataset)}")
-            if self.test_dataset is not None:
-                console.print(f"Test images: {len(self.test_dataset)}")
-            console.print(f"{'=' * 50}\n")
-
     def _loader_kwargs(self) -> dict:
         kwargs: dict = {
             "batch_size": self.batch_size,
@@ -345,33 +308,3 @@ class DetectionDataModule(pl.LightningDataModule):
             **self._loader_kwargs(),
         )
 
-    def summary(self):
-        """Return a Rich Table summarizing the data module.
-
-        Call after ``setup()`` so that datasets and class info are available.
-        """
-        from rich.table import Table
-
-        table = Table(title="DetectionDataModule Summary", show_lines=True)
-        table.add_column("Field", style="bold cyan")
-        table.add_column("Value", style="white")
-
-        table.add_row("Data dir", str(self.data_dir))
-        table.add_row("Image size", str(self.image_size))
-        table.add_row("Batch size", str(self.batch_size))
-        table.add_row("Num workers", str(self.num_workers))
-
-        if self.num_classes is not None:
-            table.add_row("Num classes", str(self.num_classes))
-
-        if self.train_dataset is not None:
-            table.add_row("Train images", str(len(self.train_dataset)))
-        if self.val_dataset is not None:
-            table.add_row("Val images", str(len(self.val_dataset)))
-        if self.test_dataset is not None:
-            table.add_row("Test images", str(len(self.test_dataset)))
-
-        if self.class_names is not None and len(self.class_names) <= 20:
-            table.add_row("Classes", ", ".join(self.class_names))
-
-        return table

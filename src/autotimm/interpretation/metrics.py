@@ -13,6 +13,8 @@ import torch
 import torch.nn as nn
 from PIL import Image
 
+from autotimm.logging import logger
+
 
 class ExplanationMetrics:
     """
@@ -526,23 +528,23 @@ class ExplanationMetrics:
         results = {}
 
         # Faithfulness metrics
-        print("Computing deletion metric...")
+        logger.info("Computing deletion metric...")
         results["deletion"] = self.deletion(image, target_class=target_class)
 
-        print("Computing insertion metric...")
+        logger.info("Computing insertion metric...")
         results["insertion"] = self.insertion(image, target_class=target_class)
 
         # Sensitivity
-        print("Computing sensitivity...")
+        logger.info("Computing sensitivity...")
         results["sensitivity"] = self.sensitivity_n(image, target_class=target_class)
 
         # Sanity checks
-        print("Running model parameter randomization test...")
+        logger.info("Running model parameter randomization test...")
         results["param_randomization"] = self.model_parameter_randomization_test(
             image, target_class=target_class
         )
 
-        print("Running data randomization test...")
+        logger.info("Running data randomization test...")
         results["data_randomization"] = self.data_randomization_test(
             image, target_class=target_class
         )

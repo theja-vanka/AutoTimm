@@ -856,6 +856,10 @@ When exporting detection models to ONNX, list outputs are flattened into named t
 
 ## Version History
 
+### v0.7.10
+- Export logging now uses loguru instead of `print()` statements
+- `logger.success()` for successful exports, `logger.info()` for progress
+
 ### v0.7.5
 - Added ONNX export functionality (`export_to_onnx`, `load_onnx`, `validate_onnx_export`, `export_checkpoint_to_onnx`)
 - Added `to_onnx()` convenience method on all task models

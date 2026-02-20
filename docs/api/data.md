@@ -24,8 +24,6 @@ Lightning data module for image classification datasets.
         - train_dataloader
         - val_dataloader
         - test_dataloader
-        - summary
-
 ## Usage Examples
 
 ### Built-in Dataset
@@ -250,34 +248,6 @@ dataset/
     └── class_b/
         └── img7.jpg
 ```
-
-## Summary Output
-
-```python
-data.setup("fit")
-print(data.summary())
-```
-
-```
-┌─────────────────────┬──────────┐
-│ Field               │ Value    │
-├─────────────────────┼──────────┤
-│ Data dir            │ ./data   │
-│ Dataset             │ CIFAR10  │
-│ Image size          │ 224      │
-│ Batch size          │ 32       │
-│ Num classes         │ 10       │
-│ Train samples       │ 45000    │
-│ Val samples         │ 5000     │
-│ Test samples        │ 10000    │
-│ Balanced sampling   │ False    │
-│ Class: airplane     │ 4500     │
-│ Class: automobile   │ 4500     │
-│ ...                 │ ...      │
-└─────────────────────┴──────────┘
-```
-
----
 
 ## CSV Data Loading
 

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import builtins
 from dataclasses import dataclass
 from typing import Any
 
@@ -10,21 +9,12 @@ import pytorch_lightning as pl
 from pytorch_lightning.tuner import Tuner
 
 from autotimm.loggers import LoggerConfig, LoggerManager
+from autotimm.logging import logger
 from autotimm.utils import seed_everything
+from autotimm.callbacks.json_progress import JsonProgressCallback, _emit
 
 # Module-level flag to ensure watermark is printed only once per session
 _WATERMARK_PRINTED = False
-try:
-    from rich.console import Console
-
-    console = Console()
-except Exception:
-
-    class _ConsoleFallback:
-        def print(self, *args, **kwargs):
-            builtins.print(*args, **kwargs)
-
-    console = _ConsoleFallback()
 
 
 def _print_watermark() -> None:
@@ -37,7 +27,7 @@ def _print_watermark() -> None:
     try:
         from watermark import watermark
 
-        console.print(
+        logger.info(
             watermark(packages="torch,lightning,timm,transformers", python=True)
         )
     except ImportError:
@@ -46,24 +36,24 @@ def _print_watermark() -> None:
 
         import torch
 
-        console.print(f"Python: {sys.version}")
-        console.print(f"PyTorch: {torch.__version__}")
+        logger.info(f"Python: {sys.version}")
+        logger.info(f"PyTorch: {torch.__version__}")
         try:
             import pytorch_lightning
 
-            console.print(f"Lightning: {pytorch_lightning.__version__}")
+            logger.info(f"Lightning: {pytorch_lightning.__version__}")
         except Exception:
             pass
         try:
             import timm
 
-            console.print(f"timm: {timm.__version__}")
+            logger.info(f"timm: {timm.__version__}")
         except ImportError:
             pass
         try:
             import transformers
 
-            console.print(f"transformers: {transformers.__version__}")
+            logger.info(f"transformers: {transformers.__version__}")
         except ImportError:
             pass
     except Exception:
@@ -178,6 +168,14 @@ class AutoTrainer(pl.Trainer):
         use_autotimm_seeding: If ``True``, uses AutoTimm's custom ``seed_everything()``
             function which provides comprehensive seeding with deterministic mode support.
             If ``False`` (default), uses PyTorch Lightning's built-in seeding.
+        json_progress: If ``True``, appends a ``JsonProgressCallback`` that
+            emits NDJSON progress events to stdout for consumption by a
+            Tauri/Preact frontend.  Default ``False``.
+        json_progress_every_n_steps: How often to emit ``batch_end`` events
+            when ``json_progress`` is enabled.  Default ``10``.
+        json_progress_log_file: Optional path to an NDJSON file where all
+            progress events are also appended.  Allows the frontend to
+            replay missed events after a disconnect.  Default ``None``.
         **trainer_kwargs: Any other ``pl.Trainer`` argument.
 
     Example:
@@ -243,6 +241,9 @@ class AutoTrainer(pl.Trainer):
         seed: int | None = 42,
         deterministic: bool = False,
         use_autotimm_seeding: bool = False,
+        json_progress: bool = False,
+        json_progress_every_n_steps: int = 10,
+        json_progress_log_file: str | None = None,
         **trainer_kwargs: Any,
     ) -> None:
         # Print environment watermark on first AutoTrainer instantiation
@@ -279,6 +280,18 @@ class AutoTrainer(pl.Trainer):
                         filename=f"best-{{epoch}}-{{{checkpoint_monitor}:.4f}}",
                     )
                 )
+
+        # Store json_progress flag and log file for tuning event emission
+        self._json_progress = json_progress
+        self._json_progress_log_file = json_progress_log_file
+
+        if json_progress:
+            callbacks.append(
+                JsonProgressCallback(
+                    emit_every_n_steps=json_progress_every_n_steps,
+                    log_file=json_progress_log_file,
+                )
+            )
 
         # Configure auto-tuning behavior
         # Disable auto-tuning during fast_dev_run or if explicitly set to False
@@ -340,14 +353,14 @@ class AutoTrainer(pl.Trainer):
         # Apply seeding at the start of fit() so trainer seed is authoritative
         self._apply_seeding()
 
-        # Print model and dataset summaries (skip during internal tuning calls)
-        if not self._is_tuning:
-            self._print_summaries(model, datamodule)
-
         if self._tuner_config is not None and not self._is_tuning:
             self._is_tuning = True
             try:
+                if self._json_progress:
+                    _emit({"event": "tuning_started"}, log_file=self._json_progress_log_file)
                 self._run_tuning(model, train_dataloaders, val_dataloaders, datamodule)
+                if self._json_progress:
+                    _emit({"event": "tuning_complete"}, log_file=self._json_progress_log_file)
             finally:
                 self._is_tuning = False
 
@@ -380,32 +393,6 @@ class AutoTrainer(pl.Trainer):
                 "Set a seed value to enable deterministic behavior.",
                 stacklevel=2,
             )
-
-    def _print_summaries(
-        self,
-        model: pl.LightningModule,
-        datamodule: pl.LightningDataModule | None,
-    ) -> None:
-        """Print model and dataset summaries before training."""
-        # Model summary (Lightning ModelSummary)
-        try:
-            from pytorch_lightning.utilities.model_summary import ModelSummary
-
-            summary = ModelSummary(model)
-            console.print(str(summary))
-        except Exception:
-            pass
-
-        # Dataset summary
-        if datamodule is not None and hasattr(datamodule, "summary"):
-            try:
-                console.print(datamodule.summary())
-            except Exception:
-                if hasattr(datamodule, "_print_summary"):
-                    try:
-                        datamodule._print_summary()
-                    except Exception:
-                        pass
 
     def _remove_tuner_callbacks(self) -> None:
         """Remove BatchSizeFinder/LearningRateFinder callbacks injected by Tuner.
@@ -440,7 +427,7 @@ class AutoTrainer(pl.Trainer):
         # Run batch size finder first (if enabled)
         # This should run before LR finder since LR depends on batch size
         if config.auto_batch_size:
-            console.print("Running batch size finder...")
+            logger.info("Running batch size finder...")
             try:
                 result = tuner.scale_batch_size(
                     model,
@@ -449,10 +436,10 @@ class AutoTrainer(pl.Trainer):
                     datamodule=datamodule,
                     **config.batch_size_kwargs,
                 )
-                console.print(f"Optimal batch size found: {result}")
+                logger.info(f"Optimal batch size found: {result}")
             except Exception as e:
-                console.print(f"Batch size finder failed: {e}")
-                console.print("Continuing with user-specified batch size.")
+                logger.error(f"Batch size finder failed: {e}")
+                logger.info("Continuing with user-specified batch size.")
             finally:
                 # Remove the BatchSizeFinder callback Tuner injected so the
                 # subsequent lr_find call (and any future fit() call) won't
@@ -461,7 +448,7 @@ class AutoTrainer(pl.Trainer):
 
         # Run LR finder (if enabled)
         if config.auto_lr:
-            console.print("Running learning rate finder...")
+            logger.info("Running learning rate finder...")
             try:
                 lr_finder = tuner.lr_find(
                     model,
@@ -473,7 +460,7 @@ class AutoTrainer(pl.Trainer):
                 if lr_finder is not None:
                     suggested_lr = lr_finder.suggestion()
                     if suggested_lr is not None:
-                        console.print(f"Suggested learning rate: {suggested_lr:.2e}")
+                        logger.info(f"Suggested learning rate: {suggested_lr:.2e}")
                         # Update model's learning rate
                         if hasattr(model, "_lr"):
                             model._lr = suggested_lr
@@ -482,10 +469,10 @@ class AutoTrainer(pl.Trainer):
                         elif hasattr(model, "hparams") and "lr" in model.hparams:
                             model.hparams.lr = suggested_lr
                     else:
-                        console.print("LR finder could not suggest a learning rate.")
+                        logger.warning("LR finder could not suggest a learning rate.")
             except Exception as e:
-                console.print(f"LR finder failed: {e}")
-                console.print("Continuing with user-specified learning rate.")
+                logger.error(f"LR finder failed: {e}")
+                logger.info("Continuing with user-specified learning rate.")
             finally:
                 # Remove the LearningRateFinder callback so fit() starts clean.
                 self._remove_tuner_callbacks()

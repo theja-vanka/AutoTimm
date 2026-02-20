@@ -4,17 +4,10 @@ Interactive visualizations provide Plotly-based HTML reports for exploring model
 
 ## Installation
 
-Interactive visualizations require Plotly:
+Plotly is included as a core dependency since v0.7.10. No additional installation needed.
 
 ```bash
-# Install plotly separately
-pip install plotly
-
-# Or install with autotimm
-pip install autotimm[interactive]
-
-# Or install all optional dependencies
-pip install autotimm[all]
+pip install autotimm
 ```
 
 ## Overview
