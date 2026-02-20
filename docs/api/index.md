@@ -152,6 +152,13 @@ For direct CSV dataset usage without DataModules, see [CSV Data Loading API](csv
 | [MaskLoss](segmentation.md#maskloss) | Binary cross-entropy for instance masks |
 | [CombinedSegmentationLoss](segmentation.md#combinedsegmentationloss) | Combined CE + Dice loss |
 
+## Logging
+
+| Symbol | Description |
+|--------|-------------|
+| [logger](utils.md#logger) | Shared loguru logger instance for the entire library |
+| [log_table](utils.md#log_table) | Log a formatted ASCII table via loguru |
+
 ## Utility Functions
 
 | Function | Description |
@@ -165,6 +172,7 @@ For direct CSV dataset usage without DataModules, see [CSV Data Loading API](csv
 | [resolve_backbone_data_config](transforms.md#resolve_backbone_data_config) | Get model-specific preprocessing config |
 | [get_transforms_from_backbone](transforms.md#get_transforms_from_backbone) | Create transforms with model normalization |
 | [create_inference_transform](transforms.md#create_inference_transform) | Create simple inference transforms |
+| [seed_everything](utils.md#seed_everything) | Set random seeds for reproducibility |
 | [count_parameters](utils.md#autotimm.count_parameters) | Count model parameters |
 | [list_optimizers](utils.md#autotimm.list_optimizers) | List available optimizers |
 | [list_schedulers](utils.md#autotimm.list_schedulers) | List available schedulers |
@@ -259,6 +267,13 @@ from autotimm import (
 )
 ```
 
+### Logging
+
+```python
+from autotimm import logger
+from autotimm.logging import logger, log_table
+```
+
 ### Utilities
 
 ```python
@@ -304,6 +319,7 @@ autotimm/
 │   ├── semantic_segmentation.py # SemanticSegmentor
 │   ├── instance_segmentation.py # InstanceSegmentor
 │   └── preprocessing_mixin.py # PreprocessingMixin
+├── logging.py                 # Central loguru-based logger, log_table
 ├── trainer.py                 # AutoTrainer, TunerConfig
 └── utils.py                   # Utility functions
 ```

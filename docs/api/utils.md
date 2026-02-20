@@ -1,6 +1,76 @@
-# Utilities
+# Utilities & Logging
 
-Utility functions for model inspection, discovery, and reproducibility.
+Utility functions for model inspection, discovery, reproducibility, and library-wide logging.
+
+## logger
+
+Shared [loguru](https://github.com/Delgan/loguru) logger instance used throughout AutoTimm. All internal logging (trainer messages, export progress, interpretation output) goes through this logger.
+
+### Usage Examples
+
+#### Basic Usage
+
+```python
+from autotimm import logger
+
+logger.info("Training started")
+logger.warning("Low GPU memory")
+logger.success("Model exported successfully")
+logger.error("Checkpoint not found")
+```
+
+#### Adjusting Log Level
+
+```python
+from autotimm.logging import logger
+
+# Suppress info messages (show only warnings and above)
+logger.remove()
+import sys
+logger.add(sys.stderr, level="WARNING")
+
+# Enable debug messages
+logger.remove()
+logger.add(sys.stderr, level="DEBUG")
+```
+
+### Default Format
+
+```
+HH:mm:ss | LEVEL    | module:function - message
+```
+
+---
+
+## log_table
+
+Log a formatted ASCII table using loguru.
+
+### Usage Examples
+
+```python
+from autotimm.logging import log_table
+
+log_table(
+    title="Model Comparison",
+    headers=["Model", "Params", "Accuracy"],
+    rows=[
+        ["ResNet-18", "11.7M", "94.2%"],
+        ["ResNet-50", "25.6M", "96.1%"],
+        ["EfficientNet-B0", "5.3M", "95.8%"],
+    ],
+)
+```
+
+### Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `title` | `str` | Table title displayed above the table |
+| `headers` | `list[str]` | Column header names |
+| `rows` | `list[list[str]]` | List of rows, each row is a list of string values |
+
+---
 
 ## seed_everything
 

@@ -21,21 +21,6 @@ from autotimm.data.transforms import (
     get_train_transforms,
 )
 
-import builtins
-
-try:
-    from rich.console import Console
-
-    console = Console()
-except Exception:
-
-    class _ConsoleFallback:
-        def print(self, *args, **kwargs):
-            builtins.print(*args, **kwargs)
-
-    console = _ConsoleFallback()
-
-
 class ImageDataModule(pl.LightningDataModule):
     """Lightning data module for image classification.
 
@@ -404,71 +389,6 @@ class ImageDataModule(pl.LightningDataModule):
             **self._loader_kwargs(),
         )
 
-    def _print_summary(self) -> None:
-        """Print data summary automatically after setup."""
-        try:
-            console.print(self.summary())
-        except Exception:
-            # Fallback to simple output using console (which itself falls back to builtin print)
-            console.print(f"\n{'=' * 50}")
-            console.print("ImageDataModule Summary")
-            console.print(f"{'=' * 50}")
-            console.print(f"Data dir: {self.data_dir}")
-            if self.dataset_name:
-                console.print(f"Dataset: {self.dataset_name}")
-            console.print(f"Image size: {self.image_size}")
-            console.print(f"Batch size: {self.batch_size}")
-            if self.num_classes is not None:
-                console.print(f"Num classes: {self.num_classes}")
-            if self.train_dataset is not None:
-                console.print(f"Train samples: {len(self.train_dataset)}")
-            if self.val_dataset is not None:
-                console.print(f"Val samples: {len(self.val_dataset)}")
-            if self.test_dataset is not None:
-                console.print(f"Test samples: {len(self.test_dataset)}")
-            console.print(f"{'=' * 50}\n")
-
-    def summary(self):
-        """Return a Rich Table summarizing the data module.
-
-        Call after ``setup()`` so that datasets and class info are available.
-        """
-        from rich.table import Table
-
-        table = Table(title="ImageDataModule Summary", show_lines=True)
-        table.add_column("Field", style="bold cyan")
-        table.add_column("Value", style="white")
-
-        table.add_row("Data dir", str(self.data_dir))
-        if self.dataset_name:
-            table.add_row("Dataset", str(self.dataset_name))
-        table.add_row("Image size", str(self.image_size))
-        table.add_row("Batch size", str(self.batch_size))
-        table.add_row("Num workers", str(self.num_workers))
-        table.add_row("Backend", str(self.transform_backend))
-
-        if self.num_classes is not None:
-            table.add_row("Num classes", str(self.num_classes))
-
-        if self.train_dataset is not None:
-            table.add_row("Train samples", str(len(self.train_dataset)))
-        if self.val_dataset is not None:
-            table.add_row("Val samples", str(len(self.val_dataset)))
-        if self.test_dataset is not None:
-            table.add_row("Test samples", str(len(self.test_dataset)))
-
-        if self._train_targets is not None:
-            table.add_row("Balanced sampling", str(self.balanced_sampling))
-            counts = Counter(self._train_targets)
-            for cls_idx in sorted(counts):
-                name = (
-                    self.class_names[cls_idx]
-                    if self.class_names and cls_idx < len(self.class_names)
-                    else str(cls_idx)
-                )
-                table.add_row(f"Class: {name}", str(counts[cls_idx]))
-
-        return table
 
 
 class _AlbumentationsBuiltinWrapper:

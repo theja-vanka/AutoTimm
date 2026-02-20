@@ -16,6 +16,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+from autotimm.logging import logger
+
 try:
     import onnx
     import onnxruntime as ort
@@ -291,7 +293,7 @@ def export_to_torchscript(
                     stacklevel=2,
                 )
 
-        print(f"✓ Model exported to TorchScript: {save_path}")
+        logger.success(f"Model exported to TorchScript: {save_path}")
         return scripted_model
 
     except Exception as e:
@@ -377,7 +379,7 @@ def export_checkpoint_to_torchscript(
     load_kwargs = load_kwargs or {}
 
     # Load the checkpoint
-    print(f"Loading checkpoint: {checkpoint_path}")
+    logger.info(f"Loading checkpoint: {checkpoint_path}")
     model = model_class.load_from_checkpoint(str(checkpoint_path), **load_kwargs)
 
     # Export to TorchScript
@@ -569,7 +571,7 @@ def export_to_onnx(
                     )
 
         file_size_mb = save_path.stat().st_size / (1024 * 1024)
-        print(f"✓ Model exported to ONNX: {save_path} ({file_size_mb:.1f} MB)")
+        logger.success(f"Model exported to ONNX: {save_path} ({file_size_mb:.1f} MB)")
         return str(save_path)
 
     except Exception as e:
@@ -728,7 +730,7 @@ def export_checkpoint_to_onnx(
     _check_onnx_deps()
     load_kwargs = load_kwargs or {}
 
-    print(f"Loading checkpoint: {checkpoint_path}")
+    logger.info(f"Loading checkpoint: {checkpoint_path}")
     model = model_class.load_from_checkpoint(str(checkpoint_path), **load_kwargs)
 
     return export_to_onnx(

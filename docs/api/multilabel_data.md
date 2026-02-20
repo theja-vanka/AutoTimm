@@ -151,31 +151,6 @@ img2.jpg,0,1,0,1
 img3.jpg,1,1,1,0
 ```
 
-## Summary Output
-
-```python
-data.setup("fit")
-print(data.summary())
-```
-
-```
-┌──────────────────────────────────────────────────┐
-│       MultiLabelImageDataModule Summary          │
-├─────────────────────┬────────────────────────────┤
-│ Field               │ Value                      │
-├─────────────────────┼────────────────────────────┤
-│ Image dir           │ ./images                   │
-│ Train CSV           │ train.csv                  │
-│ Val CSV             │ val.csv                    │
-│ Image size          │ 224                        │
-│ Batch size          │ 32                         │
-│ Num labels          │ 4                          │
-│ Label names         │ cat, dog, outdoor, indoor  │
-│ Train samples       │ 1000                       │
-│ Val samples         │ 200                        │
-└─────────────────────┴────────────────────────────┘
-```
-
 ## See Also
 
 - [CSV Data Loading API](csv_data.md#multilabelimagedataset) - Direct dataset API for multi-label CSV data

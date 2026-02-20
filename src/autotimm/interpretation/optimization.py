@@ -18,6 +18,8 @@ import numpy as np
 from PIL import Image
 import warnings
 
+from autotimm.logging import logger
+
 
 class ExplanationCache:
     """
@@ -284,7 +286,7 @@ class BatchProcessor:
             batch_targets = target_classes[i : i + self.batch_size]
 
             if self.show_progress:
-                print(
+                logger.info(
                     f"Processing batch {i // self.batch_size + 1}/{(n_images + self.batch_size - 1) // self.batch_size}..."
                 )
 
@@ -411,21 +413,23 @@ class PerformanceProfiler:
     def print_stats(self):
         """Print profiling statistics."""
         if not self.enabled:
-            print("Profiling is disabled")
+            logger.info("Profiling is disabled")
             return
 
-        print("\nPerformance Profile:")
-        print("-" * 60)
-        print(f"{'Operation':<30} {'Count':<8} {'Mean':<10} {'Total':<10}")
-        print("-" * 60)
-
         stats = self.get_stats()
+        lines = [
+            "Performance Profile:",
+            "-" * 60,
+            f"{'Operation':<30} {'Count':<8} {'Mean':<10} {'Total':<10}",
+            "-" * 60,
+        ]
         for name, stat in stats.items():
-            print(
+            lines.append(
                 f"{name:<30} {stat['count']:<8} {stat['mean']:<10.3f} {stat['total']:<10.3f}"
             )
+        lines.append("-" * 60)
 
-        print("-" * 60)
+        logger.info("\n".join(lines))
 
     def reset(self):
         """Reset all profiling data."""

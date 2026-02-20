@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from autotimm.logging import logger
+
 
 def list_yolox_models(verbose: bool = False) -> list[str]:
     """List all available YOLOX model variants.
@@ -73,22 +75,23 @@ def list_yolox_models(verbose: bool = False) -> list[str]:
     }
 
     if verbose:
-        print("\nAvailable YOLOX Models:")
-        print("=" * 100)
-        print(
+        lines = [
+            "\nAvailable YOLOX Models:",
+            "=" * 100,
             f"{'Model':<12} {'Depth':<8} {'Width':<8} {'Params':<10} {'FLOPs':<10} "
-            f"{'mAP':<8} {'Description'}"
-        )
-        print("-" * 100)
+            f"{'mAP':<8} {'Description'}",
+            "-" * 100,
+        ]
         for name, info in models_info.items():
-            print(
+            lines.append(
                 f"{name:<12} {info['depth']:<8} {info['width']:<8} "
                 f"{info['params']:<10} {info['flops']:<10} "
                 f"{info['mAP']:<8.1f} {info['description']}"
             )
-        print("=" * 100)
-        print("\nAll models trained on COCO dataset (640x640 input)")
-        print("Source: https://github.com/Megvii-BaseDetection/YOLOX\n")
+        lines.append("=" * 100)
+        lines.append("\nAll models trained on COCO dataset (640x640 input)")
+        lines.append("Source: https://github.com/Megvii-BaseDetection/YOLOX\n")
+        logger.info("\n".join(lines))
 
     return list(models_info.keys())
 
@@ -151,25 +154,26 @@ def list_yolox_backbones(verbose: bool = False) -> list[str]:
     }
 
     if verbose:
-        print("\nAvailable YOLOX Backbones (CSPDarknet):")
-        print("=" * 90)
-        print(
+        lines = [
+            "\nAvailable YOLOX Backbones (CSPDarknet):",
+            "=" * 90,
             f"{'Backbone':<20} {'Depth Mul':<12} {'Width Mul':<12} "
-            f"{'Output Channels':<20} {'Description'}"
-        )
-        print("-" * 90)
+            f"{'Output Channels':<20} {'Description'}",
+            "-" * 90,
+        ]
         for name, info in backbones_info.items():
             channels = str(info["output_channels"])
-            print(
+            lines.append(
                 f"{name:<20} {info['depth_mul']:<12} {info['width_mul']:<12} "
                 f"{channels:<20} {info['description']}"
             )
-        print("=" * 90)
-        print("\nAll backbones use:")
-        print("  - Focus layer for stem (space-to-depth downsampling)")
-        print("  - CSP (Cross Stage Partial) blocks for feature extraction")
-        print("  - SPP (Spatial Pyramid Pooling) in final stage")
-        print("  - SiLU activation function\n")
+        lines.append("=" * 90)
+        lines.append("\nAll backbones use:")
+        lines.append("  - Focus layer for stem (space-to-depth downsampling)")
+        lines.append("  - CSP (Cross Stage Partial) blocks for feature extraction")
+        lines.append("  - SPP (Spatial Pyramid Pooling) in final stage")
+        lines.append("  - SiLU activation function\n")
+        logger.info("\n".join(lines))
 
     return list(backbones_info.keys())
 
@@ -238,25 +242,26 @@ def list_yolox_necks(verbose: bool = False) -> list[str]:
     }
 
     if verbose:
-        print("\nAvailable YOLOX Necks (PAFPN):")
-        print("=" * 100)
-        print(
+        lines = [
+            "\nAvailable YOLOX Necks (PAFPN):",
+            "=" * 100,
             f"{'Neck':<18} {'Depth':<8} {'Width':<8} "
-            f"{'Input Channels':<20} {'Out Ch':<8} {'Description'}"
-        )
-        print("-" * 100)
+            f"{'Input Channels':<20} {'Out Ch':<8} {'Description'}",
+            "-" * 100,
+        ]
         for name, info in necks_info.items():
             in_ch = str(info["input_channels"])
-            print(
+            lines.append(
                 f"{name:<18} {info['depth']:<8} {info['width']:<8} "
                 f"{in_ch:<20} {info['output_channels']:<8} {info['description']}"
             )
-        print("=" * 100)
-        print("\nAll necks use:")
-        print("  - Top-down FPN pathway for feature pyramid")
-        print("  - Bottom-up PAN pathway for path aggregation")
-        print("  - CSP fusion blocks for multi-scale feature fusion")
-        print("  - Uniform output channels across all feature levels\n")
+        lines.append("=" * 100)
+        lines.append("\nAll necks use:")
+        lines.append("  - Top-down FPN pathway for feature pyramid")
+        lines.append("  - Bottom-up PAN pathway for path aggregation")
+        lines.append("  - CSP fusion blocks for multi-scale feature fusion")
+        lines.append("  - Uniform output channels across all feature levels\n")
+        logger.info("\n".join(lines))
 
     return list(necks_info.keys())
 
@@ -291,26 +296,27 @@ def list_yolox_heads(verbose: bool = False) -> list[str]:
     }
 
     if verbose:
-        print("\nAvailable YOLOX Detection Heads:")
-        print("=" * 90)
-        print(
+        lines = [
+            "\nAvailable YOLOX Detection Heads:",
+            "=" * 90,
             f"{'Head':<15} {'Type':<18} {'Branches':<10} "
-            f"{'Outputs':<30} {'Description'}"
-        )
-        print("-" * 90)
+            f"{'Outputs':<30} {'Description'}",
+            "-" * 90,
+        ]
         for name, info in heads_info.items():
-            print(
+            lines.append(
                 f"{name:<15} {info['type']:<18} {info['branches']:<10} "
                 f"{info['outputs']:<30} {info['description']}"
             )
-        print("=" * 90)
-        print("\nYOLOXHead features:")
-        print("  - Decoupled architecture: Separate convolutions for cls and reg")
-        print("  - Anchor-free: Grid-based predictions without anchor boxes")
-        print("  - Multi-scale: Predictions at 3 feature levels (strides 8, 16, 32)")
-        print("  - Group normalization: Better stability than batch norm")
-        print("  - SiLU activation: Smooth activation function (Swish)")
-        print("  - Per-level predictions: Each feature level processed independently\n")
+        lines.append("=" * 90)
+        lines.append("\nYOLOXHead features:")
+        lines.append("  - Decoupled architecture: Separate convolutions for cls and reg")
+        lines.append("  - Anchor-free: Grid-based predictions without anchor boxes")
+        lines.append("  - Multi-scale: Predictions at 3 feature levels (strides 8, 16, 32)")
+        lines.append("  - Group normalization: Better stability than batch norm")
+        lines.append("  - SiLU activation: Smooth activation function (Swish)")
+        lines.append("  - Per-level predictions: Each feature level processed independently\n")
+        logger.info("\n".join(lines))
 
     return list(heads_info.keys())
 

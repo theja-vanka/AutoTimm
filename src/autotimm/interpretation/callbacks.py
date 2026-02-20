@@ -8,6 +8,7 @@ import numpy as np
 
 from autotimm.interpretation.gradcam import GradCAM
 from autotimm.interpretation.integrated_gradients import IntegratedGradients
+from autotimm.logging import logger
 
 
 class InterpretationCallback(Callback):
@@ -218,15 +219,15 @@ class InterpretationCallback(Callback):
         epoch = trainer.current_epoch
         step = trainer.global_step
 
-        for logger in trainer.loggers:
-            logger_name = logger.__class__.__name__.lower()
+        for log in trainer.loggers:
+            logger_name = log.__class__.__name__.lower()
 
             if "tensorboard" in logger_name:
-                self._log_to_tensorboard(logger, visualizations, step)
+                self._log_to_tensorboard(log, visualizations, step)
             elif "wandb" in logger_name:
-                self._log_to_wandb(logger, visualizations, epoch, step)
+                self._log_to_wandb(log, visualizations, epoch, step)
             elif "mlflow" in logger_name:
-                self._log_to_mlflow(logger, visualizations, epoch, step)
+                self._log_to_mlflow(log, visualizations, epoch, step)
 
     def _log_to_tensorboard(self, logger, visualizations: List[np.ndarray], step: int):
         """Log to TensorBoard."""
@@ -242,7 +243,7 @@ class InterpretationCallback(Callback):
                     global_step=step,
                 )
         except Exception as e:
-            print(f"Warning: Failed to log to TensorBoard: {e}")
+            logger.warning(f"Failed to log to TensorBoard: {e}")
 
     def _log_to_wandb(
         self, logger, visualizations: List[np.ndarray], epoch: int, step: int
@@ -260,7 +261,7 @@ class InterpretationCallback(Callback):
                 step=step,
             )
         except Exception as e:
-            print(f"Warning: Failed to log to W&B: {e}")
+            logger.warning(f"Failed to log to W&B: {e}")
 
     def _log_to_mlflow(
         self, logger, visualizations: List[np.ndarray], epoch: int, step: int
@@ -278,7 +279,7 @@ class InterpretationCallback(Callback):
                         tmp.name, artifact_path=f"{self.prefix}/epoch_{epoch}"
                     )
         except Exception as e:
-            print(f"Warning: Failed to log to MLflow: {e}")
+            logger.warning(f"Failed to log to MLflow: {e}")
 
 
 class FeatureMonitorCallback(Callback):
@@ -366,7 +367,7 @@ class FeatureMonitorCallback(Callback):
                 layer = getattr(layer, part)
             return layer
         except AttributeError:
-            print(f"Warning: Layer {name} not found")
+            logger.warning(f"Layer {name} not found")
             return None
 
     def _compute_and_log_statistics(self, trainer: pl.Trainer):
@@ -392,11 +393,11 @@ class FeatureMonitorCallback(Callback):
             stats[f"features/{name}/max"] = max_act
 
         # Log to all loggers
-        for logger in trainer.loggers:
+        for log in trainer.loggers:
             try:
-                logger.log_metrics(stats, step=trainer.global_step)
+                log.log_metrics(stats, step=trainer.global_step)
             except Exception as e:
-                print(f"Warning: Failed to log feature stats: {e}")
+                logger.warning(f"Failed to log feature stats: {e}")
 
 
 __all__ = [

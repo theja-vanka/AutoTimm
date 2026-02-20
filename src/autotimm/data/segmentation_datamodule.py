@@ -180,61 +180,6 @@ class SegmentationDataModule(pl.LightningDataModule):
                 csv_path=self.test_csv,
             )
 
-    def _print_summary(self) -> None:
-        """Print data summary automatically after setup."""
-        try:
-            from rich.console import Console
-
-            console = Console()
-            console.print(self.summary())
-        except ImportError:
-            # Fallback to basic print if rich is not available
-            print(f"\n{'=' * 50}")
-            print("SegmentationDataModule Summary")
-            print(f"{'=' * 50}")
-            print(f"Data dir: {self.data_dir}")
-            print(f"Format: {self.format}")
-            print(f"Image size: {self.image_size}")
-            print(f"Batch size: {self.batch_size}")
-            if self.train_dataset is not None:
-                print(f"Train samples: {len(self.train_dataset)}")
-            if self.val_dataset is not None:
-                print(f"Val samples: {len(self.val_dataset)}")
-            if self.test_dataset is not None:
-                print(f"Test samples: {len(self.test_dataset)}")
-            print(f"{'=' * 50}\n")
-        except Exception:
-            # Silently ignore any errors in summary printing
-            pass
-
-    def summary(self):
-        """Return a Rich Table summarizing the data module.
-
-        Call after ``setup()`` so that datasets are available.
-        """
-        from rich.table import Table
-
-        table = Table(title="SegmentationDataModule Summary", show_lines=True)
-        table.add_column("Field", style="bold cyan")
-        table.add_column("Value", style="white")
-
-        table.add_row("Data dir", str(self.data_dir))
-        table.add_row("Format", str(self.format))
-        table.add_row("Image size", str(self.image_size))
-        table.add_row("Batch size", str(self.batch_size))
-        table.add_row("Num workers", str(self.num_workers))
-        table.add_row("Augmentation", str(self.augmentation_preset))
-        table.add_row("Ignore index", str(self.ignore_index))
-
-        if self.train_dataset is not None:
-            table.add_row("Train samples", str(len(self.train_dataset)))
-        if self.val_dataset is not None:
-            table.add_row("Val samples", str(len(self.val_dataset)))
-        if self.test_dataset is not None:
-            table.add_row("Test samples", str(len(self.test_dataset)))
-
-        return table
-
     def train_dataloader(self) -> DataLoader:
         """Get training dataloader."""
         if self.train_dataset is None:

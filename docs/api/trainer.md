@@ -130,7 +130,7 @@ trainer.fit(model, datamodule=data)
 | `logger` | Various | `False` | Logger configuration |
 | `tuner_config` | `TunerConfig \| None \| bool` | `None` | Auto-tuning config. `None`/`True` creates default config, `False` disables |
 | `seed` | `int \| None` | `42` | Random seed for reproducibility. Set to `None` to disable seeding |
-| `deterministic` | `bool` | `False` | Enable deterministic algorithms for reproducibility. May impact performance |
+| `deterministic` | `bool` | `True` | Enable deterministic algorithms for reproducibility. May impact performance |
 | `use_autotimm_seeding` | `bool` | `False` | Use AutoTimm's `seed_everything()` instead of Lightning's built-in seeding |
 | `checkpoint_monitor` | `str \| None` | `None` | Metric for checkpointing |
 | `checkpoint_mode` | `str` | `"max"` | `"max"` or `"min"` |

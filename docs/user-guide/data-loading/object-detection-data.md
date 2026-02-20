@@ -247,32 +247,6 @@ data = DetectionDataModule(
 
 ---
 
-## Dataset Summary
-
-Get information about your detection dataset:
-
-```python
-data = DetectionDataModule(data_dir="./coco", image_size=640)
-data.setup("fit")
-print(data.summary())
-```
-
-Output (Rich table):
-
-```
-┌─────────────────────┬──────────┐
-│ Field               │ Value    │
-├─────────────────────┼──────────┤
-│ Data dir            │ ./coco   │
-│ Image size          │ 640      │
-│ Batch size          │ 16       │
-│ Num classes         │ 80       │
-│ Train samples       │ 118287   │
-│ Val samples         │ 5000     │
-│ Test samples        │ 0        │
-└─────────────────────┴──────────┘
-```
-
 ---
 
 ## Full Parameter Reference

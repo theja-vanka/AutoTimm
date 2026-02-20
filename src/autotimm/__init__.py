@@ -76,8 +76,10 @@ from autotimm.tasks.instance_segmentation import InstanceSegmentor
 from autotimm.tasks.object_detection import ObjectDetector
 from autotimm.tasks.semantic_segmentation import SemanticSegmentor
 from autotimm.tasks.yolox_detector import YOLOXDetector
+from autotimm.callbacks import JsonProgressCallback
 from autotimm.cli import AutoTimmCLI, main as cli_main
 from autotimm.trainer import AutoTrainer, TunerConfig
+from autotimm.logging import logger
 from autotimm.utils import (
     count_parameters,
     list_optimizers,
@@ -138,6 +140,8 @@ task = tasks
 
 __all__ = [
     "__version__",
+    # Callbacks
+    "JsonProgressCallback",
     # CLI
     "AutoTimmCLI",
     "cli_main",
@@ -208,6 +212,8 @@ __all__ = [
     "LoggingConfig",
     "MetricConfig",
     "MetricManager",
+    # Logging
+    "logger",
     # Utils
     "count_parameters",
     "list_optimizers",

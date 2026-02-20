@@ -275,33 +275,6 @@ data = ImageDataModule(
 
 ---
 
-## Dataset Summary
-
-Get a summary of your data:
-
-```python
-data = ImageDataModule(data_dir="./dataset", dataset_name="CIFAR10")
-data.setup("fit")
-print(data.summary())
-```
-
-Output (Rich table):
-
-```
-┌─────────────────────┬──────────┐
-│ Field               │ Value    │
-├─────────────────────┼──────────┤
-│ Data dir            │ ./data   │
-│ Dataset             │ CIFAR10  │
-│ Image size          │ 224      │
-│ Batch size          │ 32       │
-│ Num classes         │ 10       │
-│ Train samples       │ 45000    │
-│ Val samples         │ 5000     │
-│ Test samples        │ 10000    │
-└─────────────────────┴──────────┘
-```
-
 ---
 
 ## Full Parameter Reference

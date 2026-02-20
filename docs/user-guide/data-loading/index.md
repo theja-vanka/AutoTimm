@@ -161,15 +161,6 @@ Both modules support:
 - **Custom transforms**: Torchvision or Albumentations
 - **Backend selection**: Choose between `"torchvision"` or `"albumentations"`
 
-### Dataset Summary
-
-Both provide a `.summary()` method:
-
-```python
-data.setup("fit")
-print(data.summary())  # Rich table with dataset info
-```
-
 ---
 
 ## Detailed Guides
