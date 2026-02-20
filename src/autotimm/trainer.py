@@ -82,11 +82,11 @@ class TunerConfig:
         auto_lr: Whether to use the learning rate finder before training.
             If ``True``, the optimal learning rate will be found and applied.
             If ``False``, the user-specified learning rate is used.
-            Default: ``True`` (enabled by default).
+            Default: ``True``.
         auto_batch_size: Whether to use the batch size finder before training.
             If ``True``, the optimal batch size will be found and applied.
             If ``False``, the user-specified batch size is used.
-            Default: ``True`` (enabled by default).
+            Default: ``True``.
         lr_find_kwargs: Additional kwargs passed to ``Tuner.lr_find()``.
             Common options: ``min_lr``, ``max_lr``, ``num_training``,
             ``mode`` ("exponential" or "linear"), ``early_stop_threshold``.
@@ -97,7 +97,7 @@ class TunerConfig:
             Default values are set if not provided.
 
     Example:
-        >>> # Use defaults (both auto_lr and auto_batch_size disabled)
+        >>> # Use defaults (both auto_lr and auto_batch_size enabled)
         >>> config = TunerConfig()
 
         >>> # Disable auto-tuning
@@ -112,8 +112,8 @@ class TunerConfig:
         ... )
     """
 
-    auto_lr: bool = False
-    auto_batch_size: bool = False
+    auto_lr: bool = True
+    auto_batch_size: bool = True
     lr_find_kwargs: dict[str, Any] | None = None
     batch_size_kwargs: dict[str, Any] | None = None
 
@@ -145,8 +145,8 @@ class AutoTrainer(pl.Trainer):
     and automatic hyperparameter tuning. All ``**trainer_kwargs`` are
     forwarded to ``pl.Trainer``, so any Lightning Trainer argument works.
 
-    **Auto-tuning is disabled by default** - both learning rate and batch size
-    finding are disabled unless explicitly enabled via ``tuner_config``.
+    **Auto-tuning is enabled by default** - both learning rate and batch size
+    finding are enabled unless explicitly disabled via ``tuner_config``.
 
     Parameters:
         max_epochs: Number of training epochs.
@@ -158,7 +158,7 @@ class AutoTrainer(pl.Trainer):
             disable logging.
         tuner_config: A ``TunerConfig`` instance to configure automatic learning
             rate and/or batch size finding. If ``None``, a default ``TunerConfig()``
-            is created with both auto_lr and auto_batch_size disabled.
+            is created with both auto_lr and auto_batch_size enabled.
             To disable auto-tuning completely, pass ``False``.
         checkpoint_monitor: Metric to monitor for checkpointing (e.g.,
             ``"val/accuracy"``). If ``None``, no automatic checkpoint
@@ -184,7 +184,7 @@ class AutoTrainer(pl.Trainer):
         **trainer_kwargs: Any other ``pl.Trainer`` argument.
 
     Example:
-        >>> # Default: auto-tuning disabled (both LR and batch size)
+        >>> # Default: auto-tuning enabled (both LR and batch size)
         >>> trainer = AutoTrainer(max_epochs=10)
         >>> trainer.fit(model, datamodule=data)
 
