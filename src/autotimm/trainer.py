@@ -14,6 +14,18 @@ from autotimm.utils import seed_everything
 # Module-level flag to ensure watermark is printed only once per session
 _WATERMARK_PRINTED = False
 
+import builtins
+try:
+    from rich.console import Console
+
+    console = Console()
+except Exception:
+    class _ConsoleFallback:
+        def print(self, *args, **kwargs):
+            builtins.print(*args, **kwargs)
+
+    console = _ConsoleFallback()
+
 
 def _print_watermark() -> None:
     """Print environment watermark with package versions."""
@@ -25,36 +37,36 @@ def _print_watermark() -> None:
     try:
         from watermark import watermark
 
-        print(watermark(packages="torch,lightning,timm,transformers", python=True))
+        console.print(watermark(packages="torch,lightning,timm,transformers", python=True))
     except ImportError:
         # Fallback if watermark is not available
         import sys
 
         import torch
 
-        print(f"Python: {sys.version}")
-        print(f"PyTorch: {torch.__version__}")
+        console.print(f"Python: {sys.version}")
+        console.print(f"PyTorch: {torch.__version__}")
         try:
             import lightning
 
-            print(f"Lightning: {lightning.__version__}")
+            console.print(f"Lightning: {lightning.__version__}")
         except ImportError:
             try:
                 import pytorch_lightning as pl_fallback
 
-                print(f"PyTorch Lightning: {pl_fallback.__version__}")
+                console.print(f"PyTorch Lightning: {pl_fallback.__version__}")
             except Exception:
                 pass
         try:
             import timm
 
-            print(f"timm: {timm.__version__}")
+            console.print(f"timm: {timm.__version__}")
         except ImportError:
             pass
         try:
             import transformers
 
-            print(f"transformers: {transformers.__version__}")
+            console.print(f"transformers: {transformers.__version__}")
         except ImportError:
             pass
     except Exception:
@@ -85,7 +97,7 @@ class TunerConfig:
             Default values are set if not provided.
 
     Example:
-        >>> # Use defaults (both auto_lr and auto_batch_size enabled)
+        >>> # Use defaults (both auto_lr and auto_batch_size disabled)
         >>> config = TunerConfig()
 
         >>> # Disable auto-tuning
@@ -100,8 +112,8 @@ class TunerConfig:
         ... )
     """
 
-    auto_lr: bool = True
-    auto_batch_size: bool = True
+    auto_lr: bool = False
+    auto_batch_size: bool = False
     lr_find_kwargs: dict[str, Any] | None = None
     batch_size_kwargs: dict[str, Any] | None = None
 
@@ -133,8 +145,8 @@ class AutoTrainer(pl.Trainer):
     and automatic hyperparameter tuning. All ``**trainer_kwargs`` are
     forwarded to ``pl.Trainer``, so any Lightning Trainer argument works.
 
-    **Auto-tuning is enabled by default** - both learning rate and batch size
-    finding will run automatically before training unless explicitly disabled.
+    **Auto-tuning is disabled by default** - both learning rate and batch size
+    finding are disabled unless explicitly enabled via ``tuner_config``.
 
     Parameters:
         max_epochs: Number of training epochs.
@@ -146,7 +158,7 @@ class AutoTrainer(pl.Trainer):
             disable logging.
         tuner_config: A ``TunerConfig`` instance to configure automatic learning
             rate and/or batch size finding. If ``None``, a default ``TunerConfig()``
-            is created with both auto_lr and auto_batch_size enabled.
+            is created with both auto_lr and auto_batch_size disabled.
             To disable auto-tuning completely, pass ``False``.
         checkpoint_monitor: Metric to monitor for checkpointing (e.g.,
             ``"val/accuracy"``). If ``None``, no automatic checkpoint
@@ -172,7 +184,7 @@ class AutoTrainer(pl.Trainer):
         **trainer_kwargs: Any other ``pl.Trainer`` argument.
 
     Example:
-        >>> # Default: auto-tuning enabled (both LR and batch size)
+        >>> # Default: auto-tuning disabled (both LR and batch size)
         >>> trainer = AutoTrainer(max_epochs=10)
         >>> trainer.fit(model, datamodule=data)
 
@@ -232,7 +244,7 @@ class AutoTrainer(pl.Trainer):
         enable_checkpointing: bool = True,
         fast_dev_run: bool | int = False,
         seed: int | None = 42,
-        deterministic: bool = True,
+        deterministic: bool = False,
         use_autotimm_seeding: bool = False,
         **trainer_kwargs: Any,
     ) -> None:
@@ -295,6 +307,11 @@ class AutoTrainer(pl.Trainer):
         else:
             self._tuner_config = tuner_config
 
+        # Guard flag: Lightning's Tuner internally calls trainer.fit(), which would
+        # re-enter our fit() override and trigger a recursive tuning loop. This flag
+        # breaks the cycle so that the inner fit() call skips _run_tuning().
+        self._is_tuning = False
+
         super().__init__(
             max_epochs=max_epochs,
             accelerator=accelerator,
@@ -332,8 +349,12 @@ class AutoTrainer(pl.Trainer):
             datamodule: A LightningDataModule instance.
             ckpt_path: Path to checkpoint for resuming training.
         """
-        if self._tuner_config is not None:
-            self._run_tuning(model, train_dataloaders, val_dataloaders, datamodule)
+        if self._tuner_config is not None and not self._is_tuning:
+            self._is_tuning = True
+            try:
+                self._run_tuning(model, train_dataloaders, val_dataloaders, datamodule)
+            finally:
+                self._is_tuning = False
 
         super().fit(
             model,
@@ -376,7 +397,7 @@ class AutoTrainer(pl.Trainer):
         # Run batch size finder first (if enabled)
         # This should run before LR finder since LR depends on batch size
         if config.auto_batch_size:
-            print("Running batch size finder...")
+            console.print("Running batch size finder...")
             try:
                 result = tuner.scale_batch_size(
                     model,
@@ -385,10 +406,10 @@ class AutoTrainer(pl.Trainer):
                     datamodule=datamodule,
                     **config.batch_size_kwargs,
                 )
-                print(f"Optimal batch size found: {result}")
+                console.print(f"Optimal batch size found: {result}")
             except Exception as e:
-                print(f"Batch size finder failed: {e}")
-                print("Continuing with user-specified batch size.")
+                console.print(f"Batch size finder failed: {e}")
+                console.print("Continuing with user-specified batch size.")
             finally:
                 # Remove the BatchSizeFinder callback Tuner injected so the
                 # subsequent lr_find call (and any future fit() call) won't
@@ -397,7 +418,7 @@ class AutoTrainer(pl.Trainer):
 
         # Run LR finder (if enabled)
         if config.auto_lr:
-            print("Running learning rate finder...")
+            console.print("Running learning rate finder...")
             try:
                 lr_finder = tuner.lr_find(
                     model,
@@ -409,7 +430,7 @@ class AutoTrainer(pl.Trainer):
                 if lr_finder is not None:
                     suggested_lr = lr_finder.suggestion()
                     if suggested_lr is not None:
-                        print(f"Suggested learning rate: {suggested_lr:.2e}")
+                        console.print(f"Suggested learning rate: {suggested_lr:.2e}")
                         # Update model's learning rate
                         if hasattr(model, "_lr"):
                             model._lr = suggested_lr
@@ -418,10 +439,10 @@ class AutoTrainer(pl.Trainer):
                         elif hasattr(model, "hparams") and "lr" in model.hparams:
                             model.hparams.lr = suggested_lr
                     else:
-                        print("LR finder could not suggest a learning rate.")
+                        console.print("LR finder could not suggest a learning rate.")
             except Exception as e:
-                print(f"LR finder failed: {e}")
-                print("Continuing with user-specified learning rate.")
+                console.print(f"LR finder failed: {e}")
+                console.print("Continuing with user-specified learning rate.")
             finally:
                 # Remove the LearningRateFinder callback so fit() starts clean.
                 self._remove_tuner_callbacks()
