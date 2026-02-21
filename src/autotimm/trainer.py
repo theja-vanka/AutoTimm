@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import multiprocessing
+import platform
+import sys
 from dataclasses import dataclass
 from typing import Any
 
@@ -12,6 +15,20 @@ from autotimm.loggers import LoggerConfig, LoggerManager
 from autotimm.logging import logger
 from autotimm.utils import seed_everything
 from autotimm.callbacks.json_progress import JsonProgressCallback, _emit
+
+
+def _ensure_safe_multiprocessing() -> None:
+    """Set multiprocessing start method to 'fork' on macOS if not already set.
+
+    macOS defaults to 'spawn' which requires ``if __name__ == '__main__'``
+    guards. Using 'fork' avoids this issue for dataloader workers.
+    """
+    if platform.system() == "Darwin" and sys.version_info >= (3, 8):
+        try:
+            multiprocessing.set_start_method("fork", force=False)
+        except RuntimeError:
+            # Already set — nothing to do.
+            pass
 
 # Module-level flag to ensure watermark is printed only once per session
 _WATERMARK_PRINTED = False
@@ -28,7 +45,7 @@ def _print_watermark() -> None:
         from watermark import watermark
 
         logger.info(
-            watermark(packages="torch,lightning,timm,transformers", python=True)
+            watermark(packages="torch,pytorch_lightning,timm,transformers", python=True)
         )
     except ImportError:
         # Fallback if watermark is not available
@@ -350,6 +367,9 @@ class AutoTrainer(pl.Trainer):
             datamodule: A LightningDataModule instance.
             ckpt_path: Path to checkpoint for resuming training.
         """
+        # Ensure fork-based multiprocessing on macOS to avoid spawn guard issues
+        _ensure_safe_multiprocessing()
+
         # Apply seeding at the start of fit() so trainer seed is authoritative
         self._apply_seeding()
 
