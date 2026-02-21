@@ -92,7 +92,7 @@ class DetectionDataModule(pl.LightningDataModule):
         label_column: str = "label",
         image_size: int = 640,
         batch_size: int = 16,
-        num_workers: int = os.cpu_count() or 4,
+        num_workers: int = min(os.cpu_count() or 4, 4),
         train_transforms: Callable | None = None,
         eval_transforms: Callable | None = None,
         augmentation_preset: str = "default",

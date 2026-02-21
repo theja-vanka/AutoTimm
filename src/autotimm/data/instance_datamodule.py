@@ -56,7 +56,7 @@ class InstanceSegmentationDataModule(pl.LightningDataModule):
         data_dir: str | Path = ".",
         image_size: int = 640,
         batch_size: int = 4,
-        num_workers: int = os.cpu_count() or 4,
+        num_workers: int = min(os.cpu_count() or 4, 4),
         augmentation_preset: str = "default",
         custom_train_transforms: Any = None,
         custom_val_transforms: Any = None,
