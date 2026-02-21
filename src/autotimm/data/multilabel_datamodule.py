@@ -62,7 +62,7 @@ class MultiLabelImageDataModule(pl.LightningDataModule):
         image_column: str | None = None,
         image_size: int = 224,
         batch_size: int = 32,
-        num_workers: int = os.cpu_count() or 4,
+        num_workers: int = min(os.cpu_count() or 4, 4),
         val_split: float = 0.1,
         train_transforms: Callable | None = None,
         eval_transforms: Callable | None = None,
