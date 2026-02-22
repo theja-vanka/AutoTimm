@@ -315,8 +315,14 @@ class AutoTrainer(pl.Trainer):
         if fast_dev_run or tuner_config is False:
             self._tuner_config = None
         elif tuner_config is None or tuner_config is True:
-            # Enable auto-tuning by default with sensible defaults
-            self._tuner_config = TunerConfig()
+            # Enable auto-tuning by default with sensible defaults.
+            # Batch size finder is only useful on GPU instances where VRAM
+            # probing is meaningful; disable it on CPU / MPS to avoid
+            # unnecessary overhead or failures.
+            import torch
+
+            has_gpu = torch.cuda.is_available()
+            self._tuner_config = TunerConfig(auto_batch_size=has_gpu)
         elif isinstance(tuner_config, TunerConfig):
             self._tuner_config = tuner_config
         else:

@@ -252,7 +252,9 @@ class SemanticSegmentor(PreprocessingMixin, pl.LightningModule):
                 param.requires_grad = False
 
         # Apply torch.compile for optimization (PyTorch 2.0+)
-        if compile_model:
+        # Skip on MPS — the inductor backend generates invalid Metal shaders.
+        _mps_available = hasattr(torch.backends, "mps") and torch.backends.mps.is_available()
+        if compile_model and not _mps_available:
             try:
                 compile_opts = compile_kwargs or {}
                 self.backbone = torch.compile(self.backbone, **compile_opts)

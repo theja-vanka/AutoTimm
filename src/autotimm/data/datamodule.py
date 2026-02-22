@@ -111,7 +111,7 @@ class ImageDataModule(pl.LightningDataModule):
         balanced_sampling: bool = False,
     ):
         super().__init__()
-        self.save_hyperparameters()
+        self.save_hyperparameters(ignore=["backbone"])
         self.data_dir = Path(data_dir)
         self.dataset_name = dataset_name
         self.train_csv = Path(train_csv) if train_csv else None
