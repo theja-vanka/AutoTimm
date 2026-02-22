@@ -105,7 +105,7 @@ class DetectionDataModule(pl.LightningDataModule):
         class_ids: list[int] | None = None,
     ):
         super().__init__()
-        self.save_hyperparameters()
+        self.save_hyperparameters(ignore=["backbone"])
 
         self.data_dir = Path(data_dir)
         self.train_csv = Path(train_csv) if train_csv else None

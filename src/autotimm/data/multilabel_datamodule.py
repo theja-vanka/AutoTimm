@@ -75,7 +75,7 @@ class MultiLabelImageDataModule(pl.LightningDataModule):
         prefetch_factor: int | None = None,
     ):
         super().__init__()
-        self.save_hyperparameters()
+        self.save_hyperparameters(ignore=["backbone"])
         self.train_csv = Path(train_csv)
         self.image_dir = Path(image_dir)
         self.val_csv = Path(val_csv) if val_csv is not None else None
