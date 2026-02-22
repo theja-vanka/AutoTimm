@@ -105,12 +105,15 @@ def test_auto_trainer_with_tuner_config():
 
 def test_auto_trainer_without_tuner_config():
     """Test that AutoTrainer creates default TunerConfig when none is provided."""
+    import torch
+
     trainer = AutoTrainer(max_epochs=1, logger=False, enable_checkpointing=False)
     # Default behavior: auto-tuning enabled
     assert trainer.tuner_config is not None
     assert isinstance(trainer.tuner_config, TunerConfig)
     assert trainer.tuner_config.auto_lr is True
-    assert trainer.tuner_config.auto_batch_size is True
+    # auto_batch_size is only enabled on GPU (CUDA) machines
+    assert trainer.tuner_config.auto_batch_size is torch.cuda.is_available()
 
 
 def test_auto_trainer_disable_tuning():
