@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import datetime as _dt
+import getpass
 from typing import Any
 
 import pytorch_lightning as pl
@@ -146,8 +148,14 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
 
         super().__init__()
         self.save_hyperparameters(
-            ignore=["metrics", "logging_config", "transform_config"]
+            ignore=["metrics", "logging_config", "transform_config", "backbone", "loss_fn"]
         )
+        _backbone_name = backbone.model_name if hasattr(backbone, "model_name") else str(backbone)
+        self.hparams.update({
+            "backbone_name": _backbone_name,
+            "username": getpass.getuser(),
+            "timestamp": _dt.datetime.now().isoformat(timespec="seconds"),
+        })
 
         # Backbone and head
         self.backbone = create_backbone(backbone)
@@ -253,6 +261,15 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
 
         # Setup transforms from config (PreprocessingMixin)
         self._setup_transforms(transform_config, task="classification")
+
+    def on_fit_start(self) -> None:
+        """Capture batch_size from the datamodule when training begins."""
+        if (
+            self.trainer is not None
+            and self.trainer.datamodule is not None
+            and hasattr(self.trainer.datamodule, "batch_size")
+        ):
+            self.hparams["batch_size"] = self.trainer.datamodule.batch_size
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         features = self.backbone(x)
