@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import datetime as _dt
+import getpass
 from typing import Any
 
 import pytorch_lightning as pl
@@ -151,8 +153,14 @@ class InstanceSegmentor(PreprocessingMixin, pl.LightningModule):
 
         super().__init__()
         self.save_hyperparameters(
-            ignore=["metrics", "logging_config", "transform_config"]
+            ignore=["metrics", "logging_config", "transform_config", "backbone", "cls_loss_fn", "reg_loss_fn", "mask_loss_fn"]
         )
+        _backbone_name = backbone.model_name if hasattr(backbone, "model_name") else str(backbone)
+        self.hparams.update({
+            "backbone_name": _backbone_name,
+            "username": getpass.getuser(),
+            "timestamp": _dt.datetime.now().isoformat(timespec="seconds"),
+        })
 
         self.num_classes = num_classes
         self._lr = lr
@@ -339,6 +347,15 @@ class InstanceSegmentor(PreprocessingMixin, pl.LightningModule):
                         self.val_metrics[config.name] = metric_cls(**config.params)
                     if "test" in config.stages:
                         self.test_metrics[config.name] = metric_cls(**config.params)
+
+    def on_fit_start(self) -> None:
+        """Capture batch_size from the datamodule when training begins."""
+        if (
+            self.trainer is not None
+            and self.trainer.datamodule is not None
+            and hasattr(self.trainer.datamodule, "batch_size")
+        ):
+            self.hparams["batch_size"] = self.trainer.datamodule.batch_size
 
     def forward(
         self, images: torch.Tensor

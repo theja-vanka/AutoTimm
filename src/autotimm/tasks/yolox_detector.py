@@ -5,6 +5,8 @@ Combines CSPDarknet backbone + YOLOXPAFPN neck + YOLOX decoupled head.
 
 from __future__ import annotations
 
+import datetime as _dt
+import getpass
 from typing import Any
 
 import pytorch_lightning as pl
@@ -127,6 +129,10 @@ class YOLOXDetector(PreprocessingMixin, pl.LightningModule):
         self.save_hyperparameters(
             ignore=["metrics", "logging_config", "transform_config"]
         )
+        self.hparams.update({
+            "username": getpass.getuser(),
+            "timestamp": _dt.datetime.now().isoformat(timespec="seconds"),
+        })
 
         self.model_name = model_name
         self.num_classes = num_classes
@@ -219,6 +225,15 @@ class YOLOXDetector(PreprocessingMixin, pl.LightningModule):
 
         # Setup transforms
         self._setup_transforms(transform_config, task="detection")
+
+    def on_fit_start(self) -> None:
+        """Capture batch_size from the datamodule when training begins."""
+        if (
+            self.trainer is not None
+            and self.trainer.datamodule is not None
+            and hasattr(self.trainer.datamodule, "batch_size")
+        ):
+            self.hparams["batch_size"] = self.trainer.datamodule.batch_size
 
     def forward(
         self, images: torch.Tensor
