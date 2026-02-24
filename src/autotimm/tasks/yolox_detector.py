@@ -548,14 +548,17 @@ class YOLOXDetector(PreprocessingMixin, pl.LightningModule):
 
     def on_validation_epoch_end(self) -> None:
         """Log validation metrics."""
+        is_sanity = getattr(self.trainer, "sanity_checking", False)
+        prefix = "sanity_val" if is_sanity else "val"
+
         for name, metric in self.val_metrics.items():
             try:
                 value = metric.compute()
                 if isinstance(value, dict):
                     for k, v in value.items():
-                        self.log(f"val/{k}", v)
+                        self.log(f"{prefix}/{k}", v)
                 else:
-                    self.log(f"val/{name}", value)
+                    self.log(f"{prefix}/{name}", value)
             except Exception:
                 pass
             metric.reset()

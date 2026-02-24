@@ -618,14 +618,17 @@ class InstanceSegmentor(PreprocessingMixin, pl.LightningModule):
 
     def on_validation_epoch_end(self) -> None:
         """Log metrics at end of validation epoch."""
+        is_sanity = getattr(self.trainer, "sanity_checking", False)
+        prefix = "sanity_val" if is_sanity else "val"
+
         for name, metric in self.val_metrics.items():
             try:
                 value = metric.compute()
                 if isinstance(value, dict):
                     for k, v in value.items():
-                        self.log(f"val/{name}_{k}", v, prog_bar=(k == "map"))
+                        self.log(f"{prefix}/{name}_{k}", v, prog_bar=(k == "map"))
                 else:
-                    self.log(f"val/{name}", value, prog_bar=True)
+                    self.log(f"{prefix}/{name}", value, prog_bar=True)
             except Exception:
                 pass
             metric.reset()

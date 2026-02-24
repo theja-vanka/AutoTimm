@@ -422,8 +422,11 @@ class SemanticSegmentor(PreprocessingMixin, pl.LightningModule):
         # Get predictions
         preds = logits.argmax(dim=1)
 
+        is_sanity = getattr(self.trainer, "sanity_checking", False)
+        prefix = "sanity_val" if is_sanity else "val"
+
         # Log loss
-        self.log("val/loss", loss, prog_bar=True)
+        self.log(f"{prefix}/loss", loss, prog_bar=True)
 
         # Update and log all val metrics
         if self._metric_manager is not None:
@@ -432,7 +435,7 @@ class SemanticSegmentor(PreprocessingMixin, pl.LightningModule):
                 metric.update(preds, masks)
                 if config:
                     self.log(
-                        f"val/{name}",
+                        f"{prefix}/{name}",
                         metric,
                         on_step=config.log_on_step,
                         on_epoch=config.log_on_epoch,

@@ -718,15 +718,18 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
             metric.update(preds, targets)
 
     def on_validation_epoch_end(self) -> None:
+        is_sanity = getattr(self.trainer, "sanity_checking", False)
+        prefix = "sanity_val" if is_sanity else "val"
+
         for name, metric in self.val_metrics.items():
             result = metric.compute()
             # MeanAveragePrecision returns a dict
             if isinstance(result, dict):
                 for key, value in result.items():
                     if isinstance(value, torch.Tensor) and value.numel() == 1:
-                        self.log(f"val/{key}", value, prog_bar=(key == "map"))
+                        self.log(f"{prefix}/{key}", value, prog_bar=(key == "map"))
             else:
-                self.log(f"val/{name}", result)
+                self.log(f"{prefix}/{name}", result)
             metric.reset()
 
     def test_step(self, batch: dict[str, Any], batch_idx: int) -> None:
