@@ -375,7 +375,10 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
         else:
             preds = logits.argmax(dim=-1)
 
-        is_sanity = getattr(self.trainer, "sanity_checking", False)
+        try:
+            is_sanity = getattr(self.trainer, "sanity_checking", False)
+        except RuntimeError:
+            is_sanity = False
         prefix = "sanity_val" if is_sanity else "val"
 
         # Log loss
