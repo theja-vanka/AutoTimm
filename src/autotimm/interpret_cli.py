@@ -11,8 +11,6 @@ import argparse
 import json
 import os
 import sys
-from pathlib import Path
-
 import torch
 from PIL import Image
 
@@ -86,7 +84,6 @@ def _run_method(model, image: Image.Image, method_id: str, output_dir: str):
     )
     from autotimm.interpretation.visualization.heatmap import (
         save_heatmap,
-        overlay_heatmap,
     )
 
     constructors = {
@@ -126,8 +123,6 @@ def _run_method(model, image: Image.Image, method_id: str, output_dir: str):
 
 def _get_predicted_class(model, image: Image.Image) -> int:
     """Run forward pass to get predicted class index."""
-    from autotimm.interpretation.base import BaseInterpreter
-
     # Use a temporary GradCAM just for preprocessing
     from autotimm.interpretation import GradCAM
 
@@ -167,8 +162,6 @@ def main():
 
     os.makedirs(args.output_dir, exist_ok=True)
 
-    # Suppress non-JSON output
-    stderr_orig = sys.stderr
     try:
         model = _load_model(args.checkpoint, args.task_class)
         image = Image.open(args.image).convert("RGB")

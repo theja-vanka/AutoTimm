@@ -303,6 +303,40 @@ LightningCLI supports multiple `--config` flags for composing configs:
 autotimm fit --config base.yaml --config overrides.yaml
 ```
 
+## Standalone CLI Modules
+
+Beyond the `autotimm` training CLI, AutoTimm provides standalone CLI modules for common workflows:
+
+### Export to TorchScript
+
+Export a trained checkpoint to TorchScript (JIT) format for production deployment or model visualization:
+
+```bash
+python -m autotimm.export_jit \
+    --checkpoint logs/run_1/checkpoints/best.ckpt \
+    --output model.pt \
+    --task-class ImageClassifier
+```
+
+The exported `.pt` file can be loaded with `torch.jit.load()` without any AutoTimm dependency. Input size is auto-detected from model hparams when available.
+
+### Run Model Interpretation
+
+Run interpretation methods on a trained checkpoint and save heatmap overlays:
+
+```bash
+python -m autotimm.interpret_cli \
+    --checkpoint logs/run_1/checkpoints/best.ckpt \
+    --image test_image.jpg \
+    --methods gradcam,gradcampp,integrated_gradients \
+    --output-dir ./interpretations \
+    --task-class ImageClassifier
+```
+
+Outputs JSON to stdout with heatmap file paths and predicted class. Attention methods are automatically skipped for non-ViT models.
+
+See [CLI API Reference](../../api/cli.md) for full argument details.
+
 ---
 
-See also: [AutoTrainer API](../../api/trainer.md) | [CLI API Reference](../../api/cli.md) | [Example Configs](https://github.com/theja-vanka/AutoTimm/tree/main/examples/cli)
+See also: [AutoTrainer API](../../api/trainer.md) | [CLI API Reference](../../api/cli.md) | [Export API](../../api/export.md) | [Example Configs](https://github.com/theja-vanka/AutoTimm/tree/main/examples/cli)
