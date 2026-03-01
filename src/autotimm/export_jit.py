@@ -12,9 +12,11 @@ Outputs the path to the saved .pt file on stdout.
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 
 import torch
+import yaml  # PyYAML — bundled with PyTorch Lightning
 
 from autotimm.export import export_checkpoint_to_torchscript
 
@@ -40,9 +42,47 @@ def _resolve_task_class(name: str):
     return getattr(mod, cls_name)
 
 
-def _resolve_input_size(checkpoint_path: str, task_class, default_size: int) -> int:
-    """Determine image input size from checkpoint hparams or fall back to *default_size*."""
-    model = task_class.load_from_checkpoint(checkpoint_path, map_location="cpu")
+def _parse_hparams_yaml(path: str) -> dict:
+    """Read an hparams.yaml file and return the parsed dict."""
+    with open(path) as f:
+        data = yaml.safe_load(f) or {}
+    return data
+
+
+def _build_load_overrides(hp: dict) -> dict:
+    """Build ``load_from_checkpoint`` overrides from an hparams dict."""
+    override: dict = {}
+    backbone = hp.get("backbone") or hp.get("backbone_name")
+    if backbone is not None:
+        override["backbone"] = backbone
+    model_name = hp.get("model_name")
+    if model_name is not None:
+        override["model_name"] = model_name
+    num_classes = hp.get("num_classes")
+    if num_classes is not None:
+        override["num_classes"] = int(num_classes)
+    override["compile_model"] = False
+    return override
+
+
+def _get_hparams(hparams_yaml: str | None, checkpoint_path: str) -> dict:
+    """Load hparams from YAML file, falling back to checkpoint peek."""
+    if hparams_yaml and os.path.isfile(hparams_yaml):
+        return _parse_hparams_yaml(hparams_yaml)
+    # Fallback: peek into checkpoint
+    ckpt = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
+    hp = ckpt.get("hyper_parameters", {})
+    if isinstance(hp, dict):
+        return hp.get("init_args", hp)
+    return {}
+
+
+def _resolve_input_size(checkpoint_path: str, task_class, default_size: int,
+                        hparams_yaml: str | None = None) -> int:
+    """Determine image input size from hparams or fall back to *default_size*."""
+    hp = _get_hparams(hparams_yaml, checkpoint_path)
+    overrides = _build_load_overrides(hp)
+    model = task_class.load_from_checkpoint(checkpoint_path, map_location="cpu", **overrides)
     if hasattr(model, "hparams"):
         img_size = getattr(model.hparams, "image_size", None)
         if img_size is not None:
@@ -76,13 +116,23 @@ def main():
         action="store_true",
         help="Disable torch.jit.optimize_for_inference",
     )
+    parser.add_argument(
+        "--hparams-yaml",
+        default=None,
+        help="Path to hparams.yaml (logs/<run_id>/hparams.yaml)",
+    )
     args = parser.parse_args()
 
     try:
         cls = _resolve_task_class(args.task_class)
 
+        # Read hparams from YAML file (preferred) or checkpoint fallback
+        hp = _get_hparams(args.hparams_yaml, args.checkpoint)
+        overrides = _build_load_overrides(hp)
+
         # Determine input size from model hparams if available
-        input_size = _resolve_input_size(args.checkpoint, cls, args.input_size)
+        input_size = _resolve_input_size(args.checkpoint, cls, args.input_size,
+                                         args.hparams_yaml)
         example_input = torch.randn(1, 3, input_size, input_size)
 
         export_checkpoint_to_torchscript(
@@ -92,6 +142,7 @@ def main():
             example_input=example_input,
             method=args.method,
             optimize=not args.no_optimize,
+            load_kwargs=overrides,
         )
 
         print(str(args.output))
