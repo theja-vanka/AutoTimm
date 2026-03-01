@@ -26,6 +26,22 @@
 <details>
 <summary><strong>v0.7 Changelog</strong></summary>
 
+### v0.7.21 — JIT Export CLI
+
+- New `export_jit` CLI module (`python -m autotimm.export_jit`) for exporting trained checkpoints to TorchScript (JIT) format
+- Accepts `--checkpoint`, `--output`, `--task-class`, and `--input-size` arguments
+- Automatically detects input size from model `hparams` when available
+- Uses `torch.jit.trace` for broad compatibility across all task types
+- Enables NightFlow's Netron integration to visualize model architectures from completed runs
+
+### v0.7.20 — Interpretation CLI
+
+- New `interpret_cli` CLI module (`python -m autotimm.interpret_cli`) for running model interpretation from the command line
+- Supports all 6 interpretation methods: GradCAM, GradCAM++, IntegratedGradients, SmoothGrad, AttentionRollout, AttentionFlow
+- Outputs JSON with heatmap file paths, predicted class, and per-method errors
+- Automatically skips attention methods on non-ViT models with descriptive messages
+- Enables NightFlow's Interpretation view to run explanations against trained checkpoints
+
 ### v0.7.19 — Test Metrics Logging & SEO
 
 - Test metrics now logged to CSV logger and JSONL alongside train/val metrics
@@ -1026,7 +1042,7 @@ For major changes, please open an issue first.
   title = {AutoTimm: Automatic PyTorch Image Models},
   url = {https://github.com/theja-vanka/AutoTimm},
   year = {2026},
-  version = {0.7.20}
+  version = {0.7.21}
 }
 ```
 

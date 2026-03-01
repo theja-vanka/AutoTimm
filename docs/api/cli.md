@@ -110,4 +110,64 @@ trainer:
 
 ---
 
-See also: [CLI User Guide](../user-guide/training/cli.md) | [AutoTrainer](trainer.md) | [Example Configs](https://github.com/theja-vanka/AutoTimm/tree/main/examples/cli)
+## Standalone CLI Modules
+
+In addition to the `autotimm` CLI, AutoTimm provides standalone CLI modules for specific tasks:
+
+### export_jit — TorchScript Export
+
+Export a trained checkpoint to TorchScript (JIT) format:
+
+```bash
+python -m autotimm.export_jit \
+    --checkpoint path/to/checkpoint.ckpt \
+    --output model.pt \
+    --task-class ImageClassifier \
+    --input-size 224
+```
+
+| Argument | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `--checkpoint` | Yes | — | Path to `.ckpt` file |
+| `--output` | Yes | — | Output `.pt` file path |
+| `--task-class` | No | `ImageClassifier` | Task class name |
+| `--input-size` | No | `224` | Input image size (auto-detected from hparams) |
+
+See also: [Export API Reference](export.md)
+
+### interpret_cli — Model Interpretation
+
+Run interpretation methods on a trained checkpoint from the command line:
+
+```bash
+python -m autotimm.interpret_cli \
+    --checkpoint path/to/checkpoint.ckpt \
+    --image path/to/image.jpg \
+    --methods gradcam,gradcampp,integrated_gradients \
+    --output-dir ./interpretations \
+    --task-class ImageClassifier
+```
+
+| Argument | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `--checkpoint` | Yes | — | Path to `.ckpt` file |
+| `--image` | Yes | — | Path to input image |
+| `--methods` | No | All 6 methods | Comma-separated method names |
+| `--output-dir` | Yes | — | Directory for output heatmap PNGs |
+| `--task-class` | No | `ImageClassifier` | Task class name |
+
+**Output:** JSON to stdout with heatmap file paths, predicted class, and per-method errors.
+
+```json
+{
+  "results": {"gradcam": "/path/to/gradcam.png", ...},
+  "predicted_class": 5,
+  "errors": {}
+}
+```
+
+**Available methods:** `gradcam`, `gradcampp`, `integrated_gradients`, `smoothgrad`, `attention_rollout`, `attention_flow`
+
+---
+
+See also: [CLI User Guide](../user-guide/training/cli.md) | [AutoTrainer](trainer.md) | [Export API](export.md) | [Example Configs](https://github.com/theja-vanka/AutoTimm/tree/main/examples/cli)

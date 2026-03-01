@@ -844,6 +844,61 @@ When exporting detection models to ONNX, list outputs are flattened into named t
 
 ---
 
+## CLI Tools
+
+### export_jit (CLI)
+
+Export a trained checkpoint to TorchScript (JIT) format from the command line.
+
+```bash
+python -m autotimm.export_jit \
+    --checkpoint path/to/checkpoint.ckpt \
+    --output model.pt \
+    --task-class ImageClassifier \
+    --input-size 224
+```
+
+**Arguments:**
+
+| Argument | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `--checkpoint` | Yes | — | Path to the `.ckpt` file |
+| `--output` | Yes | — | Output `.pt` file path |
+| `--task-class` | No | `ImageClassifier` | Task class name (`ImageClassifier`, `ObjectDetector`, `SemanticSegmentor`, `InstanceSegmentor`, `YOLOXDetector`) |
+| `--input-size` | No | `224` | Input image size for tracing (auto-detected from model hparams when available) |
+
+**Output:** Prints the output file path to stdout on success.
+
+**Notes:**
+
+- Uses `torch.jit.trace` for broad compatibility across all task types
+- Automatically detects `image_size` from model `hparams` if saved during training
+- The exported `.pt` file can be loaded with `torch.jit.load()` without any AutoTimm dependency
+- Used by NightFlow's Netron integration to visualize model architectures from completed runs
+
+**Example — Export and load:**
+
+```python
+import subprocess
+import torch
+
+# Export via CLI
+subprocess.run([
+    "python", "-m", "autotimm.export_jit",
+    "--checkpoint", "logs/run_1/checkpoints/best.ckpt",
+    "--output", "model.pt",
+    "--task-class", "ImageClassifier",
+])
+
+# Load without AutoTimm
+model = torch.jit.load("model.pt")
+model.eval()
+with torch.inference_mode():
+    output = model(torch.randn(1, 3, 224, 224))
+```
+
+---
+
 ## See Also
 
 - [TorchScript Export Guide](../user-guide/deployment/torchscript-export.md) - Complete TorchScript usage guide
@@ -855,6 +910,14 @@ When exporting detection models to ONNX, list outputs are flattened into named t
 ---
 
 ## Version History
+
+### v0.7.21
+- Added `export_jit` CLI module (`python -m autotimm.export_jit`) for command-line TorchScript export
+- Auto-detects input size from model hparams
+- Enables NightFlow Netron integration for model architecture visualization
+
+### v0.7.20
+- Added `interpret_cli` CLI module (`python -m autotimm.interpret_cli`) for command-line interpretation
 
 ### v0.7.10
 - Export logging now uses loguru instead of `print()` statements

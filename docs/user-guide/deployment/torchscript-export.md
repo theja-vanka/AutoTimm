@@ -52,6 +52,20 @@ with torch.inference_mode():
     output = model(image)
 ```
 
+## CLI Export
+
+Export from the command line without writing Python code:
+
+```bash
+python -m autotimm.export_jit \
+    --checkpoint path/to/checkpoint.ckpt \
+    --output model.pt \
+    --task-class ImageClassifier \
+    --input-size 224
+```
+
+Input size is auto-detected from model hparams when available. See [CLI API Reference](../../api/cli.md) for full details.
+
 ## Export Methods
 
 AutoTimm provides multiple ways to export models:

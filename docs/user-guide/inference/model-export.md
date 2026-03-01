@@ -6,6 +6,15 @@ This guide covers how to export trained AutoTimm models to production-ready form
 
 TorchScript allows you to serialize PyTorch models for deployment in C++ applications or environments without Python.
 
+### CLI Export (Quickest)
+
+```bash
+python -m autotimm.export_jit \
+    --checkpoint checkpoint.ckpt \
+    --output model.pt \
+    --task-class ImageClassifier
+```
+
 ### Basic TorchScript Export
 
 ```python

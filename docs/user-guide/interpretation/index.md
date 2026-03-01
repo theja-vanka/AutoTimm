@@ -482,6 +482,38 @@ See the complete examples:
 - `examples/interpretation/interpretation_phase3_demo.py` - Training integration and feature visualization
 - `examples/interpretation/interpretation_metrics_demo.py` - Quantitative evaluation of explanation quality
 
+## Command-Line Interpretation
+
+Run interpretation methods directly from the command line without writing Python code:
+
+```bash
+python -m autotimm.interpret_cli \
+    --checkpoint path/to/checkpoint.ckpt \
+    --image path/to/image.jpg \
+    --methods gradcam,gradcampp,integrated_gradients,smoothgrad \
+    --output-dir ./interpretations \
+    --task-class ImageClassifier
+```
+
+This outputs JSON to stdout with heatmap file paths and the predicted class:
+
+```json
+{
+  "results": {
+    "gradcam": "./interpretations/gradcam.png",
+    "gradcampp": "./interpretations/gradcampp.png",
+    "integrated_gradients": "./interpretations/integrated_gradients.png",
+    "smoothgrad": "./interpretations/smoothgrad.png"
+  },
+  "predicted_class": 5,
+  "errors": {}
+}
+```
+
+Attention methods (`attention_rollout`, `attention_flow`) are automatically skipped with descriptive messages for non-ViT models.
+
+See [CLI API Reference](../../api/cli.md) for full argument details.
+
 ## API Reference
 
 For detailed API documentation, see:
