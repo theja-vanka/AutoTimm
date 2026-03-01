@@ -26,6 +26,47 @@
 <details>
 <summary><strong>v0.7 Changelog</strong></summary>
 
+### v0.7.19 — Test Metrics Logging & SEO
+
+- Test metrics now logged to CSV logger and JSONL alongside train/val metrics
+- SEO meta tags automatically generated for documentation pages
+
+### v0.7.18 — Sanity Run Tagging
+
+- Sanity-check validation runs are now tagged so they can be distinguished from real validation runs in logs and frontends
+
+### v0.7.17 — Backbone Path Fix
+
+- Fixed model path resolution in `backbone.py` for edge cases
+
+### v0.7.16 — Additional Hyperparameters
+
+- `hparams.yaml` saved automatically with all hyperparameters for each run
+- Enables downstream dashboards to display training configuration alongside metrics
+
+### v0.7.15 — Auto-Tuner GPU Guard
+
+- Batch-size finder now auto-disabled on CPU/MPS where VRAM probing is not meaningful
+- Prevents unnecessary overhead and failures on non-GPU devices
+
+### v0.7.14 — macOS Stability Fixes
+
+- Fixed multiprocessing issues on macOS (fork vs. spawn)
+- Resolved `num_workers` bug on Apple Silicon
+
+### v0.7.13 — macOS Num Workers Fix
+
+- Automatic safe `num_workers` selection on macOS to prevent deadlocks
+
+### v0.7.12 — macOS Training Bug Fix
+
+- Fixed a training crash on macOS when using MPS accelerator
+
+### v0.7.11 — MPS / Apple Silicon Fixes
+
+- Resolved `torch.compile` incompatibilities on Apple MPS backend
+- Graceful fallback when deterministic algorithms are unavailable on MPS
+
 ### v0.7.10 — Loguru Logging & Dependency Cleanup
 
 **Logging Migration: `rich` → `loguru`**
@@ -235,12 +276,16 @@ trainer.fit(model, datamodule=data)
 <td>Load any task from CSV files — classification, detection, segmentation, instance segmentation</td>
 </tr>
 <tr>
+<td><strong>JSON Progress Events</strong></td>
+<td>NDJSON progress callback for frontend integration • Train/val/test lifecycle events • File-based replay</td>
+</tr>
+<tr>
 <td><strong>Model Export</strong></td>
 <td>TorchScript (.pt) and ONNX (.onnx) export • ONNX Runtime, TensorRT, OpenVINO, CoreML</td>
 </tr>
 <tr>
 <td><strong>Production Ready</strong></td>
-<td>Mixed precision • Multi-GPU • Gradient accumulation • 487 tests</td>
+<td>Mixed precision • Multi-GPU • Gradient accumulation • macOS/MPS native support • 487 tests</td>
 </tr>
 </table>
 
@@ -981,7 +1026,7 @@ For major changes, please open an issue first.
   title = {AutoTimm: Automatic PyTorch Image Models},
   url = {https://github.com/theja-vanka/AutoTimm},
   year = {2026},
-  version = {0.7.10}
+  version = {0.7.20}
 }
 ```
 

@@ -185,8 +185,8 @@ class TestHFHubWithAutoTrainer:
         assert isinstance(val_results, list)
         assert len(val_results) > 0
 
-        # Test
-        test_results = trainer.test(model, val_loader)
+        # Test (ckpt_path=None because checkpointing is disabled)
+        test_results = trainer.test(model, val_loader, ckpt_path=None)
         assert isinstance(test_results, list)
         assert len(test_results) > 0
 
