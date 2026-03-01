@@ -1,5 +1,6 @@
 ---
-title: 
+title: AutoTimm - Automated Deep Learning for Computer Vision
+description: Train state-of-the-art image classification, object detection, and segmentation models with 1000+ timm backbones using minimal Python code. Built on PyTorch Lightning.
 ---
 
 <div align="center">

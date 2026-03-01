@@ -1,3 +1,8 @@
+---
+title: Instance Segmentation
+description: Mask R-CNN style instance segmentation combining FCOS detection with mask prediction heads. Train on custom datasets with any timm backbone.
+---
+
 # Instance Segmentation
 
 AutoTimm provides Mask R-CNN style instance segmentation combining FCOS object detection with mask prediction.

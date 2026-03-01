@@ -1,3 +1,8 @@
+---
+title: Examples
+description: Runnable code examples for AutoTimm — image classification, object detection, segmentation, HuggingFace integration, CLI usage, and more.
+---
+
 # Examples
 
 The [`examples/`](https://github.com/theja-vanka/AutoTimm/tree/main/examples) directory contains runnable scripts demonstrating AutoTimm features.

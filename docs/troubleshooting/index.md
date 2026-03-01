@@ -1,3 +1,8 @@
+---
+title: Troubleshooting
+description: Solutions for common AutoTimm issues — training failures, OOM errors, slow performance, data loading problems, model export, and environment setup.
+---
+
 # Troubleshooting
 
 Comprehensive troubleshooting guide for common issues when using AutoTimm.

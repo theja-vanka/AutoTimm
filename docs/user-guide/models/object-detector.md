@@ -1,3 +1,8 @@
+---
+title: ObjectDetector (FCOS)
+description: Anchor-free FCOS object detection with timm backbones, Feature Pyramid Networks, and configurable detection heads. Supports custom datasets in COCO format.
+---
+
 # ObjectDetector
 
 FCOS-style anchor-free object detector that combines timm backbones with Feature Pyramid Networks (FPN) and detection heads.

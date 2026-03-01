@@ -3,37 +3,66 @@
 {% block extrahead %}
   <!-- Google Site Verification -->
   <meta name="google-site-verification" content="p_z6B5TiMdq2eo0Nv7iOWaYanUBHwf2pxQ5B-qvbE_o">
-  
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="{{ config.site_url }}{{ page.url }}">
+
   <!-- Sitemap Reference -->
   <link rel="sitemap" type="application/xml" title="Sitemap" href="{{ config.site_url }}/sitemap.xml">
-  
+
   <!-- Referrer Policy -->
   <meta name="referrer" content="no-referrer-when-downgrade">
-  
+
   <!-- Home Page Reference -->
   <link rel="home" href="{{ config.site_url }}/" title="AutoTimm Home">
-  
+
+  <!-- Language -->
+  <meta http-equiv="content-language" content="en">
+
   <!-- SEO Meta Tags -->
-  <meta name="description" content="AutoTimm - Automatic PyTorch Image Models for Computer Vision. Build, train, and deploy state-of-the-art models for image classification, object detection, and segmentation with minimal code.">
-  <meta name="keywords" content="PyTorch, Computer Vision, Deep Learning, Image Classification, Object Detection, Semantic Segmentation, Instance Segmentation, Transfer Learning, timm, YOLOX, AutoML, Machine Learning, Neural Networks, CNN, Vision Transformer, Model Training, Model Deployment, TorchScript">
+  {% if page and page.meta and page.meta.description %}
+  <meta name="description" content="{{ page.meta.description }}">
+  {% else %}
+  <meta name="description" content="AutoTimm - Automated deep learning for computer vision. Train image classification, object detection, and segmentation models with 1000+ timm backbones in minimal Python code.">
+  {% endif %}
+  <meta name="keywords" content="PyTorch, Computer Vision, Deep Learning, Image Classification, Object Detection, Semantic Segmentation, Instance Segmentation, Transfer Learning, timm, YOLOX, AutoML, Machine Learning, Neural Networks, CNN, Vision Transformer, ViT, ResNet, EfficientNet, ConvNeXt, Swin Transformer, Model Training, Model Deployment, TorchScript, ONNX, PyTorch Lightning, GradCAM, Model Interpretation">
   <meta name="author" content="Krishnatheja Vanka">
-  <meta name="robots" content="index, follow">
-  
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+
   <!-- Open Graph Meta Tags -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="AutoTimm - Automatic PyTorch Image Models">
-  <meta property="og:description" content="Build, train, and deploy state-of-the-art computer vision models with minimal code. Support for classification, detection, and segmentation tasks.">
-  <meta property="og:url" content="https://theja-vanka.github.io/AutoTimm">
+  {% if page and page.meta and page.meta.title %}
+  <meta property="og:title" content="{{ page.meta.title }} - AutoTimm">
+  {% else %}
+  <meta property="og:title" content="{{ page.title }} - AutoTimm">
+  {% endif %}
+  {% if page and page.meta and page.meta.description %}
+  <meta property="og:description" content="{{ page.meta.description }}">
+  {% else %}
+  <meta property="og:description" content="Automated deep learning for computer vision. Train image classification, object detection, and segmentation models with 1000+ timm backbones in minimal code.">
+  {% endif %}
+  <meta property="og:url" content="{{ config.site_url }}{{ page.url }}">
   <meta property="og:site_name" content="AutoTimm">
   <meta property="og:image" content="https://theja-vanka.github.io/AutoTimm/assets/logo.png">
-  
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="en_US">
+
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="AutoTimm - Automatic PyTorch Image Models">
-  <meta name="twitter:description" content="Build, train, and deploy state-of-the-art computer vision models with minimal code.">
+  {% if page and page.meta and page.meta.title %}
+  <meta name="twitter:title" content="{{ page.meta.title }} - AutoTimm">
+  {% else %}
+  <meta name="twitter:title" content="{{ page.title }} - AutoTimm">
+  {% endif %}
+  {% if page and page.meta and page.meta.description %}
+  <meta name="twitter:description" content="{{ page.meta.description }}">
+  {% else %}
+  <meta name="twitter:description" content="Automated deep learning for computer vision. Train state-of-the-art models with 1000+ backbones in minimal code.">
+  {% endif %}
   <meta name="twitter:image" content="https://theja-vanka.github.io/AutoTimm/assets/logo.png">
-  
-  <!-- Structured Data for Breadcrumbs -->
+
+  <!-- Structured Data: WebSite -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -44,7 +73,72 @@
     "publisher": {
       "@type": "Person",
       "name": "{{ config.site_author }}"
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "{{ config.site_url }}?q={search_term_string}",
+      "query-input": "required name=search_term_string"
     }
   }
   </script>
+
+  <!-- Structured Data: SoftwareApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareSourceCode",
+    "name": "AutoTimm",
+    "description": "Automated deep learning library for computer vision — train image classification, object detection, and segmentation models with 1000+ backbones in minimal Python code.",
+    "url": "https://github.com/theja-vanka/AutoTimm",
+    "codeRepository": "https://github.com/theja-vanka/AutoTimm",
+    "programmingLanguage": "Python",
+    "runtimePlatform": "Python 3.10+",
+    "license": "https://www.apache.org/licenses/LICENSE-2.0",
+    "author": {
+      "@type": "Person",
+      "name": "Krishnatheja Vanka",
+      "url": "https://github.com/theja-vanka"
+    },
+    "operatingSystem": "Linux, macOS, Windows",
+    "applicationCategory": "Machine Learning",
+    "keywords": ["PyTorch", "Computer Vision", "Deep Learning", "Image Classification", "Object Detection", "Segmentation", "timm", "AutoML"]
+  }
+  </script>
+
+  <!-- Structured Data: BreadcrumbList -->
+  {% if page %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "{{ config.site_url }}"
+      }
+      {% if page.parent %}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": "{{ page.parent.title }}",
+        "item": "{{ config.site_url }}{{ page.parent.url }}"
+      }
+      ,{
+        "@type": "ListItem",
+        "position": 3,
+        "name": "{{ page.title }}"
+      }
+      {% elif page.title != "Home" %}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": "{{ page.title }}"
+      }
+      {% endif %}
+    ]
+  }
+  </script>
+  {% endif %}
 {% endblock %}

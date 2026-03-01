@@ -1,3 +1,8 @@
+---
+title: API Reference
+description: Complete API documentation for AutoTimm — task models, data modules, training, metrics, losses, export, and utility functions.
+---
+
 # API Reference
 
 This section provides detailed API documentation for all AutoTimm classes and functions.
