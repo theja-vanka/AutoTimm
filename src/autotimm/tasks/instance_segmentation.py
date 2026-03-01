@@ -151,13 +151,16 @@ class InstanceSegmentor(PreprocessingMixin, pl.LightningModule):
                 stacklevel=2,
             )
 
+        # Normalize backbone to a plain string so it survives checkpoint
+        # round-trip (FeatureBackboneConfig is not serialised by save_hyperparameters).
+        backbone = backbone.model_name if hasattr(backbone, "model_name") else str(backbone)
+
         super().__init__()
         self.save_hyperparameters(
-            ignore=["metrics", "logging_config", "transform_config", "backbone", "cls_loss_fn", "reg_loss_fn", "mask_loss_fn"]
+            ignore=["metrics", "logging_config", "transform_config", "cls_loss_fn", "reg_loss_fn", "mask_loss_fn"]
         )
-        _backbone_name = backbone.model_name if hasattr(backbone, "model_name") else str(backbone)
         self.hparams.update({
-            "backbone_name": _backbone_name,
+            "backbone_name": backbone,
             "username": getpass.getuser(),
             "timestamp": _dt.datetime.now().isoformat(timespec="seconds"),
         })

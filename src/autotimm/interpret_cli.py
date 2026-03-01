@@ -47,10 +47,59 @@ def _resolve_task_class(name: str):
     return getattr(mod, cls_name)
 
 
-def _load_model(checkpoint: str, task_class_name: str):
-    """Load a model from checkpoint."""
+def _parse_hparams_yaml(path: str) -> dict:
+    """Read an hparams.yaml file and return the parsed dict."""
+    import yaml  # PyYAML — bundled with PyTorch Lightning
+
+    with open(path) as f:
+        data = yaml.safe_load(f) or {}
+    return data
+
+
+def _build_overrides_from_hparams(hp: dict) -> dict:
+    """Build ``load_from_checkpoint`` overrides from an hparams dict."""
+    override: dict = {}
+
+    backbone = hp.get("backbone") or hp.get("backbone_name")
+    if backbone is not None:
+        override["backbone"] = backbone
+
+    model_name = hp.get("model_name")
+    if model_name is not None:
+        override["model_name"] = model_name
+
+    num_classes = hp.get("num_classes")
+    if num_classes is not None:
+        override["num_classes"] = int(num_classes)
+
+    # Always disable torch.compile for interpretation / export (CPU inference)
+    override["compile_model"] = False
+    return override
+
+
+def _load_model(checkpoint: str, task_class_name: str, hparams_yaml: str | None = None):
+    """Load a model from checkpoint.
+
+    Args:
+        checkpoint: Path to the ``.ckpt`` file.
+        task_class_name: Name of the task class (e.g. ``ImageClassifier``).
+        hparams_yaml: Optional path to ``hparams.yaml`` saved by the logger
+            in ``logs/<run_id>/``.  When provided, backbone and other required
+            constructor args are read from this file.
+    """
     cls = _resolve_task_class(task_class_name)
-    model = cls.load_from_checkpoint(checkpoint, map_location="cpu")
+
+    if hparams_yaml and os.path.isfile(hparams_yaml):
+        hp = _parse_hparams_yaml(hparams_yaml)
+    else:
+        # Fallback: peek into the checkpoint's hyper_parameters dict.
+        ckpt = torch.load(checkpoint, map_location="cpu", weights_only=False)
+        hp = ckpt.get("hyper_parameters", {})
+        if isinstance(hp, dict):
+            hp = hp.get("init_args", hp)
+
+    override = _build_overrides_from_hparams(hp)
+    model = cls.load_from_checkpoint(checkpoint, map_location="cpu", **override)
     model.eval()
     return model
 
@@ -158,12 +207,17 @@ def main():
         default="ImageClassifier",
         help="Task class name (default: ImageClassifier)",
     )
+    parser.add_argument(
+        "--hparams-yaml",
+        default=None,
+        help="Path to hparams.yaml (logs/<run_id>/hparams.yaml)",
+    )
     args = parser.parse_args()
 
     os.makedirs(args.output_dir, exist_ok=True)
 
     try:
-        model = _load_model(args.checkpoint, args.task_class)
+        model = _load_model(args.checkpoint, args.task_class, args.hparams_yaml)
         image = Image.open(args.image).convert("RGB")
 
         methods = [m.strip() for m in args.methods.split(",") if m.strip()]
