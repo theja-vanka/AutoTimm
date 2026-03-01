@@ -1,3 +1,8 @@
+---
+title: Semantic Segmentation
+description: Pixel-level semantic segmentation with DeepLabV3+ and FCN architectures. Use any timm backbone for state-of-the-art segmentation with Dice and Tversky losses.
+---
+
 # Semantic Segmentation
 
 AutoTimm provides state-of-the-art semantic segmentation with DeepLabV3+ and FCN architectures.

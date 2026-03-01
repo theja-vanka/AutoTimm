@@ -1,3 +1,8 @@
+---
+title: ImageClassifier
+description: Train image classification models with 1000+ timm backbones including ResNet, EfficientNet, ViT, and Swin Transformer. Supports multi-class and multi-label classification.
+---
+
 # ImageClassifier
 
 Image classification with any timm backbone and flexible training options.

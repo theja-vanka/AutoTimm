@@ -1,3 +1,8 @@
+---
+title: Quick Start Guide
+description: Train your first image classifier with AutoTimm in minutes. Step-by-step tutorial covering data loading, model creation, training, and evaluation.
+---
+
 # Quick Start
 
 This guide walks you through training your first image classifier with AutoTimm.

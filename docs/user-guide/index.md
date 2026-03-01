@@ -1,3 +1,8 @@
+---
+title: User Guide
+description: Comprehensive guides for using AutoTimm — data loading, model configuration, training, evaluation, interpretation, HuggingFace integration, and deployment.
+---
+
 # User Guide
 
 Comprehensive guides for using AutoTimm across all computer vision tasks — from data loading to deployment.

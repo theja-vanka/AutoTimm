@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+Disallow: /search/
+Disallow: /assets/javascripts/
+Disallow: /assets/stylesheets/
 
+# Sitemaps
 Sitemap: https://theja-vanka.github.io/AutoTimm/sitemap.xml

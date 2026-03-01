@@ -172,6 +172,21 @@ class JsonProgressCallback(pl.Callback):
         )
 
     # ------------------------------------------------------------------
+    # Test lifecycle
+    # ------------------------------------------------------------------
+
+    def on_test_start(
+        self, trainer: pl.Trainer, pl_module: pl.LightningModule
+    ) -> None:
+        self._emit({"event": "testing_started"})
+
+    def on_test_epoch_end(
+        self, trainer: pl.Trainer, pl_module: pl.LightningModule
+    ) -> None:
+        metrics = _sanitize_metrics(trainer.callback_metrics)
+        self._emit({"event": "testing_complete", "metrics": metrics})
+
+    # ------------------------------------------------------------------
     # Error handling
     # ------------------------------------------------------------------
 

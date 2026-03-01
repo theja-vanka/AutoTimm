@@ -1,3 +1,8 @@
+---
+title: YOLOX Object Detection
+description: Train YOLOX object detectors with official weights or custom timm backbones. Supports YOLOX-S/M/L/X variants, mosaic augmentation, and COCO-format datasets.
+---
+
 # YOLOX Object Detection Guide
 
 Complete guide to using YOLOX models in AutoTimm, including official YOLOX implementation and YOLOX-style detection with timm backbones.
