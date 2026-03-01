@@ -398,6 +398,43 @@ class AutoTrainer(pl.Trainer):
             ckpt_path=ckpt_path,
         )
 
+    def test(
+        self,
+        model: pl.LightningModule | None = None,
+        dataloaders: Any = None,
+        datamodule: pl.LightningDataModule | None = None,
+        ckpt_path: str | None = "best",
+        verbose: bool = True,
+    ) -> list[dict[str, float]]:
+        """Test the model, logging results to configured loggers (CSV, JSONL, etc.).
+
+        Ensures multiprocessing safety and seeding are applied before
+        running the test loop. All configured loggers (CSVLogger,
+        TensorBoard, etc.) and callbacks (``JsonProgressCallback``)
+        remain active during testing.
+
+        Parameters:
+            model: The LightningModule to test. If ``None``, uses the
+                model from the last ``fit()`` call.
+            dataloaders: Test dataloaders (if not using datamodule).
+            datamodule: A LightningDataModule instance.
+            ckpt_path: Path to checkpoint to load for testing.
+                Defaults to ``"best"`` (best checkpoint from training).
+            verbose: Whether to print test results.
+
+        Returns:
+            List of dictionaries containing test metrics.
+        """
+        _ensure_safe_multiprocessing()
+        self._apply_seeding()
+        return super().test(
+            model=model,
+            dataloaders=dataloaders,
+            datamodule=datamodule,
+            ckpt_path=ckpt_path,
+            verbose=verbose,
+        )
+
     def _apply_seeding(self) -> None:
         """Apply seeding based on stored parameters."""
         if self._seed is not None and self._use_autotimm_seeding:
