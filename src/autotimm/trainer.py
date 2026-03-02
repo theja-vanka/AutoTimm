@@ -431,21 +431,10 @@ class AutoTrainer(pl.Trainer):
         _ensure_safe_multiprocessing()
         self._apply_seeding()
 
-        # Fall back to current model weights when ckpt_path="best" but no
-        # ModelCheckpoint callback is configured to track the best model.
+        # Resolve ckpt_path="best" robustly — handles both in-process
+        # (fit then test) and separate-process (CLI test after fit) scenarios.
         if ckpt_path == "best":
-            has_ckpt_cb = any(
-                isinstance(cb, pl.callbacks.ModelCheckpoint)
-                and cb.monitor is not None
-                for cb in (self.callbacks or [])
-            )
-            if not has_ckpt_cb:
-                logger.warning(
-                    'No ModelCheckpoint configured with a monitored metric. '
-                    'Falling back to ckpt_path=None (current model weights) '
-                    'instead of ckpt_path="best".'
-                )
-                ckpt_path = None
+            ckpt_path = self._resolve_best_ckpt_path()
 
         return super().test(
             model=model,
@@ -454,6 +443,81 @@ class AutoTrainer(pl.Trainer):
             ckpt_path=ckpt_path,
             verbose=verbose,
         )
+
+    def _resolve_best_ckpt_path(self) -> str | None:
+        """Resolve ``ckpt_path="best"`` to an actual file path.
+
+        Handles three scenarios:
+        1. A ``ModelCheckpoint`` callback has ``best_model_path`` populated
+           (in-process fit→test) — returns that path directly.
+        2. No ``ModelCheckpoint`` with a monitor is configured — falls back
+           to ``None`` (current model weights).
+        3. A ``ModelCheckpoint`` is configured but ``best_model_path`` is empty
+           (separate-process test after fit, e.g. NightFlow CLI) — searches
+           the checkpoint directory on disk for ``best-*.ckpt`` files and
+           returns the most recent one.
+        """
+        from pathlib import Path
+
+        ckpt_cb = None
+        for cb in (self.callbacks or []):
+            if isinstance(cb, pl.callbacks.ModelCheckpoint) and cb.monitor is not None:
+                ckpt_cb = cb
+                break
+
+        if ckpt_cb is None:
+            logger.warning(
+                'No ModelCheckpoint configured with a monitored metric. '
+                'Falling back to ckpt_path=None (current model weights) '
+                'instead of ckpt_path="best".'
+            )
+            return None
+
+        # In-process: fit() already set best_model_path
+        if ckpt_cb.best_model_path:
+            return "best"
+
+        # Separate-process: search for checkpoint files on disk
+        ckpt_dir = Path(ckpt_cb.dirpath) if ckpt_cb.dirpath else None
+
+        # If dirpath is not set, try the default Lightning checkpoint dir
+        if ckpt_dir is None:
+            root = Path(self.default_root_dir)
+            # Check common checkpoint locations
+            for candidate in [
+                root / "checkpoints",
+                root,
+            ]:
+                if candidate.is_dir():
+                    ckpts = sorted(candidate.glob("best-*.ckpt"), key=lambda p: p.stat().st_mtime)
+                    if ckpts:
+                        ckpt_dir = candidate
+                        break
+
+            # Also check logger-specific directories
+            if ckpt_dir is None and self.loggers:
+                for lg in self.loggers:
+                    log_dir = getattr(lg, "log_dir", None)
+                    if log_dir:
+                        candidate = Path(log_dir) / "checkpoints"
+                        if candidate.is_dir():
+                            ckpts = sorted(candidate.glob("best-*.ckpt"), key=lambda p: p.stat().st_mtime)
+                            if ckpts:
+                                ckpt_dir = candidate
+                                break
+
+        if ckpt_dir and ckpt_dir.is_dir():
+            ckpts = sorted(ckpt_dir.glob("best-*.ckpt"), key=lambda p: p.stat().st_mtime)
+            if ckpts:
+                best = str(ckpts[-1])
+                logger.info(f"Found best checkpoint on disk: {best}")
+                return best
+
+        logger.warning(
+            'ckpt_path="best" requested but no checkpoint file found on disk. '
+            'Falling back to ckpt_path=None (current model weights).'
+        )
+        return None
 
     def _apply_seeding(self) -> None:
         """Apply seeding based on stored parameters."""
