@@ -261,7 +261,7 @@ trainer.fit(model, datamodule=data)
 
 # Load from checkpoint
 loaded_model = ImageClassifier.load_from_checkpoint(
-    "checkpoints/best-epoch=42-val/accuracy=0.9543.ckpt",
+    "checkpoints/best-epoch=42-val_accuracy=0.9543.ckpt",
     backbone="hf-hub:timm/resnet50.a1_in1k",
     metrics=metrics,
 )
