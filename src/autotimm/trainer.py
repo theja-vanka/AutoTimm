@@ -246,8 +246,8 @@ class AutoTrainer(pl.Trainer):
             | bool
         ) = False,
         tuner_config: TunerConfig | None | bool = None,
-        checkpoint_monitor: str | None = None,
-        checkpoint_mode: str = "max",
+        checkpoint_monitor: str | None = "val/loss",
+        checkpoint_mode: str = "min",
         callbacks: list[pl.Callback] | None = None,
         default_root_dir: str = ".",
         gradient_clip_val: float | None = None,
@@ -295,6 +295,7 @@ class AutoTrainer(pl.Trainer):
                         mode=checkpoint_mode,
                         save_top_k=1,
                         filename=f"best-{{epoch}}-{{{checkpoint_monitor}:.4f}}",
+
                     )
                 )
 
@@ -427,6 +428,23 @@ class AutoTrainer(pl.Trainer):
         """
         _ensure_safe_multiprocessing()
         self._apply_seeding()
+
+        # Fall back to current model weights when ckpt_path="best" but no
+        # ModelCheckpoint callback is configured to track the best model.
+        if ckpt_path == "best":
+            has_ckpt_cb = any(
+                isinstance(cb, pl.callbacks.ModelCheckpoint)
+                and cb.monitor is not None
+                for cb in (self.callbacks or [])
+            )
+            if not has_ckpt_cb:
+                logger.warning(
+                    'No ModelCheckpoint configured with a monitored metric. '
+                    'Falling back to ckpt_path=None (current model weights) '
+                    'instead of ckpt_path="best".'
+                )
+                ckpt_path = None
+
         return super().test(
             model=model,
             dataloaders=dataloaders,
