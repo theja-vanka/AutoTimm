@@ -178,7 +178,37 @@ class JsonProgressCallback(pl.Callback):
     def on_test_start(
         self, trainer: pl.Trainer, pl_module: pl.LightningModule
     ) -> None:
-        self._emit({"event": "testing_started"})
+        total_batches = (
+            trainer.num_test_batches[0]
+            if trainer.num_test_batches
+            else 0
+        )
+        self._emit({"event": "testing_started", "total_batches": total_batches})
+
+    def on_test_batch_end(
+        self,
+        trainer: pl.Trainer,
+        pl_module: pl.LightningModule,
+        outputs: Any,
+        batch: Any,
+        batch_idx: int,
+        dataloader_idx: int = 0,
+    ) -> None:
+        if (batch_idx + 1) % self.emit_every_n_steps != 0:
+            return
+
+        total_batches = (
+            trainer.num_test_batches[0]
+            if trainer.num_test_batches
+            else 0
+        )
+        self._emit(
+            {
+                "event": "test_batch_end",
+                "batch": batch_idx + 1,
+                "total_batches": total_batches,
+            }
+        )
 
     def on_test_epoch_end(
         self, trainer: pl.Trainer, pl_module: pl.LightningModule

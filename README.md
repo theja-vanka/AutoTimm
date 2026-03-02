@@ -26,6 +26,12 @@
 <details>
 <summary><strong>v0.7 Changelog</strong></summary>
 
+### v0.7.25 — Checkpoint Filename Fix
+
+- Fixed `ModelCheckpoint` creating nested subdirectories when metric names contain `/` (e.g. `val/loss`)
+- Checkpoint filenames now use `_` instead of `/` (e.g. `best-epoch=7-val_loss=0.1234.ckpt`)
+- Added `auto_insert_metric_name=False` to prevent Lightning from prepending metric name as a directory
+
 ### v0.7.21 — JIT Export CLI
 
 - New `export_jit` CLI module (`python -m autotimm.export_jit`) for exporting trained checkpoints to TorchScript (JIT) format
@@ -1042,7 +1048,7 @@ For major changes, please open an issue first.
   title = {AutoTimm: Automatic PyTorch Image Models},
   url = {https://github.com/theja-vanka/AutoTimm},
   year = {2026},
-  version = {0.7.21}
+  version = {0.7.25}
 }
 ```
 

@@ -289,13 +289,15 @@ class AutoTrainer(pl.Trainer):
                 isinstance(cb, pl.callbacks.ModelCheckpoint) for cb in callbacks
             )
             if not has_checkpoint_cb:
+                # Replace '/' in monitor name to avoid creating subdirectories
+                safe_monitor = checkpoint_monitor.replace("/", "_")
                 callbacks.append(
                     pl.callbacks.ModelCheckpoint(
                         monitor=checkpoint_monitor,
                         mode=checkpoint_mode,
                         save_top_k=1,
-                        filename=f"best-{{epoch}}-{{{checkpoint_monitor}:.4f}}",
-
+                        filename=f"best-{{epoch}}-{{{safe_monitor}:.4f}}",
+                        auto_insert_metric_name=False,
                     )
                 )
 
