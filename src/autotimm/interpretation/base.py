@@ -156,6 +156,11 @@ class BaseInterpreter(ABC):
         """
         Preprocess image to tensor format suitable for model.
 
+        Uses the model's own ``preprocess()`` method when available (from
+        ``PreprocessingMixin``) so that resizing and normalization match
+        training exactly.  Falls back to resolving the backbone data config
+        from timm, and finally to ImageNet defaults.
+
         Args:
             image: Input image as PIL Image, numpy array, or tensor
 
@@ -164,10 +169,8 @@ class BaseInterpreter(ABC):
         """
         # Convert to PIL Image if numpy array
         if isinstance(image, np.ndarray):
-            # Handle float arrays
             if image.dtype in [np.float32, np.float64]:
                 if image.max() <= 1.0:
-                    # Assume normalized [0, 1]
                     image = (image * 255).astype(np.uint8)
                 else:
                     image = image.astype(np.uint8)
@@ -179,13 +182,51 @@ class BaseInterpreter(ABC):
                 image = image.unsqueeze(0)
             return image.to(self.device)
 
-        # Convert PIL Image to tensor
-        transform = T.Compose(
-            [
-                T.ToTensor(),
-            ]
-        )
+        # 1. Try model.preprocess() — uses backbone-specific transforms
+        if hasattr(self.model, "preprocess"):
+            try:
+                tensor = self.model.preprocess(image)
+                return tensor.to(self.device)
+            except Exception:
+                pass
 
+        # 2. Try building transforms from the model's backbone data config
+        try:
+            from autotimm.data.timm_transforms import resolve_backbone_data_config
+
+            backbone_name = ""
+            if hasattr(self.model, "hparams"):
+                backbone_name = str(
+                    getattr(self.model.hparams, "backbone", "")
+                    or getattr(self.model.hparams, "backbone_name", "")
+                )
+            if backbone_name:
+                cfg = resolve_backbone_data_config(backbone_name)
+                mean = cfg.get("mean", (0.485, 0.456, 0.406))
+                std = cfg.get("std", (0.229, 0.224, 0.225))
+                input_size = cfg.get("input_size", (3, 224, 224))
+                crop_pct = cfg.get("crop_pct", 0.875)
+                img_size = input_size[-1]
+                resize_size = int(img_size / crop_pct)
+
+                transform = T.Compose([
+                    T.Resize(resize_size, interpolation=T.InterpolationMode.BICUBIC),
+                    T.CenterCrop(img_size),
+                    T.ToTensor(),
+                    T.Normalize(mean=mean, std=std),
+                ])
+                tensor = transform(image).unsqueeze(0)
+                return tensor.to(self.device)
+        except Exception:
+            pass
+
+        # 3. Fallback: ImageNet defaults
+        transform = T.Compose([
+            T.Resize(256, interpolation=T.InterpolationMode.BICUBIC),
+            T.CenterCrop(224),
+            T.ToTensor(),
+            T.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+        ])
         tensor = transform(image).unsqueeze(0)
         return tensor.to(self.device)
 

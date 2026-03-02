@@ -533,7 +533,7 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
 
     def test_step(
         self, batch: tuple[torch.Tensor, torch.Tensor], batch_idx: int
-    ) -> None:
+    ) -> dict[str, torch.Tensor]:
         x, y = batch
 
         if self._multi_label:
@@ -563,6 +563,8 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
                         on_epoch=config.log_on_epoch,
                         prog_bar=config.prog_bar,
                     )
+
+        return {"preds": preds.detach(), "targets": y.detach()}
 
     def predict_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
         x = batch[0] if isinstance(batch, (tuple, list)) else batch

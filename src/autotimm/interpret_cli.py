@@ -172,18 +172,10 @@ def _run_method(model, image: Image.Image, method_id: str, output_dir: str):
 
 def _get_predicted_class(model, image: Image.Image) -> int:
     """Run forward pass to get predicted class index."""
-    # Use a temporary GradCAM just for preprocessing
     from autotimm.interpretation import GradCAM
 
-    try:
-        explainer = GradCAM(model)
-        input_tensor = explainer._preprocess_image(image)
-    except Exception:
-        # Fallback: manual preprocessing
-        import torchvision.transforms as T
-
-        transform = T.Compose([T.Resize((224, 224)), T.ToTensor()])
-        input_tensor = transform(image).unsqueeze(0)
+    explainer = GradCAM(model)
+    input_tensor = explainer._preprocess_image(image)
 
     with torch.inference_mode():
         output = model(input_tensor)

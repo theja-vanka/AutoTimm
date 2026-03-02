@@ -378,9 +378,11 @@ def export_checkpoint_to_torchscript(
     """
     load_kwargs = load_kwargs or {}
 
-    # Load the checkpoint
+    # Load the checkpoint on CPU to avoid device mismatches during tracing
     logger.info(f"Loading checkpoint: {checkpoint_path}")
-    model = model_class.load_from_checkpoint(str(checkpoint_path), **load_kwargs)
+    model = model_class.load_from_checkpoint(
+        str(checkpoint_path), map_location="cpu", **load_kwargs
+    )
 
     # Export to TorchScript
     return export_to_torchscript(
@@ -731,7 +733,9 @@ def export_checkpoint_to_onnx(
     load_kwargs = load_kwargs or {}
 
     logger.info(f"Loading checkpoint: {checkpoint_path}")
-    model = model_class.load_from_checkpoint(str(checkpoint_path), **load_kwargs)
+    model = model_class.load_from_checkpoint(
+        str(checkpoint_path), map_location="cpu", **load_kwargs
+    )
 
     return export_to_onnx(
         model=model,

@@ -71,6 +71,9 @@ class JsonProgressCallback(pl.Callback):
         super().__init__()
         self.emit_every_n_steps = emit_every_n_steps
         self._log_file: Path | None = Path(log_file) if log_file is not None else None
+        # Accumulate test predictions for confusion matrix
+        self._test_preds: list[torch.Tensor] = []
+        self._test_targets: list[torch.Tensor] = []
 
     def _emit(self, event: dict[str, Any]) -> None:
         """Emit an event via the module-level helper with our log_file."""
@@ -178,6 +181,8 @@ class JsonProgressCallback(pl.Callback):
     def on_test_start(
         self, trainer: pl.Trainer, pl_module: pl.LightningModule
     ) -> None:
+        self._test_preds = []
+        self._test_targets = []
         total_batches = (
             trainer.num_test_batches[0]
             if trainer.num_test_batches
@@ -194,6 +199,11 @@ class JsonProgressCallback(pl.Callback):
         batch_idx: int,
         dataloader_idx: int = 0,
     ) -> None:
+        # Collect predictions/targets for confusion matrix
+        if isinstance(outputs, dict) and "preds" in outputs and "targets" in outputs:
+            self._test_preds.append(outputs["preds"].cpu())
+            self._test_targets.append(outputs["targets"].cpu())
+
         if (batch_idx + 1) % self.emit_every_n_steps != 0:
             return
 
@@ -214,7 +224,45 @@ class JsonProgressCallback(pl.Callback):
         self, trainer: pl.Trainer, pl_module: pl.LightningModule
     ) -> None:
         metrics = _sanitize_metrics(trainer.callback_metrics)
-        self._emit({"event": "testing_complete", "metrics": metrics})
+
+        # Build confusion matrix and per-class metrics from collected predictions
+        extra: dict[str, Any] = {}
+        if self._test_preds and self._test_targets:
+            all_preds = torch.cat(self._test_preds)
+            all_targets = torch.cat(self._test_targets)
+            # Only for single-label classification (1-D integer tensors)
+            if all_preds.ndim == 1 and all_targets.ndim == 1:
+                num_classes = int(max(all_preds.max(), all_targets.max()) + 1)
+                # Confusion matrix as list-of-lists
+                cm = torch.zeros(num_classes, num_classes, dtype=torch.long)
+                for p, t in zip(all_preds, all_targets):
+                    cm[int(t), int(p)] += 1
+                extra["confusion_matrix"] = cm.tolist()
+                # Per-class precision / recall / f1
+                per_class = []
+                for c in range(num_classes):
+                    tp = cm[c, c].item()
+                    fp = cm[:, c].sum().item() - tp
+                    fn = cm[c, :].sum().item() - tp
+                    precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+                    recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+                    f1 = (
+                        2 * precision * recall / (precision + recall)
+                        if (precision + recall) > 0
+                        else 0.0
+                    )
+                    per_class.append({
+                        "label": str(c),
+                        "precision": round(precision, 4),
+                        "recall": round(recall, 4),
+                        "f1": round(f1, 4),
+                    })
+                extra["per_class_metrics"] = per_class
+            # Cleanup
+            self._test_preds = []
+            self._test_targets = []
+
+        self._emit({"event": "testing_complete", "metrics": metrics, **extra})
 
     # ------------------------------------------------------------------
     # Error handling
