@@ -1,13 +1,13 @@
 ---
 title: Installation Guide
-description: Install AutoTimm via pip or from source. Supports Python 3.10-3.14, PyTorch 2.0+, and optional GPU acceleration with CUDA.
+description: Install AutoTimm via pip or from source. Supports Python 3.10-3.13, PyTorch 2.0+, and optional GPU acceleration with CUDA.
 ---
 
 # Installation
 
 ## Requirements
 
-- Python 3.10-3.14
+- Python 3.10-3.13
 - PyTorch 2.0+
 - CUDA (optional, for GPU training)
 

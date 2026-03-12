@@ -233,11 +233,25 @@ class JsonProgressCallback(pl.Callback):
             # Only for single-label classification (1-D integer tensors)
             if all_preds.ndim == 1 and all_targets.ndim == 1:
                 num_classes = int(max(all_preds.max(), all_targets.max()) + 1)
-                # Confusion matrix as list-of-lists
+
+                # Try to get class names from the datamodule
+                class_names: list[str] | None = None
+                dm = getattr(trainer, "datamodule", None)
+                if dm is not None:
+                    cn = getattr(dm, "class_names", None)
+                    if cn and len(cn) >= num_classes:
+                        class_names = list(cn[:num_classes])
+                if class_names is None:
+                    class_names = [f"Class {i}" for i in range(num_classes)]
+
+                # Confusion matrix as dict with matrix + labels
                 cm = torch.zeros(num_classes, num_classes, dtype=torch.long)
                 for p, t in zip(all_preds, all_targets):
                     cm[int(t), int(p)] += 1
-                extra["confusion_matrix"] = cm.tolist()
+                extra["confusion_matrix"] = {
+                    "matrix": cm.tolist(),
+                    "labels": class_names,
+                }
                 # Per-class precision / recall / f1
                 per_class = []
                 for c in range(num_classes):
@@ -252,7 +266,8 @@ class JsonProgressCallback(pl.Callback):
                         else 0.0
                     )
                     per_class.append({
-                        "label": str(c),
+                        "class_index": c,
+                        "label": class_names[c],
                         "precision": round(precision, 4),
                         "recall": round(recall, 4),
                         "f1": round(f1, 4),

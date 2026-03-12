@@ -26,11 +26,28 @@
 <details>
 <summary><strong>v0.7 Changelog</strong></summary>
 
+### v0.7.28 — Drop Python 3.14 Support
+
+- Removed Python 3.14 from supported versions (now 3.10–3.13)
+- Updated CI matrix and documentation to reflect supported range
+
+### v0.7.26 — Trainer Test CLI Fix
+
+- Fixed Trainer test CLI command not working correctly
+
 ### v0.7.25 — Checkpoint Filename Fix
 
 - Fixed `ModelCheckpoint` creating nested subdirectories when metric names contain `/` (e.g. `val/loss`)
 - Checkpoint filenames now use `_` instead of `/` (e.g. `best-epoch=7-val_loss=0.1234.ckpt`)
 - Added `auto_insert_metric_name=False` to prevent Lightning from prepending metric name as a directory
+
+### v0.7.24 — Default Monitor Metric Fix
+
+- Fixed bug introduced when `val/loss` was added as the default monitor metric for checkpointing
+
+### v0.7.22 — Bug Fixes
+
+- Miscellaneous bug fixes and stability improvements
 
 ### v0.7.21 — JIT Export CLI
 
@@ -1048,7 +1065,7 @@ For major changes, please open an issue first.
   title = {AutoTimm: Automatic PyTorch Image Models},
   url = {https://github.com/theja-vanka/AutoTimm},
   year = {2026},
-  version = {0.7.25}
+  version = {0.7.28}
 }
 ```
 
