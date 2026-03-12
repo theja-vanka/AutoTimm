@@ -58,7 +58,7 @@ class TestModelLevelSeeding:
     """Test seeding at the model level."""
 
     def test_default_seed(self):
-        """Test that models use default seed=42."""
+        """Test that models use default seed=None."""
         model1 = ImageClassifier(
             backbone="resnet18", num_classes=10, compile_model=False
         )
@@ -70,8 +70,8 @@ class TestModelLevelSeeding:
         )
         initial_weights2 = model2.head.fc.weight.clone()
 
-        # Should have identical initialization
-        assert torch.allclose(initial_weights1, initial_weights2, rtol=1e-4)
+        # Should have different initialization
+        assert not torch.allclose(initial_weights1, initial_weights2, rtol=1e-4)
 
     def test_custom_seed(self):
         """Test custom seed values."""
@@ -152,9 +152,9 @@ class TestTrainerLevelSeeding:
     """Test seeding at the trainer level."""
 
     def test_trainer_default_seed(self):
-        """Test that AutoTrainer uses default seed=42."""
+        """Test that AutoTrainer uses default seed=None."""
         # Just verify it doesn't crash - AutoTrainer handles seeding internally
-        trainer = AutoTrainer(max_epochs=1, seed=42, fast_dev_run=True)
+        trainer = AutoTrainer(max_epochs=1, fast_dev_run=True)
 
         # Verify trainer was created successfully
         assert trainer is not None
