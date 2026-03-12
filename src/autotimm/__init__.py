@@ -12,7 +12,7 @@ try:
 except PackageNotFoundError:
     __version__ = "unknown"
 
-from autotimm.backbone import (
+from autotimm.core.backbone import (
     BackboneConfig,
     FeatureBackboneConfig,
     ModelSource,
@@ -61,7 +61,7 @@ from autotimm.heads import (
     MaskHead,
     YOLOXHead,
 )
-from autotimm.loggers import LoggerConfig, LoggerManager
+from autotimm.core.loggers import LoggerConfig, LoggerManager
 from autotimm.losses import CenternessLoss, FCOSLoss, FocalLoss, GIoULoss
 from autotimm.losses.segmentation import (
     CombinedSegmentationLoss,
@@ -70,7 +70,7 @@ from autotimm.losses.segmentation import (
     MaskLoss,
     TverskyLoss,
 )
-from autotimm.metrics import LoggingConfig, MetricConfig, MetricManager
+from autotimm.core.metrics import LoggingConfig, MetricConfig, MetricManager
 from autotimm.tasks.classification import ImageClassifier
 from autotimm.tasks.instance_segmentation import InstanceSegmentor
 from autotimm.tasks.object_detection import ObjectDetector
@@ -78,9 +78,9 @@ from autotimm.tasks.semantic_segmentation import SemanticSegmentor
 from autotimm.tasks.yolox_detector import YOLOXDetector
 from autotimm.callbacks import JsonProgressCallback
 from autotimm.cli import AutoTimmCLI, main as cli_main
-from autotimm.trainer import AutoTrainer, TunerConfig
-from autotimm.logging import logger
-from autotimm.utils import (
+from autotimm.training.trainer import AutoTrainer, TunerConfig
+from autotimm.core.logging import logger
+from autotimm.core.utils import (
     count_parameters,
     list_optimizers,
     list_schedulers,

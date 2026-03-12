@@ -124,7 +124,7 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
         mixup_alpha: float = 0.0,
         compile_model: bool = True,
         compile_kwargs: dict[str, Any] | None = None,
-        seed: int | None = 42,
+        seed: int | None = None,
         deterministic: bool = True,
     ):
         # Validate multi-label + label_smoothing combination

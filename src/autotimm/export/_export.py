@@ -16,7 +16,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from autotimm.logging import logger
+from autotimm.core.logging import logger
 
 try:
     import onnx
@@ -166,8 +166,8 @@ def _get_detection_output_names(model: nn.Module) -> list[str]:
     return names
 
 
-def _get_onnx_wrapper(model: nn.Module) -> nn.Module | None:
-    """Get the appropriate ONNX forward wrapper for a model, or None for simple models."""
+def _get_export_wrapper(model: nn.Module) -> nn.Module | None:
+    """Get the appropriate forward wrapper for a model, or None for simple models."""
     model_class_name = type(model).__name__
 
     if model_class_name == "ObjectDetector":
@@ -255,7 +255,11 @@ def export_to_torchscript(
                 "LightningModule" in cls.__name__ for cls in type(model).__mro__
             )
             if wrap_model and is_lightning:
-                model_to_export = _ForwardWrapper(model)
+                detection_wrapper = _get_export_wrapper(model)
+                if detection_wrapper is not None:
+                    model_to_export = detection_wrapper
+                else:
+                    model_to_export = _ForwardWrapper(model)
             else:
                 model_to_export = model
 
@@ -510,7 +514,7 @@ def export_to_onnx(
     # Determine wrapper and output names for detection models
     is_lightning = any("LightningModule" in cls.__name__ for cls in type(model).__mro__)
     detection_wrapper = (
-        _get_onnx_wrapper(model) if wrap_model and is_lightning else None
+        _get_export_wrapper(model) if wrap_model and is_lightning else None
     )
 
     if output_names is None:
