@@ -66,9 +66,41 @@ image = np.random.randn(1, 3, 224, 224).astype(np.float32)
 outputs = session.run(None, {input_name: image})
 ```
 
+## CLI Export (Quickest)
+
+Export directly from the command line without writing Python:
+
+```bash
+python -m autotimm.export_onnx \
+    --checkpoint logs/run_1/checkpoints/best.ckpt \
+    --output model.onnx \
+    --task-class ImageClassifier \
+    --input-size 224
+```
+
+Additional options:
+
+```bash
+# With graph simplification and custom opset
+python -m autotimm.export_onnx \
+    --checkpoint checkpoint.ckpt \
+    --output model.onnx \
+    --task-class ObjectDetector \
+    --opset-version 17 \
+    --simplify
+
+# With explicit hparams file
+python -m autotimm.export_onnx \
+    --checkpoint checkpoint.ckpt \
+    --output model.onnx \
+    --hparams-yaml logs/run_1/hparams.yaml
+```
+
+The CLI auto-detects `image_size` from model hparams when available, so `--input-size` is optional if the checkpoint was saved with hparams.
+
 ## Export Methods
 
-AutoTimm provides multiple ways to export models to ONNX:
+AutoTimm provides multiple ways to export models to ONNX from Python:
 
 ### Method 1: export_to_onnx()
 
@@ -373,6 +405,113 @@ The warning about `dynamic_axes` being deprecated in favor of `dynamic_shapes` i
 See complete working examples in the repository:
 
 - `examples/deployment/export_to_onnx.py` - Comprehensive ONNX export examples
+
+## TensorRT Deployment
+
+For maximum inference performance on NVIDIA GPUs, convert your ONNX model to a TensorRT engine. TensorRT applies layer fusion, kernel auto-tuning, and precision calibration to produce highly optimised inference plans.
+
+### Prerequisites
+
+```bash
+pip install tensorrt pycuda numpy
+```
+
+TensorRT requires an NVIDIA GPU and CUDA toolkit installed on the system.
+
+### Convert ONNX to TensorRT
+
+```python
+import tensorrt as trt
+
+logger = trt.Logger(trt.Logger.WARNING)
+builder = trt.Builder(logger)
+network = builder.create_network(1 << int(trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH))
+parser = trt.OnnxParser(network, logger)
+
+# Parse the ONNX model
+with open("model.onnx", "rb") as f:
+    if not parser.parse(f.read()):
+        for i in range(parser.num_errors):
+            print(parser.get_error(i))
+        raise RuntimeError("ONNX parsing failed")
+
+# Build the engine
+config = builder.create_builder_config()
+config.set_memory_pool_limit(trt.MemoryPoolType.WORKSPACE, 1 << 30)  # 1 GB
+
+# Optional: enable FP16 for ~2x speedup
+# config.set_flag(trt.BuilderFlag.FP16)
+
+engine_bytes = builder.build_serialized_network(network, config)
+
+# Save the engine
+with open("model.engine", "wb") as f:
+    f.write(engine_bytes)
+```
+
+### Run Inference with TensorRT
+
+```python
+import tensorrt as trt
+import pycuda.driver as cuda
+import pycuda.autoinit
+import numpy as np
+
+# Load engine
+logger = trt.Logger(trt.Logger.WARNING)
+runtime = trt.Runtime(logger)
+with open("model.engine", "rb") as f:
+    engine = runtime.deserialize_cuda_engine(f.read())
+
+context = engine.create_execution_context()
+
+# Allocate buffers
+input_shape = engine.get_tensor_shape(engine.get_tensor_name(0))
+output_shape = engine.get_tensor_shape(engine.get_tensor_name(1))
+
+h_input = np.random.randn(*input_shape).astype(np.float32)
+h_output = np.empty(output_shape, dtype=np.float32)
+
+d_input = cuda.mem_alloc(h_input.nbytes)
+d_output = cuda.mem_alloc(h_output.nbytes)
+
+# Transfer input to GPU, run, transfer output back
+cuda.memcpy_htod(d_input, h_input)
+context.set_tensor_address(engine.get_tensor_name(0), int(d_input))
+context.set_tensor_address(engine.get_tensor_name(1), int(d_output))
+context.execute_async_v3(stream_handle=cuda.Stream().handle)
+cuda.memcpy_dtoh(h_output, d_output)
+
+predicted_class = np.argmax(h_output, axis=1)[0]
+print(f"Predicted class: {predicted_class}")
+```
+
+### End-to-End: Checkpoint → ONNX → TensorRT
+
+```bash
+# Step 1: Export checkpoint to ONNX
+python -m autotimm.export_onnx \
+    --checkpoint best.ckpt \
+    --output model.onnx \
+    --task-class ImageClassifier
+
+# Step 2: Convert ONNX to TensorRT (via trtexec CLI)
+trtexec --onnx=model.onnx --saveEngine=model.engine --fp16
+```
+
+`trtexec` ships with the TensorRT installation and is the simplest way to convert without writing Python.
+
+### Performance Comparison
+
+| Runtime | Latency (ResNet-50, batch=1) | Notes |
+|---------|------------------------------|-------|
+| PyTorch (CPU) | ~30 ms | Baseline |
+| ONNX Runtime (CPU) | ~15 ms | 2x faster |
+| ONNX Runtime (CUDA) | ~5 ms | GPU acceleration |
+| TensorRT (FP32) | ~2 ms | Optimised GPU kernels |
+| TensorRT (FP16) | ~1 ms | Half precision |
+
+*Approximate values on an NVIDIA A100. Actual results depend on hardware and model architecture.*
 
 ## See Also
 

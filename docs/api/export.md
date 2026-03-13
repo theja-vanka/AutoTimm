@@ -897,6 +897,63 @@ with torch.inference_mode():
     output = model(torch.randn(1, 3, 224, 224))
 ```
 
+### export_onnx (CLI)
+
+Export a trained checkpoint to ONNX format from the command line.
+
+```bash
+python -m autotimm.export_onnx \
+    --checkpoint path/to/checkpoint.ckpt \
+    --output model.onnx \
+    --task-class ImageClassifier \
+    --input-size 224
+```
+
+**Arguments:**
+
+| Argument | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `--checkpoint` | Yes | — | Path to the `.ckpt` file |
+| `--output` | Yes | — | Output `.onnx` file path |
+| `--task-class` | No | `ImageClassifier` | Task class name (`ImageClassifier`, `ObjectDetector`, `SemanticSegmentor`, `InstanceSegmentor`, `YOLOXDetector`) |
+| `--input-size` | No | `224` | Input image size for tracing (auto-detected from model hparams when available) |
+| `--opset-version` | No | `17` | ONNX opset version |
+| `--simplify` | No | `false` | Simplify ONNX graph using onnx-simplifier |
+| `--hparams-yaml` | No | — | Path to `hparams.yaml` (auto-detected from checkpoint when not provided) |
+
+**Output:** Prints the output file path to stdout on success.
+
+**Notes:**
+
+- Uses `torch.onnx.export` with dynamic batch dimension enabled by default
+- Automatically detects `image_size` from model `hparams` if saved during training
+- The exported `.onnx` file can be loaded with `onnxruntime.InferenceSession()` without any AutoTimm dependency
+- Detection and instance segmentation models automatically flatten list outputs into named tensors (e.g. `cls_l0`..`cls_l4`)
+- Used by NightFlow's deploy bar for ONNX and TensorRT export flows
+
+**Example — Export and run inference:**
+
+```python
+import subprocess
+import numpy as np
+import onnxruntime as ort
+
+# Export via CLI
+subprocess.run([
+    "python", "-m", "autotimm.export_onnx",
+    "--checkpoint", "logs/run_1/checkpoints/best.ckpt",
+    "--output", "model.onnx",
+    "--task-class", "ImageClassifier",
+    "--opset-version", "17",
+])
+
+# Load without AutoTimm
+session = ort.InferenceSession("model.onnx")
+input_name = session.get_inputs()[0].name
+image = np.random.randn(1, 3, 224, 224).astype(np.float32)
+outputs = session.run(None, {input_name: image})
+```
+
 ---
 
 ## See Also

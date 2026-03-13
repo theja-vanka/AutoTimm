@@ -151,17 +151,13 @@ class TestListHFHubBackbones:
 
     def test_list_hf_hub_backbones_without_hf_hub(self, monkeypatch):
         """Test that proper error is raised when huggingface_hub is not available."""
-        # Mock HfApi as None to simulate missing package
-        import autotimm.backbone
+        # Patch HfApi in the actual implementation module (not the re-export stub)
+        import autotimm.core.backbone
 
-        original_hfapi = autotimm.backbone.HfApi
-        monkeypatch.setattr(autotimm.backbone, "HfApi", None)
+        monkeypatch.setattr(autotimm.core.backbone, "HfApi", None)
 
         with pytest.raises(ImportError, match="huggingface_hub is required"):
             autotimm.list_hf_hub_backbones()
-
-        # Restore original
-        monkeypatch.setattr(autotimm.backbone, "HfApi", original_hfapi)
 
 
 class TestBackboneConfigWithHFHub:

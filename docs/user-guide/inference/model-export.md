@@ -80,6 +80,24 @@ scripted_model.save("model_scripted.pt")
 
 ONNX (Open Neural Network Exchange) is a cross-platform format supported by many inference engines including ONNX Runtime, TensorRT, OpenVINO, and CoreML.
 
+### CLI Export (Quickest)
+
+```bash
+python -m autotimm.export_onnx \
+    --checkpoint checkpoint.ckpt \
+    --output model.onnx \
+    --task-class ImageClassifier
+
+# With additional options
+python -m autotimm.export_onnx \
+    --checkpoint checkpoint.ckpt \
+    --output model.onnx \
+    --task-class ObjectDetector \
+    --input-size 640 \
+    --opset-version 17 \
+    --simplify
+```
+
 ### Basic ONNX Export
 
 ```python
@@ -294,12 +312,56 @@ torch.save(model_quantized.state_dict(), "model_quantized.pth")
 
 ---
 
+## TensorRT Export
+
+For maximum inference throughput on NVIDIA GPUs, convert an ONNX model to a TensorRT engine. This is a two-step process: first export to ONNX, then convert to TensorRT.
+
+### Quick Convert via trtexec
+
+```bash
+# Step 1: Export to ONNX
+python -m autotimm.export_onnx \
+    --checkpoint checkpoint.ckpt \
+    --output model.onnx \
+    --task-class ImageClassifier
+
+# Step 2: Convert to TensorRT engine
+trtexec --onnx=model.onnx --saveEngine=model.engine --fp16
+```
+
+### Python Conversion
+
+```python
+import tensorrt as trt
+
+logger = trt.Logger(trt.Logger.WARNING)
+builder = trt.Builder(logger)
+network = builder.create_network(1 << int(trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH))
+parser = trt.OnnxParser(network, logger)
+
+with open("model.onnx", "rb") as f:
+    parser.parse(f.read())
+
+config = builder.create_builder_config()
+config.set_memory_pool_limit(trt.MemoryPoolType.WORKSPACE, 1 << 30)
+config.set_flag(trt.BuilderFlag.FP16)  # Optional: enable FP16
+
+engine_bytes = builder.build_serialized_network(network, config)
+with open("model.engine", "wb") as f:
+    f.write(engine_bytes)
+```
+
+For detailed TensorRT usage including inference code, see the [ONNX Export Guide — TensorRT Deployment](../deployment/onnx-export.md#tensorrt-deployment).
+
+---
+
 ## Model Optimization Comparison
 
 | Method | Size Reduction | Speed Increase | Accuracy Impact | Deployment |
 |--------|----------------|----------------|-----------------|------------|
 | **TorchScript** | None | 10-20% | None | PyTorch C++ |
 | **ONNX** | None | 20-30% | None | Cross-platform |
+| **TensorRT** | None | 5-15x | <0.5% (FP16) | NVIDIA GPU |
 | **Dynamic Quant** | 4x | 2-3x | 1-2% drop | PyTorch |
 | **Static Quant** | 4x | 2-4x | 0.5-1% drop | PyTorch |
 | **FP16** | 2x | 2-3x | <0.5% drop | GPU only |
@@ -377,6 +439,7 @@ print(f"Class: {result['class']}, Confidence: {result['confidence']:.2%}")
 - **Development/Research**: Use PyTorch checkpoints
 - **Production (PyTorch ecosystem)**: Use TorchScript
 - **Cross-platform deployment**: Use ONNX
+- **Maximum NVIDIA GPU throughput**: Use TensorRT (via ONNX)
 - **Mobile/Edge**: Use ONNX + quantization or TorchScript Mobile
 
 ### 2. Optimize for Target Hardware
