@@ -128,7 +128,7 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
         regress_ranges: tuple[tuple[int, int], ...] | None = None,
         compile_model: bool = True,
         compile_kwargs: dict[str, Any] | None = None,
-        seed: int | None = 42,
+        seed: int | None = None,
         deterministic: bool = True,
     ):
         # Seed for reproducibility

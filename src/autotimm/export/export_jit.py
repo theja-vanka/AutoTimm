@@ -18,7 +18,7 @@ import sys
 import torch
 import yaml  # PyYAML — bundled with PyTorch Lightning
 
-from autotimm.export import export_checkpoint_to_torchscript
+from autotimm.export._export import export_checkpoint_to_torchscript
 
 
 TASK_CLASS_MAP = {

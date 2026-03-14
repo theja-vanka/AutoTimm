@@ -87,6 +87,8 @@ def _load_model(checkpoint: str, task_class_name: str, hparams_yaml: str | None 
             in ``logs/<run_id>/``.  When provided, backbone and other required
             constructor args are read from this file.
     """
+    from pytorch_lightning import seed_everything
+
     cls = _resolve_task_class(task_class_name)
 
     if hparams_yaml and os.path.isfile(hparams_yaml):
@@ -97,6 +99,13 @@ def _load_model(checkpoint: str, task_class_name: str, hparams_yaml: str | None 
         hp = ckpt.get("hyper_parameters", {})
         if isinstance(hp, dict):
             hp = hp.get("init_args", hp)
+
+    # Use the seed from hparams (matches training), default to 42
+    seed = hp.get("seed_everything", hp.get("seed", 42))
+    if seed is None:
+        seed = 42
+
+    seed_everything(seed)
 
     override = _build_overrides_from_hparams(hp)
     model = cls.load_from_checkpoint(checkpoint, map_location="cpu", **override)

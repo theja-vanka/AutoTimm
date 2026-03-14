@@ -110,7 +110,7 @@ class YOLOXDetector(PreprocessingMixin, pl.LightningModule):
         max_detections_per_image: int = 100,
         compile_model: bool = True,
         compile_kwargs: dict[str, Any] | None = None,
-        seed: int | None = 42,
+        seed: int | None = None,
         deterministic: bool = True,
     ):
         # Seed for reproducibility

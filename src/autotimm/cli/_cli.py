@@ -14,7 +14,7 @@ from __future__ import annotations
 import pytorch_lightning as pl
 from pytorch_lightning.cli import LightningCLI
 
-from autotimm.trainer import AutoTrainer
+from autotimm.training.trainer import AutoTrainer
 
 # Import task classes so LightningCLI can discover them as subclasses
 from autotimm.tasks.classification import ImageClassifier  # noqa: F401
@@ -56,6 +56,7 @@ def main() -> None:
         subclass_mode_model=True,
         subclass_mode_data=True,
         save_config_callback=None,
+        seed_everything_default=False,
     )
 
 
