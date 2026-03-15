@@ -155,6 +155,7 @@ pip install autotimm
 pip install autotimm[tensorboard]  # TensorBoard
 pip install autotimm[wandb]        # Weights & Biases
 pip install autotimm[mlflow]       # MLflow
+pip install autotimm[onnx]         # ONNX export (onnx + onnxruntime + onnxscript)
 pip install autotimm[all]          # Everything
 ```
 
