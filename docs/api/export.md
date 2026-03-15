@@ -851,7 +851,7 @@ When exporting detection models to ONNX, list outputs are flattened into named t
 Export a trained checkpoint to TorchScript (JIT) format from the command line.
 
 ```bash
-python -m autotimm.export_jit \
+python -m autotimm.export.export_jit \
     --checkpoint path/to/checkpoint.ckpt \
     --output model.pt \
     --task-class ImageClassifier \
@@ -884,7 +884,7 @@ import torch
 
 # Export via CLI
 subprocess.run([
-    "python", "-m", "autotimm.export_jit",
+    "python", "-m", "autotimm.export.export_jit",
     "--checkpoint", "logs/run_1/checkpoints/best.ckpt",
     "--output", "model.pt",
     "--task-class", "ImageClassifier",
@@ -902,7 +902,7 @@ with torch.inference_mode():
 Export a trained checkpoint to ONNX format from the command line.
 
 ```bash
-python -m autotimm.export_onnx \
+python -m autotimm.export.export_onnx \
     --checkpoint path/to/checkpoint.ckpt \
     --output model.onnx \
     --task-class ImageClassifier \
@@ -940,7 +940,7 @@ import onnxruntime as ort
 
 # Export via CLI
 subprocess.run([
-    "python", "-m", "autotimm.export_onnx",
+    "python", "-m", "autotimm.export.export_onnx",
     "--checkpoint", "logs/run_1/checkpoints/best.ckpt",
     "--output", "model.onnx",
     "--task-class", "ImageClassifier",

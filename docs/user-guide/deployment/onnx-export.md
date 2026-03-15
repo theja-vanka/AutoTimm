@@ -71,7 +71,7 @@ outputs = session.run(None, {input_name: image})
 Export directly from the command line without writing Python:
 
 ```bash
-python -m autotimm.export_onnx \
+python -m autotimm.export.export_onnx \
     --checkpoint logs/run_1/checkpoints/best.ckpt \
     --output model.onnx \
     --task-class ImageClassifier \
@@ -82,7 +82,7 @@ Additional options:
 
 ```bash
 # With graph simplification and custom opset
-python -m autotimm.export_onnx \
+python -m autotimm.export.export_onnx \
     --checkpoint checkpoint.ckpt \
     --output model.onnx \
     --task-class ObjectDetector \
@@ -90,7 +90,7 @@ python -m autotimm.export_onnx \
     --simplify
 
 # With explicit hparams file
-python -m autotimm.export_onnx \
+python -m autotimm.export.export_onnx \
     --checkpoint checkpoint.ckpt \
     --output model.onnx \
     --hparams-yaml logs/run_1/hparams.yaml
@@ -490,7 +490,7 @@ print(f"Predicted class: {predicted_class}")
 
 ```bash
 # Step 1: Export checkpoint to ONNX
-python -m autotimm.export_onnx \
+python -m autotimm.export.export_onnx \
     --checkpoint best.ckpt \
     --output model.onnx \
     --task-class ImageClassifier

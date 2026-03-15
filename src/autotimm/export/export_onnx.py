@@ -1,6 +1,6 @@
 """Export a trained checkpoint to ONNX format.
 
-Invoked as: python -m autotimm.export_onnx --checkpoint <path> --output <path> --task-class <name>
+Invoked as: python -m autotimm.export.export_onnx --checkpoint <path> --output <path> --task-class <name>
 
 Delegates to :func:`autotimm.export.export_checkpoint_to_onnx` for the
 actual conversion so that Lightning-module wrapping, optimisation and

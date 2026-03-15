@@ -119,7 +119,7 @@ In addition to the `autotimm` CLI, AutoTimm provides standalone CLI modules for 
 Export a trained checkpoint to TorchScript (JIT) format:
 
 ```bash
-python -m autotimm.export_jit \
+python -m autotimm.export.export_jit \
     --checkpoint path/to/checkpoint.ckpt \
     --output model.pt \
     --task-class ImageClassifier \
@@ -140,7 +140,7 @@ See also: [Export API Reference](export.md)
 Run interpretation methods on a trained checkpoint from the command line:
 
 ```bash
-python -m autotimm.interpret_cli \
+python -m autotimm.cli.interpret_cli \
     --checkpoint path/to/checkpoint.ckpt \
     --image path/to/image.jpg \
     --methods gradcam,gradcampp,integrated_gradients \

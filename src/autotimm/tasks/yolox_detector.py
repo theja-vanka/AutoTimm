@@ -17,11 +17,11 @@ import torchvision.ops as ops
 from autotimm.data.transform_config import TransformConfig
 from autotimm.heads import YOLOXHead
 from autotimm.losses import FocalLoss, GIoULoss
-from autotimm.metrics import LoggingConfig, MetricConfig, MetricManager
+from autotimm.core.metrics import LoggingConfig, MetricConfig, MetricManager
 from autotimm.models.csp_darknet import build_csp_darknet
 from autotimm.models.yolox_pafpn import build_yolox_pafpn
 from autotimm.tasks.preprocessing_mixin import PreprocessingMixin
-from autotimm.utils import seed_everything
+from autotimm.core.utils import seed_everything
 
 
 class YOLOXDetector(PreprocessingMixin, pl.LightningModule):

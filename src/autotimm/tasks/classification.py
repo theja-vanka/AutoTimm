@@ -11,13 +11,13 @@ import torch
 import torch.nn as nn
 import torchmetrics
 
-from autotimm.backbone import BackboneConfig, create_backbone, get_backbone_out_features
+from autotimm.core.backbone import BackboneConfig, create_backbone, get_backbone_out_features
 from autotimm.data.transform_config import TransformConfig
 from autotimm.heads import ClassificationHead
 from autotimm.losses import get_loss_registry
-from autotimm.metrics import LoggingConfig, MetricConfig, MetricManager
+from autotimm.core.metrics import LoggingConfig, MetricConfig, MetricManager
 from autotimm.tasks.preprocessing_mixin import PreprocessingMixin
-from autotimm.utils import seed_everything
+from autotimm.core.utils import seed_everything
 
 
 class ImageClassifier(PreprocessingMixin, pl.LightningModule):

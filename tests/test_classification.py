@@ -3,7 +3,7 @@
 import pytest
 import torch
 
-from autotimm.metrics import MetricConfig
+from autotimm.core.metrics import MetricConfig
 from autotimm.tasks.classification import ImageClassifier
 
 # ---------------------------------------------------------------------------

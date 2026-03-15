@@ -11,7 +11,7 @@ from autotimm.data.timm_transforms import (
     resolve_backbone_data_config,
 )
 from autotimm.data.transform_config import TransformConfig
-from autotimm.metrics import MetricConfig
+from autotimm.core.metrics import MetricConfig
 from autotimm.tasks.classification import ImageClassifier
 
 

@@ -9,7 +9,7 @@ TorchScript allows you to serialize PyTorch models for deployment in C++ applica
 ### CLI Export (Quickest)
 
 ```bash
-python -m autotimm.export_jit \
+python -m autotimm.export.export_jit \
     --checkpoint checkpoint.ckpt \
     --output model.pt \
     --task-class ImageClassifier
@@ -83,13 +83,13 @@ ONNX (Open Neural Network Exchange) is a cross-platform format supported by many
 ### CLI Export (Quickest)
 
 ```bash
-python -m autotimm.export_onnx \
+python -m autotimm.export.export_onnx \
     --checkpoint checkpoint.ckpt \
     --output model.onnx \
     --task-class ImageClassifier
 
 # With additional options
-python -m autotimm.export_onnx \
+python -m autotimm.export.export_onnx \
     --checkpoint checkpoint.ckpt \
     --output model.onnx \
     --task-class ObjectDetector \
@@ -320,7 +320,7 @@ For maximum inference throughput on NVIDIA GPUs, convert an ONNX model to a Tens
 
 ```bash
 # Step 1: Export to ONNX
-python -m autotimm.export_onnx \
+python -m autotimm.export.export_onnx \
     --checkpoint checkpoint.ckpt \
     --output model.onnx \
     --task-class ImageClassifier

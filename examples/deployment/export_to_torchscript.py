@@ -6,7 +6,7 @@ which enables deployment without Python dependencies to C++, mobile, and edge de
 
 import torch
 from autotimm import ImageClassifier, export_to_torchscript, load_torchscript
-from autotimm.metrics import MetricConfig
+from autotimm.core.metrics import MetricConfig
 
 
 def example_basic_export():

@@ -1,6 +1,6 @@
 """Export a trained checkpoint to TorchScript (JIT) format.
 
-Invoked as: python -m autotimm.export_jit --checkpoint <path> --output <path> --task-class <name>
+Invoked as: python -m autotimm.export.export_jit --checkpoint <path> --output <path> --task-class <name>
 
 Delegates to :func:`autotimm.export.export_checkpoint_to_torchscript` for the
 actual conversion so that Lightning-module wrapping, optimisation and

@@ -8,7 +8,7 @@ import numpy as np
 
 from autotimm.interpretation.gradcam import GradCAM
 from autotimm.interpretation.integrated_gradients import IntegratedGradients
-from autotimm.logging import logger
+from autotimm.core.logging import logger
 
 
 class InterpretationCallback(Callback):

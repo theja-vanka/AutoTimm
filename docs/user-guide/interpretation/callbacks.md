@@ -84,7 +84,7 @@ trainer.fit(model, datamodule=data)
 ### With TensorBoard
 
 ```python
-from autotimm.loggers import LoggerConfig
+from autotimm.core.loggers import LoggerConfig
 
 # Configure TensorBoard logger
 logger_config = LoggerConfig(

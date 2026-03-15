@@ -22,7 +22,7 @@ logger.error("Checkpoint not found")
 #### Adjusting Log Level
 
 ```python
-from autotimm.logging import logger
+from autotimm.core.logging import logger
 
 # Suppress info messages (show only warnings and above)
 logger.remove()
@@ -49,7 +49,7 @@ Log a formatted ASCII table using loguru.
 ### Usage Examples
 
 ```python
-from autotimm.logging import log_table
+from autotimm.core.logging import log_table
 
 log_table(
     title="Model Comparison",

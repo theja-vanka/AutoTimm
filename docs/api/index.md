@@ -276,7 +276,7 @@ from autotimm import (
 
 ```python
 from autotimm import logger
-from autotimm.logging import logger, log_table
+from autotimm.core.logging import logger, log_table
 ```
 
 ### Utilities

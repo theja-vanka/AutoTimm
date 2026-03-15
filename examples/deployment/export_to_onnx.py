@@ -12,7 +12,7 @@ import numpy as np
 import torch
 
 from autotimm import ImageClassifier, export_to_onnx, load_onnx
-from autotimm.metrics import MetricConfig
+from autotimm.core.metrics import MetricConfig
 
 
 def example_basic_export():

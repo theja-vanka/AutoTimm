@@ -3,7 +3,7 @@
 import pytest
 from pytorch_lightning.loggers import CSVLogger
 
-from autotimm.loggers import LoggerConfig, LoggerManager
+from autotimm.core.loggers import LoggerConfig, LoggerManager
 
 
 class TestLoggerConfig:

@@ -487,7 +487,7 @@ See the complete examples:
 Run interpretation methods directly from the command line without writing Python code:
 
 ```bash
-python -m autotimm.interpret_cli \
+python -m autotimm.cli.interpret_cli \
     --checkpoint path/to/checkpoint.ckpt \
     --image path/to/image.jpg \
     --methods gradcam,gradcampp,integrated_gradients,smoothgrad \

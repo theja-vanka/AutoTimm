@@ -217,7 +217,7 @@ from autotimm.metric import MetricConfig
 from autotimm.tasks import SemanticSegmentor
 from autotimm.losses import DiceLoss
 from autotimm.heads import DeepLabV3PlusHead
-from autotimm.metrics import MetricConfig
+from autotimm.core.metrics import MetricConfig
 ```
 
 ### Namespace Access

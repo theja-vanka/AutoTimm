@@ -18,7 +18,7 @@ import numpy as np
 from PIL import Image
 import warnings
 
-from autotimm.logging import logger
+from autotimm.core.logging import logger
 
 
 class ExplanationCache:

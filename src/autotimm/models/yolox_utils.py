@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from autotimm.logging import logger
+from autotimm.core.logging import logger
 
 
 def list_yolox_models(verbose: bool = False) -> list[str]:

@@ -312,7 +312,7 @@ Beyond the `autotimm` training CLI, AutoTimm provides standalone CLI modules for
 Export a trained checkpoint to TorchScript (JIT) format for production deployment or model visualization:
 
 ```bash
-python -m autotimm.export_jit \
+python -m autotimm.export.export_jit \
     --checkpoint logs/run_1/checkpoints/best.ckpt \
     --output model.pt \
     --task-class ImageClassifier
@@ -325,7 +325,7 @@ The exported `.pt` file can be loaded with `torch.jit.load()` without any AutoTi
 Run interpretation methods on a trained checkpoint and save heatmap overlays:
 
 ```bash
-python -m autotimm.interpret_cli \
+python -m autotimm.cli.interpret_cli \
     --checkpoint logs/run_1/checkpoints/best.ckpt \
     --image test_image.jpg \
     --methods gradcam,gradcampp,integrated_gradients \
