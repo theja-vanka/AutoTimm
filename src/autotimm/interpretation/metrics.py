@@ -13,7 +13,7 @@ import torch
 import torch.nn as nn
 from PIL import Image
 
-from autotimm.logging import logger
+from autotimm.core.logging import logger
 
 
 class ExplanationMetrics:

@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
-from autotimm.logging import logger
+from autotimm.core.logging import logger
 
 from autotimm.data.transform_config import (
     ALBUMENTATIONS_PRESETS,
@@ -290,7 +290,7 @@ def compare_backends(verbose: bool = True) -> dict[str, dict]:
 
 def _print_comparison(comparison: dict) -> None:
     """Pretty print the backend comparison using loguru."""
-    from autotimm.logging import log_table
+    from autotimm.core.logging import log_table
 
     # Build comparison table
     features = ["Backend", "Speed", "Augmentations", "BBox/Mask Support", "Best For", "Presets"]

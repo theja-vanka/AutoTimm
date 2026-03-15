@@ -326,7 +326,7 @@ for stage_name, backbone in stages:
 ### Pattern 3: Custom Configuration
 
 ```python
-from autotimm.backbone import BackboneConfig
+from autotimm.core.backbone import BackboneConfig
 
 # Fine control over model creation
 config = BackboneConfig(

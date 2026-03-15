@@ -12,7 +12,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.ops as ops
 
-from autotimm.backbone import (
+from autotimm.core.backbone import (
     FeatureBackboneConfig,
     create_feature_backbone,
     get_feature_channels,
@@ -20,9 +20,9 @@ from autotimm.backbone import (
 from autotimm.data.transform_config import TransformConfig
 from autotimm.heads import FPN, DetectionHead, YOLOXHead
 from autotimm.losses import FocalLoss, GIoULoss, get_loss_registry
-from autotimm.metrics import LoggingConfig, MetricConfig, MetricManager
+from autotimm.core.metrics import LoggingConfig, MetricConfig, MetricManager
 from autotimm.tasks.preprocessing_mixin import PreprocessingMixin
-from autotimm.utils import seed_everything
+from autotimm.core.utils import seed_everything
 
 
 class ObjectDetector(PreprocessingMixin, pl.LightningModule):
@@ -194,13 +194,13 @@ class ObjectDetector(PreprocessingMixin, pl.LightningModule):
         # For object detection, we typically use 3 backbone features (C3, C4, C5)
         # which combined with 2 extra FPN levels gives us P3-P7 (5 levels total)
         if isinstance(backbone, str):
-            from autotimm.backbone import FeatureBackboneConfig
+            from autotimm.core.backbone import FeatureBackboneConfig
 
             backbone = FeatureBackboneConfig(model_name=backbone, out_indices=(2, 3, 4))
         elif not hasattr(backbone, "out_indices"):
             # If it's a FeatureBackboneConfig without out_indices set, use (2, 3, 4)
             if hasattr(backbone, "model_name"):
-                from autotimm.backbone import FeatureBackboneConfig
+                from autotimm.core.backbone import FeatureBackboneConfig
 
                 backbone = FeatureBackboneConfig(
                     model_name=backbone.model_name,

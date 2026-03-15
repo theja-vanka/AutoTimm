@@ -57,7 +57,7 @@ with torch.inference_mode():
 Export from the command line without writing Python code:
 
 ```bash
-python -m autotimm.export_jit \
+python -m autotimm.export.export_jit \
     --checkpoint path/to/checkpoint.ckpt \
     --output model.pt \
     --task-class ImageClassifier \

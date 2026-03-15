@@ -294,7 +294,7 @@ def demonstrate_custom_configurations():
     # Example 1: Custom dropout
     print("1. Custom dropout rates:")
     print("""
-from autotimm.backbone import BackboneConfig
+from autotimm.core.backbone import BackboneConfig
 
 config = BackboneConfig(
     model_name="hf-hub:timm/resnet50.a1_in1k",

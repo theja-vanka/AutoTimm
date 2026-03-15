@@ -1,6 +1,6 @@
 """Standalone CLI for running model interpretation.
 
-Invoked as: python -m autotimm.interpret_cli --checkpoint <path> --image <path> ...
+Invoked as: python -m autotimm.cli.interpret_cli --checkpoint <path> --image <path> ...
 
 Outputs JSON to stdout with heatmap file paths and predicted class.
 """
@@ -148,7 +148,7 @@ def _run_method(model, image: Image.Image, method_id: str, output_dir: str):
         "gradcam": lambda m: GradCAM(m),
         "gradcampp": lambda m: GradCAMPlusPlus(m),
         "integrated_gradients": lambda m: IntegratedGradients(m),
-        "smoothgrad": lambda m: SmoothGrad(m),
+        "smoothgrad": lambda m: SmoothGrad(GradCAM(m)),
         "attention_rollout": lambda m: AttentionRollout(m),
         "attention_flow": lambda m: AttentionFlow(m),
     }

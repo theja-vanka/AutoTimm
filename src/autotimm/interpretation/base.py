@@ -50,6 +50,9 @@ class BaseInterpreter(ABC):
         )
         self.model.to(self.device)
 
+        # Unwrap torch.compile'd modules so hooks and gradients work correctly
+        self._unwrap_compiled_modules()
+
         # Resolve target layer
         self.target_layer = self._resolve_target_layer(target_layer)
 
@@ -57,6 +60,17 @@ class BaseInterpreter(ABC):
         self.activations = None
         self.gradients = None
         self._hooks = []
+
+    def _unwrap_compiled_modules(self):
+        """Replace any torch.compile'd submodules with their originals.
+
+        Compiled modules may not propagate gradients to non-parameter leaf
+        tensors and may not fire forward/backward hooks correctly.
+        """
+        for name, module in self.model.named_children():
+            orig = getattr(module, "_orig_mod", None)
+            if orig is not None:
+                setattr(self.model, name, orig)
 
     def _resolve_target_layer(
         self, target_layer: Optional[Union[str, nn.Module]]

@@ -58,6 +58,9 @@ class IntegratedGradients(BaseInterpreter):
         )
         self.model.to(self.device)
 
+        # Unwrap torch.compile'd modules so backward() can reach leaf inputs
+        self._unwrap_compiled_modules()
+
         self.baseline_type = baseline if isinstance(baseline, str) else "custom"
         self.custom_baseline = baseline if isinstance(baseline, torch.Tensor) else None
         self.steps = steps
@@ -67,6 +70,13 @@ class IntegratedGradients(BaseInterpreter):
         self.activations = None
         self.gradients = None
         self._hooks = []
+
+    def _unwrap_compiled_modules(self):
+        """Replace any torch.compile'd submodules with their originals."""
+        for name, module in self.model.named_children():
+            orig = getattr(module, "_orig_mod", None)
+            if orig is not None:
+                setattr(self.model, name, orig)
 
     def _generate_baseline(self, input_tensor: torch.Tensor) -> torch.Tensor:
         """
@@ -125,7 +135,6 @@ class IntegratedGradients(BaseInterpreter):
         """
         # Preprocess image
         input_tensor = self._preprocess_image(image)
-        input_tensor.requires_grad = True
 
         # Get predicted class if needed
         with torch.no_grad():
@@ -163,6 +172,10 @@ class IntegratedGradients(BaseInterpreter):
         """
         Compute integrated gradients along path from baseline to input.
 
+        Uses the Riemann sum approximation: sample at alpha = k/m for
+        k = 1, ..., m (excluding the baseline at alpha=0), average the
+        gradients, and multiply by (input - baseline).
+
         Args:
             input_tensor: Input tensor
             baseline: Baseline tensor
@@ -173,31 +186,32 @@ class IntegratedGradients(BaseInterpreter):
         """
         # Accumulate gradients
         accumulated_gradients = torch.zeros_like(input_tensor)
+        diff = (input_tensor - baseline).detach()
 
-        # Integrate gradients along path
-        for step in range(self.steps + 1):
-            # Linear interpolation
-            alpha = step / self.steps
-            interpolated = baseline + alpha * (input_tensor - baseline)
-            interpolated = interpolated.detach().requires_grad_(True)
+        # Integrate gradients along path (k=1..steps, exclude baseline)
+        with torch.enable_grad():
+            for step in range(1, self.steps + 1):
+                # Linear interpolation
+                alpha = step / self.steps
+                interpolated = (baseline + alpha * diff).detach().requires_grad_(True)
 
-            # Forward pass
-            output = self.model(interpolated)
-            if isinstance(output, dict):
-                output = output.get("logits", output.get("output", output))
+                # Forward pass
+                output = self.model(interpolated)
+                if isinstance(output, dict):
+                    output = output.get("logits", output.get("output", output))
 
-            # Backward pass
-            self.model.zero_grad()
-            target_score = output[0, target_class]
-            target_score.backward()
+                # Backward pass
+                self.model.zero_grad()
+                target_score = output[0, target_class]
+                target_score.backward()
 
-            # Accumulate gradients
-            if interpolated.grad is not None:
-                accumulated_gradients += interpolated.grad
+                # Accumulate gradients
+                if interpolated.grad is not None:
+                    accumulated_gradients += interpolated.grad.detach().clone()
 
         # Average gradients and multiply by (input - baseline)
         averaged_gradients = accumulated_gradients / self.steps
-        integrated_gradients = (input_tensor - baseline) * averaged_gradients
+        integrated_gradients = diff * averaged_gradients
 
         return integrated_gradients.detach()
 
@@ -312,7 +326,6 @@ class IntegratedGradients(BaseInterpreter):
             ).item()
 
         # Sum of attributions (need to recompute with full channels)
-        input_tensor.requires_grad = True
         full_attribution = self._compute_integrated_gradients(
             input_tensor, baseline, target_class
         )

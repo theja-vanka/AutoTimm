@@ -3,7 +3,7 @@
 import pytest
 import torchmetrics
 
-from autotimm.metrics import (
+from autotimm.core.metrics import (
     LoggingConfig,
     MetricConfig,
     MetricManager,

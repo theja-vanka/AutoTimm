@@ -2,7 +2,7 @@
 
 import pytorch_lightning as pl
 
-from autotimm.trainer import AutoTrainer, TunerConfig
+from autotimm.training.trainer import AutoTrainer, TunerConfig
 
 
 def test_auto_trainer_returns_pl_trainer():

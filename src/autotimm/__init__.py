@@ -121,7 +121,7 @@ from autotimm.interpretation import (
 from autotimm import data
 from autotimm import heads
 from autotimm import losses
-from autotimm import metrics as metrics_module
+from autotimm.core import metrics as metrics_module
 from autotimm import tasks
 from autotimm import interpretation
 

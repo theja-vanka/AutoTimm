@@ -6,7 +6,7 @@ import pytest
 import torch
 
 import autotimm
-from autotimm.backbone import ModelSource, _is_hf_hub_model, get_model_source
+from autotimm.core.backbone import ModelSource, _is_hf_hub_model, get_model_source
 
 
 class TestHFHubDetection:
@@ -96,7 +96,7 @@ class TestHFHubBackboneCreation:
         # We can't test actual model creation without internet, but we can verify
         # that the validation logic allows HF Hub models
         try:
-            from autotimm.backbone import _is_hf_hub_model
+            from autotimm.core.backbone import _is_hf_hub_model
 
             assert _is_hf_hub_model(model_name)
         except Exception as e:
@@ -165,7 +165,7 @@ class TestBackboneConfigWithHFHub:
 
     def test_backbone_config_with_hf_hub_model(self):
         """Test creating BackboneConfig with HF Hub model."""
-        from autotimm.backbone import BackboneConfig
+        from autotimm.core.backbone import BackboneConfig
 
         config = BackboneConfig(
             model_name="hf-hub:timm/resnet18.a1_in1k",
@@ -179,7 +179,7 @@ class TestBackboneConfigWithHFHub:
 
     def test_feature_backbone_config_with_hf_hub_model(self):
         """Test creating FeatureBackboneConfig with HF Hub model."""
-        from autotimm.backbone import FeatureBackboneConfig
+        from autotimm.core.backbone import FeatureBackboneConfig
 
         config = FeatureBackboneConfig(
             model_name="hf-hub:timm/resnet50.a1_in1k",
@@ -264,7 +264,7 @@ class TestEndToEndWithHFHub:
     def test_object_detector_with_hf_hub(self):
         """Test ObjectDetector with HF Hub backbone."""
         from autotimm import MetricConfig, ObjectDetector
-        from autotimm.backbone import FeatureBackboneConfig
+        from autotimm.core.backbone import FeatureBackboneConfig
 
         metrics = [
             MetricConfig(

@@ -3,7 +3,7 @@
 import pytest
 import torch.nn as nn
 
-from autotimm.backbone import (
+from autotimm.core.backbone import (
     BackboneConfig,
     ModelSource,
     create_backbone,

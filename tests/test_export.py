@@ -13,7 +13,7 @@ from autotimm.export import (
     load_torchscript,
     validate_torchscript_export,
 )
-from autotimm.metrics import MetricConfig
+from autotimm.core.metrics import MetricConfig
 
 try:
     import onnx
