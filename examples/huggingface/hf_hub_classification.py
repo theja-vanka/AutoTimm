@@ -9,7 +9,7 @@ Usage:
 
 from __future__ import annotations
 
-import autotimm
+import autotimm as at  # recommended alias
 from autotimm import (
     AutoTrainer,
     ImageClassifier,
@@ -75,8 +75,8 @@ def compare_model_sizes():
 
     for model_name in models_to_compare:
         try:
-            backbone = autotimm.create_backbone(model_name)
-            params = autotimm.count_parameters(backbone, trainable_only=False)
+            backbone = at.create_backbone(model_name)
+            params = at.count_parameters(backbone, trainable_only=False)
             features = backbone.num_features
 
             # Extract short name for display
@@ -132,7 +132,7 @@ def train_with_resnet_hf():
         weight_decay=1e-4,
     )
 
-    print(f"Total parameters: {autotimm.count_parameters(model):,}")
+    print(f"Total parameters: {at.count_parameters(model):,}")
 
     # Trainer
     trainer = AutoTrainer(
@@ -189,7 +189,7 @@ def train_with_vision_transformer():
         weight_decay=0.05,  # Higher weight decay for transformers
     )
 
-    print(f"Total parameters: {autotimm.count_parameters(model):,}")
+    print(f"Total parameters: {at.count_parameters(model):,}")
 
     # Trainer with gradient clipping for transformers
     trainer = AutoTrainer(
@@ -246,7 +246,7 @@ def train_with_mobilenet_for_edge():
         optimizer="adamw",
     )
 
-    print(f"Total parameters: {autotimm.count_parameters(model):,}")
+    print(f"Total parameters: {at.count_parameters(model):,}")
     print("(Perfect for edge devices and mobile deployment!)")
 
     # Trainer

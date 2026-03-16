@@ -18,11 +18,12 @@ python -m autotimm.export.export_jit \
 ### Basic TorchScript Export
 
 ```python
+import autotimm as at  # recommended alias
 import torch
 from autotimm import ImageClassifier, MetricConfig
 
 # Load model
-metrics = [MetricConfig(name="accuracy", backend="torchmetrics", 
+metrics = [MetricConfig(name="accuracy", backend="torchmetrics",
                         metric_class="Accuracy", params={"task": "multiclass"},
                         stages=["val"])]
 model = ImageClassifier.load_from_checkpoint(

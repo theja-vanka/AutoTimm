@@ -9,11 +9,11 @@ AutoTimm supports loading timm-compatible models directly from Hugging Face Hub 
 ## Quick Start
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 from autotimm import ImageClassifier
 
 # Discover models on HF Hub
-models = autotimm.list_hf_hub_backbones(model_name="resnet", limit=5)
+models = at.list_hf_hub_backbones(model_name="resnet", limit=5)
 
 # Use HF Hub model as backbone
 model = ImageClassifier(
@@ -223,17 +223,17 @@ You can use any of these formats:
 ## Model Discovery
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 
 # Search by architecture
-resnets = autotimm.list_hf_hub_backbones(model_name="resnet", limit=10)
-vits = autotimm.list_hf_hub_backbones(model_name="vit", limit=10)
+resnets = at.list_hf_hub_backbones(model_name="resnet", limit=10)
+vits = at.list_hf_hub_backbones(model_name="vit", limit=10)
 
 # Search by author
-timm_models = autotimm.list_hf_hub_backbones(author="timm", limit=20)
+timm_models = at.list_hf_hub_backbones(author="timm", limit=20)
 
 # Filter for efficient models
-efficient = autotimm.list_hf_hub_backbones(model_name="mobilenet", limit=5)
+efficient = at.list_hf_hub_backbones(model_name="mobilenet", limit=5)
 ```
 
 ## Quick Reference: Task-Specific Recommendations

@@ -38,6 +38,7 @@ This example demonstrates various interpretation techniques for understanding wh
 ### Quick Start
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import ImageClassifier
 from autotimm.interpretation import GradCAM, quick_explain
 from PIL import Image

@@ -39,6 +39,7 @@ TorchScript serializes PyTorch models for deployment without Python dependencies
 ### Quick Example
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import ImageClassifier, export_to_torchscript
 import torch
 

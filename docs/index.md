@@ -101,6 +101,7 @@ Torchvision (PIL) or albumentations (OpenCV) with bbox and mask support
 ## Quick Example
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import (
     AutoTrainer, ImageClassifier, ImageDataModule,
     LoggerConfig, MetricConfig,

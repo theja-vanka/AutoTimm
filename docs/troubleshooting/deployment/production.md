@@ -71,6 +71,7 @@ traced_model.save("model.pt")
 **Solutions:**
 
 ```python
+import autotimm as at  # recommended alias
 # 1. Use quantization
 from autotimm.export import quantize_dynamic
 quantize_dynamic("model.onnx", "model_quant.onnx")

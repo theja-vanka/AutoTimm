@@ -99,6 +99,7 @@ graph TD
 Train DeepLabV3+ on Cityscapes dataset for urban scene segmentation.
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import (
     AutoTrainer,
     SemanticSegmentor,

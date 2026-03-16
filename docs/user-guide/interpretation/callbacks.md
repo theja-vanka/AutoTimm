@@ -20,6 +20,7 @@ Automatically generate explanations for sample images during training and log th
 ### Class: `InterpretationCallback`
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm.interpretation import InterpretationCallback
 
 callback = InterpretationCallback(

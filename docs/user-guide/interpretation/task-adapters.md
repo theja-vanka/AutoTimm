@@ -16,6 +16,7 @@ While classification interpretation is straightforward, detection and segmentati
 ### Function: `explain_detection()`
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm.interpretation import explain_detection
 
 results = explain_detection(

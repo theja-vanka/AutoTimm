@@ -82,6 +82,7 @@ data/
 **Example:**
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import SegmentationDataModule
 
 data = SegmentationDataModule(

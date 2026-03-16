@@ -5,6 +5,7 @@ This guide covers how to use trained classification models for inference and pre
 ## Loading a Trained Model
 
 ```python
+import autotimm as at  # recommended alias
 import torch
 from autotimm import ImageClassifier, MetricConfig, TransformConfig
 

@@ -32,6 +32,7 @@ graph LR
 ### 1. Import Required Classes
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import (
     AutoTrainer,
     ImageClassifier,
@@ -237,12 +238,12 @@ if __name__ == "__main__":
 Browse available backbones:
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 
 # Search by pattern
-autotimm.list_backbones("*resnet*")
-autotimm.list_backbones("*efficientnet*", pretrained_only=True)
-autotimm.list_backbones("*vit*")
+at.list_backbones("*resnet*")
+at.list_backbones("*efficientnet*", pretrained_only=True)
+at.list_backbones("*vit*")
 ```
 
 Popular choices:
@@ -262,15 +263,15 @@ AutoTimm provides utilities to discover all available optimizers and learning ra
 ### List Optimizers
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 
 # Get all optimizers from torch and timm
-optimizers = autotimm.list_optimizers()
+optimizers = at.list_optimizers()
 print("Torch optimizers:", optimizers["torch"])
 print("Timm optimizers:", optimizers.get("timm", []))
 
 # Get only torch optimizers
-optimizers = autotimm.list_optimizers(include_timm=False)
+optimizers = at.list_optimizers(include_timm=False)
 ```
 
 **Available optimizers:**
@@ -282,7 +283,7 @@ optimizers = autotimm.list_optimizers(include_timm=False)
 
 ```python
 # Get all schedulers from torch and timm
-schedulers = autotimm.list_schedulers()
+schedulers = at.list_schedulers()
 print("Torch schedulers:", schedulers["torch"])
 print("Timm schedulers:", schedulers.get("timm", []))
 ```

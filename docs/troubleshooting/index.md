@@ -139,6 +139,7 @@ If you encounter an issue not covered here:
 Enable detailed logging for troubleshooting:
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import LoggingConfig, ImageClassifier
 
 logging_config = LoggingConfig(

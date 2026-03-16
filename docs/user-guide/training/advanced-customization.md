@@ -938,18 +938,18 @@ model = ImageClassifier(
 ```python
 from autotimm import ImageClassifier, AutoTrainer, seed_everything
 
-# Default: seed=42, deterministic=True
+# Default: seed=None, deterministic=True (model) / False (trainer)
+# Seeding is opt-in — pass seed=42 explicitly for reproducibility
 model = ImageClassifier(
     backbone="resnet50",
     num_classes=10,
-    # seed=42 (default)
-    # deterministic=True (default)
+    seed=42,              # opt-in for reproducibility
+    deterministic=True,   # default
 )
 
 trainer = AutoTrainer(
     max_epochs=10,
-    # seed=42 (default)
-    # deterministic=True (default)
+    seed=42,              # opt-in for reproducibility
 )
 ```
 
@@ -1034,10 +1034,10 @@ trainer = AutoTrainer(
 
 **Best practices:**
 
-- **Research papers**: Use `seed=42, deterministic=True`
-- **Production training**: Use `seed=42, deterministic=False`
-- **Debugging**: Use `seed=42, deterministic=True`
-- **Exploration**: Use `seed=None`
+- **Research papers**: Set `seed=42, deterministic=True` explicitly
+- **Production training**: Set `seed=42, deterministic=False` explicitly
+- **Debugging**: Set `seed=42, deterministic=True` explicitly
+- **Exploration**: Use default `seed=None`
 
 ---
 

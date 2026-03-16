@@ -537,26 +537,26 @@ if __name__ == "__main__":
 AutoTimm supports all timm backbones:
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 
 # List available backbones
-backbones = autotimm.list_backbones()
+backbones = at.list_backbones()
 print(f"Available backbones: {len(backbones)}")
 
 # Use any timm model
-model = autotimm.ImageClassifier(
+model = at.ImageClassifier(
     backbone="convnext_base",  # ConvNeXt
     num_classes=10,
     metrics=metrics,
 )
 
-model = autotimm.ImageClassifier(
+model = at.ImageClassifier(
     backbone="vit_base_patch16_224",  # Vision Transformer
     num_classes=10,
     metrics=metrics,
 )
 
-model = autotimm.ImageClassifier(
+model = at.ImageClassifier(
     backbone="swin_base_patch4_window7_224",  # Swin Transformer
     num_classes=10,
     metrics=metrics,

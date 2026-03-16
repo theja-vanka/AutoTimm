@@ -10,7 +10,7 @@ Usage:
 
 from __future__ import annotations
 
-import autotimm
+import autotimm as at  # recommended alias
 from autotimm import (
     AutoTrainer,
     ImageClassifier,
@@ -92,9 +92,9 @@ def train_with_hf_hub_model():
     )
 
     # Print model info
-    print(f"Total parameters: {autotimm.count_parameters(model):,}")
+    print(f"Total parameters: {at.count_parameters(model):,}")
     print(
-        f"Trainable parameters: {autotimm.count_parameters(model, trainable_only=True):,}"
+        f"Trainable parameters: {at.count_parameters(model, trainable_only=True):,}"
     )
 
     # Trainer setup
@@ -122,17 +122,17 @@ def compare_timm_vs_hf_hub():
 
     # Create both types of models
     print("\n1. Creating standard timm model (resnet18)...")
-    timm_model = autotimm.create_backbone("resnet18")
+    timm_model = at.create_backbone("resnet18")
     print(f"   Features: {timm_model.num_features}")
     print(
-        f"   Parameters: {autotimm.count_parameters(timm_model, trainable_only=False):,}"
+        f"   Parameters: {at.count_parameters(timm_model, trainable_only=False):,}"
     )
 
     print("\n2. Creating HF Hub model (hf-hub:timm/resnet18.a1_in1k)...")
-    hf_model = autotimm.create_backbone("hf-hub:timm/resnet18.a1_in1k")
+    hf_model = at.create_backbone("hf-hub:timm/resnet18.a1_in1k")
     print(f"   Features: {hf_model.num_features}")
     print(
-        f"   Parameters: {autotimm.count_parameters(hf_model, trainable_only=False):,}"
+        f"   Parameters: {at.count_parameters(hf_model, trainable_only=False):,}"
     )
 
     print("\nBoth models have the same architecture and can be used interchangeably!")

@@ -9,7 +9,7 @@ Usage:
 
 from __future__ import annotations
 
-import autotimm
+import autotimm as at  # recommended alias
 from autotimm import (
     AutoTrainer,
     MetricConfig,
@@ -68,9 +68,9 @@ def compare_backbone_features():
 
     for model_name in models_to_compare:
         try:
-            backbone = autotimm.create_feature_backbone(model_name)
-            channels = autotimm.get_feature_channels(backbone)
-            autotimm.get_feature_strides(backbone)
+            backbone = at.create_feature_backbone(model_name)
+            channels = at.get_feature_channels(backbone)
+            at.get_feature_strides(backbone)
 
             short_name = model_name.replace("hf-hub:timm/", "")
             channels_str = str(channels)
@@ -143,7 +143,7 @@ def train_deeplabv3_with_resnet():
         weight_decay=1e-4,
     )
 
-    print(f"Total parameters: {autotimm.count_parameters(model):,}")
+    print(f"Total parameters: {at.count_parameters(model):,}")
 
     # Trainer
     AutoTrainer(
@@ -205,7 +205,7 @@ def train_fcn_with_convnext():
         weight_decay=0.05,
     )
 
-    print(f"Total parameters: {autotimm.count_parameters(model):,}")
+    print(f"Total parameters: {at.count_parameters(model):,}")
 
     # Trainer
     AutoTrainer(
@@ -265,7 +265,7 @@ def train_lightweight_segmentation():
         optimizer="adamw",
     )
 
-    print(f"Total parameters: {autotimm.count_parameters(model):,}")
+    print(f"Total parameters: {at.count_parameters(model):,}")
     print("(Optimized for edge devices and mobile deployment!)")
 
     # Trainer

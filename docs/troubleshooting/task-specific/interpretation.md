@@ -23,6 +23,7 @@ model.eval()
 **Solutions:**
 
 ```python
+import autotimm as at  # recommended alias
 # 1. Try GradCAM++ instead of GradCAM
 from autotimm.interpretation import GradCAMPlusPlus
 

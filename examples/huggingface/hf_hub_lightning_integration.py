@@ -16,7 +16,7 @@ from pathlib import Path
 import torch
 import pytorch_lightning as pl
 
-import autotimm
+import autotimm as at  # recommended alias
 from autotimm import (
     AutoTrainer,
     ImageClassifier,
@@ -62,7 +62,7 @@ def test_basic_training():
         scheduler="cosine",
     )
 
-    print(f"\n✓ Model created: {autotimm.count_parameters(model):,} parameters")
+    print(f"\n✓ Model created: {at.count_parameters(model):,} parameters")
 
     # Train
     trainer = AutoTrainer(
@@ -350,8 +350,8 @@ def compare_timm_vs_hf_hub():
     )
 
     # Compare
-    timm_params = autotimm.count_parameters(model_timm, trainable_only=False)
-    hf_params = autotimm.count_parameters(model_hf, trainable_only=False)
+    timm_params = at.count_parameters(model_timm, trainable_only=False)
+    hf_params = at.count_parameters(model_hf, trainable_only=False)
 
     print(f"\nStandard timm model: {timm_params:,} parameters")
     print(f"HF Hub model:        {hf_params:,} parameters")

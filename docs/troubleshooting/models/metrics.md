@@ -9,6 +9,7 @@ Problems with metric configuration and values.
 **Solutions:**
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import MetricConfig
 
 # 1. Verify metric configuration matches task

@@ -301,10 +301,10 @@ trainer.test(model, datamodule=data)
 AutoTimm supports all PyTorch and timm optimizers. Use `list_optimizers()` to discover available options:
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 
 # List all optimizers
-optimizers = autotimm.list_optimizers()
+optimizers = at.list_optimizers()
 print("PyTorch optimizers:", optimizers["torch"])
 print("Timm optimizers:", optimizers.get("timm", []))
 ```
@@ -538,8 +538,8 @@ AutoTrainer(
     precision=32,                   # 32, 16, "bf16-mixed", "16-mixed"
     logger=False,                   # LoggerManager, list of LoggerConfig, or False
     tuner_config=None,              # TunerConfig for auto-tuning
-    checkpoint_monitor=None,        # Metric to monitor for checkpointing
-    checkpoint_mode="max",          # "max" or "min"
+    checkpoint_monitor="val/loss",   # Metric to monitor for checkpointing
+    checkpoint_mode="min",          # "max" or "min"
     callbacks=None,                 # List of Lightning callbacks
     default_root_dir=".",           # Root directory for logs/checkpoints
     gradient_clip_val=None,         # Gradient clipping value
@@ -547,7 +547,10 @@ AutoTrainer(
     val_check_interval=1.0,         # Validation frequency
     enable_checkpointing=True,      # Save checkpoints
     fast_dev_run=False,             # True, False, or int (number of batches)
-    seed=42,                        # Random seed for reproducibility (None to disable)
+    seed=None,                      # Random seed for reproducibility (None to disable)
+    json_progress=False,            # Enable JSON progress reporting
+    json_progress_every_n_steps=10, # JSON progress reporting frequency
+    json_progress_log_file=None,    # File path for JSON progress logs
     deterministic=False,            # Enable deterministic algorithms
     use_autotimm_seeding=False,     # Use AutoTimm's seed_everything() instead of Lightning's
     # ... any other pl.Trainer argument

@@ -27,12 +27,15 @@ End-to-end image classifier backed by a timm backbone.
         - preprocess
         - get_data_config
         - get_transform
+        - to_torchscript
+        - to_onnx
 
 ## Usage Examples
 
 ### Basic Usage
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import ImageClassifier, MetricConfig
 
 metrics = [
@@ -241,6 +244,11 @@ print(f"Input size: {config['input_size']}")
 | `label_smoothing` | `float` | `0.0` | Label smoothing (not for multi-label) |
 | `freeze_backbone` | `bool` | `False` | Freeze backbone weights |
 | `mixup_alpha` | `float` | `0.0` | Mixup augmentation alpha |
+| `loss_fn` | `str \| nn.Module \| None` | `None` | Loss function (string from registry, nn.Module, or None for default) |
+| `compile_model` | `bool` | `True` | Apply `torch.compile()` for faster training/inference (PyTorch 2.0+) |
+| `compile_kwargs` | `dict \| None` | `None` | Kwargs for `torch.compile()` (e.g., `mode`, `fullgraph`, `dynamic`) |
+| `seed` | `int \| None` | `None` | Random seed for reproducibility (None to disable seeding) |
+| `deterministic` | `bool` | `True` | Enable deterministic algorithms (may impact performance) |
 
 ## Supported Optimizers
 

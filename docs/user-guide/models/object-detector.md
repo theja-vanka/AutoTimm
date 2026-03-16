@@ -258,7 +258,10 @@ ObjectDetector(
     regress_ranges=None,                    # Custom regression ranges
     compile_model=True,                     # Enable torch.compile (PyTorch 2.0+)
     compile_kwargs=None,                    # Custom torch.compile options
-    seed=42,                                # Random seed for reproducibility (None to disable)
+    detection_arch="fcos",                  # Detection architecture ("fcos" or "yolox")
+    cls_loss_fn=None,                       # Custom classification loss (string from registry, nn.Module, or None)
+    reg_loss_fn=None,                       # Custom regression loss (string from registry, nn.Module, or None)
+    seed=None,                              # Random seed for reproducibility (None to disable)
     deterministic=True,                     # Enable deterministic algorithms
 )
 ```

@@ -9,7 +9,7 @@ Usage:
 
 from __future__ import annotations
 
-import autotimm
+import autotimm as at  # recommended alias
 from autotimm import (
     AutoTrainer,
     DetectionDataModule,
@@ -69,10 +69,10 @@ def analyze_feature_pyramid_capabilities():
 
     for model_name in models_to_analyze:
         try:
-            backbone = autotimm.create_feature_backbone(model_name)
-            params = autotimm.count_parameters(backbone, trainable_only=False)
-            channels = autotimm.get_feature_channels(backbone)
-            autotimm.get_feature_strides(backbone)
+            backbone = at.create_feature_backbone(model_name)
+            params = at.count_parameters(backbone, trainable_only=False)
+            channels = at.get_feature_channels(backbone)
+            at.get_feature_strides(backbone)
 
             short_name = model_name.replace("hf-hub:timm/", "")
             channels_str = str(channels[-4:])  # Last 4 levels for FPN
@@ -125,7 +125,7 @@ def train_detector_with_resnet():
         weight_decay=1e-4,
     )
 
-    print(f"Total parameters: {autotimm.count_parameters(model):,}")
+    print(f"Total parameters: {at.count_parameters(model):,}")
 
     # Trainer
     AutoTrainer(
@@ -182,7 +182,7 @@ def train_detector_with_resnext():
         weight_decay=1e-4,
     )
 
-    print(f"Total parameters: {autotimm.count_parameters(model):,}")
+    print(f"Total parameters: {at.count_parameters(model):,}")
     print("ResNeXt provides stronger features than ResNet")
 
     # Trainer
@@ -240,7 +240,7 @@ def train_efficient_detector():
         weight_decay=1e-4,
     )
 
-    print(f"Total parameters: {autotimm.count_parameters(model):,}")
+    print(f"Total parameters: {at.count_parameters(model):,}")
     print("Optimized for fast inference and lower memory usage")
 
     # Trainer
@@ -296,7 +296,7 @@ def train_modern_detector():
         weight_decay=0.05,  # Higher weight decay
     )
 
-    print(f"Total parameters: {autotimm.count_parameters(model):,}")
+    print(f"Total parameters: {at.count_parameters(model):,}")
     print("ConvNeXt: Modern CNN with transformer-like design")
 
     # Trainer
@@ -400,7 +400,7 @@ def compare_detection_backbones():
                 num_classes=80,
                 fpn_channels=256,
             )
-            params = autotimm.count_parameters(model, trainable_only=False)
+            params = at.count_parameters(model, trainable_only=False)
 
             if base_params is None:
                 base_params = params

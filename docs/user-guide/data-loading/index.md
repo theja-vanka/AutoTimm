@@ -49,6 +49,7 @@ graph LR
 ### Image Classification
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import ImageDataModule
 
 # Built-in dataset

@@ -9,6 +9,7 @@ Problems using HuggingFace Hub models.
 **Solution:** Verify model name exists:
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import list_hf_hub_backbones
 
 # Search for model

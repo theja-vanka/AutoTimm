@@ -20,6 +20,7 @@ Comprehensive guide to deploying models from development to production, covering
 ### ONNX (Recommended for Production)
 
 ```python
+import autotimm as at  # recommended alias
 import torch
 from autotimm import ImageClassifier
 

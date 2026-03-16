@@ -81,7 +81,7 @@ trainer.fit(model, datamodule=data)  # Runs tuning first
 #### With Reproducibility Settings
 
 ```python
-# Default: seed=42, deterministic=True (Lightning's seeding)
+# Default: seed=None, deterministic=True
 trainer = AutoTrainer(max_epochs=10)
 
 # Custom seed
@@ -129,11 +129,11 @@ trainer.fit(model, datamodule=data)
 | `precision` | `str \| int` | `32` | `32`, `16`, `"bf16-mixed"`, `"16-mixed"` |
 | `logger` | Various | `False` | Logger configuration |
 | `tuner_config` | `TunerConfig \| None \| bool` | `None` | Auto-tuning config. `None`/`True` creates default config, `False` disables |
-| `seed` | `int \| None` | `42` | Random seed for reproducibility. Set to `None` to disable seeding |
-| `deterministic` | `bool` | `True` | Enable deterministic algorithms for reproducibility. May impact performance |
+| `seed` | `int \| None` | `None` | Random seed for reproducibility. Set to `None` to disable seeding |
+| `deterministic` | `bool` | `False` | Enable deterministic algorithms for reproducibility. May impact performance |
 | `use_autotimm_seeding` | `bool` | `False` | Use AutoTimm's `seed_everything()` instead of Lightning's built-in seeding |
-| `checkpoint_monitor` | `str \| None` | `None` | Metric for checkpointing |
-| `checkpoint_mode` | `str` | `"max"` | `"max"` or `"min"` |
+| `checkpoint_monitor` | `str \| None` | `"val/loss"` | Metric for checkpointing |
+| `checkpoint_mode` | `str` | `"min"` | `"max"` or `"min"` |
 | `callbacks` | `list \| None` | `None` | Lightning callbacks |
 | `default_root_dir` | `str` | `"."` | Root directory |
 | `gradient_clip_val` | `float \| None` | `None` | Gradient clipping |
@@ -141,6 +141,9 @@ trainer.fit(model, datamodule=data)
 | `val_check_interval` | `float \| int` | `1.0` | Validation frequency |
 | `enable_checkpointing` | `bool` | `True` | Save checkpoints |
 | `fast_dev_run` | `bool \| int` | `False` | Run N batches for debugging |
+| `json_progress` | `bool` | `False` | Enable JSON progress reporting |
+| `json_progress_every_n_steps` | `int` | `10` | JSON progress reporting frequency |
+| `json_progress_log_file` | `str \| None` | `None` | File path for JSON progress logs |
 
 ---
 
@@ -249,6 +252,7 @@ config = TunerConfig(
 ## Complete Example
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import (
     AutoTrainer,
     ImageClassifier,

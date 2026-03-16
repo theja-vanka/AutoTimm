@@ -15,6 +15,7 @@ Feature visualization helps you understand:
 ## Class: `FeatureVisualizer`
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm.interpretation import FeatureVisualizer
 
 viz = FeatureVisualizer(

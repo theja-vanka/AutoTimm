@@ -14,6 +14,7 @@ While visual inspection of heatmaps is helpful, quantitative metrics provide obj
 ## Class: `ExplanationMetrics`
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm.interpretation import ExplanationMetrics, GradCAM
 
 model = ImageClassifier(backbone="resnet50", num_classes=10)

@@ -34,6 +34,7 @@ trainer = AutoTrainer(
 ## TensorBoard Issues
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import LoggingConfig
 
 # Specify custom log directory

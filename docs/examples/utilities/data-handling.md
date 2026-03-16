@@ -7,6 +7,7 @@ This page demonstrates data loading, augmentation, and balanced sampling techniq
 Handle imbalanced datasets with weighted sampling.
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import ImageDataModule
 
 

@@ -79,6 +79,7 @@ Learn how to create model ensembles for improved accuracy and use knowledge dist
 ### Simple Averaging
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import ImageClassifier
 
 # Create diverse models

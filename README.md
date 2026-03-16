@@ -66,7 +66,7 @@ Whether you're training an image classifier, an object detector, or a segmentati
 | **Backbone variety** | Wire up manually | 1000+ backbones, swap with one arg |
 | **Auto-tuning** | Implement yourself | LR + batch size finding built-in |
 | **Experiment tracking** | External tooling needed | Multi-logger (TensorBoard, MLflow, W&B, CSV) |
-| **Reproducibility** | Manual seed management | Deterministic by default (seed=42) |
+| **Reproducibility** | Manual seed management | Opt-in deterministic mode (`seed=42`) |
 | **Model export** | Custom export scripts | One-line TorchScript & ONNX |
 | **Interpretation** | Separate libraries | 6 methods + metrics built-in |
 
@@ -164,6 +164,7 @@ pip install autotimm[all]          # Everything
 ### Your First Model
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import AutoTrainer, ImageClassifier, ImageDataModule, MetricConfig
 
 # Data

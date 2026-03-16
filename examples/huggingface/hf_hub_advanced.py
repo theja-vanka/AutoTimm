@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import torch
 
-import autotimm
+import autotimm as at  # recommended alias
 
 
 def explore_pretraining_datasets():
@@ -133,9 +133,9 @@ def benchmark_inference_speed():
     for name, model_id in models_to_test:
         try:
             # Create model
-            backbone = autotimm.create_backbone(model_id)
+            backbone = at.create_backbone(model_id)
             backbone.eval()
-            params = autotimm.count_parameters(backbone, trainable_only=False)
+            params = at.count_parameters(backbone, trainable_only=False)
 
             # Warmup
             dummy_input = torch.randn(1, 3, 224, 224)

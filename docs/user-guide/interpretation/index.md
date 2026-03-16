@@ -76,6 +76,7 @@ The interpretation module offers:
 ## Quick Start
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import ImageClassifier
 from autotimm.interpretation import explain_prediction
 from PIL import Image

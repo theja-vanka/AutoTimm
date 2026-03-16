@@ -16,6 +16,7 @@ TorchScript allows you to:
 ### Basic Export
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import ImageClassifier, export_to_torchscript
 import torch
 

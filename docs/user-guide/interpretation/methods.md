@@ -9,6 +9,7 @@ Gradient-weighted Class Activation Mapping uses gradients to identify important 
 ### Class: `GradCAM`
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm.interpretation import GradCAM
 
 explainer = GradCAM(

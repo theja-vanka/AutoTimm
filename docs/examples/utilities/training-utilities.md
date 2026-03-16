@@ -85,6 +85,7 @@ graph TD
 Automatically find optimal learning rate and batch size.
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import AutoTrainer, TunerConfig
 
 

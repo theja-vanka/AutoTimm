@@ -23,6 +23,7 @@ data = ImageDataModule(
 ## Custom Transform Errors
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import TransformConfig
 
 # Debug transforms

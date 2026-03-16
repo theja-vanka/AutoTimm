@@ -1,4 +1,13 @@
-"""AutoTimm: automated deep learning image tasks powered by timm and PyTorch Lightning."""
+"""AutoTimm: automated deep learning image tasks powered by timm and PyTorch Lightning.
+
+Recommended import alias::
+
+    import autotimm as at
+
+    # Then use:
+    model = at.ImageClassifier(backbone="resnet50", num_classes=10)
+    trainer = at.AutoTrainer(max_epochs=10)
+"""
 
 import sys
 

@@ -17,6 +17,7 @@ NaN (Not a Number) losses typically indicate numerical instability during traini
 ### 1. Reduce Learning Rate
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import ImageClassifier, MetricConfig
 
 metrics = [

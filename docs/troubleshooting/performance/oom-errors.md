@@ -7,6 +7,7 @@ Out of Memory (OOM) errors occur when GPU memory is exhausted.
 ### 1. Reduce Batch Size
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import ImageDataModule
 
 data = ImageDataModule(

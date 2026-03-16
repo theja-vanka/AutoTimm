@@ -39,6 +39,7 @@ graph TD
 Load standard datasets automatically:
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import ImageDataModule
 
 data = ImageDataModule(

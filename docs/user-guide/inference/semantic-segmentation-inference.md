@@ -531,6 +531,7 @@ model = load_model(
 ### Direct Loading with SemanticSegmentor
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import SemanticSegmentor, MetricConfig, TransformConfig
 
 metrics = [

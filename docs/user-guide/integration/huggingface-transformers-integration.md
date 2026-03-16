@@ -336,13 +336,13 @@ AutoTimm uses the `timm` library, not `transformers`. They are complementary:
 You can use **both** in the same project:
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 
 # AutoTimm with timm backbones
-model1 = autotimm.create_backbone("resnet50")
+model1 = at.create_backbone("resnet50")
 
 # AutoTimm with HF Hub timm models
-model2 = autotimm.create_backbone("hf-hub:timm/resnet50.a1_in1k")
+model2 = at.create_backbone("hf-hub:timm/resnet50.a1_in1k")
 
 # Direct HF transformers usage
 from transformers import ViTModel

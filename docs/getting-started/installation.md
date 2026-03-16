@@ -83,13 +83,13 @@ This installs:
 ## Verify Installation
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 
 # Check available backbones
-print(len(autotimm.list_backbones()))  # 1000+ models
+print(len(at.list_backbones()))  # 1000+ models
 
 # Check version
-print(autotimm.__version__)
+print(at.__version__)
 ```
 
 ## GPU Support

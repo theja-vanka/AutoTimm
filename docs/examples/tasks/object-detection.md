@@ -36,6 +36,7 @@ graph TD
 ### Implementation
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import (
     AutoTrainer,
     DetectionDataModule,
@@ -71,6 +72,7 @@ def main():
     model = ObjectDetector(
         backbone="resnet50",  # Any timm backbone works
         num_classes=80,  # COCO has 80 classes
+        detection_arch="fcos",  # FCOS anchor-free architecture
         metrics=metric_configs,
         fpn_channels=256,
         head_num_convs=4,
@@ -330,6 +332,7 @@ def main():
     model_swin = ObjectDetector(
         backbone="swin_tiny_patch4_window7_224",
         num_classes=80,
+        detection_arch="fcos",
         metrics=metric_configs,
         fpn_channels=256,
         head_num_convs=4,
@@ -342,6 +345,7 @@ def main():
     model_vit = ObjectDetector(
         backbone="vit_base_patch16_224",
         num_classes=80,
+        detection_arch="fcos",
         metrics=metric_configs,
         fpn_channels=256,
         head_num_convs=4,
@@ -353,6 +357,7 @@ def main():
     model = ObjectDetector(
         backbone="swin_base_patch4_window7_224",
         num_classes=80,
+        detection_arch="fcos",
         metrics=metric_configs,
         fpn_channels=256,
         freeze_backbone=True,  # Phase 1: freeze backbone

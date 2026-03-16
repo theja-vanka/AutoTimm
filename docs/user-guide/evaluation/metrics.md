@@ -50,6 +50,7 @@ graph TD
 ### Basic Configuration
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import MetricConfig
 
 accuracy = MetricConfig(

@@ -215,8 +215,8 @@ model = ObjectDetector(backbone="convnext_tiny", detection_arch="yolox", ...)
 model = ObjectDetector(backbone="vit_base_patch16_224", detection_arch="yolox", ...)
 
 # Search available backbones
-import autotimm
-autotimm.list_backbones("*efficientnet*", pretrained_only=True)
+import autotimm as at  # recommended alias
+at.list_backbones("*efficientnet*", pretrained_only=True)
 ```
 
 ### Custom Training Settings
