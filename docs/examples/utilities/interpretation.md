@@ -7,6 +7,7 @@ This page demonstrates model interpretation and visualization techniques for und
 Visualize and interpret model predictions using various techniques.
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import ImageClassifier
 from autotimm.interpretation import ModelInterpreter
 import torch

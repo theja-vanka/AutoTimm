@@ -68,6 +68,7 @@ brew install cmake
 First, export your trained AutoTimm model to TorchScript:
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import ImageClassifier
 import torch
 

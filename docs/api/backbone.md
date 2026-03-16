@@ -77,9 +77,9 @@ Create a timm backbone from a config or model name.
 #### From String
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 
-backbone = autotimm.create_backbone("resnet50")
+backbone = at.create_backbone("resnet50")
 print(f"Output features: {backbone.num_features}")
 ```
 
@@ -221,9 +221,9 @@ Create a feature extraction backbone from a config or model name.
 #### From String
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 
-backbone = autotimm.create_feature_backbone("resnet50")
+backbone = at.create_feature_backbone("resnet50")
 features = backbone(images)
 print(f"Feature levels: {len(features)}")  # 3 (C3, C4, C5)
 ```
@@ -266,10 +266,10 @@ Get feature information (channels, strides, reductions) from a backbone.
       show_source: true
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 
-backbone = autotimm.create_feature_backbone("resnet50")
-info = autotimm.get_feature_info(backbone)
+backbone = at.create_feature_backbone("resnet50")
+info = at.get_feature_info(backbone)
 print(info)
 # [{'num_chs': 512, 'reduction': 8, ...},
 #  {'num_chs': 1024, 'reduction': 16, ...},
@@ -285,10 +285,10 @@ Extract feature channels for each level.
       show_source: true
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 
-backbone = autotimm.create_feature_backbone("resnet50")
-channels = autotimm.get_feature_channels(backbone)
+backbone = at.create_feature_backbone("resnet50")
+channels = at.get_feature_channels(backbone)
 print(channels)  # [512, 1024, 2048]
 ```
 
@@ -301,10 +301,10 @@ Get stride information for FPN construction.
       show_source: true
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 
-backbone = autotimm.create_feature_backbone("resnet50")
-strides = autotimm.get_feature_strides(backbone)
+backbone = at.create_feature_backbone("resnet50")
+strides = at.get_feature_strides(backbone)
 print(strides)  # [8, 16, 32]
 ```
 
@@ -325,9 +325,9 @@ List available timm backbones with optional filtering.
 #### List All Backbones
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 
-all_models = autotimm.list_backbones()
+all_models = at.list_backbones()
 print(f"Total models: {len(all_models)}")  # 1000+
 ```
 
@@ -335,23 +335,23 @@ print(f"Total models: {len(all_models)}")  # 1000+
 
 ```python
 # ResNet variants
-resnet_models = autotimm.list_backbones("*resnet*")
+resnet_models = at.list_backbones("*resnet*")
 print(resnet_models[:10])
 
 # EfficientNet variants
-efficientnet_models = autotimm.list_backbones("*efficientnet*")
+efficientnet_models = at.list_backbones("*efficientnet*")
 
 # Vision Transformers
-vit_models = autotimm.list_backbones("*vit*")
+vit_models = at.list_backbones("*vit*")
 
 # ConvNeXt
-convnext_models = autotimm.list_backbones("*convnext*")
+convnext_models = at.list_backbones("*convnext*")
 ```
 
 #### Pretrained Only
 
 ```python
-pretrained = autotimm.list_backbones("*resnet*", pretrained_only=True)
+pretrained = at.list_backbones("*resnet*", pretrained_only=True)
 ```
 
 ### Parameters
@@ -404,15 +404,15 @@ pretrained = autotimm.list_backbones("*resnet*", pretrained_only=True)
 ## Backbone Info
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 
 # Create backbone
-backbone = autotimm.create_backbone("resnet50")
+backbone = at.create_backbone("resnet50")
 
 # Get output features
 print(f"Output features: {backbone.num_features}")  # 2048
 
 # Count parameters
-total = autotimm.count_parameters(backbone, trainable_only=False)
+total = at.count_parameters(backbone, trainable_only=False)
 print(f"Total parameters: {total:,}")  # 23,508,032
 ```

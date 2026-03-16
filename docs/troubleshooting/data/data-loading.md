@@ -5,6 +5,7 @@ Common data loading problems and solutions.
 ## Corrupted or Missing Images
 
 ```python
+import autotimm as at  # recommended alias
 # Enable validation to skip corrupted images
 from autotimm import ImageDataModule
 

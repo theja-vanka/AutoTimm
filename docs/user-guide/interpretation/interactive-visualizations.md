@@ -23,6 +23,7 @@ The `InteractiveVisualizer` class provides three main visualization types:
 ### Single Explanation
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import ImageClassifier
 from autotimm.interpretation import GradCAM, InteractiveVisualizer
 

@@ -76,6 +76,7 @@ graph TD
 ## Quick Start
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import recommend_backend
 
 # Get a recommendation for your task

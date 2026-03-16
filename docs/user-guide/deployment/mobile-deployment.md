@@ -20,6 +20,7 @@ AutoTimm models can be deployed to mobile devices for on-device inference:
 First, export your model to TorchScript with mobile optimization:
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import ImageClassifier
 import torch
 

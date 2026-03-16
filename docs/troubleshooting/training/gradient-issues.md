@@ -7,6 +7,7 @@ Problems with gradient explosion and gradient monitoring.
 ### Detection
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import LoggingConfig
 
 # Enable gradient norm logging

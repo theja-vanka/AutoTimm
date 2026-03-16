@@ -5,6 +5,7 @@ Quick examples for logging and evaluation. For comprehensive documentation, see 
 ## Multiple Loggers
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import AutoTrainer, LoggerConfig
 
 trainer = AutoTrainer(

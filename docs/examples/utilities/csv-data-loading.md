@@ -7,6 +7,7 @@ This page demonstrates loading data from CSV files for all task types.
 Train a classifier using CSV-based data loading with auto-detected class names.
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import ImageClassifier, ImageDataModule, AutoTrainer, MetricConfig
 
 
@@ -70,6 +71,7 @@ def main():
     model = ObjectDetector(
         backbone="resnet50",
         num_classes=data.num_classes,
+        detection_arch="fcos",
         metrics=[
             MetricConfig(
                 name="mAP",

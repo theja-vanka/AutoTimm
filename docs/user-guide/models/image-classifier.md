@@ -35,19 +35,19 @@ model = ImageClassifier(
 AutoTimm supports 1000+ backbones from timm. Browse available models:
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 
 # List all backbones
-all_models = autotimm.list_backbones()
+all_models = at.list_backbones()
 print(f"Total models: {len(all_models)}")
 
 # Search by pattern
-autotimm.list_backbones("*resnet*")
-autotimm.list_backbones("*efficientnet*")
-autotimm.list_backbones("*vit*")
+at.list_backbones("*resnet*")
+at.list_backbones("*efficientnet*")
+at.list_backbones("*vit*")
 
 # Only pretrained models
-autotimm.list_backbones("*convnext*", pretrained_only=True)
+at.list_backbones("*convnext*", pretrained_only=True)
 ```
 
 Popular backbone families:
@@ -98,25 +98,25 @@ model = ImageClassifier(
 ### Inspect Backbone
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 
-backbone = autotimm.create_backbone("resnet50")
+backbone = at.create_backbone("resnet50")
 print(f"Output features: {backbone.num_features}")
-print(f"Parameters: {autotimm.count_parameters(backbone):,}")
+print(f"Parameters: {at.count_parameters(backbone):,}")
 ```
 
 ### Count Parameters
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 
 model = ImageClassifier(backbone="resnet50", num_classes=10, metrics=metrics)
 
 # Trainable parameters only
-trainable = autotimm.count_parameters(model)
+trainable = at.count_parameters(model)
 
 # All parameters
-total = autotimm.count_parameters(model, trainable_only=False)
+total = at.count_parameters(model, trainable_only=False)
 
 print(f"Trainable: {trainable:,}")
 print(f"Total: {total:,}")
@@ -435,10 +435,18 @@ ImageClassifier(
     mixup_alpha=0.0,               # Mixup augmentation alpha
     compile_model=True,            # Enable torch.compile (PyTorch 2.0+)
     compile_kwargs=None,           # Custom torch.compile options
-    seed=42,                       # Random seed for reproducibility (None to disable)
+    loss_fn=None,                  # Custom loss function (string from registry, nn.Module, or None)
+    seed=None,                     # Random seed for reproducibility (None to disable)
     deterministic=True,            # Enable deterministic algorithms
 )
 ```
+
+!!! tip "Import Alias"
+    You can use `import autotimm as at` as a shorthand:
+    ```python
+    import autotimm as at
+    model = at.ImageClassifier(backbone="resnet50", num_classes=10)
+    ```
 
 ## See Also
 

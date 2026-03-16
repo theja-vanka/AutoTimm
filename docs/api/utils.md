@@ -132,7 +132,7 @@ seed_everything(123)
 
 - Setting `deterministic=True` may reduce performance due to slower deterministic algorithm implementations.
 - When `deterministic=False` (default), cuDNN benchmark mode is enabled for faster training.
-- All task classes call `seed_everything()` automatically with `seed=42, deterministic=True` by default.
+- All task classes support `seed` and `deterministic` parameters. By default `seed=None` (no seeding). Set `seed=42` explicitly for reproducibility.
 - If `seed=None` is passed to a task class, `seed_everything()` is not called and a warning is emitted if `deterministic=True`.
 
 ---
@@ -152,30 +152,30 @@ Count the number of parameters in a model.
 #### Trainable Parameters
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 
-model = autotimm.ImageClassifier(
+model = at.ImageClassifier(
     backbone="resnet50",
     num_classes=10,
     metrics=metrics,
 )
 
-trainable = autotimm.count_parameters(model)
+trainable = at.count_parameters(model)
 print(f"Trainable parameters: {trainable:,}")
 ```
 
 #### All Parameters
 
 ```python
-total = autotimm.count_parameters(model, trainable_only=False)
+total = at.count_parameters(model, trainable_only=False)
 print(f"Total parameters: {total:,}")
 ```
 
 #### Backbone Only
 
 ```python
-backbone = autotimm.create_backbone("resnet50")
-print(f"Backbone parameters: {autotimm.count_parameters(backbone):,}")
+backbone = at.create_backbone("resnet50")
+print(f"Backbone parameters: {at.count_parameters(backbone):,}")
 ```
 
 ### Parameters
@@ -208,9 +208,9 @@ List available optimizers from torch and timm.
 #### All Optimizers
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 
-optimizers = autotimm.list_optimizers()
+optimizers = at.list_optimizers()
 print("Torch optimizers:", optimizers["torch"])
 print("Timm optimizers:", optimizers.get("timm", []))
 ```
@@ -218,7 +218,7 @@ print("Timm optimizers:", optimizers.get("timm", []))
 #### Torch Only
 
 ```python
-optimizers = autotimm.list_optimizers(include_timm=False)
+optimizers = at.list_optimizers(include_timm=False)
 print(optimizers["torch"])
 ```
 
@@ -273,9 +273,9 @@ List available learning rate schedulers from torch and timm.
 #### All Schedulers
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 
-schedulers = autotimm.list_schedulers()
+schedulers = at.list_schedulers()
 print("Torch schedulers:", schedulers["torch"])
 print("Timm schedulers:", schedulers.get("timm", []))
 ```
@@ -283,7 +283,7 @@ print("Timm schedulers:", schedulers.get("timm", []))
 #### Torch Only
 
 ```python
-schedulers = autotimm.list_schedulers(include_timm=False)
+schedulers = at.list_schedulers(include_timm=False)
 print(schedulers["torch"])
 ```
 
@@ -335,16 +335,16 @@ Schedulers are dynamically discovered from PyTorch and timm. Common schedulers i
 ## Full Example
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 
 # List available options
 print("=== Available Optimizers ===")
-optimizers = autotimm.list_optimizers()
+optimizers = at.list_optimizers()
 for source, names in optimizers.items():
     print(f"{source}: {', '.join(names)}")
 
 print("\n=== Available Schedulers ===")
-schedulers = autotimm.list_schedulers()
+schedulers = at.list_schedulers()
 for source, names in schedulers.items():
     print(f"{source}: {', '.join(names)}")
 
@@ -352,13 +352,13 @@ print("\n=== Available Backbones ===")
 # Search patterns
 patterns = ["*resnet*", "*efficientnet*", "*vit*", "*convnext*"]
 for pattern in patterns:
-    models = autotimm.list_backbones(pattern, pretrained_only=True)
+    models = at.list_backbones(pattern, pretrained_only=True)
     print(f"{pattern}: {len(models)} models")
 
 print("\n=== Model Parameters ===")
 for backbone_name in ["resnet18", "resnet50", "efficientnet_b0", "vit_base_patch16_224"]:
-    backbone = autotimm.create_backbone(backbone_name)
-    params = autotimm.count_parameters(backbone, trainable_only=False)
+    backbone = at.create_backbone(backbone_name)
+    params = at.count_parameters(backbone, trainable_only=False)
     features = backbone.num_features
     print(f"{backbone_name}: {params:,} params, {features} features")
 ```

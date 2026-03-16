@@ -65,6 +65,7 @@ graph TD
 Basic training with ResNet-18 on CIFAR-10 using MetricManager.
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import (
     AutoTrainer,
     ImageClassifier,
@@ -285,6 +286,7 @@ def main():
     ]
 
     # Model - multi_label=True switches to BCEWithLogitsLoss + sigmoid
+    # Use loss_fn to override the default loss (e.g., loss_fn="focal" or a custom nn.Module)
     model = ImageClassifier(
         backbone="resnet50",
         num_classes=num_labels,

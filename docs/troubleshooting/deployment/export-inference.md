@@ -5,6 +5,7 @@ Problems with model export and inference.
 ## ONNX Export Failures
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import ImageClassifier, export_to_onnx
 import torch
 

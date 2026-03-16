@@ -85,7 +85,7 @@ AutoTimm supports three distinct ways to work with HuggingFace models, each suit
 **What it is:** Loading timm models from HuggingFace Hub using AutoTimm's native integration.
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 from autotimm import ImageClassifier
 
 # Load timm model from HF Hub
@@ -300,7 +300,7 @@ Here's how all three approaches work together:
 import pytorch_lightning as pl
 import torch
 from transformers import ViTModel, ViTConfig, AutoModel
-import autotimm
+import autotimm as at  # recommended alias
 from autotimm import ImageClassifier, AutoTrainer, ImageDataModule
 
 # Prepare data

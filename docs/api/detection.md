@@ -1,6 +1,6 @@
 # ObjectDetector
 
-FCOS-style anchor-free object detector with timm backbones and Feature Pyramid Networks.
+Anchor-free object detector with timm backbones and Feature Pyramid Networks, supporting FCOS and YOLOX architectures.
 
 ## Overview
 
@@ -8,8 +8,8 @@ FCOS-style anchor-free object detector with timm backbones and Feature Pyramid N
 
 - Any timm backbone for feature extraction
 - Feature Pyramid Network (FPN) for multi-scale features
-- FCOS-style detection head with classification, bbox regression, and centerness
-- Focal Loss, GIoU Loss, and Centerness Loss
+- FCOS or YOLOX detection head (configurable via `detection_arch`)
+- Focal Loss, GIoU Loss, and Centerness Loss (FCOS) or YOLOX losses
 - NMS post-processing for inference
 - Configurable optimizer and scheduler
 
@@ -26,12 +26,17 @@ FCOS-style anchor-free object detector with timm backbones and Feature Pyramid N
         - test_step
         - predict_step
         - configure_optimizers
+        - preprocess
+        - get_data_config
+        - get_transform
+        - to_onnx
 
 ## Usage Examples
 
 ### Basic Usage
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import ObjectDetector, MetricConfig
 
 metrics = [
@@ -192,7 +197,10 @@ model = ObjectDetector(
 |-----------|------|---------|-------------|
 | `backbone` | `str \| FeatureBackboneConfig` | Required | Model name or config |
 | `num_classes` | `int` | Required | Number of object classes |
-| `metrics` | `MetricManager \| list[MetricConfig]` | Required | Metrics configuration |
+| `detection_arch` | `str` | `"fcos"` | Detection architecture (`"fcos"` or `"yolox"`) |
+| `cls_loss_fn` | `str \| nn.Module \| None` | `None` | Classification loss function (string from registry, nn.Module, or None for default) |
+| `reg_loss_fn` | `str \| nn.Module \| None` | `None` | Regression loss function (string from registry, nn.Module, or None for default) |
+| `metrics` | `MetricManager \| list[MetricConfig]` | `None` | Metrics configuration |
 | `logging_config` | `LoggingConfig \| None` | `None` | Enhanced logging options |
 | `transform_config` | `TransformConfig \| None` | `None` | Transform config for preprocessing |
 | `lr` | `float` | `1e-4` | Learning rate |
@@ -213,7 +221,11 @@ model = ObjectDetector(
 | `max_detections_per_image` | `int` | `100` | Max detections per image |
 | `freeze_backbone` | `bool` | `False` | Freeze backbone weights |
 | `strides` | `tuple[int, ...]` | `(8, 16, 32, 64, 128)` | FPN strides |
-| `regress_ranges` | `tuple \| None` | `None` | Custom regression ranges |
+| `regress_ranges` | `tuple \| None` | `None` | Custom regression ranges (FCOS only) |
+| `compile_model` | `bool` | `True` | Apply `torch.compile()` for faster training/inference (PyTorch 2.0+) |
+| `compile_kwargs` | `dict \| None` | `None` | Kwargs for `torch.compile()` (e.g., `mode`, `fullgraph`, `dynamic`) |
+| `seed` | `int \| None` | `None` | Random seed for reproducibility (None to disable seeding) |
+| `deterministic` | `bool` | `True` | Enable deterministic algorithms (may impact performance) |
 
 ## Model Architecture
 

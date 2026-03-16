@@ -115,6 +115,7 @@ This guide provides performance benchmarks for different backbone architectures 
 ### Recommended Configuration
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import ObjectDetector, MetricConfig
 
 # For real-time applications

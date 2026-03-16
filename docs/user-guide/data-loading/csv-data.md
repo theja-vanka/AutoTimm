@@ -93,6 +93,7 @@ img001.jpg,50,60,150,250,dog,masks/img001_1.png
 ### Basic Usage
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import ImageDataModule
 
 data = ImageDataModule(

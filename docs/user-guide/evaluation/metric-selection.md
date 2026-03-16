@@ -22,6 +22,7 @@ This guide helps you choose the right metrics for your computer vision task and 
 Best for balanced datasets with equal class distribution.
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import MetricConfig
 
 accuracy = MetricConfig(

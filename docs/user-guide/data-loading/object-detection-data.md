@@ -62,6 +62,7 @@ The annotation files follow the standard COCO JSON format with image metadata, c
 ## Basic Usage
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import DetectionDataModule
 
 data = DetectionDataModule(

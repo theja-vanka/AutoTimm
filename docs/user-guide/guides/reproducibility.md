@@ -8,8 +8,8 @@ AutoTimm is designed with reproducibility as a first-class feature. This guide c
 
 ```mermaid
 graph LR
-    A{Seed Sources} --> B[Model<br/>seed=42]
-    A --> C[Trainer<br/>seed=42]
+    A{Seed Sources} --> B[Model<br/>seed=42 opt-in]
+    A --> C[Trainer<br/>seed=42 opt-in]
     A --> D[Manual<br/>seed_everything]
     B --> E[seed_everything<br/>Python, NumPy, PyTorch, CUDA]
     C --> E
@@ -49,35 +49,36 @@ graph LR
 
 ## Quick Start
 
-AutoTimm is reproducible by default:
+AutoTimm supports opt-in reproducibility by setting `seed` explicitly:
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import ImageClassifier, AutoTrainer
 
-# Everything seeded with 42 by default
-model = ImageClassifier(backbone="resnet50", num_classes=10)
-trainer = AutoTrainer(max_epochs=10)
+# Opt-in to reproducibility with seed=42
+model = ImageClassifier(backbone="resnet50", num_classes=10, seed=42)
+trainer = AutoTrainer(max_epochs=10, seed=42)
 
 # Results will be identical across runs!
 ```
 
 ## Default Behavior
 
-All AutoTimm models and trainers come with **seeding enabled by default**:
+By default, seeding is **disabled** (`seed=None`). Set a seed explicitly for reproducibility:
 
-- **Default seed**: `42`
-- **Deterministic mode**: `True` (full reproducibility)
-- **Components seeded**: Python, NumPy, PyTorch, cuDNN
+- **Default seed**: `None` (no seeding)
+- **Deterministic mode**: `True` for models, `False` for trainer
+- **Components seeded** (when seed is set): Python, NumPy, PyTorch, cuDNN
 
 ```python
 from autotimm import ImageClassifier
 
-# This is reproducible by default
+# Explicit opt-in to reproducibility
 model = ImageClassifier(
     backbone="resnet50",
     num_classes=10,
-    # seed=42 (implicit)
-    # deterministic=True (implicit)
+    seed=42,              # set explicitly
+    deterministic=True,   # default for models
 )
 ```
 
@@ -515,7 +516,7 @@ See complete working examples in the repository:
 
 **Key Takeaways:**
 
-1. AutoTimm is reproducible by default (`seed=42`)
+1. AutoTimm supports opt-in reproducibility (set `seed=42` explicitly)
 2. Use `deterministic=True` for full reproducibility
 3. Use `deterministic=False` for faster training
 4. Both model and trainer support seeding

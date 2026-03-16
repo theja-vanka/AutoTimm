@@ -5,6 +5,7 @@ This guide covers how to use trained object detection models for inference and p
 ## Loading a Detection Model
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import ObjectDetector, MetricConfig, TransformConfig
 
 # Define metrics

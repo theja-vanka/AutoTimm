@@ -105,6 +105,7 @@ This example demonstrates sophisticated transfer learning techniques including p
 ### Basic Two-Phase Training
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import ImageClassifier, ImageDataModule, AutoTrainer
 
 # Phase 1: Train head with frozen backbone

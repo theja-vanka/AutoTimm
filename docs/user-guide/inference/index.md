@@ -55,6 +55,7 @@ graph LR
 ### Classification
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import ImageClassifier, MetricConfig, TransformConfig
 import torch
 from PIL import Image

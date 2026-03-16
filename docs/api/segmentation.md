@@ -220,15 +220,24 @@ from autotimm.heads import DeepLabV3PlusHead
 from autotimm.core.metrics import MetricConfig
 ```
 
+### Package Alias
+
+```python
+import autotimm as at  # recommended alias
+
+model = at.SemanticSegmentor(backbone="resnet50", num_classes=19)
+loss = at.DiceLoss(num_classes=19)
+```
+
 ### Namespace Access
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 
 # Access via submodule aliases
-model = autotimm.task.SemanticSegmentor(...)
-loss = autotimm.losses.DiceLoss(...)
-head = autotimm.heads.DeepLabV3PlusHead(...)
+model = at.task.SemanticSegmentor(...)
+loss = at.losses.DiceLoss(...)
+head = at.heads.DeepLabV3PlusHead(...)
 ```
 
 ## Parameters Reference
@@ -248,9 +257,18 @@ head = autotimm.heads.DeepLabV3PlusHead(...)
 | `lr` | float | 1e-4 | Learning rate |
 | `weight_decay` | float | 1e-4 | Weight decay |
 | `optimizer` | str \| dict | "adamw" | Optimizer name or config |
+| `optimizer_kwargs` | dict \| None | None | Extra optimizer kwargs |
 | `scheduler` | str \| dict | "cosine" | Scheduler name or config |
+| `scheduler_kwargs` | dict \| None | None | Extra scheduler kwargs |
 | `freeze_backbone` | bool | False | Whether to freeze backbone parameters |
 | `transform_config` | TransformConfig \| None | None | Transform config for preprocessing |
+| `logging_config` | LoggingConfig \| None | None | Enhanced logging configuration |
+| `loss_fn` | str \| nn.Module \| None | None | Custom loss function (string from registry, nn.Module, or None for default) |
+| `class_weights` | torch.Tensor \| None | None | Class weights for loss computation |
+| `compile_model` | bool | True | Apply `torch.compile()` for faster training/inference |
+| `compile_kwargs` | dict \| None | None | Kwargs for `torch.compile()` |
+| `seed` | int \| None | None | Random seed for reproducibility (None to disable) |
+| `deterministic` | bool | True | Enable deterministic algorithms |
 
 ### InstanceSegmentor Parameters
 
@@ -277,9 +295,18 @@ head = autotimm.heads.DeepLabV3PlusHead(...)
 | `lr` | float | 1e-4 | Learning rate |
 | `weight_decay` | float | 1e-4 | Weight decay |
 | `optimizer` | str \| dict | "adamw" | Optimizer name or config |
+| `optimizer_kwargs` | dict \| None | None | Extra optimizer kwargs |
 | `scheduler` | str \| dict | "cosine" | Scheduler name or config |
+| `scheduler_kwargs` | dict \| None | None | Extra scheduler kwargs |
 | `freeze_backbone` | bool | False | Whether to freeze backbone parameters |
 | `transform_config` | TransformConfig \| None | None | Transform config for preprocessing |
+| `cls_loss_fn` | str \| nn.Module \| None | None | Classification loss function |
+| `reg_loss_fn` | str \| nn.Module \| None | None | Regression loss function |
+| `mask_loss_fn` | str \| nn.Module \| None | None | Mask loss function |
+| `compile_model` | bool | True | Apply `torch.compile()` for faster training/inference |
+| `compile_kwargs` | dict \| None | None | Kwargs for `torch.compile()` |
+| `seed` | int \| None | None | Random seed for reproducibility (None to disable) |
+| `deterministic` | bool | True | Enable deterministic algorithms |
 
 ### SegmentationDataModule Parameters
 

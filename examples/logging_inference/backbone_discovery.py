@@ -11,7 +11,7 @@ Usage:
     python examples/backbone_discovery.py
 """
 
-import autotimm
+import autotimm as at  # recommended alias
 from autotimm import BackboneConfig, list_transform_presets
 
 
@@ -23,7 +23,7 @@ def main():
     # ========================================================================
     # List all available backbones
     # ========================================================================
-    all_models = autotimm.list_backbones()
+    all_models = at.list_backbones()
     print(f"\nTotal available backbones: {len(all_models)}")
 
     # ========================================================================
@@ -47,8 +47,8 @@ def main():
     }
 
     for name, pattern in families.items():
-        models = autotimm.list_backbones(pattern)
-        pretrained = autotimm.list_backbones(pattern, pretrained_only=True)
+        models = at.list_backbones(pattern)
+        pretrained = at.list_backbones(pattern, pretrained_only=True)
         print(f"{name:.<30} {len(models):>5} total, {len(pretrained):>5} pretrained")
 
     # ========================================================================
@@ -59,7 +59,7 @@ def main():
     print("-" * 70)
 
     for name, pattern in list(families.items())[:4]:  # First 4 families
-        models = autotimm.list_backbones(pattern, pretrained_only=True)
+        models = at.list_backbones(pattern, pretrained_only=True)
         print(f"\n{name}:")
         for m in models[:5]:
             print(f"  - {m}")
@@ -88,8 +88,8 @@ def main():
 
     for model_name in models_to_inspect:
         try:
-            backbone = autotimm.create_backbone(model_name)
-            params = autotimm.count_parameters(backbone, trainable_only=False)
+            backbone = at.create_backbone(model_name)
+            params = at.count_parameters(backbone, trainable_only=False)
             print(f"{model_name:<35} {params / 1e6:>12.2f} {backbone.num_features:>10}")
         except Exception as e:
             print(f"{model_name:<35} Error: {e}")
@@ -103,9 +103,9 @@ def main():
 
     # Standard backbone
     print("\n1. Standard backbone (pretrained):")
-    backbone = autotimm.create_backbone("resnet50")
+    backbone = at.create_backbone("resnet50")
     print(f"   Output features: {backbone.num_features}")
-    print(f"   Total params: {autotimm.count_parameters(backbone):,}")
+    print(f"   Total params: {at.count_parameters(backbone):,}")
 
     # With BackboneConfig for more control
     print("\n2. BackboneConfig with drop path:")
@@ -114,11 +114,11 @@ def main():
         pretrained=True,
         drop_path_rate=0.1,  # Stochastic depth
     )
-    backbone = autotimm.create_backbone(config)
+    backbone = at.create_backbone(config)
     print(f"   Model: {config.model_name}")
     print(f"   Drop path rate: {config.drop_path_rate}")
     print(f"   Output features: {backbone.num_features}")
-    print(f"   Total params: {autotimm.count_parameters(backbone):,}")
+    print(f"   Total params: {at.count_parameters(backbone):,}")
 
     # With dropout
     print("\n3. BackboneConfig with dropout:")
@@ -127,7 +127,7 @@ def main():
         pretrained=True,
         drop_rate=0.2,  # Classifier dropout
     )
-    backbone = autotimm.create_backbone(config)
+    backbone = at.create_backbone(config)
     print(f"   Model: {config.model_name}")
     print(f"   Drop rate: {config.drop_rate}")
     print(f"   Output features: {backbone.num_features}")
@@ -138,7 +138,7 @@ def main():
         model_name="resnet18",
         pretrained=False,
     )
-    backbone = autotimm.create_backbone(config)
+    backbone = at.create_backbone(config)
     print(f"   Model: {config.model_name}")
     print(f"   Pretrained: {config.pretrained}")
     print(f"   Output features: {backbone.num_features}")
@@ -152,13 +152,13 @@ def main():
 
     # Find all ImageNet-21k pretrained models
     print("\nImageNet-21k pretrained ViTs:")
-    vit_21k = autotimm.list_backbones("vit_*in21k*", pretrained_only=True)
+    vit_21k = at.list_backbones("vit_*in21k*", pretrained_only=True)
     for m in vit_21k[:5]:
         print(f"  - {m}")
 
     # Find CLIP models
     print("\nCLIP models:")
-    clip_models = autotimm.list_backbones("*clip*", pretrained_only=True)
+    clip_models = at.list_backbones("*clip*", pretrained_only=True)
     for m in clip_models[:5]:
         print(f"  - {m}")
 
@@ -172,8 +172,8 @@ def main():
     ]
     for model_name in small_models:
         try:
-            backbone = autotimm.create_backbone(model_name)
-            params = autotimm.count_parameters(backbone)
+            backbone = at.create_backbone(model_name)
+            params = at.count_parameters(backbone)
             print(f"  - {model_name}: {params / 1e6:.1f}M params")
         except Exception:
             pass
@@ -197,7 +197,7 @@ def main():
 
     print("\n" + "=" * 70)
     print(
-        "Done! Use autotimm.list_backbones() and list_transform_presets() to explore."
+        "Done! Use at.list_backbones() and list_transform_presets() to explore."
     )
     print("=" * 70)
 

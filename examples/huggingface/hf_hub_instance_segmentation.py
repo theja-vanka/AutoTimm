@@ -9,7 +9,7 @@ Usage:
 
 from __future__ import annotations
 
-import autotimm
+import autotimm as at  # recommended alias
 from autotimm import (
     AutoTrainer,
     InstanceSegmentationDataModule,
@@ -64,9 +64,9 @@ def analyze_mask_head_compatibility():
 
     for backbone_name in backbones:
         try:
-            feature_backbone = autotimm.create_feature_backbone(backbone_name)
-            params = autotimm.count_parameters(feature_backbone, trainable_only=False)
-            channels = autotimm.get_feature_channels(feature_backbone)
+            feature_backbone = at.create_feature_backbone(backbone_name)
+            params = at.count_parameters(feature_backbone, trainable_only=False)
+            channels = at.get_feature_channels(feature_backbone)
 
             short_name = backbone_name.replace("hf-hub:timm/", "")
             channels_str = str(channels[-4:])  # Last 4 levels
@@ -137,7 +137,7 @@ def train_instance_segmentor_resnet():
         weight_decay=1e-4,
     )
 
-    print(f"Total parameters: {autotimm.count_parameters(model):,}")
+    print(f"Total parameters: {at.count_parameters(model):,}")
 
     # Trainer
     AutoTrainer(
@@ -195,7 +195,7 @@ def train_instance_segmentor_resnext():
         weight_decay=1e-4,
     )
 
-    print(f"Total parameters: {autotimm.count_parameters(model):,}")
+    print(f"Total parameters: {at.count_parameters(model):,}")
     print("ResNeXt provides stronger features for better mask quality")
 
     # Trainer
@@ -254,7 +254,7 @@ def train_modern_instance_segmentor():
         weight_decay=0.05,
     )
 
-    print(f"Total parameters: {autotimm.count_parameters(model):,}")
+    print(f"Total parameters: {at.count_parameters(model):,}")
     print("ConvNeXt: State-of-the-art CNN with modern design principles")
 
     # Trainer
@@ -356,7 +356,7 @@ def compare_computational_requirements():
                 num_classes=80,
                 fpn_channels=256,
             )
-            params = autotimm.count_parameters(model, trainable_only=False)
+            params = at.count_parameters(model, trainable_only=False)
 
             if base_params is None:
                 base_params = params

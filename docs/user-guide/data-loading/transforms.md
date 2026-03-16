@@ -95,6 +95,7 @@ The transform system consists of three main components:
 ### Basic Usage
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import TransformConfig
 
 # Default configuration

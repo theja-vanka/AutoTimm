@@ -24,6 +24,7 @@ Cache computed explanations to disk to avoid recomputation.
 ### Basic Usage
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm.interpretation import GradCAM
 from autotimm.interpretation.optimization import ExplanationCache
 

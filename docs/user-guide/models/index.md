@@ -177,14 +177,14 @@ Both models share several key concepts:
 Both models support 1000+ backbones from timm:
 
 ```python
-import autotimm
+import autotimm as at  # recommended alias
 
 # List all available backbones
-autotimm.list_backbones()
+at.list_backbones()
 
 # Search for specific backbones
-autotimm.list_backbones("*resnet*")
-autotimm.list_backbones("*vit*")
+at.list_backbones("*resnet*")
+at.list_backbones("*vit*")
 ```
 
 Popular backbone families: ResNet, EfficientNet, ConvNeXt, ViT, Swin, DeiT.

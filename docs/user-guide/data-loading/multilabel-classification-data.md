@@ -90,6 +90,7 @@ img3.jpg,1,1,1,0
 ## Basic Usage
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import MultiLabelImageDataModule
 
 data = MultiLabelImageDataModule(

@@ -111,6 +111,7 @@ graph TD
 Train Mask R-CNN style model on COCO dataset.
 
 ```python
+import autotimm as at  # recommended alias
 from autotimm import (
     AutoTrainer,
     InstanceSegmentor,
