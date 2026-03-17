@@ -34,7 +34,7 @@ from autotimm import ImageClassifier, export_to_onnx
 import torch
 
 # Load trained model
-model = ImageClassifier.load_from_checkpoint("model.ckpt")
+model = ImageClassifier.load_from_checkpoint("model.ckpt", compile_model=False)
 
 # Export to ONNX
 example_input = torch.randn(1, 3, 224, 224)

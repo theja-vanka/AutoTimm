@@ -220,9 +220,6 @@ class CSVDetectionDataset(Dataset):
 
         if bbox_columns is None:
             bbox_columns = ["x_min", "y_min", "x_max", "y_max"]
-        self._bbox_columns = bbox_columns
-        self._image_column = image_column
-        self._label_column = label_column
 
         # Parse CSV and group by image
         image_anns: dict[str, list[dict]] = defaultdict(list)

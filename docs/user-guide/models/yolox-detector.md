@@ -401,7 +401,7 @@ import torch
 from autotimm import YOLOXDetector
 
 # Load trained model
-model = YOLOXDetector.load_from_checkpoint("path/to/checkpoint.ckpt")
+model = YOLOXDetector.load_from_checkpoint("path/to/checkpoint.ckpt", compile_model=False)
 model.eval()
 
 # Prepare image

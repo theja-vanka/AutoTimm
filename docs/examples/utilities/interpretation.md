@@ -16,7 +16,7 @@ from PIL import Image
 
 def main():
     # Load trained model
-    model = ImageClassifier.load_from_checkpoint("best-model.ckpt")
+    model = ImageClassifier.load_from_checkpoint("best-model.ckpt", compile_model=False)
     model.eval()
     
     # Create interpreter
@@ -71,7 +71,7 @@ from autotimm.interpretation import ModelInterpreter, InterpretationMetrics
 
 
 def main():
-    model = ImageClassifier.load_from_checkpoint("best-model.ckpt")
+    model = ImageClassifier.load_from_checkpoint("best-model.ckpt", compile_model=False)
     interpreter = ModelInterpreter(model)
     metrics = InterpretationMetrics()
     
@@ -133,7 +133,7 @@ from autotimm.interpretation import ModelInterpreter, CounterfactualGenerator
 
 
 def main():
-    model = ImageClassifier.load_from_checkpoint("best-model.ckpt")
+    model = ImageClassifier.load_from_checkpoint("best-model.ckpt", compile_model=False)
     interpreter = ModelInterpreter(model)
     cf_generator = CounterfactualGenerator(model)
     
@@ -190,7 +190,7 @@ from autotimm.interpretation import (
 
 
 def main():
-    model = ImageClassifier.load_from_checkpoint("best-model.ckpt")
+    model = ImageClassifier.load_from_checkpoint("best-model.ckpt", compile_model=False)
     interpreter = ModelInterpreter(model)
     metrics = InterpretationMetrics()
     comparison = InterpretationComparison()
@@ -256,7 +256,7 @@ import gradio as gr
 
 
 def main():
-    model = ImageClassifier.load_from_checkpoint("best-model.ckpt")
+    model = ImageClassifier.load_from_checkpoint("best-model.ckpt", compile_model=False)
     visualizer = InteractiveVisualizer(model)
     
     # Create interactive interface

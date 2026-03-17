@@ -1,7 +1,7 @@
 """Base interpreter class for all interpretation methods."""
 
 from abc import ABC, abstractmethod
-from typing import Optional, Union, Tuple
+from typing import Optional, Union
 import torch
 import torch.nn as nn
 import numpy as np
@@ -243,39 +243,6 @@ class BaseInterpreter(ABC):
         ])
         tensor = transform(image).unsqueeze(0)
         return tensor.to(self.device)
-
-    def _postprocess_heatmap(
-        self, heatmap: torch.Tensor, target_size: Optional[Tuple[int, int]] = None
-    ) -> np.ndarray:
-        """
-        Postprocess heatmap to numpy array.
-
-        Args:
-            heatmap: Raw heatmap tensor
-            target_size: Optional (H, W) to resize to
-
-        Returns:
-            Normalized heatmap as numpy array in [0, 1]
-        """
-        # Convert to numpy
-        if isinstance(heatmap, torch.Tensor):
-            heatmap = heatmap.cpu().numpy()
-
-        # Ensure 2D
-        if heatmap.ndim > 2:
-            heatmap = heatmap.squeeze()
-
-        # Normalize to [0, 1]
-        heatmap = heatmap - heatmap.min()
-        heatmap = heatmap / (heatmap.max() + 1e-8)
-
-        # Resize if needed
-        if target_size is not None:
-            import cv2
-
-            heatmap = cv2.resize(heatmap, target_size)
-
-        return heatmap
 
     @abstractmethod
     def explain(

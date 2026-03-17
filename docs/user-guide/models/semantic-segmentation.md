@@ -358,7 +358,7 @@ from PIL import Image
 from torchvision import transforms
 
 # Load model
-model = SemanticSegmentor.load_from_checkpoint("best_model.ckpt")
+model = SemanticSegmentor.load_from_checkpoint("best_model.ckpt", compile_model=False)
 model.eval()
 
 # Load and preprocess image

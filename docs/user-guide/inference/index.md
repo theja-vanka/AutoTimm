@@ -67,8 +67,9 @@ model = ImageClassifier.load_from_checkpoint(
     "checkpoint.ckpt",
     backbone="resnet50",
     num_classes=10,
-    metrics=metrics,
-    transform_config=TransformConfig(),
+    compile_model=False,                 # skip compilation for inference
+    metrics=metrics,                     # not saved in checkpoint
+    transform_config=TransformConfig(),  # not saved in checkpoint
 )
 model.eval()
 
@@ -91,7 +92,8 @@ model = ImageClassifier.load_from_checkpoint(
     num_classes=4,
     multi_label=True,
     threshold=0.5,
-    transform_config=TransformConfig(),
+    compile_model=False,                 # skip compilation for inference
+    transform_config=TransformConfig(),  # not saved in checkpoint
 )
 model.eval()
 
@@ -111,7 +113,8 @@ model = ObjectDetector.load_from_checkpoint(
     "detector.ckpt",
     backbone="resnet50",
     num_classes=80,
-    transform_config=TransformConfig(image_size=640),
+    compile_model=False,                                # skip compilation for inference
+    transform_config=TransformConfig(image_size=640),   # not saved in checkpoint
 )
 model.eval()
 

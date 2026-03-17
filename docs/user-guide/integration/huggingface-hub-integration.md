@@ -259,11 +259,11 @@ trainer = AutoTrainer(
 
 trainer.fit(model, datamodule=data)
 
-# Load from checkpoint
+# Re-supply ignored params for continued training
 loaded_model = ImageClassifier.load_from_checkpoint(
     "checkpoints/best-epoch=42-val_accuracy=0.9543.ckpt",
     backbone="hf-hub:timm/resnet50.a1_in1k",
-    metrics=metrics,
+    metrics=metrics,  # not saved in checkpoint
 )
 ```
 

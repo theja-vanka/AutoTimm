@@ -372,6 +372,57 @@ export_to_onnx(model, "model.onnx", example_input=example_input)
 
 ---
 
+## Loading from Checkpoints
+
+All task classes inherit PyTorch Lightning's `load_from_checkpoint`. Most parameters are auto-restored from saved hyperparameters — only **ignored** parameters (non-serializable objects) need to be re-supplied.
+
+```python
+import autotimm as at
+
+# Basic — works for all tasks (ignored params default to None)
+model = at.ImageClassifier.load_from_checkpoint("checkpoint.ckpt")
+
+# For inference on CPU
+model = at.ImageClassifier.load_from_checkpoint("checkpoint.ckpt", map_location="cpu")
+model.eval()
+
+# Override any saved hyperparameter
+model = at.ImageClassifier.load_from_checkpoint("checkpoint.ckpt", num_classes=20)
+
+# Disable torch.compile for faster loading (recommended for inference/export)
+model = at.ImageClassifier.load_from_checkpoint("checkpoint.ckpt", compile_model=False)
+```
+
+<details>
+<summary><b>Ignored parameters by task</b> (not saved in checkpoint, re-supply if needed)</summary>
+<br>
+
+| Task | Ignored Parameters |
+| :--- | :--- |
+| **ImageClassifier** | `metrics`, `logging_config`, `transform_config`, `loss_fn` |
+| **ObjectDetector** | `metrics`, `logging_config`, `transform_config`, `cls_loss_fn`, `reg_loss_fn` |
+| **SemanticSegmentor** | `metrics`, `logging_config`, `transform_config`, `class_weights`, `loss_fn` |
+| **InstanceSegmentor** | `metrics`, `logging_config`, `transform_config`, `cls_loss_fn`, `reg_loss_fn`, `mask_loss_fn` |
+| **YOLOXDetector** | `metrics`, `logging_config`, `transform_config` |
+
+All ignored parameters default to `None`, so `load_from_checkpoint` works without passing them. Re-supply only if you need custom losses or metrics for continued training.
+
+```python
+# Resume training with custom metrics and loss
+model = at.ObjectDetector.load_from_checkpoint(
+    "checkpoint.ckpt",
+    metrics=[at.MetricConfig(name="map", backend="torchmetrics", metric_class="MeanAveragePrecision")],
+    cls_loss_fn="focal",
+    reg_loss_fn="giou",
+)
+```
+
+</details>
+
+> **Note:** `backbone`, `num_classes`, and all other constructor arguments are saved as hyperparameters and restored automatically — no need to re-specify them.
+
+---
+
 ## Architecture
 
 ```mermaid

@@ -25,8 +25,9 @@ model = ImageClassifier.load_from_checkpoint(
     "path/to/checkpoint.ckpt",
     backbone="resnet50",
     num_classes=10,
-    metrics=metrics,
-    transform_config=TransformConfig(),  # Enable preprocessing
+    compile_model=False,                 # skip compilation for inference
+    metrics=metrics,                     # not saved in checkpoint
+    transform_config=TransformConfig(),  # not saved in checkpoint; enables preprocessing
 )
 model.eval()
 ```
@@ -275,8 +276,9 @@ class InferencePipeline:
             checkpoint_path,
             backbone=backbone,
             num_classes=num_classes,
-            metrics=metrics,
-            transform_config=TransformConfig(),  # Enable preprocess()
+            compile_model=False,                 # skip compilation for inference
+            metrics=metrics,                     # not saved in checkpoint
+            transform_config=TransformConfig(),  # not saved in checkpoint; enables preprocess()
         )
         self.model.eval()
 
@@ -386,8 +388,9 @@ model = ImageClassifier.load_from_checkpoint(
     num_classes=4,
     multi_label=True,
     threshold=0.5,
-    metrics=metrics,
-    transform_config=TransformConfig(),
+    compile_model=False,                 # skip compilation for inference
+    metrics=metrics,                     # not saved in checkpoint
+    transform_config=TransformConfig(),  # not saved in checkpoint
 )
 model.eval()
 ```
@@ -571,7 +574,7 @@ Use `torch.compile` for optimized inference (PyTorch 2.0+):
 ```python
 import torch
 
-model = ImageClassifier.load_from_checkpoint(...)
+model = ImageClassifier.load_from_checkpoint(..., compile_model=False)
 model.eval()
 
 # Compile model

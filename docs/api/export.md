@@ -60,7 +60,7 @@ from autotimm import ImageClassifier, export_to_torchscript
 import torch
 
 # Load model
-model = ImageClassifier.load_from_checkpoint("model.ckpt")
+model = ImageClassifier.load_from_checkpoint("model.ckpt", compile_model=False)
 model.eval()
 
 # Export with trace (recommended)
@@ -332,7 +332,7 @@ from autotimm import ImageClassifier, export_to_onnx
 import torch
 
 # Load model
-model = ImageClassifier.load_from_checkpoint("model.ckpt")
+model = ImageClassifier.load_from_checkpoint("model.ckpt", compile_model=False)
 model.eval()
 
 # Export to ONNX

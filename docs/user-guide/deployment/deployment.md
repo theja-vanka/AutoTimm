@@ -44,7 +44,7 @@ from autotimm import ImageClassifier, export_to_torchscript
 import torch
 
 # Load trained model
-model = ImageClassifier.load_from_checkpoint("model.ckpt")
+model = ImageClassifier.load_from_checkpoint("model.ckpt", compile_model=False)
 
 # Export to TorchScript
 example_input = torch.randn(1, 3, 224, 224)
@@ -83,7 +83,7 @@ from autotimm import ImageClassifier, export_to_onnx
 import torch
 
 # Load trained model
-model = ImageClassifier.load_from_checkpoint("model.ckpt")
+model = ImageClassifier.load_from_checkpoint("model.ckpt", compile_model=False)
 
 # Export to ONNX
 example_input = torch.randn(1, 3, 224, 224)
@@ -162,7 +162,8 @@ def quantize_dynamic(checkpoint_path, backbone, num_classes):
         checkpoint_path,
         backbone=backbone,
         num_classes=num_classes,
-        metrics=metrics,
+        compile_model=False,  # skip compilation for export
+        metrics=metrics,      # not saved in checkpoint
     )
     model.eval()
 
@@ -759,7 +760,8 @@ def deploy_model(
         checkpoint_path,
         backbone=backbone,
         num_classes=num_classes,
-        metrics=metrics,
+        compile_model=False,  # skip compilation for export
+        metrics=metrics,      # not saved in checkpoint
     )
     model.eval()
 

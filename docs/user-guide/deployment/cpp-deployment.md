@@ -73,7 +73,7 @@ from autotimm import ImageClassifier
 import torch
 
 # Load trained model
-model = ImageClassifier.load_from_checkpoint("model.ckpt")
+model = ImageClassifier.load_from_checkpoint("model.ckpt", compile_model=False)
 
 # Export to TorchScript
 model.eval()

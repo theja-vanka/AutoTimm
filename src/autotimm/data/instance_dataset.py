@@ -74,7 +74,6 @@ class COCOInstanceDataset(Dataset):
         # Create category ID to contiguous ID mapping
         category_ids = sorted(self.categories.keys())
         self.cat_id_to_label = {cat_id: i for i, cat_id in enumerate(category_ids)}
-        self.label_to_cat_id = {i: cat_id for cat_id, i in self.cat_id_to_label.items()}
 
         # Group annotations by image
         self.img_to_anns = {}
@@ -281,13 +280,9 @@ class CSVInstanceDataset(Dataset):
         self.csv_path = Path(csv_path)
         self.image_dir = Path(image_dir)
         self.transform = transform
-        self._image_column = image_column
-        self._label_column = label_column
-        self._mask_column = mask_column
 
         if bbox_columns is None:
             bbox_columns = ["x_min", "y_min", "x_max", "y_max"]
-        self._bbox_columns = bbox_columns
 
         # Parse CSV and group by image
         image_anns: dict[str, list[dict]] = defaultdict(list)

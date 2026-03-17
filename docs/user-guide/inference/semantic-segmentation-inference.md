@@ -554,8 +554,9 @@ model = SemanticSegmentor.load_from_checkpoint(
     backbone="resnet50",
     num_classes=19,
     head_type="deeplabv3plus",
-    metrics=metrics,
-    transform_config=TransformConfig(image_size=512),
+    compile_model=False,                                # skip compilation for inference
+    metrics=metrics,                                    # not saved in checkpoint
+    transform_config=TransformConfig(image_size=512),   # not saved in checkpoint
 )
 model.eval()
 ```

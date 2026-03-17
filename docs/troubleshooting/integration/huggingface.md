@@ -31,11 +31,11 @@ print(models)
 # Save
 model = ImageClassifier(backbone="hf-hub:timm/resnet50.a1_in1k", ...)
 
-# Load - must match
+# Load - must match backbone; re-supply ignored params
 loaded = ImageClassifier.load_from_checkpoint(
     path,
     backbone="hf-hub:timm/resnet50.a1_in1k",  # Must match original
-    metrics=metrics,
+    metrics=metrics,                            # not saved in checkpoint
 )
 ```
 

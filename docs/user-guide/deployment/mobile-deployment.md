@@ -688,7 +688,7 @@ import torch
 from autotimm import ImageClassifier
 
 # Load model
-model = ImageClassifier.load_from_checkpoint("model.ckpt")
+model = ImageClassifier.load_from_checkpoint("model.ckpt", compile_model=False)
 model.eval()
 
 # Export with quantization

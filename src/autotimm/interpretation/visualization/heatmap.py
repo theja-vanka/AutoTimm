@@ -255,39 +255,3 @@ def save_heatmap(
         # Save only overlay
         overlayed = overlay_heatmap(image, heatmap, alpha=alpha, colormap=colormap)
         Image.fromarray(overlayed).save(save_path, dpi=(dpi, dpi))
-
-
-def create_heatmap_legend(
-    colormap: str = "viridis",
-    figsize: Tuple[int, int] = (6, 1),
-    label: str = "Importance",
-) -> Figure:
-    """
-    Create a colorbar legend for heatmap visualization.
-
-    Args:
-        colormap: Matplotlib colormap name
-        figsize: Figure size (width, height)
-        label: Label for the colorbar
-
-    Returns:
-        Matplotlib Figure with colorbar
-
-    Example:
-        >>> fig = create_heatmap_legend(colormap='viridis')
-        >>> fig.savefig("legend.png", dpi=300, bbox_inches='tight')
-    """
-    fig, ax = plt.subplots(figsize=figsize)
-    fig.subplots_adjust(bottom=0.5)
-
-    cmap = cm.get_cmap(colormap)
-    norm = plt.Normalize(vmin=0, vmax=1)
-
-    fig.colorbar(
-        cm.ScalarMappable(norm=norm, cmap=cmap),
-        cax=ax,
-        orientation="horizontal",
-        label=label,
-    )
-
-    return fig

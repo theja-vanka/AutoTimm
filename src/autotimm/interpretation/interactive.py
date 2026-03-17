@@ -347,8 +347,6 @@ class InteractiveVisualizer:
         explainer,
         target_class: Optional[int] = None,
         include_statistics: bool = True,
-        include_top_regions: bool = True,
-        top_k: int = 5,
         save_path: str = "report.html",
         title: str = "Interpretation Report",
     ) -> str:
@@ -360,8 +358,6 @@ class InteractiveVisualizer:
             explainer: Interpretation method
             target_class: Target class to explain
             include_statistics: Include heatmap statistics
-            include_top_regions: Highlight top important regions
-            top_k: Number of top regions to show
             save_path: Path to save HTML report
             title: Report title
 
