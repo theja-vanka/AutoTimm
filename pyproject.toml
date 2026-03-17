@@ -73,6 +73,7 @@ dependencies = [
 
 [project.scripts]
 autotimm = "autotimm.cli:main"
+autotimm-flow = "autotimm.flow.cli:main"
 
 [project.optional-dependencies]
 tensorboard = ["tensorboard>=2.14"]
