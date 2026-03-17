@@ -142,13 +142,17 @@ class TestGradCAM:
         assert len(heatmaps) == 3
         assert all(isinstance(h, np.ndarray) for h in heatmaps)
 
-    def test_gradcam_change_target_layer(self, simple_cnn, test_image):
+    def test_gradcam_change_target_layer(self, simple_cnn):
         """Test changing target layer dynamically."""
+        # Use a non-uniform image so different layers produce different heatmaps
+        torch.manual_seed(42)
+        image_tensor = torch.randn(1, 3, 224, 224)
+
         explainer = GradCAM(simple_cnn, target_layer="conv3")
-        heatmap1 = explainer(test_image)
+        heatmap1 = explainer(image_tensor)
 
         explainer.set_target_layer("conv2")
-        heatmap2 = explainer(test_image)
+        heatmap2 = explainer(image_tensor)
 
         assert explainer.target_layer is simple_cnn.conv2
         # Heatmaps should be different
