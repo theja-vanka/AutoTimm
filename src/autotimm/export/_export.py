@@ -184,7 +184,6 @@ def export_to_torchscript(
     save_path: str | Path,
     example_input: torch.Tensor | tuple[torch.Tensor, ...] | None = None,
     method: str = "trace",
-    strict: bool = True,
     optimize: bool = True,
     wrap_model: bool = True,
 ) -> torch.jit.ScriptModule:
@@ -201,8 +200,6 @@ def export_to_torchscript(
         method: Export method. Options:
             - "trace": Uses torch.jit.trace (recommended for most models, requires example_input)
             - "script": Uses torch.jit.script (works without example_input but may fail on dynamic code)
-        strict: If True (default), enforces strict type checking during scripting.
-            Only used when method="script".
         optimize: If True (default), applies TorchScript optimizations for inference.
         wrap_model: If True (default), wraps PyTorch Lightning modules to avoid compatibility issues.
 

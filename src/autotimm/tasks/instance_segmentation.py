@@ -416,7 +416,6 @@ class InstanceSegmentor(PreprocessingMixin, pl.LightningModule):
         self,
         fpn_features: list[torch.Tensor],
         pred_boxes: list[torch.Tensor],
-        pred_labels: list[torch.Tensor],
         target_boxes: list[torch.Tensor],
         target_labels: list[torch.Tensor],
         target_masks: list[torch.Tensor],
@@ -426,7 +425,6 @@ class InstanceSegmentor(PreprocessingMixin, pl.LightningModule):
         Args:
             fpn_features: FPN feature pyramids
             pred_boxes: Predicted boxes for each image (list of [N, 4])
-            pred_labels: Predicted labels for each image (list of [N])
             target_boxes: Target boxes for each image (list of [M, 4])
             target_labels: Target labels for each image (list of [M])
             target_masks: Target masks for each image (list of [M, H, W])
@@ -537,7 +535,6 @@ class InstanceSegmentor(PreprocessingMixin, pl.LightningModule):
         mask_loss = self._compute_mask_loss(
             fpn_features,
             target_boxes,
-            target_labels,
             target_boxes,
             target_labels,
             target_masks,

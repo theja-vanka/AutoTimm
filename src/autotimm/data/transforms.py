@@ -98,9 +98,6 @@ TORCHVISION_PRESETS: dict[str, callable] = {
     "trivialaugment": trivialaugment_train_transforms,
 }
 
-# Keep backward-compatible alias
-AUGMENTATION_PRESETS = TORCHVISION_PRESETS
-
 
 # ---------------------------------------------------------------------------
 # Albumentations transforms (lazy-imported, requires `pip install autotimm[albumentations]`)

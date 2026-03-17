@@ -24,8 +24,9 @@ model = ObjectDetector.load_from_checkpoint(
     "path/to/checkpoint.ckpt",
     backbone="resnet50",
     num_classes=80,
-    metrics=metrics,
-    transform_config=TransformConfig(),  # Enable preprocess()
+    compile_model=False,                 # skip compilation for inference
+    metrics=metrics,                     # not saved in checkpoint
+    transform_config=TransformConfig(),  # not saved in checkpoint; enables preprocess()
 )
 model.eval()
 ```
@@ -243,8 +244,9 @@ class DetectionPipeline:
             checkpoint_path,
             backbone=backbone,
             num_classes=num_classes,
-            metrics=metrics,
-            transform_config=TransformConfig(image_size=image_size),  # Enable preprocess()
+            compile_model=False,                                       # skip compilation for inference
+            metrics=metrics,                                           # not saved in checkpoint
+            transform_config=TransformConfig(image_size=image_size),   # not saved in checkpoint; enables preprocess()
         )
         self.model.eval()
 

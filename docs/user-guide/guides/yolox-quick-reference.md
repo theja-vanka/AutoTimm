@@ -97,7 +97,7 @@ model = YOLOXDetector(
 import torch
 from autotimm import YOLOXDetector
 
-model = YOLOXDetector.load_from_checkpoint("checkpoint.ckpt")
+model = YOLOXDetector.load_from_checkpoint("checkpoint.ckpt", compile_model=False)
 model.eval()
 
 images = torch.randn(1, 3, 640, 640)
@@ -205,6 +205,6 @@ list_yolox_models(verbose=True)
 info = get_yolox_model_info("yolox-s")
 
 # Inference
-model = YOLOXDetector.load_from_checkpoint("checkpoint.ckpt")
+model = YOLOXDetector.load_from_checkpoint("checkpoint.ckpt", compile_model=False)
 predictions = model.predict(images)
 ```

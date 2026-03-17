@@ -60,7 +60,7 @@ from autotimm.interpretation import explain_detection
 from PIL import Image
 
 # Load model
-model = ObjectDetector.load_from_checkpoint("detector.ckpt")
+model = ObjectDetector.load_from_checkpoint("detector.ckpt", compile_model=False)
 
 # Load image
 image = Image.open("street.jpg")
@@ -209,7 +209,7 @@ from autotimm.interpretation import explain_segmentation
 from PIL import Image
 
 # Load model
-model = SemanticSegmentor.load_from_checkpoint("segmentor.ckpt")
+model = SemanticSegmentor.load_from_checkpoint("segmentor.ckpt", compile_model=False)
 
 # Load image
 image = Image.open("cityscape.jpg")

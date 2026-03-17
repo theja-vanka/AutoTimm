@@ -10,7 +10,7 @@ from autotimm import ImageClassifier, export_to_onnx
 import torch
 
 # 1. Use AutoTimm's export function (handles Lightning modules automatically)
-model = ImageClassifier.load_from_checkpoint("checkpoint.ckpt")
+model = ImageClassifier.load_from_checkpoint("checkpoint.ckpt", compile_model=False)
 model.eval()
 
 example_input = torch.randn(1, 3, 224, 224)

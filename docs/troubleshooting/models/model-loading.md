@@ -17,6 +17,21 @@ model = ImageClassifier.load_from_checkpoint(
     "path/to/checkpoint.ckpt",
     strict=False,  # Ignore missing/unexpected keys
 )
+
+# Note: certain params are NOT saved in checkpoints (save_hyperparameters ignores them).
+# You must re-supply these when loading:
+#   ImageClassifier:   metrics, logging_config, transform_config, loss_fn
+#   ObjectDetector:    metrics, logging_config, transform_config, cls_loss_fn, reg_loss_fn
+#   SemanticSegmentor: metrics, logging_config, transform_config, class_weights, loss_fn
+#   InstanceSegmentor: metrics, logging_config, transform_config, cls_loss_fn, reg_loss_fn, mask_loss_fn
+#   YOLOXDetector:     metrics, logging_config, transform_config
+#
+# For inference/export, also pass compile_model=False to skip unnecessary compilation:
+model = ImageClassifier.load_from_checkpoint(
+    "path/to/checkpoint.ckpt",
+    compile_model=False,  # skip compilation for inference
+    metrics=metrics,      # not saved in checkpoint
+)
 ```
 
 ## Pretrained Model Download Failures

@@ -84,7 +84,7 @@ class ExplanationMetrics:
         """
         # Get original prediction
         input_tensor = self._preprocess_image(image)
-        original_pred, original_score, target_class = self._get_prediction(
+        _, original_score, target_class = self._get_prediction(
             input_tensor, target_class
         )
 

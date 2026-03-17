@@ -454,7 +454,7 @@ def visualize_instance_segmentation(image, prediction, threshold=0.5):
 
 def main():
     # Load model
-    model = InstanceSegmentor.load_from_checkpoint("best_model.ckpt")
+    model = InstanceSegmentor.load_from_checkpoint("best_model.ckpt", compile_model=False)
     model.eval()
 
     # Load and preprocess image
@@ -693,7 +693,7 @@ def batch_predict(model, image_paths, batch_size=4):
 
 def main():
     # Load model
-    model = InstanceSegmentor.load_from_checkpoint("best_model.ckpt")
+    model = InstanceSegmentor.load_from_checkpoint("best_model.ckpt", compile_model=False)
     model.eval()
 
     # Get all images

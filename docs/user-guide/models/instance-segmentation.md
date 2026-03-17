@@ -230,7 +230,7 @@ from PIL import Image
 from torchvision import transforms as T
 
 # Load model
-model = InstanceSegmentor.load_from_checkpoint("best_model.ckpt")
+model = InstanceSegmentor.load_from_checkpoint("best_model.ckpt", compile_model=False)
 model.eval()
 
 # Preprocess image

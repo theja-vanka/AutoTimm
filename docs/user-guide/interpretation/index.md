@@ -82,7 +82,7 @@ from autotimm.interpretation import explain_prediction
 from PIL import Image
 
 # Load model
-model = ImageClassifier.load_from_checkpoint("model.ckpt")
+model = ImageClassifier.load_from_checkpoint("model.ckpt", compile_model=False)
 
 # Load image
 image = Image.open("cat.jpg")

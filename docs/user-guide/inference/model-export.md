@@ -30,7 +30,8 @@ model = ImageClassifier.load_from_checkpoint(
     "checkpoint.ckpt",
     backbone="resnet50",
     num_classes=10,
-    metrics=metrics,
+    compile_model=False,  # skip compilation for export
+    metrics=metrics,      # not saved in checkpoint
 )
 model.eval()
 
@@ -106,7 +107,7 @@ from autotimm import ImageClassifier, export_to_onnx
 import torch
 
 # Load model
-model = ImageClassifier.load_from_checkpoint("checkpoint.ckpt")
+model = ImageClassifier.load_from_checkpoint("checkpoint.ckpt", compile_model=False)
 model.eval()
 
 # Export to ONNX
@@ -217,7 +218,8 @@ model = ObjectDetector.load_from_checkpoint(
     "detector.ckpt",
     backbone="resnet50",
     num_classes=80,
-    metrics=metrics,
+    compile_model=False,  # skip compilation for export
+    metrics=metrics,      # not saved in checkpoint
 )
 model.eval()
 
@@ -234,7 +236,7 @@ from autotimm import ObjectDetector, export_to_onnx
 import torch
 
 # Export detection model
-model = ObjectDetector.load_from_checkpoint("detector.ckpt")
+model = ObjectDetector.load_from_checkpoint("detector.ckpt", compile_model=False)
 model.eval()
 
 example_input = torch.randn(1, 3, 640, 640)
@@ -265,7 +267,8 @@ model = ImageClassifier.load_from_checkpoint(
     "checkpoint.ckpt",
     backbone="resnet50",
     num_classes=10,
-    metrics=metrics,
+    compile_model=False,  # skip compilation for export
+    metrics=metrics,      # not saved in checkpoint
 )
 model.eval()
 
@@ -290,7 +293,7 @@ import torch
 from torch.quantization import get_default_qconfig, prepare, convert
 
 # Load model
-model = ImageClassifier.load_from_checkpoint(...)
+model = ImageClassifier.load_from_checkpoint(..., compile_model=False)
 model.eval()
 
 # Set quantization config
@@ -382,7 +385,7 @@ from torchvision import transforms
 from autotimm import ImageClassifier, export_to_onnx
 
 # 1. Load and prepare model
-model = ImageClassifier.load_from_checkpoint(...)
+model = ImageClassifier.load_from_checkpoint(..., compile_model=False)
 model.eval()
 
 # 2. Export to ONNX
