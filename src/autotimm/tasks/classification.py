@@ -333,7 +333,7 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
                 lr = opt.param_groups[0]["lr"]
                 self.log("train/lr", lr, on_step=True, on_epoch=False)
 
-        return {"loss": loss, "preds": preds.detach(), "targets": y.detach()}
+        return loss
 
     def on_before_optimizer_step(self, optimizer) -> None:
         """Hook for gradient norm logging."""
@@ -404,8 +404,6 @@ class ImageClassifier(PreprocessingMixin, pl.LightningModule):
         # Update confusion matrix if enabled (not meaningful for multi-label)
         if self._logging_config.log_confusion_matrix and not self._multi_label:
             self._val_confusion.update(preds, y)
-
-        return {"preds": preds.detach(), "targets": y.detach()}
 
     def on_validation_epoch_end(self) -> None:
         """Log confusion matrix at the end of validation epoch."""

@@ -112,11 +112,39 @@ def _build_confusion_data(
     }
 
 
+def _evaluate_on_loader(
+    pl_module: pl.LightningModule,
+    loader: Any,
+    multi_label: bool = False,
+    threshold: float = 0.5,
+) -> tuple[list[torch.Tensor], list[torch.Tensor]]:
+    """Run the model on a dataloader and collect preds + targets."""
+    preds: list[torch.Tensor] = []
+    targets: list[torch.Tensor] = []
+    device = pl_module.device
+    was_training = pl_module.training
+    pl_module.eval()
+    with torch.no_grad():
+        for batch in loader:
+            x, y = batch[0].to(device), batch[1]
+            logits = pl_module(x)
+            if multi_label:
+                pred = (logits.sigmoid() > threshold).int().cpu()
+            else:
+                pred = logits.argmax(dim=-1).cpu()
+            preds.append(pred)
+            targets.append(y.cpu() if isinstance(y, torch.Tensor) else torch.tensor(y))
+    if was_training:
+        pl_module.train()
+    return preds, targets
+
+
 class JsonProgressCallback(pl.Callback):
     """Lightning Callback that emits NDJSON progress events to stdout.
 
-    Designed for consumption by a Tauri/Preact frontend running the
-    training process as a subprocess.
+    Confusion matrices are built once at the end of testing (on the best
+    model) for all three splits — train, val, and test — rather than
+    per-epoch during training.
 
     Parameters:
         emit_every_n_steps: How often to emit ``batch_end`` events.
@@ -135,11 +163,7 @@ class JsonProgressCallback(pl.Callback):
         super().__init__()
         self.emit_every_n_steps = emit_every_n_steps
         self._log_file: Path | None = Path(log_file) if log_file is not None else None
-        # Accumulate predictions for confusion matrices per stage
-        self._train_preds: list[torch.Tensor] = []
-        self._train_targets: list[torch.Tensor] = []
-        self._val_preds: list[torch.Tensor] = []
-        self._val_targets: list[torch.Tensor] = []
+        # Accumulate test predictions for confusion matrix
         self._test_preds: list[torch.Tensor] = []
         self._test_targets: list[torch.Tensor] = []
 
@@ -176,8 +200,6 @@ class JsonProgressCallback(pl.Callback):
     def on_train_epoch_start(
         self, trainer: pl.Trainer, pl_module: pl.LightningModule
     ) -> None:
-        self._train_preds = []
-        self._train_targets = []
         self._emit(
             {
                 "event": "epoch_started",
@@ -194,11 +216,6 @@ class JsonProgressCallback(pl.Callback):
         batch: Any,
         batch_idx: int,
     ) -> None:
-        # Collect predictions for confusion matrix
-        if isinstance(outputs, dict) and "preds" in outputs and "targets" in outputs:
-            self._train_preds.append(outputs["preds"].cpu())
-            self._train_targets.append(outputs["targets"].cpu())
-
         if (batch_idx + 1) % self.emit_every_n_steps != 0:
             return
 
@@ -225,21 +242,11 @@ class JsonProgressCallback(pl.Callback):
         self, trainer: pl.Trainer, pl_module: pl.LightningModule
     ) -> None:
         metrics = _sanitize_metrics(trainer.callback_metrics)
-
-        extra: dict[str, Any] = {}
-        cm_data = _build_confusion_data(self._train_preds, self._train_targets, trainer)
-        if cm_data:
-            extra["train_confusion_matrix"] = cm_data["confusion_matrix"]
-            extra["train_per_class_metrics"] = cm_data["per_class_metrics"]
-        self._train_preds = []
-        self._train_targets = []
-
         self._emit(
             {
                 "event": "epoch_end",
                 "epoch": trainer.current_epoch,
                 "metrics": metrics,
-                **extra,
             }
         )
 
@@ -247,44 +254,15 @@ class JsonProgressCallback(pl.Callback):
     # Validation
     # ------------------------------------------------------------------
 
-    def on_validation_epoch_start(
-        self, trainer: pl.Trainer, pl_module: pl.LightningModule
-    ) -> None:
-        self._val_preds = []
-        self._val_targets = []
-
-    def on_validation_batch_end(
-        self,
-        trainer: pl.Trainer,
-        pl_module: pl.LightningModule,
-        outputs: Any,
-        batch: Any,
-        batch_idx: int,
-        dataloader_idx: int = 0,
-    ) -> None:
-        if isinstance(outputs, dict) and "preds" in outputs and "targets" in outputs:
-            self._val_preds.append(outputs["preds"].cpu())
-            self._val_targets.append(outputs["targets"].cpu())
-
     def on_validation_epoch_end(
         self, trainer: pl.Trainer, pl_module: pl.LightningModule
     ) -> None:
         metrics = _sanitize_metrics(trainer.callback_metrics)
-
-        extra: dict[str, Any] = {}
-        cm_data = _build_confusion_data(self._val_preds, self._val_targets, trainer)
-        if cm_data:
-            extra["val_confusion_matrix"] = cm_data["confusion_matrix"]
-            extra["val_per_class_metrics"] = cm_data["per_class_metrics"]
-        self._val_preds = []
-        self._val_targets = []
-
         self._emit(
             {
                 "event": "validation_end",
                 "epoch": trainer.current_epoch,
                 "metrics": metrics,
-                **extra,
             }
         )
 
@@ -340,12 +318,39 @@ class JsonProgressCallback(pl.Callback):
         metrics = _sanitize_metrics(trainer.callback_metrics)
 
         extra: dict[str, Any] = {}
+
+        # Build test confusion matrix from collected predictions
         cm_data = _build_confusion_data(self._test_preds, self._test_targets, trainer)
         if cm_data:
             extra["confusion_matrix"] = cm_data["confusion_matrix"]
             extra["per_class_metrics"] = cm_data["per_class_metrics"]
         self._test_preds = []
         self._test_targets = []
+
+        # Also evaluate on train and val splits using the current (best) model.
+        # At test time the best checkpoint is loaded, so these CMs reflect
+        # the best model's performance on all splits.
+        dm = getattr(trainer, "datamodule", None)
+        if dm is not None:
+            multi_label = getattr(pl_module, "_multi_label", False)
+            threshold = getattr(pl_module, "_threshold", 0.5)
+            for stage, loader_attr in [("train", "train_dataloader"), ("val", "val_dataloader")]:
+                try:
+                    loader_fn = getattr(dm, loader_attr, None)
+                    if loader_fn is None:
+                        continue
+                    loader = loader_fn()
+                    if loader is None:
+                        continue
+                    preds, targets = _evaluate_on_loader(
+                        pl_module, loader, multi_label=multi_label, threshold=threshold,
+                    )
+                    stage_cm = _build_confusion_data(preds, targets, trainer)
+                    if stage_cm:
+                        extra[f"{stage}_confusion_matrix"] = stage_cm["confusion_matrix"]
+                        extra[f"{stage}_per_class_metrics"] = stage_cm["per_class_metrics"]
+                except Exception:
+                    pass  # Non-critical — don't break test reporting
 
         self._emit({"event": "testing_complete", "metrics": metrics, **extra})
 
