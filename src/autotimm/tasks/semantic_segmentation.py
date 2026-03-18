@@ -264,8 +264,13 @@ class SemanticSegmentor(PreprocessingMixin, pl.LightningModule):
 
         # Apply torch.compile for optimization (PyTorch 2.0+)
         # Skip on MPS — the inductor backend generates invalid Metal shaders.
+        # Skip on Windows — the inductor backend requires cl.exe (MSVC) which
+        # is typically unavailable; compilation is deferred so the try/except
+        # at init time cannot catch the error.
+        import sys as _sys
         _mps_available = hasattr(torch.backends, "mps") and torch.backends.mps.is_available()
-        if compile_model and not _mps_available:
+        _skip_compile = _mps_available or _sys.platform == "win32"
+        if compile_model and not _skip_compile:
             try:
                 compile_opts = compile_kwargs or {}
                 self.backbone = torch.compile(self.backbone, **compile_opts)
