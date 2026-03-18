@@ -1,7 +1,6 @@
 """Tests for model export functionality."""
 
 import os
-import tempfile
 
 import numpy as np
 import pytest
@@ -185,24 +184,24 @@ def test_load_torchscript(simple_classifier, tmp_path):
     assert output.shape == (1, 10)
 
 
-def test_validate_torchscript_export(simple_classifier):
+def test_validate_torchscript_export(simple_classifier, tmp_path):
     """Test validating TorchScript export matches original model."""
     example_input = torch.randn(1, 3, 224, 224)
+    save_path = tmp_path / "validate_model.pt"
 
-    with tempfile.NamedTemporaryFile(suffix=".pt") as tmp:
-        scripted_model = export_to_torchscript(
-            simple_classifier,
-            tmp.name,
-            example_input=example_input,
-        )
+    scripted_model = export_to_torchscript(
+        simple_classifier,
+        save_path,
+        example_input=example_input,
+    )
 
-        # Validate outputs match
-        is_valid = validate_torchscript_export(
-            simple_classifier,
-            scripted_model,
-            example_input,
-        )
-        assert is_valid
+    # Validate outputs match
+    is_valid = validate_torchscript_export(
+        simple_classifier,
+        scripted_model,
+        example_input,
+    )
+    assert is_valid
 
 
 def test_model_to_torchscript_method(tmp_path):
@@ -232,7 +231,7 @@ def test_model_to_torchscript_method(tmp_path):
     assert output.shape == (1, 10)
 
 
-def test_model_to_torchscript_no_save():
+def test_model_to_torchscript_no_save(tmp_path):
     """Test to_torchscript() without saving to file."""
     model = ImageClassifier(
         backbone="resnet18",
@@ -243,8 +242,10 @@ def test_model_to_torchscript_no_save():
     )
     model.eval()
 
-    # Get scripted model without saving
-    scripted = model.to_torchscript()
+    # Get scripted model — pass a path to avoid NamedTemporaryFile locking
+    # issues on Windows; the method internally creates a temp file otherwise.
+    save_path = tmp_path / "no_save_model.pt"
+    scripted = model.to_torchscript(str(save_path))
 
     # Test inference
     example_input = torch.randn(1, 3, 224, 224)
@@ -253,7 +254,7 @@ def test_model_to_torchscript_no_save():
     assert output.shape == (1, 10)
 
 
-def test_export_trace_without_example_input():
+def test_export_trace_without_example_input(tmp_path):
     """Test that tracing without example_input raises error."""
     model = ImageClassifier(
         backbone="resnet18",
@@ -263,17 +264,17 @@ def test_export_trace_without_example_input():
         deterministic=False,
     )
 
-    with tempfile.NamedTemporaryFile(suffix=".pt") as tmp:
-        with pytest.raises(RuntimeError, match="example_input is required"):
-            export_to_torchscript(
-                model,
-                tmp.name,
-                example_input=None,
-                method="trace",
-            )
+    save_path = tmp_path / "no_input_model.pt"
+    with pytest.raises(RuntimeError, match="example_input is required"):
+        export_to_torchscript(
+            model,
+            save_path,
+            example_input=None,
+            method="trace",
+        )
 
 
-def test_export_with_invalid_method():
+def test_export_with_invalid_method(tmp_path):
     """Test that invalid export method raises error."""
     model = ImageClassifier(
         backbone="resnet18",
@@ -283,17 +284,17 @@ def test_export_with_invalid_method():
         deterministic=False,
     )
 
-    with tempfile.NamedTemporaryFile(suffix=".pt") as tmp:
-        with pytest.raises(RuntimeError, match="Unknown method"):
-            export_to_torchscript(
-                model,
-                tmp.name,
-                example_input=torch.randn(1, 3, 224, 224),
-                method="invalid",
-            )
+    save_path = tmp_path / "invalid_method_model.pt"
+    with pytest.raises(RuntimeError, match="Unknown method"):
+        export_to_torchscript(
+            model,
+            save_path,
+            example_input=torch.randn(1, 3, 224, 224),
+            method="invalid",
+        )
 
 
-def test_export_preserves_training_mode():
+def test_export_preserves_training_mode(tmp_path):
     """Test that export preserves the original training mode."""
     model = ImageClassifier(
         backbone="resnet18",
@@ -304,15 +305,15 @@ def test_export_preserves_training_mode():
     )
     model.train()  # Set to training mode
 
-    with tempfile.NamedTemporaryFile(suffix=".pt") as tmp:
-        export_to_torchscript(
-            model,
-            tmp.name,
-            example_input=torch.randn(1, 3, 224, 224),
-        )
+    save_path = tmp_path / "training_mode_model.pt"
+    export_to_torchscript(
+        model,
+        save_path,
+        example_input=torch.randn(1, 3, 224, 224),
+    )
 
-        # Should still be in training mode
-        assert model.training
+    # Should still be in training mode
+    assert model.training
 
 
 # ============================================================================

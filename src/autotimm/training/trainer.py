@@ -22,6 +22,9 @@ def _ensure_safe_multiprocessing() -> None:
 
     macOS defaults to 'spawn' which requires ``if __name__ == '__main__'``
     guards. Using 'fork' avoids this issue for dataloader workers.
+
+    On Windows, 'spawn' is the only supported start method and is already the
+    default, so no action is needed.  On Linux, 'fork' is already the default.
     """
     if platform.system() == "Darwin" and sys.version_info >= (3, 8):
         try:

@@ -45,8 +45,9 @@ class COCOInstanceDataset(Dataset):
     ):
         if not HAS_PYCOCOTOOLS:
             raise ImportError(
-                "pycocotools is required for instance segmentation. "
-                "Install it with: pip install pycocotools"
+                "pycocotools is required for COCO instance segmentation. "
+                "Install it with: pip install autotimm[coco]  "
+                "(or: pip install pycocotools)"
             )
 
         self.data_dir = Path(data_dir)
