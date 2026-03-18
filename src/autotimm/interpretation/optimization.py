@@ -309,9 +309,13 @@ class BatchProcessor:
         **kwargs,
     ) -> List[np.ndarray]:
         """
-        Process batch with parallel workers (CPU-based parallelism).
+        Process batch with parallel workers (thread-based parallelism).
 
-        Useful when GPU is not available or for CPU-bound operations.
+        Uses ``ThreadPoolExecutor`` for cross-platform compatibility (Windows
+        does not support ``fork`` and ``multiprocessing.Pool`` cannot pickle
+        closures over instance methods).  Since the heavy lifting happens
+        inside PyTorch (which releases the GIL during C++/CUDA ops), threads
+        still provide meaningful parallelism.
 
         Args:
             images: List of images
@@ -322,19 +326,17 @@ class BatchProcessor:
         Returns:
             List of heatmaps
         """
-        from multiprocessing import Pool
+        from concurrent.futures import ThreadPoolExecutor
 
         if target_classes is None:
             target_classes = [None] * len(images)
 
-        # Create worker function
         def worker(args):
             img, target = args
             return self.explainer.explain(img, target_class=target, **kwargs)
 
-        # Process in parallel
-        with Pool(num_workers) as pool:
-            heatmaps = pool.map(worker, zip(images, target_classes))
+        with ThreadPoolExecutor(max_workers=num_workers) as executor:
+            heatmaps = list(executor.map(worker, zip(images, target_classes)))
 
         return heatmaps
 
