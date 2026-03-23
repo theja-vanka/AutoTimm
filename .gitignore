@@ -17,9 +17,6 @@ venv/
 *.swp
 *.swo
 
-# Claude
-.claude/
-CLAUDE.md
 
 # OS
 .DS_Store
@@ -51,5 +48,3 @@ demo_cache/
 /*.png
 /*.jpg
 
-# Temporary completion summaries
-*_COMPLETE.md
